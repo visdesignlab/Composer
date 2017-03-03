@@ -1,0 +1,30 @@
+{
+  "generator-phovea": {
+    "sextensions": [
+      {
+        "type": "namespace",
+        "id": "hello_world",
+        "module": "hello_world",
+        "extras": {
+          "namespace": "/api/hello_world"
+        }
+      }
+    ],
+    "type": "slib",
+    "modules": [
+      "phovea_server"
+    ],
+    "libraries": [],
+    "unknown": {
+      "requirements": [
+        "enum==0.4.6",
+        "sklearn==0.0"
+      ],
+      "dockerPackages": []
+    },
+    "name": "app_server",
+    "author": "Sahar",
+    "today": "Fri, 03 Mar 2017 06:40:17 GMT",
+    "githubAccount": "saharmehrpour"
+  }
+}

@@ -1,0 +1,6 @@
+version: '2.0'
+services:
+  api:
+    ports:
+      - '2222:22'
+    command: '/usr/sbin/sshd -D'

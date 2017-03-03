@@ -1,0 +1,10 @@
+version: '2.0'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: phovea_server/deploy/Dockerfile_dev
+    ports:
+      - '9000:80'
+    volumes:
+      - '.:/phovea'
