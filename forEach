@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -e
+
+for plugin in */; do
+  if [ -f "${plugin}/package.json" ]; then
+    echo "on ${plugin} execute: $@"
+    echo "#######################################"
+    cd ${plugin}
+    ( exec $@ )
+	cd ..
+  fi
+done

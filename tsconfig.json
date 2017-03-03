@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "lib": [
+      "dom",
+      "es2015"
+    ],
+    "baseUrl": "./"
+  },
+  "include": [
+    "*/src/**/*.ts",
+    "*/src/**/*.tsx",
+    "*/tests/**/*.ts",
+    "*/index.ts",
+    "tsd.d.ts"
+  ]
+}

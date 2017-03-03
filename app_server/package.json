@@ -1,0 +1,38 @@
+{
+  "files": [
+    "app_server",
+    "__init__.py",
+    "__main__.py",
+    "build",
+    "requirements.txt",
+    "requirements_dev.txt",
+    "docker_packages.txt"
+  ],
+  "scripts": {
+    "check": "flake8",
+    "pretest": "npm run check",
+    "test": "test ! -d tests || python setup.py test",
+    "docs": "sphinx-apidoc -o docs -f ./app_server && sphinx-build ./docs build/docs",
+    "prebuild": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test",
+    "build": "python build.py",
+    "predist": "npm run build && npm run docs",
+    "dist": "python setup.py bdist_egg"
+  },
+  "name": "app_server",
+  "description": "",
+  "homepage": "https://phovea.caleydo.org",
+  "version": "1.0.0-SNAPSHOT",
+  "author": {
+    "name": "Sahar",
+    "email": "",
+    "url": ""
+  },
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/saharmehrpour/app_server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saharmehrpour/app_server.git"
+  }
+}
