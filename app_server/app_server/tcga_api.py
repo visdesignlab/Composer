@@ -54,9 +54,25 @@ def _get_phovea_server_data_function():
     })
 
 
+# Not working
 @app.route('/removeDataSet')
 def _remove_dataset():
-    tcgaData_handler.remove_dataset()
+    result = tcgaData_handler.remove_dataset()
+    return jsonify({
+      'data': tcgaData_handler.get_all_datasets(),
+      'result': result
+    })
+
+
+# TODO
+@app.route('/getRow/<index>')
+def _get_row(index):
+    return tcgaData_handler.get_row_by_index(index)
+
+
+@app.route('/getInfoByFunctions')
+def _get_info():
+    return tcgaData_handler.get_info_by_functions()
 
 
 def create():

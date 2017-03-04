@@ -36,11 +36,16 @@ export class App {
     await dp.run();
 
     let pl = printLogs.create();
-    await pl.runLogs();
-    await pl.runDemo();
+    //await pl.runLogs();
+    //await pl.runDemo();
 
     // Not Working!
     //await pl.runRemove();
+
+    await pl.showInfo();
+
+    // Fix it from the server
+    //await pl.showRow();
 
     this.$node.select('h3').remove();
     this.setBusy(false);
