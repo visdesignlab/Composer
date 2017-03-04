@@ -35,14 +35,19 @@ var App = (function () {
                     case 1:
                         _a.sent();
                         pl = printLogs.create();
-                        return [4 /*yield*/, pl.runLogs()];
-                    case 2:
-                        _a.sent();
-                        return [4 /*yield*/, pl.runDemo()];
-                    case 3:
-                        _a.sent();
+                        //await pl.runLogs();
+                        //await pl.runDemo();
                         // Not Working!
                         //await pl.runRemove();
+                        return [4 /*yield*/, pl.showInfo()];
+                    case 2:
+                        //await pl.runLogs();
+                        //await pl.runDemo();
+                        // Not Working!
+                        //await pl.runRemove();
+                        _a.sent();
+                        // Fix it from the server
+                        //await pl.showRow();
                         this.$node.select('h3').remove();
                         this.setBusy(false);
                         return [2 /*return*/];
