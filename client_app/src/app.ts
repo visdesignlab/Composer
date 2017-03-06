@@ -32,8 +32,8 @@ export class App {
    */
   private async build() {
 
-    let dp = drawPlots.create(this.$node.node());
-    await dp.run();
+    //let dp = drawPlots.create(this.$node.node());
+    //await dp.run();
 
     let pl = printLogs.create();
     //await pl.runLogs();
@@ -43,9 +43,8 @@ export class App {
     //await pl.runRemove();
 
     await pl.showInfo();
-
-    // Fix it from the server
-    //await pl.showRow();
+    await pl.showRow();
+    await pl.showCol();
 
     this.$node.select('h3').remove();
     this.setBusy(false);

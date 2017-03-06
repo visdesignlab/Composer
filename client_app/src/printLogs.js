@@ -9,8 +9,10 @@ var PrintLogs = (function () {
     PrintLogs.prototype.runLogs = function () {
         var _this = this;
         return new Promise(function (resolve) {
-            // print TCGA data in console
-            Promise.all([ajax.getAPIJSON('/tcga_api/getTCGAData'), ajax.getAPIJSON('/tcga_api/getAllDatasets')])
+            var dataset = 'number-one-artists';
+            var URL = "/data_api/getData" + dataset;
+            // print data in console
+            Promise.all([ajax.getAPIJSON(URL), ajax.getAPIJSON('/data_api/getAllDatasets')])
                 .then(function (args) {
                 var data = args[0]['data'];
                 var datasets = args[1]['data'];
@@ -21,7 +23,7 @@ var PrintLogs = (function () {
                 console.log(datasets);
                 console.log("----> TCGA data:");
                 console.log(data);
-                Promise.all([ajax.getAPIJSON('/tcga_api/phoveaServerDataFunction')])
+                Promise.all([ajax.getAPIJSON('/data_api/phoveaServerDataFunction')])
                     .then(function (args) {
                     console.log("----> Phovea Server Functions:");
                     console.log(args[0]);
@@ -37,8 +39,9 @@ var PrintLogs = (function () {
     PrintLogs.prototype.runRemove = function () {
         var _this = this;
         return new Promise(function (resolve) {
-            // print TCGA data in console
-            Promise.all([ajax.getAPIJSON('/tcga_api/removeDataSet')])
+            var id = "clinical_2";
+            var URL = "/data_api/removeDataSet/" + id;
+            Promise.all([ajax.getAPIJSON(URL)])
                 .then(function (args) {
                 var datasets = args[0];
                 console.log("==========");
@@ -54,13 +57,14 @@ var PrintLogs = (function () {
         var _this = this;
         return new Promise(function (resolve) {
             var rowIndex = 1;
-            var URL = "/tcga_api/getRow/" + rowIndex;
-            // print TCGA data in console
+            var dataset = 'number-one-artists';
+            var URL = "/data_api/getRowByIndex/" + dataset + "/" + rowIndex;
+            // print data in console
             Promise.all([ajax.getAPIJSON(URL)])
                 .then(function (args) {
                 var row = args[0];
                 console.log("==========");
-                console.log("Get Row 1 of TCGA dataset from a server");
+                console.log("Get Row index 1 of the dataset from a server");
                 console.log("==========");
                 console.log("----> Row 1:");
                 console.log(row);
@@ -68,16 +72,36 @@ var PrintLogs = (function () {
             });
         });
     };
+    PrintLogs.prototype.showCol = function () {
+        var _this = this;
+        return new Promise(function (resolve) {
+            var col_name = "artist";
+            var dataset = 'number-one-artists';
+            var URL = "/data_api/getColByName/" + dataset + "/" + col_name;
+            // print data in console
+            Promise.all([ajax.getAPIJSON(URL)])
+                .then(function (args) {
+                var col = args[0];
+                console.log("==========");
+                console.log("Get Col `artist` of the dataset from a server");
+                console.log("==========");
+                console.log("----> Col artist:");
+                console.log(col);
+                resolve(_this);
+            });
+        });
+    };
     PrintLogs.prototype.showInfo = function () {
         var _this = this;
         return new Promise(function (resolve) {
-            var URL = "/tcga_api/getInfoByFunctions";
+            var dataset = "number-one-artists";
+            var URL = "/data_api/getInfoByFunctions/" + dataset;
             // print TCGA data in console
             Promise.all([ajax.getAPIJSON(URL)])
                 .then(function (args) {
                 var info = args[0];
                 console.log("==========");
-                console.log("dataset big-decent-clipped-38");
+                console.log("dataset number-one-artists");
                 console.log("Information retrieved from functions in ");
                 console.log("phovea_server/dataset_csv.py#L341");
                 console.log("==========");

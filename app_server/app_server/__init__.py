@@ -16,8 +16,8 @@ def phovea(registry):
     'namespace': '/api/renamed_api'
   })
 
-  registry.append('namespace', 'tcga_api', 'app_server.tcga_api', {
-    'namespace': '/api/tcga_api'
+  registry.append('namespace', 'data_api', 'app_server.data_api', {
+    'namespace': '/api/data_api'
   })
 
   registry.append('namespace', 'iris_api', 'app_server.iris_api', {

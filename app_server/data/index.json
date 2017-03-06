@@ -1,709 +1,176 @@
 [
-      {
-    "name": "big-decent-clipped-38",
-    "type": "table",
-    "id": "big-decent-clipped-38",
-    "separator": ",",
-    "description": "description_client",
-    "creator": "Alexander Lex",
-    "path": "data_38.csv",
+  {
+    "name": "Artists",
+    "path": "number_one_artists.csv",
+    "separator": "\t",
+    "id": "number-one-artists",
     "size": [
       12,
-      102
+      13
     ],
-    "idtype": "Custom",
-    "columns": [
-      {
-        "column": 1,
-        "name": "RelativeID",
-        "value": {
-          "type": "idtype"
-        }
-      },
-      {
-        "column": 2,
-        "name": "MaID",
-        "value": {
-          "type": "idtype"
-        }
-      },
-      {
-        "column": 3,
-        "name": "PaID",
-        "value": {
-          "type": "idtype"
-        }
-      },
-      {
-        "column": 4,
-        "name": "sex",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "F",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "M",
-              "color": "#ff7f0e"
-            }
-          ]
-        }
-      },
-      {
-        "column": 5,
-        "name": "deceased",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "Y",
-              "color": "#1f77b4"
-            },
-			{
-              "name": "N",
-              "color": "#1f77b4"
-            }
-          ]
-        }
-      },
-      {
-        "column": 6,
-        "name": "suicide",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "Y",
-              "color": "#1f77b4"
-            },
-			{
-              "name": "N",
-              "color": "#1f77b4"
-            }
-          ]
-        }
-      },
-      {
-        "column": 7,
-        "name": "bdate",
-        "value": {
-          "type": "int",
-          "range": [
-            1811,
-            1899
-          ]
-        }
-      },
-      {
-        "column": 8,
-        "name": "ddate",
-        "value": {
-          "type": "int",
-          "range": [
-            1885,
-            1991
-          ]
-        }
-      },
-      {
-        "column": 9,
-        "name": "OMEID",
-        "value": {
-          "type": "idtype"
-        }
-      },
-      {
-        "column": 10,
-        "name": "LabID",
-        "value": {
-          "type": "idtype"
-        }
-      },
-      {
-        "column": 11,
-        "name": "UPDBid",
-        "value": {
-          "type": "idtype"
-        }
-      },
-      {
-        "column": 12,
-        "name": "ArchivePersonID",
-        "value": {
-          "type": "idtype"
-        }
-      }
-    ],
-    "idcolumn": 0
-  },
-  {
-    "name": "clinical_patient_public_GBM",
     "type": "table",
-    "id": "clinical_patient_public_GBM",
-    "separator": " ",
-    "description": "description_client",
-    "creator": "Sahar - TCGA",
-    "path": "clinical_patient_public_GBM.txt",
-    "size": [
-      31,
-      596
-    ],
-    "idtype": "Custom",
+    "idtype": "artist",
     "columns": [
       {
-        "column": 0,
-        "name": "bcr_patient_barcode",
-        "value": {
-          "type": "idtype"
-        }
-      },
-      {
-        "column": 1,
-        "name": "additional_chemo_therapy",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 2,
-        "name": "additional_drug_therapy",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 3,
-        "name": "additional_hormone_therapy",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 4,
-        "name": "additional_immuno_therapy",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 5,
-        "name": "additional_pharmaceutical_therapy",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 6,
-        "name": "additional_radiation_therapy",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 7,
-        "name": "age_at_initial_pathologic_diagnosis",
+        "name": "artist",
         "value": {
           "type": "string"
         }
       },
       {
-        "column": 8,
-        "name": "anatomic_organ_subdivision",
+        "name": "origin",
         "value": {
           "type": "categorical",
           "categories": [
             {
-              "name": "Brain",
-              "color": "#1f77b4"
+              "name": "Barbados",
+              "color": "#a6cee3"
             },
             {
-              "name": "null",
-              "color": "#ff7f0e"
+              "name": "Ireland",
+              "color": "#1f78b4"
+            },
+            {
+              "name": "Sweden",
+              "color": "#b2df8a"
+            },
+            {
+              "name": "UK",
+              "color": "#33a02c"
+            },
+            {
+              "name": "US",
+              "color": "#fb9a99"
             }
           ]
         }
       },
       {
-        "column": 9,
-        "name": "chemo_therapy",
+        "name": "career status",
         "value": {
           "type": "categorical",
           "categories": [
             {
-              "name": "YES",
-              "color": "#1f77b4"
+              "name": "active",
+              "color": "#b3e2cd"
             },
             {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
+              "name": "inactive",
+              "color": "#fdcdac"
             }
           ]
         }
       },
       {
-        "column": 10,
-        "name": "days_to_birth",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 11,
-        "name": "days_to_death",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 12,
-        "name": "days_to_initial_pathologic_diagnosis",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "0",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 13,
-        "name": "days_to_last_followup",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 14,
-        "name": "days_to_tumor_progression",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 15,
-        "name": "days_to_tumor_recurrence",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 16,
-        "name": "drugs",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 17,
         "name": "gender",
         "value": {
           "type": "categorical",
           "categories": [
             {
-              "name": "MALE",
-              "color": "#1f77b4"
+              "name": "female",
+              "color": "red"
             },
             {
-              "name": "FEMALE",
-              "color": "#ff7f0e"
+              "name": "group",
+              "color": "#ff00ff"
             },
             {
-              "name": "null",
-              "color": "#ddd"
+              "name": "male",
+              "color": "blue"
             }
           ]
         }
       },
       {
-        "column": 18,
-        "name": "histological_type",
+        "name": "first album (year)",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "Untreated primary (de novo) GBM",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "Treated primary GBM",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            1930,
+            2014
           ]
         }
       },
       {
-        "column": 19,
-        "name": "hormonal_therapy",
+        "name": "studio albums (count)",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            0,
+            33
           ]
         }
       },
       {
-        "column": 20,
-        "name": "immuno_therapy",
+        "name": "year of birth",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            1930,
+            2014
           ]
         }
       },
       {
-        "column": 21,
-        "name": "informed_consent_verified",
+        "name": "age (years)",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            0,
+            67
           ]
         }
       },
       {
-        "column": 22,
-        "name": "initial_pathologic_diagnosis_method",
+        "name": "age at first album (years)",
         "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 23,
-        "name": "iperson_neoplasm_cancer_status",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "TUMOR FREE",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "WITH TUMOR",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            0,
+            25
           ]
         }
       },
       {
-        "column": 24,
-        "name": "pretreatment_history",
+        "name": "start of career (year)",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            1930,
+            2014
           ]
         }
       },
       {
-        "column": 25,
-        "name": "prior_glioma",
+        "name": "end of career (year)",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            1930,
+            2014
           ]
         }
       },
       {
-        "column": 26,
-        "name": "radiation_therapy",
+        "name": "in business",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            0,
+            50
           ]
         }
       },
       {
-        "column": 27,
-        "name": "radiations",
+        "name": "in business at first album (years)",
         "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 28,
-        "name": "targeted_molecular_therapy",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "YES",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "NO",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
+          "type": "int",
+          "range": [
+            0,
+            8
           ]
-        }
-      },
-      {
-        "column": 29,
-        "name": "tumor_tissue_site",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "BRAIN",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 30,
-        "name": "vital_status",
-        "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "DECEASED",
-              "color": "#1f77b4"
-            },
-            {
-              "name": "LIVING",
-              "color": "#ff7f0e"
-            },
-            {
-              "name": "null",
-              "color": "#ddd"
-            }
-          ]
-        }
-      },
-      {
-        "column": 31,
-        "name": "year_of_initial_pathologic_diagnosis",
-        "value": {
-          "type": "string"
         }
       }
-    ],
-    "idcolumn": 0
-  },
-  {
-    "name": "clinical_2",
-    "type": "table",
-    "id": "clinical_2",
-    "separator": ",",
-    "description": "description_client",
-    "creator": "Sahar - TCGA",
-    "path": "clinical_2.csv",
-    "size": [
-      4,
-      110
-    ],
-    "idtype": "Custom",
-    "columns": [
-      {
-        "column": 1,
-        "name": "additional_chemo_therapy",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 2,
-        "name": "additional_drug_therapy",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 3,
-        "name": "additional_hormone_therapy",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "column": 4,
-        "name": "additional_immuno_therapy",
-        "value": {
-          "type": "string"
-        }
-      }
-    ],
-    "idcolumn": 0
+    ]
   }
 ]
