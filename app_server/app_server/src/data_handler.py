@@ -1,0 +1,77 @@
+import csv
+import numpy as np
+import phovea_server.dataset as dt
+from phovea_server.util import jsonify
+import phovea_server.dataset_def as dd
+import phovea_server.dataset_specific as ds
+
+
+__author__ = 'Sahar'
+
+
+def get_data(id):
+    return jsonify({
+        'data': dt.get(id)
+    })
+
+
+def get_all_datasets():
+    return dt.list_datasets()
+
+
+def get_id_types():
+    return dt.list_idtypes()
+
+
+def get_id_manager():
+    return dt.get_idmanager()
+
+
+def get_mapping_manager():
+    return dt.get_mappingmanager()
+
+
+# Not Working!
+def remove_dataset(id):
+    dataset = dt.get(id)
+    result = dt.remove(dataset)
+    return jsonify({
+      'data': data_handler.get_all_datasets(),
+      'result': result
+    })
+
+
+# functions from https://github.com/phovea/phovea_server/blob/develop/phovea_server/dataset_csv.py#L341
+def get_info_by_functions(id):
+    my_data = dt.get(id)
+    return jsonify({
+      'row': my_data.rows(),
+      'data': my_data.asjson(),
+      'rowids': my_data.rowids(),
+      'aslist': my_data.aslist(),
+      'aspandas': my_data.aspandas(),
+      'columns': my_data.columns,
+      'CSVEntry.to_description': my_data.to_description(),
+      'CSVEntry.idtypes': my_data.idtypes()
+    })
+
+
+def get_row_by_index(id, index):
+    my_data = dt.get(id)
+    rows = my_data.aslist()
+    return jsonify({
+      'row ' + index: rows[int(index)]
+    })
+
+
+def get_col_by_name(id, col_name):
+    my_data = dt.get(id)
+    cols = my_data.aspandas()
+    return jsonify({
+      'col ' + col_name: cols[col_name]
+    })
+
+
+# TODO: dt.update()
+# TODO: dt.add()
+
