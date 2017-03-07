@@ -4,6 +4,7 @@ import phovea_server.dataset as dt
 from phovea_server.util import jsonify
 import phovea_server.dataset_def as dd
 import phovea_server.dataset_specific as ds
+import phovea_server.range as rng
 
 
 __author__ = 'Sahar'
@@ -45,7 +46,7 @@ def remove_dataset(id):
 def get_info_by_functions(id):
     my_data = dt.get(id)
     return jsonify({
-      'row': my_data.rows(),
+      'rows': my_data.rows(),
       'data': my_data.asjson(),
       'rowids': my_data.rowids(),
       'aslist': my_data.aslist(),
@@ -58,9 +59,16 @@ def get_info_by_functions(id):
 
 def get_row_by_index(id, index):
     my_data = dt.get(id)
+    range = rng.RangeElem(2, 5, 1)
+    range_index = rng.RangeElem(index)
+
     rows = my_data.aslist()
+    rows_range = my_data.aslist(range)
+
     return jsonify({
-      'row ' + index: rows[int(index)]
+      'asList()[index=' + index + ']': rows[int(index)],
+      'asList( range(2,5,1) )' + index: rows_range,
+      'rows( range(2,5,1) )': my_data.rows(range)
     })
 
 
