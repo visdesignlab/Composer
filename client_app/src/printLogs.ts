@@ -89,7 +89,7 @@ export class PrintLogs {
           let row = args[0];
 
           console.log("==========");
-          console.log("Get Row index 1 of the dataset from a server");
+          console.log("Get Row index 1 and Rows 2 to 5 of the dataset from a server");
           console.log("==========");
 
           console.log("----> Row 1:");
