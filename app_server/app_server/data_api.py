@@ -56,6 +56,11 @@ def _get_row_by_index(id, index):
     return data_handler.get_row_by_index(id, index)
 
 
+@app.route('/getRowById/<id>/<rowid>')
+def _get_row_by_id(id, rowid):
+    return data_handler.get_row_by_id(id, rowid)
+
+
 @app.route('/getColByName/<id>/<col_name>')
 def _get_row(id, col_name):
     return data_handler.get_col_by_name(id, col_name)
