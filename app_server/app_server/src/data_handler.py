@@ -60,7 +60,6 @@ def get_info_by_functions(id):
 def get_row_by_index(id, index):
     my_data = dt.get(id)
     range = rng.RangeElem(2, 5, 1)
-    range_index = rng.RangeElem(index)
 
     rows = my_data.aslist()
     rows_range = my_data.aslist(range)
@@ -75,10 +74,21 @@ def get_row_by_index(id, index):
 def get_col_by_name(id, col_name):
     my_data = dt.get(id)
     cols = my_data.aspandas()
+
+    range = rng.RangeElem(2, 5, 1)
+    cols_range = my_data.aspandas(range)
+
     return jsonify({
-      'col ' + col_name: cols[col_name]
+      'aspandas()[' + col_name + ']': cols[col_name],
+      'aspandas( range(2,5,1) )': cols_range
     })
 
+
+def get_row_by_id(id, rowid):
+    my_data = dt.get(id)
+    return jsonify({
+      'row[' + rowid + ']': "I don't know how"
+    })
 
 # TODO: dt.update()
 # TODO: dt.add()

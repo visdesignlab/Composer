@@ -57,17 +57,23 @@ var PrintLogs = (function () {
         var _this = this;
         return new Promise(function (resolve) {
             var rowIndex = 1;
+            var rowId = 12;
             var dataset = 'number-one-artists';
             var URL = "/data_api/getRowByIndex/" + dataset + "/" + rowIndex;
+            var URL2 = "/data_api/getRowById/" + dataset + "/" + rowId;
             // print data in console
-            Promise.all([ajax.getAPIJSON(URL)])
+            Promise.all([ajax.getAPIJSON(URL), ajax.getAPIJSON(URL2)])
                 .then(function (args) {
-                var row = args[0];
                 console.log("==========");
                 console.log("Get Row index 1 and Rows 2 to 5 of the dataset from a server");
                 console.log("==========");
                 console.log("----> Row 1:");
-                console.log(row);
+                console.log(args[0]);
+                console.log("==========");
+                console.log("Get Row with id='" + rowId + "' of the dataset from a server");
+                console.log("==========");
+                console.log("----> Row '" + rowId + "'");
+                console.log(args[1]);
                 resolve(_this);
             });
         });

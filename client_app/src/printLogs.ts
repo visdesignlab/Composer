@@ -79,21 +79,28 @@ export class PrintLogs {
     return new Promise(resolve => {
 
       const rowIndex = 1;
+      const rowId = 12;
       const dataset = 'number-one-artists';
       let URL = `/data_api/getRowByIndex/${dataset}/${rowIndex}`;
+      let URL2 = `/data_api/getRowById/${dataset}/${rowId}`;
 
       // print data in console
-      Promise.all([ajax.getAPIJSON(URL)])
+      Promise.all([ajax.getAPIJSON(URL),ajax.getAPIJSON(URL2)])
         .then((args) => {
-
-          let row = args[0];
 
           console.log("==========");
           console.log("Get Row index 1 and Rows 2 to 5 of the dataset from a server");
           console.log("==========");
 
           console.log("----> Row 1:");
-          console.log(row);
+          console.log(args[0]);
+
+          console.log("==========");
+          console.log("Get Row with id='" +rowId + "' of the dataset from a server");
+          console.log("==========");
+
+          console.log("----> Row '" + rowId + "'");
+          console.log(args[1]);
 
           resolve(this);
 
