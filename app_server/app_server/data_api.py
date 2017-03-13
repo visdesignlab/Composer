@@ -71,5 +71,30 @@ def _get_info(id):
     return data_handler.get_info_by_functions(id)
 
 
+@app.route('/getAllRows/<id>')
+def _get_all_rows(id):
+    return data_handler.get_all_rows_aslist(id)
+
+
+@app.route('/getColTitles/<id>')
+def _get_col_titles(id):
+    return data_handler.get_column_titles(id)
+
+
+@app.route('/getCol/<id>/<col_name>')
+def _get_col(id, col_name):
+    return data_handler.get_column(id, col_name)
+
+
+@app.route('/getRowByColValue/<id>/<col_name>/<col_value>')
+def _get_row_by_col_value(id, col_name, col_value):
+    return data_handler.get_row_by_col_value(id, col_name, col_value)
+
+
+@app.route('/getSimilarRowsByIndex/<id>/<index>')
+def _get_similar_rows_by_index(id, index):
+    return data_handler.get_similar_rows_by_index(id, int(index))
+
+
 def create():
     return app

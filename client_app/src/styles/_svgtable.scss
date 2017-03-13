@@ -1,0 +1,32 @@
+
+.cells{
+  float: left;
+  padding-left: 0.5em;
+  padding-bottom: 0.5em;
+  border: 1px solid steelblue;
+  width: 6.5em;
+  height: 2em;
+}
+
+.rows{
+  padding: 0.5em 1em;
+  clear:left;
+}
+
+.cells:hover{
+  background-color: lightgrey;
+}
+
+.header{
+  padding: 2em 1em;
+}
+
+.headercells{
+  float: left;
+  padding-left: 0.5em;
+  padding-bottom: 0.5em;
+  border: 1px solid steelblue;
+  width: 6.5em;
+  height: 3.7em;
+  font-weight: bold;
+}

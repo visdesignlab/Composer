@@ -3,7 +3,7 @@
  */
 import * as tslib_1 from "tslib";
 import { select } from 'd3-selection';
-import * as printLogs from './printLogs';
+import * as svgTable from './svg_table';
 /**
  * The main class for the App app
  */
@@ -25,27 +25,15 @@ var App = (function () {
      */
     App.prototype.build = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var pl;
+            var svg_table;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        pl = printLogs.create();
-                        //await pl.runLogs();
-                        //await pl.runDemo();
-                        // Not Working!
-                        //await pl.runRemove();
-                        return [4 /*yield*/, pl.showInfo()];
+                        svg_table = svgTable.create(this.$node.node());
+                        //await query_box.searchTable('number-one-artists', svg_table);
+                        return [4 /*yield*/, svg_table.drawTable('clinical_patient_public_GBM')];
                     case 1:
-                        //await pl.runLogs();
-                        //await pl.runDemo();
-                        // Not Working!
-                        //await pl.runRemove();
-                        _a.sent();
-                        return [4 /*yield*/, pl.showRow()];
-                    case 2:
-                        _a.sent();
-                        return [4 /*yield*/, pl.showCol()];
-                    case 3:
+                        //await query_box.searchTable('number-one-artists', svg_table);
                         _a.sent();
                         this.$node.select('h3').remove();
                         this.setBusy(false);
