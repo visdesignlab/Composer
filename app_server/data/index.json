@@ -173,4 +173,76 @@
       }
     ]
   }
+  ,
+  {
+    "name": "clinical_patient_public_GBM",
+    "type": "table",
+    "id": "clinical_patient_public_GBM",
+    "separator": "\t",
+    "description": "description_client",
+    "creator": "Sahar - TCGA",
+    "path": "clinical_patient_public_GBM.txt",
+    "size": [
+      596,
+      31
+    ],
+    "idtype": "bcr_patient_barcode",
+    "columns": [
+      {
+        "name": "additional_chemo_therapy",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "additional_drug_therapy",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "additional_hormone_therapy",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "additional_immuno_therapy",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "additional_pharmaceutical_therapy",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "additional_radiation_therapy",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "age_at_initial_pathologic_diagnosis",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "anatomic_organ_subdivision",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "chemo_therapy",
+        "value": {
+          "type": "string"
+        }
+      }
+    ],
+    "idcolumn": 0
+  }
 ]

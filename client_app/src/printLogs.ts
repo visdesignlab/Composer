@@ -137,7 +137,7 @@ export class PrintLogs {
   showInfo() {
     return new Promise(resolve => {
 
-      const dataset = "number-one-artists";
+      const dataset = "clinical_patient_public_GBM";//number-one-artists";
       let URL = `/data_api/getInfoByFunctions/${dataset}`;
 
       // print TCGA data in console
@@ -147,7 +147,7 @@ export class PrintLogs {
           let info = args[0];
 
           console.log("==========");
-          console.log("dataset number-one-artists");
+          console.log("dataset clinical_patient_public_GBM");
           console.log("Information retrieved from functions in ");
           console.log("phovea_server/dataset_csv.py#L341");
           console.log("==========");

@@ -73,11 +73,13 @@
     "@types/d3-array": "^1.0.7",
     "@types/d3-scale": "^1.0.4",
     "@types/d3-axis": "^1.0.6",
+    "@types/d3-collection": "^1.0.4",
     "d3-request": "^1.0.3",
     "d3-selection": "^1.0.3",
     "d3-array": "^1.0.2",
     "d3-scale": "^1.0.3",
-    "d3-axis": "^1.0.4"
+    "d3-axis": "^1.0.4",
+    "d3-collection": "^1.0.2"
   },
   "name": "client_app",
   "description": "",

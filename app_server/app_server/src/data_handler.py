@@ -46,6 +46,8 @@ def remove_dataset(id):
 def get_info_by_functions(id):
     my_data = dt.get(id)
     return jsonify({
+      'id': id,
+      'my_data': my_data,
       'rows': my_data.rows(),
       'data': my_data.asjson(),
       'rowids': my_data.rowids(),
@@ -54,6 +56,16 @@ def get_info_by_functions(id):
       'columns': my_data.columns,
       'CSVEntry.to_description': my_data.to_description(),
       'CSVEntry.idtypes': my_data.idtypes()
+    })
+
+
+def get_all_rows_aslist(id):
+    my_data = dt.get(id)
+    rows = my_data.aslist()
+    for index in range(0, len(rows)):
+        rows[index]['index'] = index
+    return jsonify({
+      'aslist': rows  # [:50]
     })
 
 
@@ -90,6 +102,76 @@ def get_row_by_id(id, rowid):
       'row[' + rowid + ']': "I don't know how"
     })
 
-# TODO: dt.update()
-# TODO: dt.add()
 
+def get_column_titles(id):
+    my_data = dt.get(id)
+    return jsonify({
+      'columns': my_data.columns
+    })
+
+
+def get_column(id, col_name):
+    my_data = dt.get(id)
+    return jsonify({
+      col_name: my_data.aspandas()[col_name]
+    })
+
+
+def get_row_by_col_value(id, col_name, col_value):
+    my_data = dt.get(id)
+    index = 0
+
+    for i in range(0, len(my_data.rows())):
+        if my_data.aspandas()[col_name][my_data.rows()[i]] == col_value:
+            index = i
+            break
+
+    return jsonify({
+      'index': index,
+      'row': my_data.aslist()[index],
+      'similar_rows': find_similar_rows(id, col_name, col_value),
+      col_name: col_value
+    })
+
+
+def find_similar_rows(id, col_name, col_value):
+    my_data = dt.get(id)
+    index = 0
+
+    for i in range(0, len(my_data.rows())):
+        if my_data.aspandas()[col_name][my_data.rows()[i]] == col_value:
+            index = i
+            break
+
+    my_row = my_data.aslist()[index]
+    cols = my_data.columns
+    similar_rows = []
+
+    for r in my_data.aslist():
+        for c in cols:
+            if r[c.name] == my_row[c.name]:
+                similar_rows.append(r)
+                break
+
+    return similar_rows
+
+
+def get_similar_rows_by_index(id, index):
+    my_data = dt.get(id)
+
+    my_row = my_data.aslist()[index]
+    cols = my_data.columns[0:2]
+    similar_rows = []
+
+    for r in my_data.aslist():
+        for c in cols:
+            if r[c.name] == my_row[c.name]:
+                similar_rows.append(r)
+                break
+
+    return jsonify({
+      'index': index,
+      'row': my_data.aslist()[index],
+      'similar_rows': similar_rows,
+      'cols': cols
+    })

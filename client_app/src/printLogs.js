@@ -100,14 +100,14 @@ var PrintLogs = (function () {
     PrintLogs.prototype.showInfo = function () {
         var _this = this;
         return new Promise(function (resolve) {
-            var dataset = "number-one-artists";
+            var dataset = "clinical_patient_public_GBM"; //number-one-artists";
             var URL = "/data_api/getInfoByFunctions/" + dataset;
             // print TCGA data in console
             Promise.all([ajax.getAPIJSON(URL)])
                 .then(function (args) {
                 var info = args[0];
                 console.log("==========");
-                console.log("dataset number-one-artists");
+                console.log("dataset clinical_patient_public_GBM");
                 console.log("Information retrieved from functions in ");
                 console.log("phovea_server/dataset_csv.py#L341");
                 console.log("==========");
