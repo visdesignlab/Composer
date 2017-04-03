@@ -1,248 +1,321 @@
 [
   {
-    "name": "Artists",
-    "path": "number_one_artists.csv",
-    "separator": "\t",
-    "id": "number-one-artists",
+    "name": "Demo_edited",
+    "path": "EDW168-Demo-20170316-PHI_edited.csv",
+    "separator": ",",
+    "quotechar": "\"",
+    "id": "Demo",
     "size": [
-      12,
-      13
+      16210,
+      25
     ],
     "type": "table",
-    "idtype": "artist",
+    "idtype": "INDEX",
+    "idcolumn": 0,
     "columns": [
       {
-        "name": "artist",
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "PAT_BIRTHDATE",
         "value": {
           "type": "string"
         }
       },
       {
-        "name": "origin",
+        "name": "PAT_GENDER",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "Barbados",
-              "color": "#a6cee3"
-            },
-            {
-              "name": "Ireland",
-              "color": "#1f78b4"
-            },
-            {
-              "name": "Sweden",
-              "color": "#b2df8a"
-            },
-            {
-              "name": "UK",
-              "color": "#33a02c"
-            },
-            {
-              "name": "US",
-              "color": "#fb9a99"
-            }
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "career status",
+        "name": "PAT_ETHNICITY",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "active",
-              "color": "#b3e2cd"
-            },
-            {
-              "name": "inactive",
-              "color": "#fdcdac"
-            }
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "gender",
+        "name": "D_ETHNICITY_DESC",
         "value": {
-          "type": "categorical",
-          "categories": [
-            {
-              "name": "female",
-              "color": "red"
-            },
-            {
-              "name": "group",
-              "color": "#ff00ff"
-            },
-            {
-              "name": "male",
-              "color": "blue"
-            }
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "first album (year)",
+        "name": "PAT_RACE",
         "value": {
-          "type": "int",
-          "range": [
-            1930,
-            2014
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "studio albums (count)",
+        "name": "D_RACE_DESC",
         "value": {
-          "type": "int",
-          "range": [
-            0,
-            33
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "year of birth",
+        "name": "PAT_ZIP",
         "value": {
-          "type": "int",
-          "range": [
-            1930,
-            2014
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "age (years)",
+        "name": "PAT_MARITAL_STAT",
         "value": {
-          "type": "int",
-          "range": [
-            0,
-            67
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "age at first album (years)",
+        "name": "PAT_DEATH_DATE",
         "value": {
-          "type": "int",
-          "range": [
-            0,
-            25
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "start of career (year)",
+        "name": "PAT_DEATH_IND",
         "value": {
-          "type": "int",
-          "range": [
-            1930,
-            2014
-          ]
+          "type": "string"
         }
       },
       {
-        "name": "end of career (year)",
+        "name": "BMI",
         "value": {
-          "type": "int",
-          "range": [
-            1930,
-            2014
-          ]
+          "type": "float"
         }
       },
       {
-        "name": "in business",
+        "name": "HEIGHT_CM",
         "value": {
-          "type": "int",
-          "range": [
-            0,
-            50
-          ]
+          "type": "float"
         }
       },
       {
-        "name": "in business at first album (years)",
+        "name": "WEIGHT_KG",
         "value": {
-          "type": "int",
-          "range": [
-            0,
-            8
-          ]
+          "type": "float"
+        }
+      },
+      {
+        "name": "VISIT_NO_1",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ADM_DATE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "DSCH_DATE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ATT_PROV_ID",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "ATT_PROV_FULLNAME",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "INS_PAY_CAT",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "INS_PAY_GRP",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TOBACCO_USER",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ALCOHOL_USER",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ILLICIT_DRUG_USER",
+        "value": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "name": "VAS_edited",
+    "path": "EDW168-VAS-20170316-PHI_edited.csv",
+    "separator": ",",
+    "id": "VAS",
+    "size": [
+      9465,
+      6
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "FSD_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "RECORDED_TIME",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "VAS_NECK",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "VAS_ARM",
+        "value": {
+          "type": "float"
         }
       }
     ]
-  }
-  ,
+  },
   {
-    "name": "clinical_patient_public_GBM",
-    "type": "table",
-    "id": "clinical_patient_public_GBM",
-    "separator": "\t",
-    "description": "description_client",
-    "creator": "Sahar - TCGA",
-    "path": "clinical_patient_public_GBM.txt",
+    "name": "PRO_edited",
+    "path": "EDW168-PRO-20170316-PHI_edited.csv",
+    "separator": ",",
+    "id": "PRO",
     "size": [
-      596,
-      31
+      53222,
+      7
     ],
-    "idtype": "bcr_patient_barcode",
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
     "columns": [
       {
-        "name": "additional_chemo_therapy",
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ASSESSMENT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ASSESSMENT_START_DTM",
         "value": {
           "type": "string"
         }
       },
       {
-        "name": "additional_drug_therapy",
+        "name": "FORM_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "FORM",
         "value": {
           "type": "string"
         }
       },
       {
-        "name": "additional_hormone_therapy",
+        "name": "SCORE",
+        "value": {
+          "type": "float"
+        }
+      }
+    ]
+  },
+  {
+    "name": "PT_edited",
+    "path": "EDW168-PT-20170316-PHI_edited.csv",
+    "separator": ",",
+    "id": "PT",
+    "size": [
+      33127,
+      5
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ADM_DATE",
         "value": {
           "type": "string"
         }
       },
       {
-        "name": "additional_immuno_therapy",
+        "name": "PAT_UNIT",
         "value": {
           "type": "string"
         }
       },
       {
-        "name": "additional_pharmaceutical_therapy",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "additional_radiation_therapy",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "age_at_initial_pathologic_diagnosis",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "anatomic_organ_subdivision",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "chemo_therapy",
+        "name": "UNIT_NAME",
         "value": {
           "type": "string"
         }
       }
-    ],
-    "idcolumn": 0
+    ]
   }
 ]

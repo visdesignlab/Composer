@@ -8,41 +8,28 @@ import * as dataExplorations from './dataExplorations';
 
 export class PrintLogs {
 
-  constructor() {
+  private dataset_id;
+
+  constructor(dataset_id) {
+    this.dataset_id = dataset_id;
   }
 
-  runLogs() {
-    return new Promise(resolve => {
+  async runLogs() {
 
-      const dataset= 'number-one-artists';
-      let URL =  `/data_api/getData${dataset}`;
+    let URL = `/data_api/getData/${this.dataset_id}`;
+    let args = await ajax.getAPIJSON(URL);
 
-      // print data in console
-      Promise.all([ajax.getAPIJSON(URL), ajax.getAPIJSON('/data_api/getAllDatasets')])
-        .then((args) => {
-          let data = args[0]['data'];
-          let datasets = args[1]['data'];
+    // print data in console
+    console.log("==========");
+    console.log("Retrieved by phovea_server/src/dataset.py");
+    console.log("==========");
 
-          console.log("==========");
-          console.log("Retrieved by phovea_server/src/dataset.py");
-          console.log("==========");
+    console.log("----> /data_api/getData/" + this.dataset_id + " :");
+    console.log(args[0]['data']);
 
-          console.log("----> All datasets:");
-          console.log(datasets);
+    console.log("----> /data_api/phoveaServerDataFunction :");
+    console.log(args[1]);
 
-          console.log("----> TCGA data:");
-          console.log(data);
-
-          Promise.all([ajax.getAPIJSON('/data_api/phoveaServerDataFunction')])
-            .then((args) => {
-              console.log("----> Phovea Server Functions:");
-              console.log(args[0]);
-
-              resolve(this);
-            })
-        });
-
-    })
   }
 
   runDemo() {
@@ -51,117 +38,35 @@ export class PrintLogs {
 
   }
 
-  runRemove() {
-    return new Promise(resolve => {
+  async runRemove(id) {
 
-      const id = "clinical_2";
-      let URL = `/data_api/removeDataSet/${id}`;
-      Promise.all([ajax.getAPIJSON(URL)])
-        .then((args) => {
+    let URL = `/data_api/removeDataSet/${id}`;
+    let args = await ajax.getAPIJSON(URL);
 
-          let datasets = args[0];
+    console.log("==========");
+    console.log("After removing a dataset");
+    console.log("==========");
+    console.log(args[0]);
 
-          console.log("==========");
-          console.log("After removing a dataset");
-          console.log("==========");
-
-          console.log("----> All datasets and the Result:");
-          console.log(datasets);
-
-          resolve(this);
-
-        });
-
-    })
   }
 
-  showRow() {
-    return new Promise(resolve => {
+  async showInfo() {
 
-      const rowIndex = 1;
-      const rowId = 12;
-      const dataset = 'number-one-artists';
-      let URL = `/data_api/getRowByIndex/${dataset}/${rowIndex}`;
-      let URL2 = `/data_api/getRowById/${dataset}/${rowId}`;
+    let URL = `/data_api/getDatasetInfoByFunctions/${this.dataset_id}`;
+    let args = await ajax.getAPIJSON(URL);
 
-      // print data in console
-      Promise.all([ajax.getAPIJSON(URL),ajax.getAPIJSON(URL2)])
-        .then((args) => {
+    console.log("==========");
+    console.log("dataset: " + this.dataset_id);
+    console.log("Information retrieved from functions in ");
+    console.log("phovea_server/dataset_csv.py#L341");
+    console.log("==========");
 
-          console.log("==========");
-          console.log("Get Row index 1 and Rows 2 to 5 of the dataset from a server");
-          console.log("==========");
+    console.log("----> /data_api/getDatasetInfoByFunctions/" + this.dataset_id + ":");
+    console.log(args[0]);
 
-          console.log("----> Row 1:");
-          console.log(args[0]);
-
-          console.log("==========");
-          console.log("Get Row with id='" +rowId + "' of the dataset from a server");
-          console.log("==========");
-
-          console.log("----> Row '" + rowId + "'");
-          console.log(args[1]);
-
-          resolve(this);
-
-        });
-    })
-  }
-
-  showCol() {
-    return new Promise(resolve => {
-
-      const col_name = "artist";
-      const dataset = 'number-one-artists';
-      let URL = `/data_api/getColByName/${dataset}/${col_name}`;
-
-      // print data in console
-      Promise.all([ajax.getAPIJSON(URL)])
-        .then((args) => {
-
-          let col = args[0];
-
-          console.log("==========");
-          console.log("Get Col `artist` of the dataset from a server");
-          console.log("==========");
-
-          console.log("----> Col artist:");
-          console.log(col);
-
-          resolve(this);
-
-        });
-    })
-  }
-
-  showInfo() {
-    return new Promise(resolve => {
-
-      const dataset = "clinical_patient_public_GBM";//number-one-artists";
-      let URL = `/data_api/getInfoByFunctions/${dataset}`;
-
-      // print TCGA data in console
-      Promise.all([ajax.getAPIJSON(URL)])
-        .then((args) => {
-
-          let info = args[0];
-
-          console.log("==========");
-          console.log("dataset clinical_patient_public_GBM");
-          console.log("Information retrieved from functions in ");
-          console.log("phovea_server/dataset_csv.py#L341");
-          console.log("==========");
-
-          console.log("----> Info:");
-          console.log(info);
-
-          resolve(this);
-
-        });
-    })
   }
 }
 
-export function create() {
-  return new PrintLogs();
+export function create(dataset_id) {
+  return new PrintLogs(dataset_id);
 }

@@ -1,15 +1,15 @@
 
-.cells{
+.cells {
   float: left;
-  padding-left: 0.5em;
   padding-bottom: 0.5em;
   border: 1px solid steelblue;
-  width: 6.5em;
+  width: 40px;
   height: 2em;
+  font-size: small;
 }
 
 .rows{
-  padding: 0.5em 1em;
+  padding-top: 5px;
   clear:left;
 }
 
@@ -18,15 +18,45 @@
 }
 
 .header{
-  padding: 2em 1em;
+  padding-top: 5px;
 }
 
 .headercells{
   float: left;
-  padding-left: 0.5em;
   padding-bottom: 0.5em;
   border: 1px solid steelblue;
-  width: 6.5em;
-  height: 3.7em;
+  width: 40px;
+  height: 2em;
   font-weight: bold;
+  background-color: aliceblue;
+}
+
+.wideCell {
+  width: 220px;
+}
+
+.mediumCell {
+  width: 100px;
+}
+
+.sameValue {
+  background-color: transparent;
+}
+
+.lowerValue {
+  background-color: lightblue;
+}
+
+.higherValue {
+  background-color: lightcoral;
+}
+
+h3 {
+  display: block;
+  margin-left: 1em;
+  clear: both;
+}
+
+.tableDiv {
+  padding-bottom: 1em;
 }
