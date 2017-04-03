@@ -1,0 +1,28 @@
+#app {
+  width: 3200px;
+}
+
+#caleydoHeader {
+  width: 3200px;
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 5px;
+  font: 12px sans-serif;
+  background: #ddd;
+  border: 0;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.main {
+  float: left;
+}
+
+.sideBar {
+  float: left;
+  width: 300px;
+  padding: 10px;
+}
