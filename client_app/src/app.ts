@@ -52,29 +52,39 @@ export class App {
 
     let main = this.$node.append("div").classed("main", true);
 
-    let query_box = queryBox.create(main.node(), 'Demo');
+    queryBox.create(main.node(), 'Demo');
 
     main.append("h3").text("Demo");
-    let table1 = main.append("div");
+    let table_demo = main.append("div");
     main.append("h3").text("PRO");
-    let table2 = main.append("div");
+    let table_pro = main.append("div");
     main.append("h3").text("PT");
-    let table3 = main.append("div");
+    let table_pt = main.append("div");
     main.append("h3").text("VAS");
-    let table4 = main.append("div");
+    let table_vas = main.append("div");
+    main.append("h3").text("CCI");
+    let table_cci = main.append("div");
+    main.append("h3").text("Codes");
+    let table_codes = main.append("div");
+    main.append("h3").text("Orders");
+    let table_orders = main.append("div");
 
-    let svg_table1 = svgTable.create(table1.node());
-    let svg_table2 = svgTable.create(table2.node());
-    let svg_table3 = svgTable.create(table3.node());
-    let svg_table4 = svgTable.create(table4.node());
+    let svg_table_demo = svgTable.create(table_demo.node());
+    let svg_table_pro = svgTable.create(table_pro.node());
+    let svg_table_pt = svgTable.create(table_pt.node());
+    let svg_table_vas = svgTable.create(table_vas.node());
+    let svg_table_cci = svgTable.create(table_cci.node());
+    let svg_table_codes = svgTable.create(table_codes.node());
+    let svg_table_orders = svgTable.create(table_orders.node());
 
-    // TODO: replace with events.fire and .on
-    query_box.set_svg_table(svg_table1, svg_table2, svg_table3, svg_table4);
 
-    await svg_table1.drawTable('Demo');
-    await svg_table2.drawTable('PRO');
-    await svg_table3.drawTable('PT');
-    await svg_table4.drawTable('VAS');
+    await svg_table_demo.drawTable('Demo');
+    await svg_table_pro.drawTable('PRO');
+    await svg_table_pt.drawTable('PT');
+    await svg_table_vas.drawTable('VAS');
+    await svg_table_cci.drawTable('CCI');
+    await svg_table_codes.drawTable('Codes');
+    await svg_table_orders.drawTable('Orders');
 
     this.setBusy(false);
   }

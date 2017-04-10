@@ -1,12 +1,12 @@
 [
   {
-    "name": "Demo_edited",
-    "path": "EDW168-Demo-20170316-PHI_edited.csv",
+    "name": "Demo_selected",
+    "path": "Demo.csv",
     "separator": ",",
     "quotechar": "\"",
     "id": "Demo",
     "size": [
-      16210,
+      204,
       25
     ],
     "type": "table",
@@ -166,12 +166,12 @@
     ]
   },
   {
-    "name": "VAS_edited",
-    "path": "EDW168-VAS-20170316-PHI_edited.csv",
+    "name": "VAS_selected",
+    "path": "VAS.csv",
     "separator": ",",
     "id": "VAS",
     "size": [
-      9465,
+      21,
       6
     ],
     "type": "table",
@@ -217,12 +217,12 @@
     ]
   },
   {
-    "name": "PRO_edited",
-    "path": "EDW168-PRO-20170316-PHI_edited.csv",
+    "name": "PRO_selected",
+    "path": "PRO.csv",
     "separator": ",",
     "id": "PRO",
     "size": [
-      53222,
+      87,
       7
     ],
     "type": "table",
@@ -274,12 +274,12 @@
     ]
   },
   {
-    "name": "PT_edited",
-    "path": "EDW168-PT-20170316-PHI_edited.csv",
+    "name": "PT_selected",
+    "path": "PT.csv",
     "separator": ",",
     "id": "PT",
     "size": [
-      33127,
+      0,
       5
     ],
     "type": "table",
@@ -312,6 +312,381 @@
       },
       {
         "name": "UNIT_NAME",
+        "value": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "name": "CCI_selected",
+    "path": "CCI.csv",
+    "separator": ",",
+    "id": "CCI",
+    "size": [
+      200,
+      22
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "CCI_MI",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_CHF",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_PVD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_CVD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_DEMENTIA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_COPD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_RHEUM_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_PUD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_DM_WO_COMPL",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_DM_W_COMPL",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_PARAPLEGIA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_RENAL_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_MALIGNANT_TUMOR",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LYMPHOMA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LEUKEMIA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LIVER_MILD_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LIVER_SEVERE_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_METAST_TUMOR",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_HIV_AIDS",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_SCORE",
+        "value": {
+          "type": "float"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Codes_selected",
+    "path": "Codes.csv",
+    "separator": ",",
+    "id": "Codes",
+    "size": [
+      200,
+      26
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "PROC_DTM",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "DM_CODE",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "INJ_CODE",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "SURGERY_CODE",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "ICD_1",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_2",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_3",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_4",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_5",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_6",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_7",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_8",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_9",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICD_10",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "CPT_1",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "CPT_2",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "CPT_3",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "CPT_4",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CPT_5",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CPT_6",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CPT_7",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CPT_8",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CPT_9",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CPT_10",
+        "value": {
+          "type": "float"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Orders_selected",
+    "path": "Orders.csv",
+    "separator": ",",
+    "id": "Orders",
+    "size": [
+      638,
+      7
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ORDER_DTM",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ORDER_STATUS",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ORDER_CATALOG_TYPE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PRIMARY_MNEMONIC",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ORDER_MNEMONIC",
         "value": {
           "type": "string"
         }

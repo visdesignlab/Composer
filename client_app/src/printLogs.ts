@@ -62,7 +62,7 @@ export class PrintLogs {
     console.log("==========");
 
     console.log("----> /data_api/getDatasetInfoByFunctions/" + this.dataset_id + ":");
-    console.log(args[0]);
+    console.log(args);
 
   }
 }

@@ -70,7 +70,7 @@ var PrintLogs = (function () {
                         console.log("phovea_server/dataset_csv.py#L341");
                         console.log("==========");
                         console.log("----> /data_api/getDatasetInfoByFunctions/" + this.dataset_id + ":");
-                        console.log(args[0]);
+                        console.log(args);
                         return [2 /*return*/];
                 }
             });

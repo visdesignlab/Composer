@@ -35,7 +35,7 @@ def _get_phovea_server_data_function():
 
 @app.route('/getDatasetInfoByFunctions/<id>')
 def _get_dataset_info(id):
-    return data_handler.get_dataset_info_by_functions(id)
+    return data_handler.get_info_by_functions(id)
 
 
 # useful APIs
@@ -99,6 +99,11 @@ def _get_weights(id):
 @app.route('/updateWeights/<id>/<values>')
 def _update_weights(id, values):
     return data_handler.update_weights(id, values)
+
+
+@app.route('/getLatestInfo/<id>')
+def _get_latest_info(id):
+    return data_handler.get_latest_info(id)
 
 
 def create():
