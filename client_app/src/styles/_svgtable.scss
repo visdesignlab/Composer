@@ -3,9 +3,10 @@
   float: left;
   padding-bottom: 0.5em;
   border: 1px solid steelblue;
-  width: 40px;
+  width: 50px;
   height: 2em;
   font-size: small;
+  padding-left: 2px;
 }
 
 .rows{
@@ -25,10 +26,14 @@
   float: left;
   padding-bottom: 0.5em;
   border: 1px solid steelblue;
-  width: 40px;
+  width: 50px;
   height: 2em;
   font-weight: bold;
   background-color: aliceblue;
+}
+
+.superWideCell {
+  width: 440px;
 }
 
 .wideCell {
@@ -59,4 +64,10 @@ h3 {
 
 .tableDiv {
   padding-bottom: 1em;
+}
+
+.lineChart {
+  fill: none;
+  stroke: rgb(108, 2, 97);
+  stroke-width: 2px;
 }

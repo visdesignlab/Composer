@@ -10,7 +10,8 @@ var SideBar = (function () {
         this.header = {
             "Demo": ["PAT_BIRTHDATE", "PAT_GENDER", "PAT_ETHNICITY", "D_ETHNICITY_DESC",
                 "PAT_RACE", "D_RACE_DESC", "PAT_MARITAL_STAT", "PAT_DEATH_IND", "BMI",
-                "HEIGHT_CM", "WEIGHT_KG", "TOBACCO_USER", "ALCOHOL_USER", "ILLICIT_DRUG_USER"]
+                "HEIGHT_CM", "WEIGHT_KG", "ADM_DATE", "DSCH_DATE", "TOBACCO_USER",
+                "ALCOHOL_USER", "ILLICIT_DRUG_USER"]
         };
         this.$node = select(parent);
     }

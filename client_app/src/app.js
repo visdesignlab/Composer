@@ -27,7 +27,7 @@ var App = (function () {
      */
     App.prototype.build = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var sideBarDiv, side, main, query_box, table1, table2, table3, table4, svg_table1, svg_table2, svg_table3, svg_table4;
+            var sideBarDiv, side, main, table_demo, table_pro, table_pt, table_vas, table_cci, table_codes, table_orders, svg_table_demo, svg_table_pro, svg_table_pt, svg_table_vas, svg_table_cci, svg_table_codes, svg_table_orders;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -45,32 +45,48 @@ var App = (function () {
                     case 1:
                         _a.sent();
                         main = this.$node.append("div").classed("main", true);
-                        query_box = queryBox.create(main.node(), 'Demo');
+                        queryBox.create(main.node(), 'Demo');
                         main.append("h3").text("Demo");
-                        table1 = main.append("div");
+                        table_demo = main.append("div");
                         main.append("h3").text("PRO");
-                        table2 = main.append("div");
+                        table_pro = main.append("div");
                         main.append("h3").text("PT");
-                        table3 = main.append("div");
+                        table_pt = main.append("div");
                         main.append("h3").text("VAS");
-                        table4 = main.append("div");
-                        svg_table1 = svgTable.create(table1.node());
-                        svg_table2 = svgTable.create(table2.node());
-                        svg_table3 = svgTable.create(table3.node());
-                        svg_table4 = svgTable.create(table4.node());
-                        // TODO: replace with events.fire and .on
-                        query_box.set_svg_table(svg_table1, svg_table2, svg_table3, svg_table4);
-                        return [4 /*yield*/, svg_table1.drawTable('Demo')];
+                        table_vas = main.append("div");
+                        main.append("h3").text("CCI");
+                        table_cci = main.append("div");
+                        main.append("h3").text("Codes");
+                        table_codes = main.append("div");
+                        main.append("h3").text("Orders");
+                        table_orders = main.append("div");
+                        svg_table_demo = svgTable.create(table_demo.node());
+                        svg_table_pro = svgTable.create(table_pro.node());
+                        svg_table_pt = svgTable.create(table_pt.node());
+                        svg_table_vas = svgTable.create(table_vas.node());
+                        svg_table_cci = svgTable.create(table_cci.node());
+                        svg_table_codes = svgTable.create(table_codes.node());
+                        svg_table_orders = svgTable.create(table_orders.node());
+                        return [4 /*yield*/, svg_table_demo.drawTable('Demo')];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, svg_table2.drawTable('PRO')];
+                        return [4 /*yield*/, svg_table_pro.drawTable('PRO')];
                     case 3:
                         _a.sent();
-                        return [4 /*yield*/, svg_table3.drawTable('PT')];
+                        return [4 /*yield*/, svg_table_pt.drawTable('PT')];
                     case 4:
                         _a.sent();
-                        return [4 /*yield*/, svg_table4.drawTable('VAS')];
+                        return [4 /*yield*/, svg_table_vas.drawTable('VAS')];
                     case 5:
+                        _a.sent();
+                        return [4 /*yield*/, svg_table_cci.drawTable('CCI')];
+                    case 6:
+                        _a.sent();
+                        return [4 /*yield*/, svg_table_codes.drawTable('Codes')];
+                    case 7:
+                        _a.sent();
+                        return [4 /*yield*/, svg_table_orders.drawTable('Orders')];
+                    case 8:
                         _a.sent();
                         this.setBusy(false);
                         return [2 /*return*/];

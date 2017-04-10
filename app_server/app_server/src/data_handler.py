@@ -175,6 +175,12 @@ def update_weights(id, values):
     return jsonify({'message': 'error'})
 
 
+def get_latest_info(id):
+    if id == 'Demo':
+        return handle_Demo.get_latest_info()
+    return jsonify({'message': 'error'})
+
+
 # helper functions
 def verify_int(s):
     try:
@@ -185,8 +191,12 @@ def verify_int(s):
 
 
 def parse_date_time(date):
+    if not date:
+        return pd.datetime.strptime('01/01/0001', '%m/%d/%Y')
     return pd.datetime.strptime(date, '%m/%d/%Y %I:%M:%S %p')
 
 
 def parse_date(date):
+    if not date:
+      return pd.datetime.strptime('01/01/0001', '%m/%d/%Y')
     return pd.datetime.strptime(date, '%m/%d/%Y')

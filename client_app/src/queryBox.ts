@@ -11,11 +11,6 @@ export class QueryBox {
 
   private $node;
   private dataset_id;
-  private svg_table1;
-  private svg_table2;
-  private svg_table3;
-  private svg_table4;
-  private $text;
 
   constructor(parent: Element, dataset_id) {
 
@@ -25,7 +20,7 @@ export class QueryBox {
       .append("div")
       .classed("queryDiv", true);
 
-    this.$text = this.$node.append("input")
+    this.$node.append("input")
       .attr("type", "text")
       .attr("placeholder", "Search Index")
       .attr("id", "text");
@@ -40,7 +35,7 @@ export class QueryBox {
       .attr("value", "similar")
       .on("click", () => this.updateTableSimilar());
 
-    this.$text = this.$node.append("input")
+    this.$node.append("input")
       .attr("type", "text")
       .attr("placeholder", "Search PAT_ID")
       .attr("id", "text_pat_id");
@@ -50,31 +45,37 @@ export class QueryBox {
       .attr("value", "All Info")
       .on("click", () => this.updateTableInfo());
 
-    this.$node.append("p")
-      .text("A good example is 6790018");
+    //this.$node.append("p")
+    //  .text("A good example is 6790018");
+
+    this.$node.append("input")
+      .attr("type", "button")
+      .attr("value", "Latest")
+      .on("click", () => events.fire('update_table_latest', ['dataset_id', 'Demo']));
+
+    this.$node.append("input")
+      .attr("type", "button")
+      .attr("value", "Reset")
+      .on("click", () => events.fire('update_table_init', ['func', 'init']));
 
   }
 
-  async updateTableCluster() {
+  updateTableCluster() {
 
     let value = (<HTMLInputElement>document.getElementById("text")).value;
     if (!isNaN(+value)) {
-      this.setBusy(true);
-      await this.svg_table1.updateTableCluster(value);
-      this.setBusy(false);
+      events.fire('update_table_cluster', ['index', value]);
     }
     else
       console.log("Not a Number");
 
   }
 
-  async updateTableSimilar() {
+  updateTableSimilar() {
 
     let value = (<HTMLInputElement>document.getElementById("text")).value;
     if (!isNaN(+value)) {
-      this.setBusy(true);
-      await this.svg_table1.updateTableSimilar(value);
-      this.setBusy(false);
+      events.fire('update_table_similar', ['index', value]);
     }
     else
       console.log("Not a Number");
@@ -87,17 +88,6 @@ export class QueryBox {
       events.fire('update_table', ['PAT_ID', value]);
     else
       console.log("Not a Number");
-  }
-
-  set_svg_table(svg_table1, svg_table2, svg_table3, svg_table4) {
-    this.svg_table1 = svg_table1;
-    this.svg_table2 = svg_table2;
-    this.svg_table3 = svg_table3;
-    this.svg_table4 = svg_table4;
-  }
-
-  setBusy(isBusy : boolean) {
-    select('.busy').classed('hidden', !isBusy);
   }
 
 }
