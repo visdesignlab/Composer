@@ -14,15 +14,15 @@ var DrawPlots = (function () {
             Promise.all([ajax.getAPIJSON('/iris_api/irisDataDecomposed'), ajax.getAPIJSON('/iris_api/irisClustered')])
                 .then(function (args) {
                 var data = args[0];
-                var result = args[1]['clustered'];
-                var scatter_1 = scatterPlot.create(_this.$node.node(), data['data_01'], result);
-                scatter_1.init();
-                var scatter_2 = scatterPlot.create(_this.$node.node(), data['data_12'], result);
-                scatter_2.init();
-                var scatter_3 = scatterPlot.create(_this.$node.node(), data['data_23'], result);
-                scatter_3.init();
-                var scatter_4 = scatterPlot.create(_this.$node.node(), data['data_03'], result);
-                scatter_4.init();
+                var result = args[1].clustered;
+                var scatter1 = scatterPlot.create(_this.$node.node(), data.data_01, result);
+                scatter1.init();
+                var scatter2 = scatterPlot.create(_this.$node.node(), data.data_12, result);
+                scatter2.init();
+                var scatter3 = scatterPlot.create(_this.$node.node(), data.data_23, result);
+                scatter3.init();
+                var scatter4 = scatterPlot.create(_this.$node.node(), data.data_03, result);
+                scatter4.init();
                 resolve(_this);
             });
         });
