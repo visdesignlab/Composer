@@ -100,6 +100,8 @@
     "@types/d3-transition": "^1.0.7",
     "d3-transition": "^1.0.4",
     "@types/d3-shape": "^1.0.10",
-    "d3-shape": "^1.0.6"
+    "d3-shape": "^1.0.6",
+    "@types/d3-time-format": "^2.0.4",
+    "d3-time-format": "^2.0.5"
   }
 }

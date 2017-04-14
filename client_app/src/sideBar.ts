@@ -13,10 +13,10 @@ export class SideBar {
   private $node;
 
   private header = {
-    "Demo": ["PAT_BIRTHDATE", "PAT_GENDER", "PAT_ETHNICITY", "D_ETHNICITY_DESC",
-      "PAT_RACE", "D_RACE_DESC", "PAT_MARITAL_STAT", "PAT_DEATH_IND", "BMI",
-      "HEIGHT_CM", "WEIGHT_KG", "ADM_DATE", "DSCH_DATE", "TOBACCO_USER",
-      "ALCOHOL_USER", "ILLICIT_DRUG_USER"]
+    'Demo': ['PAT_BIRTHDATE', 'PAT_GENDER', 'PAT_ETHNICITY', 'D_ETHNICITY_DESC',
+      'PAT_RACE', 'D_RACE_DESC', 'PAT_MARITAL_STAT', 'PAT_DEATH_IND', 'BMI',
+      'HEIGHT_CM', 'WEIGHT_KG', 'ADM_DATE', 'DSCH_DATE', 'TOBACCO_USER',
+      'ALCOHOL_USER', 'ILLICIT_DRUG_USER']
   };
 
   constructor(parent: Element) {
@@ -25,58 +25,58 @@ export class SideBar {
 
   async init() {
 
-    let URL = `/data_api/getWeights/Demo`;
-    let args = await ajax.getAPIJSON(URL);
-    let weights = args["weights"];
+    const URL = `/data_api/getWeights/Demo`;
+    const args = await ajax.getAPIJSON(URL);
+    const weights = args.weights;
 
-    this.$node.selectAll(".item").data(this.header["Demo"])
+    this.$node.selectAll('.item').data(this.header.Demo)
       .enter()
-      .append("div")
-      .classed("item", true);
+      .append('div')
+      .classed('item', true);
 
-    this.$node.selectAll(".item")
+    this.$node.selectAll('.item')
       .html((d) => {
-        return `<input type="text" placeholder="Weight" size="8" id="weight_` + d
-          + `" value="` + weights[d] + `">`
-          + `&nbsp;` + d
+        return `<input type='text' placeholder='Weight' size='8' id='weight_` + d
+          + `' value='` + weights[d] + `'>`
+          + `&nbsp;` + d;
       });
 
-    this.$node.append("input")
-      .attr("type", "button")
-      .attr("value", "Update")
-      .on("click", () => this.updateWeights());
+    this.$node.append('input')
+      .attr('type', 'button')
+      .attr('value', 'Update')
+      .on('click', () => this.updateWeights());
   }
 
   async updateWeights() {
 
-    let temp_value = (<HTMLInputElement>document.getElementById("weight_PAT_GENDER"))
+    let tempValue = (<HTMLInputElement>document.getElementById('weight_PAT_GENDER'))
       .value;
 
-    if (isNaN(+temp_value)) {
-      console.log("error in weight_PAT_GENDER");
-      return
+    if (isNaN(+tempValue)) {
+      console.log('error in weight_PAT_GENDER');
+      return;
     }
 
-    let temp_weights = (+temp_value).toString();
+    let tempWeights = (+tempValue).toString();
 
-    for (let counter = 1; counter < this.header["Demo"].length; counter++) {
-      let temp_id = "weight_" + this.header["Demo"][counter];
-      temp_value = (<HTMLInputElement>document.getElementById(temp_id)).value;
+    for (let counter = 1; counter < this.header.Demo.length; counter++) {
+      const tempId = 'weight_' + this.header.Demo[counter];
+      tempValue = (<HTMLInputElement>document.getElementById(tempId)).value;
 
-      if (isNaN(+temp_value)) {
-        console.log("error in " + temp_id);
-        return
+      if (isNaN(+tempValue)) {
+        console.log('error in ' + tempId);
+        return;
       }
 
-      temp_weights = temp_weights + `+` + (+temp_value.toString())
+      tempWeights = tempWeights + `+` + (+tempValue.toString());
     }
 
-    let URL = `/data_api/updateWeights/Demo/` + temp_weights;
-    let args = await ajax.getAPIJSON(URL);
-    let weights = args["weights"];
+    const URL = `/data_api/updateWeights/Demo/` + tempWeights;
+    const args = await ajax.getAPIJSON(URL);
+    const weights = args.weights;
 
     console.log(URL);
-    console.log("Weights are updated.")
+    console.log('Weights are updated.');
 
   }
 

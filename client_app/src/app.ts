@@ -4,10 +4,13 @@
 
 import {select} from 'd3-selection';
 //import * as drawPlots from './drawPlots'
-import * as printLogs from './printLogs'
+import * as printLogs from './printLogs';
 import * as svgTable from './svgTable';
-import * as queryBox from './queryBox'
+import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
+import * as scoreDiagram from './scoreDiagram';
+import * as events from 'phovea_core/src/event';
+
 
 /**
  * The main class for the App app
@@ -22,7 +25,7 @@ export class App {
 
   /**
    * Initialize the view and return a promise
-   * that is resolved as soon the view is completely initialized.
+   * that is resolved as soon the view is compconstely initialized.
    * @returns {Promise<App>}
    */
   init() {
@@ -35,58 +38,62 @@ export class App {
    */
   private async build() {
 
-    //let dp = drawPlots.create(this.$node.node());
+    //const dp = drawPlots.create(this.$node.node());
     //await dp.run();
 
-    //let pl = printLogs.create('Demo');
+    //const pl = printLogs.create('Demo');
     //await pl.runLogs();
     //await pl.runDemo();
-    //await pl.runRemove("clinical_2");  // Not Working!
+    //await pl.runRemove('clinical_2');  // Not Working!
     //await pl.showInfo();
 
     this.$node.select('h3').remove();
-
-    let sideBarDiv = this.$node.append("div").classed("sideBar", true);
-    let side = sideBar.create(sideBarDiv.node());
+/*
+    const sideBarDiv = this.$node.append('div').classed('sideBar', true);
+    const side = sideBar.create(sideBarDiv.node());
     await side.init();
-
-    let main = this.$node.append("div").classed("main", true);
+*/
+    const main = this.$node.append('div').classed('main', true);
 
     queryBox.create(main.node(), 'Demo');
+/*
+    main.append('h3').text('Demo');
+    const tableDemo = main.append('div');
+    main.append('h3').text('PRO');
+    const tablePro = main.append('div');*/
+    const scoreDgm = main.append('div');/*
+    main.append('h3').text('PT');
+    const tablePt = main.append('div');
+    main.append('h3').text('VAS');
+    const tableVas = main.append('div');
+    main.append('h3').text('CCI');
+    const tableCci = main.append('div');
+    main.append('h3').text('Codes');
+    const tableCodes = main.append('div');
+    main.append('h3').text('Orders');
+    const tableOrders = main.append('div');
 
-    main.append("h3").text("Demo");
-    let table_demo = main.append("div");
-    main.append("h3").text("PRO");
-    let table_pro = main.append("div");
-    main.append("h3").text("PT");
-    let table_pt = main.append("div");
-    main.append("h3").text("VAS");
-    let table_vas = main.append("div");
-    main.append("h3").text("CCI");
-    let table_cci = main.append("div");
-    main.append("h3").text("Codes");
-    let table_codes = main.append("div");
-    main.append("h3").text("Orders");
-    let table_orders = main.append("div");
-
-    let svg_table_demo = svgTable.create(table_demo.node());
-    let svg_table_pro = svgTable.create(table_pro.node());
-    let svg_table_pt = svgTable.create(table_pt.node());
-    let svg_table_vas = svgTable.create(table_vas.node());
-    let svg_table_cci = svgTable.create(table_cci.node());
-    let svg_table_codes = svgTable.create(table_codes.node());
-    let svg_table_orders = svgTable.create(table_orders.node());
-
-
-    await svg_table_demo.drawTable('Demo');
-    await svg_table_pro.drawTable('PRO');
-    await svg_table_pt.drawTable('PT');
-    await svg_table_vas.drawTable('VAS');
-    await svg_table_cci.drawTable('CCI');
-    await svg_table_codes.drawTable('Codes');
-    await svg_table_orders.drawTable('Orders');
-
+    const svgTableDemo = svgTable.create(tableDemo.node());
+    const svgTablePro = svgTable.create(tablePro.node());
+    const svgTablePt = svgTable.create(tablePt.node());
+    const svgTableVas = svgTable.create(tableVas.node());
+    const svgTableCci = svgTable.create(tableCci.node());
+    const svgTableCodes = svgTable.create(tableCodes.node());
+    const svgTableOrders = svgTable.create(tableOrders.node());
+*/
+    scoreDiagram.create(scoreDgm.node(), 'PRO');
+/*
+    await svgTableDemo.drawTable('Demo');
+    await svgTablePro.drawTable('PRO');
+    await svgTablePt.drawTable('PT');
+    await svgTableVas.drawTable('VAS');
+    await svgTableCci.drawTable('CCI');
+    await svgTableCodes.drawTable('Codes');
+    await svgTableOrders.drawTable('Orders');
+*/
     this.setBusy(false);
+
+    events.fire('draw_score_diagram', ['PAT_ID', '6790018']);
   }
 
   /**
