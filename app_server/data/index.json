@@ -6,8 +6,8 @@
     "quotechar": "\"",
     "id": "Demo",
     "size": [
-      204,
-      25
+      53,
+      24
     ],
     "type": "table",
     "idtype": "INDEX",
@@ -104,12 +104,6 @@
         }
       },
       {
-        "name": "VISIT_NO_1",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
         "name": "ADM_DATE",
         "value": {
           "type": "string"
@@ -171,7 +165,7 @@
     "separator": ",",
     "id": "VAS",
     "size": [
-      21,
+      20,
       6
     ],
     "type": "table",
@@ -222,7 +216,7 @@
     "separator": ",",
     "id": "PRO",
     "size": [
-      87,
+      210,
       7
     ],
     "type": "table",
@@ -279,7 +273,7 @@
     "separator": ",",
     "id": "PT",
     "size": [
-      0,
+      127,
       5
     ],
     "type": "table",
@@ -324,7 +318,7 @@
     "separator": ",",
     "id": "CCI",
     "size": [
-      200,
+      3119,
       22
     ],
     "type": "table",
@@ -471,8 +465,8 @@
     "separator": ",",
     "id": "Codes",
     "size": [
-      200,
-      26
+      1420,
+      16
     ],
     "type": "table",
     "idtype": "INDEX",
@@ -512,66 +506,6 @@
         "name": "SURGERY_CODE",
         "value": {
           "type": "float"
-        }
-      },
-      {
-        "name": "ICD_1",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_2",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_3",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_4",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_5",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_6",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_7",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_8",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_9",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "ICD_10",
-        "value": {
-          "type": "string"
         }
       },
       {
@@ -642,7 +576,7 @@
     "separator": ",",
     "id": "Orders",
     "size": [
-      638,
+      3220,
       7
     ],
     "type": "table",

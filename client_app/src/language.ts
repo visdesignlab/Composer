@@ -3,4 +3,3 @@
  */
 
 export const APP_NAME = 'My App';
-export const HELLO_WORLD = 'Hello Phovea World';

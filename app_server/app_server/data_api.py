@@ -22,12 +22,6 @@ def _get_data(id):
     return data_handler.get_data(id)
 
 
-# Not working
-@app.route('/removeDataSet/<id>')
-def _remove_dataset(id):
-    return data_handler.remove_dataset(id)
-
-
 @app.route('/phoveaServerDataFunction')
 def _get_phovea_server_data_function():
     return data_handler.get_general_info()

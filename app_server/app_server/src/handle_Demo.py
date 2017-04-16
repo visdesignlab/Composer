@@ -104,38 +104,7 @@ def find_cluster(original_data, processed_data, index):
     })
 
 
-def find_similar(original_data, processed_data, index):
-    my_row = processed_data[index]
-    dist = []
-
-    for i in range(0, len(processed_data)):
-        dist.append([i, np.linalg.norm(np.array(my_row)
-                                       - np.array(processed_data[i]))])
-
-    sorted_dist = sorted(dist, key=lambda x: x[1])
-    similar_index = [row[0] for row in sorted_dist]
-
-    similar_rows = []
-    difference = []  # array of [-1 or +1 or 0] difference with the original data
-    for i in range(0, 20):
-        tmp_row = original_data[similar_index[i]]
-        similar_rows.append(tmp_row)
-        tmp_diff = []
-        for j in range(0, len(tmp_row)):
-            diff = np.sign(my_row[j]
-                           - processed_data[similar_index[i]][j])
-            tmp_diff.append(diff)
-        difference.append(tmp_diff)
-
-    return jsonify({
-      'row': original_data[index],
-      'similar_rows': similar_rows[0:20],
-      'difference': difference,
-      'indices': similar_index[0:20]
-    })
-
-
-def find_similar_new(data, index):
+def find_similar(data, index):
     similar_rows = []
     dist = []
     target_row = data[index]
@@ -209,9 +178,7 @@ def get_cluster_demo(index):
 
 def get_similar_demo(index):
     data = dt.get('Demo').aslist()
-    return find_similar_new(data, index)
-    #processed_data = process_data(data)
-    #return find_similar(data, processed_data, index)
+    return find_similar(data, index)
 
 
 def get_weights():

@@ -3,7 +3,7 @@
  */
 
 import * as ajax from 'phovea_core/src/ajax';
-import {BaseType, select, selectAll} from 'd3-selection';
+import {BaseType, select, selectAll,event} from 'd3-selection';
 import {nest,values,keys,map} from 'd3-collection'
 import * as events from 'phovea_core/src/event';
 import {scaleLinear,scaleTime,scaleOrdinal} from 'd3-scale';
@@ -65,198 +65,6 @@ export class ScoreDiagram {
       this.removeFromDiagram(item[1]);
     });
 
-  }
-
-  /**
-   * Function to draw diagram
-   * @param input
-   * @returns {Promise<void>}
-   */
-  private async oldDrawDiagram(input) {
-    console.log('Drawing diagram of ' + this.datasetId);
-
-    const args = await ajax.getAPIJSON(input.URL);
-    const data = args[input.arg].map((d) => {
-      return {date: this.parseTime(d.ASSESSMENT_START_DTM), score: d.SCORE, form: d.FORM};
-    });
-
-    const nestedData = nest()
-      .key((d) => d['form'])
-      .entries(data);
-
-    console.log(nestedData);
-
-    // set domains
-    this.yearScale.domain(extent(data, (d) => d['date']));
-
-    this.scoreScale.domain([
-      max(data, (d) => d['score']),
-      min(data, (d) => d['score'])
-    ]);
-
-    //this.colorScale.domain(nestedData.map((d) => d.key));
-
-    // define line function
-    const lineFunc = line()
-      .curve(curveBasis)
-      .x((d) => {
-        return this.yearScale(d['date']);
-      })
-      .y((d) => {
-        return this.scoreScale(d['score']);
-      });
-
-    // draw diagram
-
-    this.svg.selectAll('g').remove();
-
-    const dgms = this.svg.selectAll('.diagrams')
-      .data(nestedData)
-      .enter()
-      .append('g')
-      .classed('diagrams', true)
-      .attr('id', (d) => Constants.scoreIds[d.key])
-      .attr('transform', (d, i) => {
-        return 'translate(' + (this.margin + this.width * i) + ',' + this.margin + ')';
-      });
-
-    dgms.append('text')
-      .attr("transform", "translate(0," + this.height + ")")
-      .attr("y", 6)
-      .attr("dy", "0.71em")
-      .attr("fill", "#000")
-      .text((d) => d.key);
-
-    dgms.enter().merge(dgms);
-    const self = this;
-
-    dgms.each(function (d) {
-      const group = select(this);
-      group.append('g')
-        .attr('class', 'axis axis--x')
-        .attr('transform', 'translate(0,' + (self.height - 2 * self.margin) + ')')
-        .call(axisBottom(self.yearScale));
-
-      group.append('g')
-        .attr('class', 'axis axis--y')
-        .call(axisLeft(self.scoreScale));
-
-      let formScore = group.selectAll('.formScore')
-        .data([1])
-        .enter().append('g')
-        .attr('class', 'formScore')
-        .attr('id', () => `score_dgm_${Constants.scoreIds[d.key]}_${input.PAT_ID}`);
-
-      formScore.append('path')
-        .attr('class', 'scoreLine')
-        .attr('d', () => {
-          return lineFunc(d.values)
-        });
-
-      formScore.selectAll('.scoreCircle')
-        .data(d.values)
-        .enter().append('circle')
-        .attr('class', 'scoreCircle')
-        .attr('cx', (g) => self.yearScale(g['date']))
-        .attr('cy', (g) => self.scoreScale(g['score']))
-        .attr('r', 3);
-
-      //.style('stroke', (g) => this.colorScale(g.key));
-    });
-
-    console.log('Drawing diagram of ' + this.datasetId + ' ended');
-
-  }
-
-  private async editDiagram(input) {
-    console.log('Editing diagram of ' + this.datasetId);
-
-    const args = await ajax.getAPIJSON(input.URL);
-    const data = args[input.arg].map((d) => {
-      return {date: this.parseTime(d.ASSESSMENT_START_DTM), score: d.SCORE, form: d.FORM};
-    });
-
-    const nestedData = nest()
-      .key((d) => d['form'])
-      .entries(data);
-
-    console.log(nestedData);
-
-    // set domains
-    this.yearScale.domain(extent(data, (d) => d['date']));
-
-    this.scoreScale.domain([
-      max(data, (d) => d['score']),
-      min(data, (d) => d['score'])
-    ]);
-
-    const lineFunc = line()
-      .curve(curveBasis)
-      .x((d) => {
-        return this.yearScale(d['date']);
-      })
-      .y((d) => {
-        return this.scoreScale(d['score']);
-      });
-
-
-    for (let i = 0; i < nestedData.length; i++) {
-
-      const nData = nestedData[i];
-      // add charts if necessary
-
-      console.log(nData);
-      const keyForID = Constants.scoreIds[nData['key']];
-
-      const dgm = this.svg.selectAll(`#${keyForID}`)
-        .data([1]);
-      dgm.enter()
-        .append('g')
-        .classed('diagrams', true)
-        .attr('id', (d) => keyForID)
-        .attr('transform', () => {
-          let i = select('.diagrams').size();
-          return 'translate(' + (this.margin + this.width * i) + ',' + this.margin + ')';
-        });
-      dgm.enter().append('g')
-        .attr('class', 'axis axis--x')
-        .attr('transform', 'translate(0,' + (this.height - 2 * this.margin) + ')')
-        .call(axisBottom(this.yearScale));
-      dgm.enter().append('g')
-        .attr('class', 'axis axis--y')
-        .call(axisLeft(this.scoreScale));
-
-      dgm.enter().append('text')
-        .attr("transform", "translate(0," + this.height + ")")
-        .attr("y", 6)
-        .attr("dy", "0.71em")
-        .attr("fill", "#000")
-        .text(nData['key']);
-
-      dgm.enter().merge(dgm);
-
-      let formScore = dgm.selectAll(`#score_dgm_${keyForID}_${input.PAT_ID}`)
-        .data([1])
-        .enter().append('g')
-        .attr('class', 'formScore')
-        .attr('id', () => `score_dgm_${keyForID}_${input.PAT_ID}`);
-
-      formScore.append('path')
-        .attr('class', 'scoreLine')
-        .attr('d', () => {
-          return lineFunc(nData['values'])
-        });
-
-      formScore.selectAll('.scoreCircle')
-        .data(nData['values'])
-        .enter().append('circle')
-        .attr('class', 'scoreCircle')
-        .attr('cx', (g) => this.yearScale(g['date']))
-        .attr('cy', (g) => this.scoreScale(g['score']))
-        .attr('r', 3);
-
-    }
-    console.log('Editing diagram of ' + this.datasetId + ' ended');
   }
 
   /**
@@ -378,10 +186,23 @@ export class ScoreDiagram {
 
       circles.enter().append('circle')
         .attr('class', 'scoreCircle')
-        .classed(input.PAT_ID, true)
+        .classed(`circle_${input.PAT_ID}`, true)
         .attr('r', 3)
         .attr('cx', (g) => this.yearScale(g['date']))
-        .attr('cy', (g) => this.scoreScale(g['score']));
+        .attr('cy', (g) => this.scoreScale(g['score']))
+        .on('mouseover', function (g) {
+          select('.tooltip')
+            .style('opacity', 1);
+          select('.tooltip').html(() => {
+            return `${g['date']}, ${g['score']}`;
+          })
+            .style('left', (event.pageX) + 'px')
+            .style('top', (event.pageY - 28) + 'px');
+        })
+        .on('mouseout', function () {
+          select('.tooltip')
+            .style('opacity', 0);
+        });;
 
     }
 
@@ -403,8 +224,6 @@ export class ScoreDiagram {
           .remove();
       }
     }
-    this.svg.selectAll(`.${patId}`)
-      .remove();
   }
 }
 

@@ -19,7 +19,7 @@ export class QueryBox {
     this.$node = select(parent)
       .append('div')
       .classed('queryDiv', true);
-/*
+
     this.$node.append('input')
       .attr('type', 'text')
       .attr('placeholder', 'Search Index')
@@ -34,7 +34,7 @@ export class QueryBox {
       .attr('type', 'button')
       .attr('value', 'similar')
       .on('click', () => this.updateTableSimilar());
-*/
+
     this.$node.append('input')
       .attr('type', 'text')
       .attr('placeholder', 'Search PAT_ID')
@@ -57,7 +57,7 @@ export class QueryBox {
 
     //this.$node.append('p')
     //  .text('A good example is 6790018');
-/*
+
     this.$node.append('input')
       .attr('type', 'button')
       .attr('value', 'Latest')
@@ -67,7 +67,7 @@ export class QueryBox {
       .attr('type', 'button')
       .attr('value', 'Reset')
       .on('click', () => events.fire('update_table_init', ['func', 'init']));
-*/
+
   }
 
   updateTableCluster() {

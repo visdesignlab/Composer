@@ -12,17 +12,10 @@ def phovea(registry):
   """
   # generator-phovea:begin
 
-  registry.append('namespace', 'hello_world', 'app_server.hello_world', {
-    'namespace': '/api/renamed_api'
-  })
-
   registry.append('namespace', 'data_api', 'app_server.data_api', {
     'namespace': '/api/data_api'
   })
 
-  registry.append('namespace', 'iris_api', 'app_server.iris_api', {
-    'namespace': '/api/iris_api'
-  })
 
   # generator-phovea:end
   pass

@@ -12,22 +12,18 @@ var QueryBox = (function () {
         this.$node = select(parent)
             .append('div')
             .classed('queryDiv', true);
-        /*
-            this.$node.append('input')
-              .attr('type', 'text')
-              .attr('placeholder', 'Search Index')
-              .attr('id', 'text');
-        
-            this.$node.append('input')
-              .attr('type', 'button')
-              .attr('value', 'cluster')
-              .on('click', () => this.updateTableCluster());
-        
-            this.$node.append('input')
-              .attr('type', 'button')
-              .attr('value', 'similar')
-              .on('click', () => this.updateTableSimilar());
-        */
+        this.$node.append('input')
+            .attr('type', 'text')
+            .attr('placeholder', 'Search Index')
+            .attr('id', 'text');
+        this.$node.append('input')
+            .attr('type', 'button')
+            .attr('value', 'cluster')
+            .on('click', function () { return _this.updateTableCluster(); });
+        this.$node.append('input')
+            .attr('type', 'button')
+            .attr('value', 'similar')
+            .on('click', function () { return _this.updateTableSimilar(); });
         this.$node.append('input')
             .attr('type', 'text')
             .attr('placeholder', 'Search PAT_ID')
@@ -46,17 +42,14 @@ var QueryBox = (function () {
             .on('click', function () { return _this.removeInfo(); });
         //this.$node.append('p')
         //  .text('A good example is 6790018');
-        /*
-            this.$node.append('input')
-              .attr('type', 'button')
-              .attr('value', 'Latest')
-              .on('click', () => events.fire('update_table_latest', ['datasetId', 'Demo']));
-        
-            this.$node.append('input')
-              .attr('type', 'button')
-              .attr('value', 'Reset')
-              .on('click', () => events.fire('update_table_init', ['func', 'init']));
-        */
+        this.$node.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Latest')
+            .on('click', function () { return events.fire('update_table_latest', ['datasetId', 'Demo']); });
+        this.$node.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Reset')
+            .on('click', function () { return events.fire('update_table_init', ['func', 'init']); });
     }
     QueryBox.prototype.updateTableCluster = function () {
         var value = document.getElementById('text').value;

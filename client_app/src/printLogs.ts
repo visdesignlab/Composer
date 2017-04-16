@@ -38,18 +38,6 @@ export class PrintLogs {
 
   }
 
-  async runRemove(id) {
-
-    let URL = `/data_api/removeDataSet/${id}`;
-    let args = await ajax.getAPIJSON(URL);
-
-    console.log("==========");
-    console.log("After removing a dataset");
-    console.log("==========");
-    console.log(args[0]);
-
-  }
-
   async showInfo() {
 
     let URL = `/data_api/getDatasetInfoByFunctions/${this.dataset_id}`;
