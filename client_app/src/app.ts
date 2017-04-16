@@ -3,7 +3,6 @@
  */
 
 import {select} from 'd3-selection';
-//import * as drawPlots from './drawPlots'
 import * as printLogs from './printLogs';
 import * as svgTable from './svgTable';
 import * as queryBox from './queryBox';
@@ -38,62 +37,59 @@ export class App {
    */
   private async build() {
 
-    //const dp = drawPlots.create(this.$node.node());
-    //await dp.run();
-
     //const pl = printLogs.create('Demo');
     //await pl.runLogs();
     //await pl.runDemo();
-    //await pl.runRemove('clinical_2');  // Not Working!
     //await pl.showInfo();
 
     this.$node.select('h3').remove();
-/*
-    const sideBarDiv = this.$node.append('div').classed('sideBar', true);
-    const side = sideBar.create(sideBarDiv.node());
-    await side.init();
-*/
+
+    //const sideBarDiv = this.$node.append('div').classed('sideBar', true);
+    //const side = sideBar.create(sideBarDiv.node());
+    //await side.init();
+
     const main = this.$node.append('div').classed('main', true);
 
     queryBox.create(main.node(), 'Demo');
-/*
+
+    const scoreDgm = main.append('div');
+
     main.append('h3').text('Demo');
     const tableDemo = main.append('div');
     main.append('h3').text('PRO');
-    const tablePro = main.append('div');*/
-    const scoreDgm = main.append('div');/*
-    main.append('h3').text('PT');
-    const tablePt = main.append('div');
-    main.append('h3').text('VAS');
-    const tableVas = main.append('div');
+    const tablePro = main.append('div');
+    //main.append('h3').text('PT');
+    //const tablePt = main.append('div');
+    //main.append('h3').text('VAS');
+    //const tableVas = main.append('div');
     main.append('h3').text('CCI');
     const tableCci = main.append('div');
-    main.append('h3').text('Codes');
-    const tableCodes = main.append('div');
+    //main.append('h3').text('Codes');
+    //const tableCodes = main.append('div');
     main.append('h3').text('Orders');
     const tableOrders = main.append('div');
 
+    scoreDiagram.create(scoreDgm.node(), 'PRO');
+
     const svgTableDemo = svgTable.create(tableDemo.node());
     const svgTablePro = svgTable.create(tablePro.node());
-    const svgTablePt = svgTable.create(tablePt.node());
-    const svgTableVas = svgTable.create(tableVas.node());
+    //const svgTablePt = svgTable.create(tablePt.node());
+    //const svgTableVas = svgTable.create(tableVas.node());
     const svgTableCci = svgTable.create(tableCci.node());
-    const svgTableCodes = svgTable.create(tableCodes.node());
+    //const svgTableCodes = svgTable.create(tableCodes.node());
     const svgTableOrders = svgTable.create(tableOrders.node());
-*/
-    scoreDiagram.create(scoreDgm.node(), 'PRO');
-/*
+
     await svgTableDemo.drawTable('Demo');
     await svgTablePro.drawTable('PRO');
-    await svgTablePt.drawTable('PT');
-    await svgTableVas.drawTable('VAS');
+    //await svgTablePt.drawTable('PT');
+    //await svgTableVas.drawTable('VAS');
     await svgTableCci.drawTable('CCI');
-    await svgTableCodes.drawTable('Codes');
+    //await svgTableCodes.drawTable('Codes');
     await svgTableOrders.drawTable('Orders');
-*/
+
     this.setBusy(false);
 
-    events.fire('draw_score_diagram', ['PAT_ID', '6790018']);
+    //events.fire('draw_score_diagram', ['PAT_ID', '6790018']);
   }
 
   /**

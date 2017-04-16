@@ -35,25 +35,6 @@ var PrintLogs = (function () {
         var demo = dataExplorations.create();
         return demo.demoDatasets(null);
     };
-    PrintLogs.prototype.runRemove = function (id) {
-        return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var URL, args;
-            return tslib_1.__generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        URL = "/data_api/removeDataSet/" + id;
-                        return [4 /*yield*/, ajax.getAPIJSON(URL)];
-                    case 1:
-                        args = _a.sent();
-                        console.log("==========");
-                        console.log("After removing a dataset");
-                        console.log("==========");
-                        console.log(args[0]);
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
     PrintLogs.prototype.showInfo = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
             var URL, args;

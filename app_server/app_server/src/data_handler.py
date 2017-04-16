@@ -1,10 +1,7 @@
-import csv
-import numpy as np
 import phovea_server.dataset as dt
 from phovea_server.util import jsonify
 #import phovea_server.range as rng
 
-from sklearn.cluster import DBSCAN
 import pandas as pd
 import operator
 import json
@@ -17,16 +14,6 @@ __author__ = 'Sahar'
 def get_data(id):
     return jsonify({
         'data': dt.get(id)
-    })
-
-
-# Not Working!
-def remove_dataset(id):
-    dataset = dt.get(id)
-    result = dt.remove(dataset)
-    return jsonify({
-      'data': data_handler.get_all_datasets(),
-      'result': result
     })
 
 
