@@ -14,7 +14,7 @@ var PrintLogs = (function () {
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        URL = "/data_api/getData/" + this.dataset_id;
+                        URL = "/general_api/getData/" + this.dataset_id;
                         return [4 /*yield*/, ajax.getAPIJSON(URL)];
                     case 1:
                         args = _a.sent();
@@ -22,9 +22,9 @@ var PrintLogs = (function () {
                         console.log("==========");
                         console.log("Retrieved by phovea_server/src/dataset.py");
                         console.log("==========");
-                        console.log("----> /data_api/getData/" + this.dataset_id + " :");
+                        console.log("----> /general_api/getData/" + this.dataset_id + " :");
                         console.log(args[0]['data']);
-                        console.log("----> /data_api/phoveaServerDataFunction :");
+                        console.log("----> /general_api/phoveaServerDataFunctions :");
                         console.log(args[1]);
                         return [2 /*return*/];
                 }
@@ -41,7 +41,7 @@ var PrintLogs = (function () {
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        URL = "/data_api/getDatasetInfoByFunctions/" + this.dataset_id;
+                        URL = "/general_api/getDatasetInfoByFunctions/" + this.dataset_id;
                         return [4 /*yield*/, ajax.getAPIJSON(URL)];
                     case 1:
                         args = _a.sent();
@@ -50,7 +50,7 @@ var PrintLogs = (function () {
                         console.log("Information retrieved from functions in ");
                         console.log("phovea_server/dataset_csv.py#L341");
                         console.log("==========");
-                        console.log("----> /data_api/getDatasetInfoByFunctions/" + this.dataset_id + ":");
+                        console.log("----> /general_api/getDatasetInfoByFunctions/" + this.dataset_id + ":");
                         console.log(args);
                         return [2 /*return*/];
                 }

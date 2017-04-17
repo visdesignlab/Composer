@@ -16,7 +16,7 @@ export class PrintLogs {
 
   async runLogs() {
 
-    let URL = `/data_api/getData/${this.dataset_id}`;
+    let URL = `/general_api/getData/${this.dataset_id}`;
     let args = await ajax.getAPIJSON(URL);
 
     // print data in console
@@ -24,10 +24,10 @@ export class PrintLogs {
     console.log("Retrieved by phovea_server/src/dataset.py");
     console.log("==========");
 
-    console.log("----> /data_api/getData/" + this.dataset_id + " :");
+    console.log("----> /general_api/getData/" + this.dataset_id + " :");
     console.log(args[0]['data']);
 
-    console.log("----> /data_api/phoveaServerDataFunction :");
+    console.log("----> /general_api/phoveaServerDataFunctions :");
     console.log(args[1]);
 
   }
@@ -40,7 +40,7 @@ export class PrintLogs {
 
   async showInfo() {
 
-    let URL = `/data_api/getDatasetInfoByFunctions/${this.dataset_id}`;
+    let URL = `/general_api/getDatasetInfoByFunctions/${this.dataset_id}`;
     let args = await ajax.getAPIJSON(URL);
 
     console.log("==========");
@@ -49,7 +49,7 @@ export class PrintLogs {
     console.log("phovea_server/dataset_csv.py#L341");
     console.log("==========");
 
-    console.log("----> /data_api/getDatasetInfoByFunctions/" + this.dataset_id + ":");
+    console.log("----> /general_api/getDatasetInfoByFunctions/" + this.dataset_id + ":");
     console.log(args);
 
   }

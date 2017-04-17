@@ -33,8 +33,10 @@ export class SvgTable {
     this.drawHeader();
 
     const url = `/data_api/getAllRows/${this.datasetId}`;
-    const dic = {'func': 'init', 'URL': url, 'arg': 'rows'};
-    await this.drawRows(dic);
+    this.getData(url).then((args) => {
+      const dic = {'func': 'init', 'args': args, 'arg': 'rows'};
+      this.drawRows(dic);
+    });
 
   }
 
@@ -93,23 +95,19 @@ export class SvgTable {
 
   /**
    * Draw the rows of the table
-   * url = `/data_api/getAllRows/${this.datasetId}`
-   * url = `/data_api/getClusterByIndex/${this.datasetId}/${index}`
-   * url = `/data_api/getSimilarRowsByIndex/${this.datasetId}/${index}`
-   * url = `/data_api/getInfoByColValue/${this.datasetId}/${col_name}/${col_value}`
-   * arg = cluster/similar_row/info_rows/rows/latest_info
-   * @param input dict= {'func': 'init'/'similar'/'cluster'/'update', 'URL': url, 'arg': arg}
+   * args = {data}
+   * arg = rows
+   * @param input dict= {'func': 'init'/'similar'/'all', 'args': {data}, 'arg': arg}
    * @returns {Promise<void>}
    */
-  private async drawRows(input) {
+  private drawRows(input) {
 
     console.log('Loading ' + this.datasetId);
 
-    const args = await ajax.getAPIJSON(input.URL);
-    const data = (input.func === 'init') ? args[input.arg].slice(0, 20)
-      : args[input.arg];
+    const data = (input.func === 'init') ? input.args[input.arg].slice(0, 20)
+      : input.args[input.arg];
 
-    const diff = (input.func === 'similar') ? args.difference : [];
+    const diff = (input.func === 'similar') ? input.args.difference : [];
 
     const rows = this.$node
       .selectAll('.rows')
@@ -165,7 +163,7 @@ export class SvgTable {
     rows.exit().remove();
 
     if (input.func === 'latest') {
-      this.drawLineChart(args.weights);
+      this.drawLineChart(input.args.WEIGHT_KG);
     }
 
     console.log(this.datasetId + ' loaded');
@@ -193,41 +191,45 @@ export class SvgTable {
   }
 
   private attachListener() {
-    events.on('update_table', (evt, item) => {
-       const url = `/data_api/getInfoByColValue/${this.datasetId}/${item[0]}/${item[1]}`;
-       const dic = {'func': 'update', 'URL': url, 'arg': 'info_rows'};
-       this.drawRows(dic);
+    events.on('update_table_all', (evt, item) => {
+      const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
+      const args = this.getData(url);
+      const dic = {'func': 'all', 'args': args, 'arg': 'rows'};
+      this.drawRows(dic);
     });
 
     events.on('update_table_similar', (evt, item) => {
-      if(this.datasetId === 'Demo') {
-        const url = `/data_api/getSimilarRowsByIndex/${this.datasetId}/${item[1]}`;
-        const dic = {'func': 'similar', 'URL': url, 'arg': 'similar_rows'};
-        this.drawRows(dic);
-      }
-    });
-
-    events.on('update_table_cluster', (evt, item) => {
-      if(this.datasetId === 'Demo') {
-        const url = `/data_api/getClusterByIndex/${this.datasetId}/${item[1]}`;
-        const dic = {'func': 'cluster', 'URL': url, 'arg': 'cluster'};
-        this.drawRows(dic);
+      if (this.datasetId === 'Demo') {
+        const url = `/data_api/getSimilarRows/${item[1]}`;
+        this.getData(url).then((args) => {
+          const dic = {'func': 'sim', 'args': args, 'arg': 'rows'}; // TODO func = 'similar'
+          // another event for diagrams
+          this.drawRows(dic);
+        });
       }
     });
 
     events.on('update_table_latest', () => {
-      if(this.datasetId === 'Demo') {
+      if (this.datasetId === 'Demo') {
         const url = `/data_api/getLatestInfo/${this.datasetId}`;
-        const dic = {'func': 'latest', 'URL': url, 'arg': 'latest_info'};
-        this.drawRows(dic);
+        this.getData(url).then((args) => {
+          const dic = {'func': 'latest', 'args': args, 'arg': 'rows'};
+          this.drawRows(dic);
+        });
       }
     });
 
     events.on('update_table_init', () => {
-        const url = `/data_api/getAllRows/${this.datasetId}`;
-        const dic = {'func': 'init', 'URL': url, 'arg': 'rows'};
+      const url = `/data_api/getAllRows/${this.datasetId}`;
+      this.getData(url).then((args) => {
+        const dic = {'func': 'init', 'args': args, 'arg': 'rows'};
         this.drawRows(dic);
+      });
     });
+  }
+
+  private async getData(URL) {
+    return await ajax.getAPIJSON(URL);
   }
 
 }
