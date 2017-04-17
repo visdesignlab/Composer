@@ -4,7 +4,9 @@
 import * as tslib_1 from "tslib";
 import * as ajax from 'phovea_core/src/ajax';
 import { select } from 'd3-selection';
+import { entries } from 'd3-collection';
 //import {transition} from 'd3-transition';
+import { Constants } from './constants';
 var SideBar = (function () {
     function SideBar(parent) {
         this.header = {
@@ -18,24 +20,25 @@ var SideBar = (function () {
     SideBar.prototype.init = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var URL, args, weights;
+            var args_Demo, args_CCI, weights;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        URL = "/data_api/getWeights/Demo";
-                        return [4 /*yield*/, ajax.getAPIJSON(URL)];
+                    case 0: return [4 /*yield*/, ajax.getAPIJSON("/data_api/getWeights/Demo")];
                     case 1:
-                        args = _a.sent();
-                        weights = args.weights;
-                        this.$node.selectAll('.item').data(this.header.Demo)
+                        args_Demo = _a.sent();
+                        return [4 /*yield*/, ajax.getAPIJSON("/data_api/getWeights/CCI")];
+                    case 2:
+                        args_CCI = _a.sent();
+                        weights = Object.assign(args_Demo.weights, args_CCI.weights);
+                        this.$node.selectAll('.item').data(entries(Constants.sideBar.Demo).concat(entries(Constants.sideBar.CCI)))
                             .enter()
                             .append('div')
                             .classed('item', true);
                         this.$node.selectAll('.item')
                             .html(function (d) {
-                            return "<input type='text' placeholder='Weight' size='8' id='weight_" + d
-                                + "' value='" + weights[d] + "'>"
-                                + "&nbsp;" + d;
+                            return "<input type='text' placeholder='Weight' size='8' id='weight_" + d.key
+                                + "' value='" + weights[d.key] + "'>"
+                                + "&nbsp;" + d.value;
                         });
                         this.$node.append('input')
                             .attr('type', 'button')
@@ -48,32 +51,37 @@ var SideBar = (function () {
     };
     SideBar.prototype.updateWeights = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var tempValue, tempWeights, counter, tempId, URL, args, weights;
+            var t, table, tempWeights, array, counter, tempId, tempValue, URL_1;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        tempValue = document.getElementById('weight_PAT_GENDER')
-                            .value;
-                        if (isNaN(+tempValue)) {
-                            console.log('error in weight_PAT_GENDER');
-                            return [2 /*return*/];
-                        }
-                        tempWeights = (+tempValue).toString();
-                        for (counter = 1; counter < this.header.Demo.length; counter++) {
-                            tempId = 'weight_' + this.header.Demo[counter];
+                        t = 0;
+                        _a.label = 1;
+                    case 1:
+                        if (!(t < ['Demo', 'CCI'].length)) return [3 /*break*/, 4];
+                        table = ['Demo', 'CCI'][t];
+                        tempWeights = '';
+                        array = entries(Constants.sideBar[table]);
+                        for (counter = 0; counter < array.length; counter++) {
+                            tempId = 'weight_' + array[counter].key;
                             tempValue = document.getElementById(tempId).value;
                             if (isNaN(+tempValue)) {
-                                console.log('error in ' + tempId);
+                                console.log('error in ' + array[counter].key);
                                 return [2 /*return*/];
                             }
-                            tempWeights = tempWeights + "+" + (+tempValue.toString());
+                            tempWeights = tempWeights + (+tempValue.toString()) + "+";
                         }
-                        URL = "/data_api/updateWeights/Demo/" + tempWeights;
-                        return [4 /*yield*/, ajax.getAPIJSON(URL)];
-                    case 1:
-                        args = _a.sent();
-                        weights = args.weights;
-                        console.log(URL);
+                        URL_1 = "/data_api/updateWeights/" + table + "/"
+                            + tempWeights.substring(0, tempWeights.length - 1);
+                        return [4 /*yield*/, ajax.getAPIJSON(URL_1)];
+                    case 2:
+                        _a.sent();
+                        console.log(URL_1);
+                        _a.label = 3;
+                    case 3:
+                        t++;
+                        return [3 /*break*/, 1];
+                    case 4:
                         console.log('Weights are updated.');
                         return [2 /*return*/];
                 }

@@ -48,4 +48,14 @@ Constants.scoreIds = {
     'PROMIS-Ca Bank v1.1 - Physical Function': 'promis_ca',
     'ODI for Lumbar Spine (Owestry Disability Index) Neurosurgery': 'lumar'
 };
+Constants.sideBar = {
+    'Demo': {
+        'AGE': 'Admission Date - Birth Date', 'PAT_GENDER': 'Gender',
+        'PAT_ETHNICITY': 'Ethnicity', 'PAT_RACE': 'Race', 'PAT_MARITAL_STAT': 'Marital Status',
+        'BMI': 'BMI', 'HEIGHT_CM': 'Height', 'WEIGHT_KG': 'Weight',
+        'TOBACCO_USER': 'Tobacco User', 'ALCOHOL_USER': 'Alcohol user',
+        'ILLICIT_DRUG_USER': 'Illicit Drug User'
+    },
+    'CCI': { 'CCI_SCORE': 'CCI score' }
+};
 //# sourceMappingURL=constants.js.map

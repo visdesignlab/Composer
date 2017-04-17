@@ -46,18 +46,21 @@ export class ScoreDiagram {
   }
 
   private attachListener() {
-    events.on('draw_score_diagram', (evt, item) => {
-      const url = `/data_api/getInfoByColValue/${this.datasetId}/${item[0]}/${item[1]}`;
-      const dic = {'func': 'update', 'URL': url, 'arg': 'info_rows', 'PAT_ID': item[1]};
+    events.on('init_score_diagram', (evt, item) => {
+      const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
+      const dic = {'func': 'init', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1]};
+
+      // reset
       this.svg.selectAll('g').remove();
       this.yearScale = scaleTime().range([0, this.width - 2 * this.margin]);
       this.scoreScale = scaleLinear().range([0, this.height - 2 * this.margin]);
+
       this.drawDiagram(dic);
     });
 
-    events.on('edit_score_diagram', (evt, item) => {
-      const url = `/data_api/getInfoByColValue/${this.datasetId}/${item[0]}/${item[1]}`;
-      const dic = {'func': 'update', 'URL': url, 'arg': 'info_rows', 'PAT_ID': item[1]};
+    events.on('add_score_diagram', (evt, item) => {
+      const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
+      const dic = {'func': 'add', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1]};
       this.drawDiagram(dic);
     });
 

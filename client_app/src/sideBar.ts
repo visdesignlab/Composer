@@ -7,6 +7,7 @@ import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
 //import {transition} from 'd3-transition';
+import {Constants} from './constants';
 
 export class SideBar {
 
@@ -25,20 +26,21 @@ export class SideBar {
 
   async init() {
 
-    const URL = `/data_api/getWeights/Demo`;
-    const args = await ajax.getAPIJSON(URL);
-    const weights = args.weights;
+    let args_Demo = await ajax.getAPIJSON(`/data_api/getWeights/Demo`);
+    let args_CCI = await ajax.getAPIJSON(`/data_api/getWeights/CCI`);
+    const weights = Object.assign(args_Demo.weights,args_CCI.weights);
 
-    this.$node.selectAll('.item').data(this.header.Demo)
+    this.$node.selectAll('.item').data(
+      entries(Constants.sideBar.Demo).concat(entries(Constants.sideBar.CCI)))
       .enter()
       .append('div')
       .classed('item', true);
 
     this.$node.selectAll('.item')
       .html((d) => {
-        return `<input type='text' placeholder='Weight' size='8' id='weight_` + d
-          + `' value='` + weights[d] + `'>`
-          + `&nbsp;` + d;
+        return `<input type='text' placeholder='Weight' size='8' id='weight_` + d.key
+          + `' value='` + weights[d.key] + `'>`
+          + `&nbsp;` + d.value;
       });
 
     this.$node.append('input')
@@ -49,33 +51,29 @@ export class SideBar {
 
   async updateWeights() {
 
-    let tempValue = (<HTMLInputElement>document.getElementById('weight_PAT_GENDER'))
-      .value;
+    for(let t=0; t<['Demo', 'CCI'].length; t++) {
+      let table = ['Demo', 'CCI'][t];
 
-    if (isNaN(+tempValue)) {
-      console.log('error in weight_PAT_GENDER');
-      return;
-    }
+      let tempWeights = '';
+      let array = entries(Constants.sideBar[table]);
 
-    let tempWeights = (+tempValue).toString();
+      for (let counter = 0; counter < array.length; counter++) {
+        const tempId = 'weight_' + array[counter].key;
+        const tempValue = (<HTMLInputElement>document.getElementById(tempId)).value;
 
-    for (let counter = 1; counter < this.header.Demo.length; counter++) {
-      const tempId = 'weight_' + this.header.Demo[counter];
-      tempValue = (<HTMLInputElement>document.getElementById(tempId)).value;
-
-      if (isNaN(+tempValue)) {
-        console.log('error in ' + tempId);
-        return;
+        if (isNaN(+tempValue)) {
+          console.log('error in ' + array[counter].key);
+          return;
+        }
+        tempWeights = tempWeights + (+tempValue.toString()) + `+`;
       }
 
-      tempWeights = tempWeights + `+` + (+tempValue.toString());
+      let URL = `/data_api/updateWeights/${table}/`
+        + tempWeights.substring(0, tempWeights.length-1); // The last character is '+'
+      await ajax.getAPIJSON(URL);
+      console.log(URL);
     }
 
-    const URL = `/data_api/updateWeights/Demo/` + tempWeights;
-    const args = await ajax.getAPIJSON(URL);
-    const weights = args.weights;
-
-    console.log(URL);
     console.log('Weights are updated.');
 
   }

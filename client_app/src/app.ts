@@ -44,9 +44,9 @@ export class App {
 
     this.$node.select('h3').remove();
 
-    //const sideBarDiv = this.$node.append('div').classed('sideBar', true);
-    //const side = sideBar.create(sideBarDiv.node());
-    //await side.init();
+    const sideBarDiv = this.$node.append('div').classed('sideBar', true);
+    const side = sideBar.create(sideBarDiv.node());
+    await side.init();
 
     const main = this.$node.append('div').classed('main', true);
 
@@ -55,7 +55,7 @@ export class App {
     const scoreDgm = main.append('div');
 
     main.append('h3').text('Demo');
-    const tableDemo = main.append('div');
+    const tableDemo = main.append('div');/*
     main.append('h3').text('PRO');
     const tablePro = main.append('div');
     //main.append('h3').text('PT');
@@ -68,25 +68,25 @@ export class App {
     //const tableCodes = main.append('div');
     main.append('h3').text('Orders');
     const tableOrders = main.append('div');
-
+*/
     scoreDiagram.create(scoreDgm.node(), 'PRO');
 
-    const svgTableDemo = svgTable.create(tableDemo.node());
+    const svgTableDemo = svgTable.create(tableDemo.node());/*
     const svgTablePro = svgTable.create(tablePro.node());
     //const svgTablePt = svgTable.create(tablePt.node());
     //const svgTableVas = svgTable.create(tableVas.node());
     const svgTableCci = svgTable.create(tableCci.node());
     //const svgTableCodes = svgTable.create(tableCodes.node());
     const svgTableOrders = svgTable.create(tableOrders.node());
-
-    await svgTableDemo.drawTable('Demo');
+*/
+    await svgTableDemo.drawTable('Demo');/*
     await svgTablePro.drawTable('PRO');
     //await svgTablePt.drawTable('PT');
     //await svgTableVas.drawTable('VAS');
     await svgTableCci.drawTable('CCI');
     //await svgTableCodes.drawTable('Codes');
     await svgTableOrders.drawTable('Orders');
-
+*/
     this.setBusy(false);
 
     //events.fire('draw_score_diagram', ['PAT_ID', '6790018']);

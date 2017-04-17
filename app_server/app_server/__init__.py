@@ -12,6 +12,10 @@ def phovea(registry):
   """
   # generator-phovea:begin
 
+  registry.append('namespace', 'general_api', 'app_server.general_api', {
+      'namespace': '/api/general_api'
+    })
+
   registry.append('namespace', 'data_api', 'app_server.data_api', {
     'namespace': '/api/data_api'
   })

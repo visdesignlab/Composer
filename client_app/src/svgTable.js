@@ -21,19 +21,17 @@ var SvgTable = (function () {
     }
     SvgTable.prototype.drawTable = function (datasetId) {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var url, dic;
+            var _this = this;
+            var url;
             return tslib_1.__generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        this.datasetId = datasetId;
-                        this.drawHeader();
-                        url = "/data_api/getAllRows/" + this.datasetId;
-                        dic = { 'func': 'init', 'URL': url, 'arg': 'rows' };
-                        return [4 /*yield*/, this.drawRows(dic)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
+                this.datasetId = datasetId;
+                this.drawHeader();
+                url = "/data_api/getAllRows/" + this.datasetId;
+                this.getData(url).then(function (args) {
+                    var dic = { 'func': 'init', 'args': args, 'arg': 'rows' };
+                    _this.drawRows(dic);
+                });
+                return [2 /*return*/];
             });
         });
     };
@@ -89,85 +87,70 @@ var SvgTable = (function () {
     };
     /**
      * Draw the rows of the table
-     * url = `/data_api/getAllRows/${this.datasetId}`
-     * url = `/data_api/getClusterByIndex/${this.datasetId}/${index}`
-     * url = `/data_api/getSimilarRowsByIndex/${this.datasetId}/${index}`
-     * url = `/data_api/getInfoByColValue/${this.datasetId}/${col_name}/${col_value}`
-     * arg = cluster/similar_row/info_rows/rows/latest_info
-     * @param input dict= {'func': 'init'/'similar'/'cluster'/'update', 'URL': url, 'arg': arg}
+     * args = {data}
+     * arg = rows
+     * @param input dict= {'func': 'init'/'similar'/'all', 'args': {data}, 'arg': arg}
      * @returns {Promise<void>}
      */
     SvgTable.prototype.drawRows = function (input) {
-        return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            var args, data, diff, rows, cells;
-            return tslib_1.__generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        console.log('Loading ' + this.datasetId);
-                        return [4 /*yield*/, ajax.getAPIJSON(input.URL)];
-                    case 1:
-                        args = _a.sent();
-                        data = (input.func === 'init') ? args[input.arg].slice(0, 20)
-                            : args[input.arg];
-                        diff = (input.func === 'similar') ? args.difference : [];
-                        rows = this.$node
-                            .selectAll('.rows')
-                            .data(data);
-                        cells = rows.enter().append('div')
-                            .classed('rows', true)
-                            .merge(rows)
-                            .selectAll('.cells')
-                            .data(function (d, i) {
-                            var ent = entries(d);
-                            ent.sort(function (a, b) {
-                                return _this.header[_this.datasetId].indexOf(a.key)
-                                    - _this.header[_this.datasetId].indexOf(b.key);
-                            });
-                            if (input.func === 'similar') {
-                                for (var j = 0; j < ent.length; j++) {
-                                    ent[j]['diff'] = +diff[i][j];
-                                }
-                            }
-                            return ent;
-                        });
-                        cells
-                            .enter().append('div')
-                            .classed('cells', true)
-                            .merge(cells)
-                            .classed('superWideCell', function (g, i) {
-                            return _this.cols[_this.datasetId].SuperWide.indexOf(i) !== -1;
-                        })
-                            .classed('wideCell', function (g, i) {
-                            return _this.cols[_this.datasetId].Wide.indexOf(i) !== -1;
-                        })
-                            .classed('mediumCell', function (g, i) {
-                            return _this.cols[_this.datasetId].Medium.indexOf(i) !== -1;
-                        })
-                            .classed('sameValue', function (g) {
-                            return input.func === 'similar' && g.diff === 0;
-                        })
-                            .classed('lowerValue', function (g) {
-                            return input.func === 'similar' && g.diff === -1;
-                        })
-                            .classed('higherValue', function (g) {
-                            return input.func === 'similar' && g.diff === +1;
-                        })
-                            .html(function (g) {
-                            if (g.key === 'WEIGHT_KG') {
-                                return "<svg width='50' height='20'><path class='lineChart' d></svg>" + g.value;
-                            }
-                            return g.value;
-                        });
-                        rows.exit().remove();
-                        if (input.func === 'latest') {
-                            this.drawLineChart(args.weights);
-                        }
-                        console.log(this.datasetId + ' loaded');
-                        return [2 /*return*/];
-                }
+        var _this = this;
+        console.log('Loading ' + this.datasetId);
+        var data = (input.func === 'init') ? input.args[input.arg].slice(0, 20)
+            : input.args[input.arg];
+        var diff = (input.func === 'similar') ? input.args.difference : [];
+        var rows = this.$node
+            .selectAll('.rows')
+            .data(data);
+        var cells = rows.enter().append('div')
+            .classed('rows', true)
+            .merge(rows)
+            .selectAll('.cells')
+            .data(function (d, i) {
+            var ent = entries(d);
+            ent.sort(function (a, b) {
+                return _this.header[_this.datasetId].indexOf(a.key)
+                    - _this.header[_this.datasetId].indexOf(b.key);
             });
+            if (input.func === 'similar') {
+                for (var j = 0; j < ent.length; j++) {
+                    ent[j]['diff'] = +diff[i][j];
+                }
+            }
+            return ent;
         });
+        cells
+            .enter().append('div')
+            .classed('cells', true)
+            .merge(cells)
+            .classed('superWideCell', function (g, i) {
+            return _this.cols[_this.datasetId].SuperWide.indexOf(i) !== -1;
+        })
+            .classed('wideCell', function (g, i) {
+            return _this.cols[_this.datasetId].Wide.indexOf(i) !== -1;
+        })
+            .classed('mediumCell', function (g, i) {
+            return _this.cols[_this.datasetId].Medium.indexOf(i) !== -1;
+        })
+            .classed('sameValue', function (g) {
+            return input.func === 'similar' && g.diff === 0;
+        })
+            .classed('lowerValue', function (g) {
+            return input.func === 'similar' && g.diff === -1;
+        })
+            .classed('higherValue', function (g) {
+            return input.func === 'similar' && g.diff === +1;
+        })
+            .html(function (g) {
+            if (g.key === 'WEIGHT_KG') {
+                return "<svg width='50' height='20'><path class='lineChart' d></svg>" + g.value;
+            }
+            return g.value;
+        });
+        rows.exit().remove();
+        if (input.func === 'latest') {
+            this.drawLineChart(input.args.WEIGHT_KG);
+        }
+        console.log(this.datasetId + ' loaded');
     };
     SvgTable.prototype.drawLineChart = function (data) {
         var scaleWeight = scaleLinear()
@@ -185,36 +168,47 @@ var SvgTable = (function () {
     };
     SvgTable.prototype.attachListener = function () {
         var _this = this;
-        events.on('update_table', function (evt, item) {
-            var url = "/data_api/getInfoByColValue/" + _this.datasetId + "/" + item[0] + "/" + item[1];
-            var dic = { 'func': 'update', 'URL': url, 'arg': 'info_rows' };
+        events.on('update_table_all', function (evt, item) {
+            var url = "/data_api/getPatInfo/" + _this.datasetId + "/" + item[1];
+            var args = _this.getData(url);
+            var dic = { 'func': 'all', 'args': args, 'arg': 'rows' };
             _this.drawRows(dic);
         });
         events.on('update_table_similar', function (evt, item) {
             if (_this.datasetId === 'Demo') {
-                var url = "/data_api/getSimilarRowsByIndex/" + _this.datasetId + "/" + item[1];
-                var dic = { 'func': 'similar', 'URL': url, 'arg': 'similar_rows' };
-                _this.drawRows(dic);
-            }
-        });
-        events.on('update_table_cluster', function (evt, item) {
-            if (_this.datasetId === 'Demo') {
-                var url = "/data_api/getClusterByIndex/" + _this.datasetId + "/" + item[1];
-                var dic = { 'func': 'cluster', 'URL': url, 'arg': 'cluster' };
-                _this.drawRows(dic);
+                var url = "/data_api/getSimilarRows/" + item[1];
+                _this.getData(url).then(function (args) {
+                    var dic = { 'func': 'sim', 'args': args, 'arg': 'rows' }; // TODO func = 'similar'
+                    // another event for diagrams
+                    _this.drawRows(dic);
+                });
             }
         });
         events.on('update_table_latest', function () {
             if (_this.datasetId === 'Demo') {
                 var url = "/data_api/getLatestInfo/" + _this.datasetId;
-                var dic = { 'func': 'latest', 'URL': url, 'arg': 'latest_info' };
-                _this.drawRows(dic);
+                _this.getData(url).then(function (args) {
+                    var dic = { 'func': 'latest', 'args': args, 'arg': 'rows' };
+                    _this.drawRows(dic);
+                });
             }
         });
         events.on('update_table_init', function () {
             var url = "/data_api/getAllRows/" + _this.datasetId;
-            var dic = { 'func': 'init', 'URL': url, 'arg': 'rows' };
-            _this.drawRows(dic);
+            _this.getData(url).then(function (args) {
+                var dic = { 'func': 'init', 'args': args, 'arg': 'rows' };
+                _this.drawRows(dic);
+            });
+        });
+    };
+    SvgTable.prototype.getData = function (URL) {
+        return tslib_1.__awaiter(this, void 0, void 0, function () {
+            return tslib_1.__generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, ajax.getAPIJSON(URL)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
         });
     };
     return SvgTable;

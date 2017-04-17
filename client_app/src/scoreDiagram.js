@@ -32,17 +32,18 @@ var ScoreDiagram = (function () {
     }
     ScoreDiagram.prototype.attachListener = function () {
         var _this = this;
-        events.on('draw_score_diagram', function (evt, item) {
-            var url = "/data_api/getInfoByColValue/" + _this.datasetId + "/" + item[0] + "/" + item[1];
-            var dic = { 'func': 'update', 'URL': url, 'arg': 'info_rows', 'PAT_ID': item[1] };
+        events.on('init_score_diagram', function (evt, item) {
+            var url = "/data_api/getPatInfo/" + _this.datasetId + "/" + item[1];
+            var dic = { 'func': 'init', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1] };
+            // reset
             _this.svg.selectAll('g').remove();
             _this.yearScale = scaleTime().range([0, _this.width - 2 * _this.margin]);
             _this.scoreScale = scaleLinear().range([0, _this.height - 2 * _this.margin]);
             _this.drawDiagram(dic);
         });
-        events.on('edit_score_diagram', function (evt, item) {
-            var url = "/data_api/getInfoByColValue/" + _this.datasetId + "/" + item[0] + "/" + item[1];
-            var dic = { 'func': 'update', 'URL': url, 'arg': 'info_rows', 'PAT_ID': item[1] };
+        events.on('add_score_diagram', function (evt, item) {
+            var url = "/data_api/getPatInfo/" + _this.datasetId + "/" + item[1];
+            var dic = { 'func': 'add', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1] };
             _this.drawDiagram(dic);
         });
         events.on('remove_score_diagram', function (evt, item) {
