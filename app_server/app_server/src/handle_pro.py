@@ -19,6 +19,7 @@ category_replacement = {
 }
 
 
+# NEVER USED!
 def process_data(data):  # only values!!
     processed_data = []
 

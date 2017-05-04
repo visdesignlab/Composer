@@ -3,11 +3,13 @@
  */
 
 import {select} from 'd3-selection';
+import {scaleLinear} from 'd3-scale';
 import * as printLogs from './printLogs';
 import * as svgTable from './svgTable';
 import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
 import * as scoreDiagram from './scoreDiagram';
+import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 
 
@@ -52,44 +54,51 @@ export class App {
 
     queryBox.create(main.node(), 'Demo');
 
-    const scoreDgm = main.append('div');
+    //const scoreDgm = main.append('div'); // old one
+    const dgmPromisPhysicalDiv = main.append('Div');
 
     main.append('h3').text('Demo');
-    const tableDemo = main.append('div');/*
+    const tableDemo = main.append('div');
     main.append('h3').text('PRO');
     const tablePro = main.append('div');
-    //main.append('h3').text('PT');
-    //const tablePt = main.append('div');
-    //main.append('h3').text('VAS');
-    //const tableVas = main.append('div');
     main.append('h3').text('CCI');
     const tableCci = main.append('div');
     //main.append('h3').text('Codes');
     //const tableCodes = main.append('div');
-    main.append('h3').text('Orders');
-    const tableOrders = main.append('div');
-*/
-    scoreDiagram.create(scoreDgm.node(), 'PRO');
+    //main.append('h3').text('Orders');
+    //const tableOrders = main.append('div');
+    //main.append('h3').text('PT');
+    //const tablePt = main.append('div');
+    //main.append('h3').text('VAS');
+    //const tableVas = main.append('div');
 
-    const svgTableDemo = svgTable.create(tableDemo.node());/*
+
+    //scoreDiagram.create(scoreDgm.node(), 'PRO'); // old one
+    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
+    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
+
+
+    const svgTableDemo = svgTable.create(tableDemo.node());
     const svgTablePro = svgTable.create(tablePro.node());
-    //const svgTablePt = svgTable.create(tablePt.node());
-    //const svgTableVas = svgTable.create(tableVas.node());
     const svgTableCci = svgTable.create(tableCci.node());
     //const svgTableCodes = svgTable.create(tableCodes.node());
-    const svgTableOrders = svgTable.create(tableOrders.node());
-*/
-    await svgTableDemo.drawTable('Demo');/*
+    //const svgTableOrders = svgTable.create(tableOrders.node());
+    //const svgTablePt = svgTable.create(tablePt.node());
+    //const svgTableVas = svgTable.create(tableVas.node());
+
+    await svgTableDemo.drawTable('Demo');
     await svgTablePro.drawTable('PRO');
-    //await svgTablePt.drawTable('PT');
-    //await svgTableVas.drawTable('VAS');
     await svgTableCci.drawTable('CCI');
     //await svgTableCodes.drawTable('Codes');
-    await svgTableOrders.drawTable('Orders');
-*/
+    //await svgTableOrders.drawTable('Orders');
+    //await svgTablePt.drawTable('PT');
+    //await svgTableVas.drawTable('VAS');
+
     this.setBusy(false);
 
-    //events.fire('draw_score_diagram', ['PAT_ID', '6790018']);
+    //events.fire('draw_score_diagram', ['PAT_ID', '920736']);
+    //events.fire('update_table_similar', ['PAT_ID', '16182719']);
   }
 
   /**

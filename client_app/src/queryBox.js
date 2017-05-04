@@ -28,20 +28,28 @@ var QueryBox = (function () {
             .attr('type', 'button')
             .attr('value', 'similar')
             .on('click', function () { return _this.updateTableSimilar(); });
+        // TODO: Not active right now
+        /*
         this.$node.append('input')
-            .attr('type', 'button')
-            .attr('value', 'All Info')
-            .on('click', function () { return _this.updateTableInfo(); });
+          .attr('type', 'button')
+          .attr('value', 'All Info')
+          .on('click', () => this.updateTableInfo());
+    
+    
         this.$node.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Add Patient info')
-            .on('click', function () { return _this.addInfo(); });
+          .attr('type', 'button')
+          .attr('value', 'Add Patient info')
+          .on('click', () => this.addInfo());
+    
         this.$node.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Remove Patient info')
-            .on('click', function () { return _this.removeInfo(); });
+          .attr('type', 'button')
+          .attr('value', 'Remove Patient info')
+          .on('click', () => this.removeInfo());
+    
         //this.$node.append('p')
         //  .text('A good example is 6790018');
+    
+    */
     }
     QueryBox.prototype.updateTableSimilar = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
@@ -49,9 +57,6 @@ var QueryBox = (function () {
             return tslib_1.__generator(this, function (_a) {
                 value = document.getElementById('text_pat_id').value;
                 if (!isNaN(+value)) {
-                    //console.log('loading');
-                    //const args = await ajax.getAPIJSON(`/data_api/getSimilarRowsNew/${value}`);
-                    //console.log(args);
                     events.fire('update_table_similar', ['PAT_ID', value]);
                 }
                 else {
@@ -65,25 +70,6 @@ var QueryBox = (function () {
         var value = document.getElementById('text_pat_id').value;
         if (!isNaN(+value)) {
             events.fire('update_table_all', ['PAT_ID', value]);
-            events.fire('init_score_diagram', ['PAT_ID', value]);
-        }
-        else {
-            console.log('Not a Number');
-        }
-    };
-    QueryBox.prototype.addInfo = function () {
-        var value = document.getElementById('text_pat_id').value;
-        if (!isNaN(+value)) {
-            events.fire('add_score_diagram', ['PAT_ID', value]);
-        }
-        else {
-            console.log('Not a Number');
-        }
-    };
-    QueryBox.prototype.removeInfo = function () {
-        var value = document.getElementById('text_pat_id').value;
-        if (!isNaN(+value)) {
-            events.fire('remove_score_diagram', ['PAT_ID', value]);
         }
         else {
             console.log('Not a Number');

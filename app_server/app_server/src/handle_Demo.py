@@ -1,7 +1,6 @@
 import phovea_server.dataset as dt
 from phovea_server.util import jsonify
 
-from sklearn.cluster import DBSCAN
 import numpy as np
 import pandas as pd
 
@@ -24,82 +23,7 @@ numerical_data = ["BMI", "HEIGHT_CM", "WEIGHT_KG"]
 years = ["PAT_BIRTHDATE", "ADM_DATE", "DSCH_DATE"]
 
 
-def find_similar(data, PAT_ID):
-    similar_rows = []
-    dist = []
-
-    index = 0
-    for i in range(0, len(data)):
-        if int(data[i]['PAT_ID']) == int(PAT_ID):
-            index = i
-            break
-
-    target_row = data[index]
-
-    header = list(weights_Demo.keys())
-
-    for num in range(len(data)):
-        row = data[num]
-        tmp_row = []
-        for h in header:
-            if not row[h] and not target_row[h]:
-                tmp_value = 0
-            elif weights_Demo[h] != 0:
-                if h in years:
-                    if not row[h]:
-                        tmp_value = float(extract_year(target_row[h])) * weights_Demo[h]
-                    elif not target_row[h]:
-                        tmp_value = float(extract_year(row[h])) * weights_Demo[h]
-                    else:
-                        tmp_value = (float(extract_year(row[h])) - float(extract_year(target_row[h]))) * weights_Demo[h]
-                elif h in numerical_data:
-                    if not row[h]:
-                        tmp_value = float(target_row[h]) * weights_Demo[h]
-                    elif not target_row[h]:
-                        tmp_value = float(row[h]) * weights_Demo[h]
-                    else:
-                        tmp_value = (float(row[h]) - float(target_row[h])) * weights_Demo[h]
-                else:
-                    tmp_value = 0 if target_row[h] == row[h] else weights_Demo[h]
-            else:
-                tmp_value = 0
-            tmp_row.append(tmp_value)
-        dist.append([num, np.linalg.norm(tmp_row)])
-
-    sorted_dist = sorted(dist, key=lambda x: x[1])
-    similar_index = [row[0] for row in sorted_dist]
-
-    difference = []  # array of [-1 or +1 or 0] difference with the original data
-    for i in range(0, 20):
-        tmp_row = data[similar_index[i]]
-        similar_rows.append(tmp_row)
-        tmp_diff = []
-        for h in header:
-            if not tmp_row[h] and not target_row[h]:
-                diff = 0
-            elif not tmp_row[h] or not target_row[h]:
-                diff = -1
-            elif h in years:
-                diff = np.sign((float(extract_year(tmp_row[h])) - float(extract_year(target_row[h]))))
-            elif h in categorical_data:
-                diff = 0 if target_row[h] == tmp_row[h] else -1
-            elif h in numerical_data:
-                diff = np.sign((float(tmp_row[h]) - float(target_row[h])))
-            else:
-                diff = 0 if target_row[h] == tmp_row[h] else -1
-            tmp_diff.append(diff)
-
-        difference.append(tmp_diff)
-
-    return jsonify({
-      'PAT_ID': PAT_ID,
-      'row': target_row,
-      'rows': similar_rows[0:20],
-      'difference': difference,
-      'indices': similar_index[0:20]
-    })
-
-
+# used in data_handler.get_latest_info
 def get_latest_info():
     data = dt.get('Demo').aslist()
     pat_ids = set([int(d['PAT_ID']) for d in data])
@@ -120,21 +44,23 @@ def get_latest_info():
       'WEIGHT_KG': pat_weights
     })
 
-#####=======================
 
+# NEVER USED!
 def get_similar_demo(PAT_ID):
     data = dt.get('Demo').aslist()
     return find_similar(data, PAT_ID)
 
 
+# used in data_handler.get_weights
 def get_weights():
     return jsonify({
       'weights': weights_Demo
     })
 
 
+# used in data_handler.update_weights
 def update_weights(values):
-    partial_header = ["AGE", "PAT_GENDER", "PAT_ETHNICITY",
+    partial_header = ["PAT_BIRTHDATE", "PAT_GENDER", "PAT_ETHNICITY",
                       "PAT_RACE", "PAT_MARITAL_STAT", "BMI",
                       "HEIGHT_CM", "WEIGHT_KG", "TOBACCO_USER",
                       "ALCOHOL_USER", "ILLICIT_DRUG_USER"]
@@ -148,6 +74,7 @@ def update_weights(values):
     })
 
 
+# used in data_handler.get_similar_rows
 def get_first_info(PAT_ID):
     data = dt.get('Demo').aslist()
     # find the first entry for each patient
@@ -162,14 +89,18 @@ def get_first_info(PAT_ID):
     return first_ent
 
 
+# used in data_handler.get_similar_rows
 def get_similarity_score(PAT_ID):
     data = dt.get('Demo').aslist()
     pat_ids = set([int(d['PAT_ID']) for d in data])
 
     # find the first entry for each patient
     pats = {}
-    for id in pat_ids:
-        pats[id] = get_first_info(id)
+    #for id in pat_ids:
+    #    pats[id] = get_first_info(id)
+
+    for row in data:
+        pats[int(row['PAT_ID'])] = row
 
     scores = {}
     target_pat = pats[PAT_ID]
@@ -182,10 +113,10 @@ def get_similarity_score(PAT_ID):
         for h in list(weights_Demo.keys()):
             if weights_Demo[h] == 0:
                 continue
-            if not curr_pat[h] or not target_pat[h]:
+            elif not curr_pat[h] or not target_pat[h]:
                 similarity_score += 0.5 * weights_Demo[h]
 
-            if h in categorical_data:
+            elif h in categorical_data:
                 similarity_score += weights_Demo[h] if target_pat[h] == curr_pat[h] else 0
             elif h in numerical_data:
                 similarity_score += weights_Demo[h] if target_pat[h] == curr_pat[h] else 0 ## within range
@@ -198,8 +129,47 @@ def get_similarity_score(PAT_ID):
 
     return scores
 
-#####=======================
 
+# used in data_handler.get_similar_rows
+def get_difference(PAT_ID, ids):
+
+    pats = {}
+    for id in ids:
+        pats[id] = get_first_info(id)
+
+    target_pat = get_first_info(PAT_ID)
+    difference = []  # array of {h : -1/+1/0/0.5} difference with the original data
+
+    # for the target patient
+    tmp_diff = {}
+    for h in list(weights_Demo.keys()):
+        tmp_diff[h] = 0
+    difference.append(tmp_diff)
+
+    for id in ids:
+        curr_pat = pats[id]
+        tmp_diff = {}
+        for h in list(weights_Demo.keys()):
+            #if weights_Demo[h] == 0:
+            #    diff = 0
+            if not curr_pat[h] or not target_pat[h]:
+                diff = 0.5
+            elif h in categorical_data:
+                diff = 0 if target_pat[h] == curr_pat[h] else 1
+            elif h in numerical_data:
+                diff = 0 if target_pat[h] == curr_pat[h] else np.sign(float(target_pat[h]) - float(curr_pat[h])) ## within range
+            elif h in years: ## age! ## within range
+                diff = 0 if float(extract_year(target_pat[h])) == float(extract_year(curr_pat[h])) else np.sign(float(extract_year(target_pat[h])) - float(extract_year(curr_pat[h])))
+            else:
+                diff = 0 if target_pat[h] == curr_pat[h] else 1
+
+            tmp_diff[h] = diff
+        difference.append(tmp_diff)
+
+    return difference
+
+
+##============= utility functions
 def extract_year(date):
     time = to_data_time(date)
     return time.year

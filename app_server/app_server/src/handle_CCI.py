@@ -17,12 +17,14 @@ weights_CCI = {"PAT_ID": 0, "VISIT_NO": 0, "CCI_MI": 0, "CCI_CHF": 0, "CCI_PVD":
 numerical_data = ["CCI_SCORE"]
 
 
+# used in data_handler.get_weights
 def get_weights():
     return jsonify({
       'weights': weights_CCI
     })
 
 
+# used in data_handler.update_weights
 def update_weights(values):
     partial_header = ["CCI_SCORE"]
 
@@ -35,22 +37,20 @@ def update_weights(values):
     })
 
 
+# used in data_handler.get_similar_rows
 def get_similarity_score(PAT_ID):
     data = dt.get('CCI').aslist()
     pat_ids = set([int(d['PAT_ID']) for d in data])
 
     # find the first entry for each patient
     pats = {}
-    for id in pat_ids:
-        temp_pat = []
-        for row in data:
-            if row['PAT_ID'] == id:
-                temp_pat.append(row)
-
-        # get average?
-        pats[id] = temp_pat[0]
+    for row in data:
+        pats[int(row['PAT_ID'])] = row
 
     scores = {}
+    if PAT_ID not in pats:
+        return []
+
     target_pat = pats[PAT_ID]
 
     for id in pat_ids:
@@ -75,8 +75,7 @@ def get_similarity_score(PAT_ID):
 
     return scores
 
-#####=======================
-
+##============= utility functions
 def extract_year(date):
     time = to_data_time(date)
     return time.year

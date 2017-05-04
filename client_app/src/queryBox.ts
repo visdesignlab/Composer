@@ -40,10 +40,13 @@ export class QueryBox {
       .attr('value', 'similar')
       .on('click', () => this.updateTableSimilar());
 
+    // TODO: Not active right now
+    /*
     this.$node.append('input')
       .attr('type', 'button')
       .attr('value', 'All Info')
       .on('click', () => this.updateTableInfo());
+
 
     this.$node.append('input')
       .attr('type', 'button')
@@ -58,16 +61,13 @@ export class QueryBox {
     //this.$node.append('p')
     //  .text('A good example is 6790018');
 
-
+*/
   }
 
   async updateTableSimilar() {
 
     const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
     if (!isNaN(+value)) {
-      //console.log('loading');
-      //const args = await ajax.getAPIJSON(`/data_api/getSimilarRowsNew/${value}`);
-      //console.log(args);
       events.fire('update_table_similar', ['PAT_ID', value]);
     } else {
       console.log('Not a Number');
@@ -79,12 +79,15 @@ export class QueryBox {
     const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
     if (!isNaN(+value)) {
       events.fire('update_table_all', ['PAT_ID', value]);
-      events.fire('init_score_diagram', ['PAT_ID', value]);
+      // TODO: Not active right now
+      //events.fire('init_score_diagram', ['PAT_ID', value]);
     } else {
       console.log('Not a Number');
     }
   }
 
+  // TODO: Not active right now
+/*
   addInfo() {
     const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
     if (!isNaN(+value)) {
@@ -102,6 +105,7 @@ export class QueryBox {
       console.log('Not a Number');
     }
   }
+*/
 
 }
 
