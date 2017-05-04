@@ -32,14 +32,9 @@ def _get_pat_info(id, PAT_ID):
     return data_handler.get_pat_info(id, PAT_ID)
 
 
-@app.route('/getSimilarRowsOld/<id>/<PAT_ID>')
-def _get_similar_rows(id, PAT_ID):
-    return data_handler.get_similar_rows(id, PAT_ID)
-
-
 @app.route('/getSimilarRows/<PAT_ID>')
-def _get_similar_rows_new(PAT_ID):
-    return data_handler.new_get_similar_rows(PAT_ID)
+def _get_similar_rows(PAT_ID):
+    return data_handler.get_similar_rows(PAT_ID)
 
 
 @app.route('/getWeights/<id>')

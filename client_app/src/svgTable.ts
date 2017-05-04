@@ -33,6 +33,7 @@ export class SvgTable {
     this.drawHeader();
 
     const url = `/data_api/getAllRows/${this.datasetId}`;
+    console.log("start loading init");
     this.getData(url).then((args) => {
       const dic = {'func': 'init', 'args': args, 'arg': 'rows'};
       this.drawRows(dic);
@@ -117,15 +118,16 @@ export class SvgTable {
       .classed('rows', true)
       .merge(rows)
       .selectAll('.cells')
-      .data((d, i) => {
+      .data((d,i) => {
         const ent = entries(d);
         ent.sort((a, b) => {
           return this.header[this.datasetId].indexOf(a.key)
             - this.header[this.datasetId].indexOf(b.key);
         });
+
         if (input.func === 'similar') {
           for (let j = 0; j < ent.length; j++) {
-            ent[j]['diff'] = +diff[i][j];
+            ent[j]['diff'] = +diff[i][ent[j].key];
           }
         }
         return ent;
@@ -201,9 +203,12 @@ export class SvgTable {
     events.on('update_table_similar', (evt, item) => {
       if (this.datasetId === 'Demo') {
         const url = `/data_api/getSimilarRows/${item[1]}`;
+        console.log("start loading similar");
         this.getData(url).then((args) => {
-          const dic = {'func': 'sim', 'args': args, 'arg': 'rows'}; // TODO func = 'similar'
-          // another event for diagrams
+          const dic = {'func': 'similar', 'args': args, 'arg': 'rows'};
+          console.log("start drawing similar");
+          console.log(args);
+          events.fire('similar_score_diagram', ['args', args]);
           this.drawRows(dic);
         });
       }

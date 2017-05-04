@@ -6,7 +6,7 @@ import { select } from 'd3-selection';
 import * as svgTable from './svgTable';
 import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
-import * as scoreDiagram from './scoreDiagram';
+import * as similarityScoreDiagram from './similarityScoreDiagram';
 /**
  * The main class for the App app
  */
@@ -28,7 +28,7 @@ var App = (function () {
      */
     App.prototype.build = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var sideBarDiv, side, main, scoreDgm, tableDemo, svgTableDemo;
+            var sideBarDiv, side, main, dgmPromisPhysicalDiv, tableDemo, tablePro, tableCci, svgTableDemo, svgTablePro, svgTableCci;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -44,21 +44,49 @@ var App = (function () {
                         _a.sent();
                         main = this.$node.append('div').classed('main', true);
                         queryBox.create(main.node(), 'Demo');
-                        scoreDgm = main.append('div');
+                        dgmPromisPhysicalDiv = main.append('Div');
                         main.append('h3').text('Demo');
                         tableDemo = main.append('div');
-                        scoreDiagram.create(scoreDgm.node(), 'PRO');
+                        main.append('h3').text('PRO');
+                        tablePro = main.append('div');
+                        main.append('h3').text('CCI');
+                        tableCci = main.append('div');
+                        //main.append('h3').text('Codes');
+                        //const tableCodes = main.append('div');
+                        //main.append('h3').text('Orders');
+                        //const tableOrders = main.append('div');
+                        //main.append('h3').text('PT');
+                        //const tablePt = main.append('div');
+                        //main.append('h3').text('VAS');
+                        //const tableVas = main.append('div');
+                        //scoreDiagram.create(scoreDgm.node(), 'PRO'); // old one
+                        similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+                        similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
+                        similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
                         svgTableDemo = svgTable.create(tableDemo.node());
+                        svgTablePro = svgTable.create(tablePro.node());
+                        svgTableCci = svgTable.create(tableCci.node());
+                        //const svgTableCodes = svgTable.create(tableCodes.node());
+                        //const svgTableOrders = svgTable.create(tableOrders.node());
+                        //const svgTablePt = svgTable.create(tablePt.node());
+                        //const svgTableVas = svgTable.create(tableVas.node());
                         return [4 /*yield*/, svgTableDemo.drawTable('Demo')];
                     case 2:
-                        _a.sent(); /*
-                        await svgTablePro.drawTable('PRO');
+                        //const svgTableCodes = svgTable.create(tableCodes.node());
+                        //const svgTableOrders = svgTable.create(tableOrders.node());
+                        //const svgTablePt = svgTable.create(tablePt.node());
+                        //const svgTableVas = svgTable.create(tableVas.node());
+                        _a.sent();
+                        return [4 /*yield*/, svgTablePro.drawTable('PRO')];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, svgTableCci.drawTable('CCI')];
+                    case 4:
+                        _a.sent();
+                        //await svgTableCodes.drawTable('Codes');
+                        //await svgTableOrders.drawTable('Orders');
                         //await svgTablePt.drawTable('PT');
                         //await svgTableVas.drawTable('VAS');
-                        await svgTableCci.drawTable('CCI');
-                        //await svgTableCodes.drawTable('Codes');
-                        await svgTableOrders.drawTable('Orders');
-                    */
                         this.setBusy(false);
                         return [2 /*return*/];
                 }

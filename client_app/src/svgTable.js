@@ -27,6 +27,7 @@ var SvgTable = (function () {
                 this.datasetId = datasetId;
                 this.drawHeader();
                 url = "/data_api/getAllRows/" + this.datasetId;
+                console.log("start loading init");
                 this.getData(url).then(function (args) {
                     var dic = { 'func': 'init', 'args': args, 'arg': 'rows' };
                     _this.drawRows(dic);
@@ -113,7 +114,7 @@ var SvgTable = (function () {
             });
             if (input.func === 'similar') {
                 for (var j = 0; j < ent.length; j++) {
-                    ent[j]['diff'] = +diff[i][j];
+                    ent[j]['diff'] = +diff[i][ent[j].key];
                 }
             }
             return ent;
@@ -177,9 +178,12 @@ var SvgTable = (function () {
         events.on('update_table_similar', function (evt, item) {
             if (_this.datasetId === 'Demo') {
                 var url = "/data_api/getSimilarRows/" + item[1];
+                console.log("start loading similar");
                 _this.getData(url).then(function (args) {
-                    var dic = { 'func': 'sim', 'args': args, 'arg': 'rows' }; // TODO func = 'similar'
-                    // another event for diagrams
+                    var dic = { 'func': 'similar', 'args': args, 'arg': 'rows' };
+                    console.log("start drawing similar");
+                    console.log(args);
+                    events.fire('similar_score_diagram', ['args', args]);
                     _this.drawRows(dic);
                 });
             }

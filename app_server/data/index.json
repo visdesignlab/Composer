@@ -1,12 +1,12 @@
 [
   {
     "name": "Demo_selected",
-    "path": "Demo.csv",
+    "path": "shrank_cleaned_Demo_index.csv",
     "separator": ",",
     "quotechar": "\"",
     "id": "Demo",
     "size": [
-      53,
+      300,
       24
     ],
     "type": "table",
@@ -160,63 +160,12 @@
     ]
   },
   {
-    "name": "VAS_selected",
-    "path": "VAS.csv",
-    "separator": ",",
-    "id": "VAS",
-    "size": [
-      20,
-      6
-    ],
-    "type": "table",
-    "idtype": "INDEX",
-    "idcolumn": 0,
-    "columns": [
-      {
-        "name": "PAT_ID",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
-        "name": "VISIT_NO",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
-        "name": "FSD_ID",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
-        "name": "RECORDED_TIME",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "VAS_NECK",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "VAS_ARM",
-        "value": {
-          "type": "float"
-        }
-      }
-    ]
-  },
-  {
     "name": "PRO_selected",
-    "path": "PRO.csv",
+    "path": "shrank_cleaned_PRO_index.csv",
     "separator": ",",
     "id": "PRO",
     "size": [
-      210,
+      2851,
       7
     ],
     "type": "table",
@@ -268,57 +217,12 @@
     ]
   },
   {
-    "name": "PT_selected",
-    "path": "PT.csv",
-    "separator": ",",
-    "id": "PT",
-    "size": [
-      127,
-      5
-    ],
-    "type": "table",
-    "idtype": "INDEX",
-    "idcolumn": 0,
-    "columns": [
-      {
-        "name": "PAT_ID",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
-        "name": "VISIT_NO",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
-        "name": "ADM_DATE",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "PAT_UNIT",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "UNIT_NAME",
-        "value": {
-          "type": "string"
-        }
-      }
-    ]
-  },
-  {
     "name": "CCI_selected",
-    "path": "CCI.csv",
+    "path": "shrank_cleaned_CCI_index.csv",
     "separator": ",",
     "id": "CCI",
     "size": [
-      3119,
+      300,
       22
     ],
     "type": "table",
@@ -460,123 +364,12 @@
     ]
   },
   {
-    "name": "Codes_selected",
-    "path": "Codes.csv",
-    "separator": ",",
-    "id": "Codes",
-    "size": [
-      1420,
-      16
-    ],
-    "type": "table",
-    "idtype": "INDEX",
-    "idcolumn": 0,
-    "columns": [
-      {
-        "name": "PAT_ID",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
-        "name": "VISIT_NO",
-        "value": {
-          "type": "int"
-        }
-      },
-      {
-        "name": "PROC_DTM",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "DM_CODE",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "INJ_CODE",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "SURGERY_CODE",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "CPT_1",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "CPT_2",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "CPT_3",
-        "value": {
-          "type": "string"
-        }
-      },
-      {
-        "name": "CPT_4",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "CPT_5",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "CPT_6",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "CPT_7",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "CPT_8",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "CPT_9",
-        "value": {
-          "type": "float"
-        }
-      },
-      {
-        "name": "CPT_10",
-        "value": {
-          "type": "float"
-        }
-      }
-    ]
-  },
-  {
     "name": "Orders_selected",
-    "path": "Orders.csv",
+    "path": "shrank_cleaned_Orders_index.csv",
     "separator": ",",
     "id": "Orders",
     "size": [
-      3220,
+      298,
       7
     ],
     "type": "table",
@@ -626,5 +419,33 @@
         }
       }
     ]
+  },
+  {
+    "name": "status",
+    "path": "procedure_result.csv",
+    "separator": ",",
+    "id": "Status",
+    "size": [
+      300,
+      2
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns":[
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "STATUS",
+        "value": {
+          "type": "string"
+        }
+      }
+    ]
   }
+
 ]

@@ -51,8 +51,9 @@ export class SideBar {
 
   async updateWeights() {
 
-    for(let t=0; t<['Demo', 'CCI'].length; t++) {
-      let table = ['Demo', 'CCI'][t];
+    const tables = ['Demo', 'CCI'];
+    for(let t=0; t<tables.length; t++) {
+      let table = tables[t];
 
       let tempWeights = '';
       let array = entries(Constants.sideBar[table]);
@@ -69,9 +70,8 @@ export class SideBar {
       }
 
       let URL = `/data_api/updateWeights/${table}/`
-        + tempWeights.substring(0, tempWeights.length-1); // The last character is '+'
+        + tempWeights.substring(0, tempWeights.length - 1); // The last character is '+'
       await ajax.getAPIJSON(URL);
-      console.log(URL);
     }
 
     console.log('Weights are updated.');

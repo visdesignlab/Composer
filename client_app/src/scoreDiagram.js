@@ -31,27 +31,39 @@ var ScoreDiagram = (function () {
         //this.colorScale = scaleOrdinal().range(['darkblue', 'darkred', 'forestgreen', 'darkmagenta']);
     }
     ScoreDiagram.prototype.attachListener = function () {
-        var _this = this;
-        events.on('init_score_diagram', function (evt, item) {
-            var url = "/data_api/getPatInfo/" + _this.datasetId + "/" + item[1];
-            var dic = { 'func': 'init', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1] };
-            // reset
-            _this.svg.selectAll('g').remove();
-            _this.yearScale = scaleTime().range([0, _this.width - 2 * _this.margin]);
-            _this.scoreScale = scaleLinear().range([0, _this.height - 2 * _this.margin]);
-            _this.drawDiagram(dic);
+        // TODO: Not active right now
+        /*
+        events.on('init_score_diagram', (evt, item) => {
+          const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
+          const dic = {'func': 'init', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1]};
+    
+          // reset
+          this.svg.selectAll('g').remove();
+          this.yearScale = scaleTime().range([0, this.width - 2 * this.margin]);
+          this.scoreScale = scaleLinear().range([0, this.height - 2 * this.margin]);
+    
+          this.drawDiagram(dic);
         });
-        events.on('add_score_diagram', function (evt, item) {
-            var url = "/data_api/getPatInfo/" + _this.datasetId + "/" + item[1];
-            var dic = { 'func': 'add', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1] };
-            _this.drawDiagram(dic);
+    */
+        events.on('similar_score_diagram', function (evt, item) {
+            console.log('score diagram listener');
+            console.log(item[1]);
         });
-        events.on('remove_score_diagram', function (evt, item) {
-            _this.removeFromDiagram(item[1]);
-        });
+        // TODO: Not active right now
+        /*
+            events.on('add_score_diagram', (evt, item) => {
+              const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
+              const dic = {'func': 'add', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1]};
+              this.drawDiagram(dic);
+            });
+        
+            events.on('remove_score_diagram', (evt, item) => {
+              this.removeFromDiagram(item[1]);
+            });
+        
+        */
     };
     /**
-     *
      * @param input
      * @returns {Promise<void>}
      */
@@ -183,14 +195,6 @@ var ScoreDiagram = (function () {
                 }
             });
         });
-    };
-    ScoreDiagram.prototype.removeFromDiagram = function (patId) {
-        for (var id in Constants.scoreIds) {
-            if (Constants.scoreIds.hasOwnProperty(id)) {
-                this.svg.selectAll("#score_dgm_" + Constants.scoreIds[id] + "_" + patId)
-                    .remove();
-            }
-        }
     };
     return ScoreDiagram;
 }());

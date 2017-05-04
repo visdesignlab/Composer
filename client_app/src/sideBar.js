@@ -51,15 +51,16 @@ var SideBar = (function () {
     };
     SideBar.prototype.updateWeights = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var t, table, tempWeights, array, counter, tempId, tempValue, URL_1;
+            var tables, t, table, tempWeights, array, counter, tempId, tempValue, URL_1;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        tables = ['Demo', 'CCI'];
                         t = 0;
                         _a.label = 1;
                     case 1:
-                        if (!(t < ['Demo', 'CCI'].length)) return [3 /*break*/, 4];
-                        table = ['Demo', 'CCI'][t];
+                        if (!(t < tables.length)) return [3 /*break*/, 4];
+                        table = tables[t];
                         tempWeights = '';
                         array = entries(Constants.sideBar[table]);
                         for (counter = 0; counter < array.length; counter++) {
@@ -76,7 +77,6 @@ var SideBar = (function () {
                         return [4 /*yield*/, ajax.getAPIJSON(URL_1)];
                     case 2:
                         _a.sent();
-                        console.log(URL_1);
                         _a.label = 3;
                     case 3:
                         t++;

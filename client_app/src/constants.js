@@ -50,7 +50,7 @@ Constants.scoreIds = {
 };
 Constants.sideBar = {
     'Demo': {
-        'AGE': 'Admission Date - Birth Date', 'PAT_GENDER': 'Gender',
+        'PAT_BIRTHDATE': 'Birth Date', 'PAT_GENDER': 'Gender',
         'PAT_ETHNICITY': 'Ethnicity', 'PAT_RACE': 'Race', 'PAT_MARITAL_STAT': 'Marital Status',
         'BMI': 'BMI', 'HEIGHT_CM': 'Height', 'WEIGHT_KG': 'Weight',
         'TOBACCO_USER': 'Tobacco User', 'ALCOHOL_USER': 'Alcohol user',

@@ -77,6 +77,8 @@
     "@types/d3-transition": "^1.0.7",
     "@types/d3-shape": "^1.0.10",
     "@types/d3-time-format": "^2.0.4",
+    "@types/d3-drag": "^1.0.7",
+    "@types/d3-dispatch": "^1.0.4",
     "d3-request": "^1.0.3",
     "d3-selection": "^1.0.3",
     "d3-array": "^1.0.2",
@@ -85,7 +87,9 @@
     "d3-collection": "^1.0.2",
     "d3-transition": "^1.0.4",
     "d3-shape": "^1.0.6",
-    "d3-time-format": "^2.0.5"
+    "d3-time-format": "^2.0.5",
+    "d3-drag": "^1.0.4",
+    "d3-dispatch": "^1.0.3"
   },
   "name": "client_app",
   "description": "",

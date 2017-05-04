@@ -8,11 +8,13 @@ import json
 
 import handle_Demo
 import handle_CCI
+import handle_Orders
 
 __author__ = 'Sahar'
 
 
-# add column index to the data
+# TODO from and to: '/getRows/<id>/<frm>/<t>'
+# access directly from API: '/getAllRows/<id>'
 def get_all_rows(id):
     my_data = dt.get(id)
     rows = my_data.aslist()
@@ -20,7 +22,104 @@ def get_all_rows(id):
       'rows': rows[:50]
     })
 
+
+# access directly from API: '/getPatInfo/<id>/<PAT_ID>'
 def get_pat_info(id, PAT_ID):
+    info_rows = get_all_info_for_pat(id, PAT_ID)
+    return jsonify({
+      'PAT_ID': PAT_ID,
+      'rows': info_rows,
+      #'indices': indices,
+      'dataset id': id
+    })
+
+
+# access directly from API: '/getSimilarRows/<PAT_ID>'
+def get_similar_rows(PAT_ID):
+
+    Demo_score = handle_Demo.get_similarity_score(int(PAT_ID))
+    CCI_score = handle_CCI.get_similarity_score(int(PAT_ID))
+    #Pro_score = handle_Pro.get_similarity_score(int(PAT_ID))
+    id_scores = []
+
+    pat_ids = set(list(Demo_score.keys()) + (list(CCI_score.keys())))
+
+    for id in pat_ids:
+        temp = 0
+        if id in Demo_score:
+            temp += Demo_score[id]
+        if id in CCI_score:
+            temp += CCI_score[id]
+        id_scores.append([id, temp])
+
+    id_scores.sort(key=lambda r: r[1], reverse=True)
+    ids = [d[0] for d in id_scores[:20]]
+    scores = [d[1] for d in id_scores[:20]]
+
+    pat_Demo_first = [handle_Demo.get_first_info(id) for id in ([int(PAT_ID)] + ids)]
+    difference = handle_Demo.get_difference(int(PAT_ID), ids)
+
+    pro_rows = [[id, get_all_info_for_pat('PRO', id)] for id in ids]
+
+
+    # group them based on first ORDER_CATALOG_TYPE in Orders: Medication, Procedure        Orders_rows = {}
+    ##Orders_rows = {}
+    ##for id in ids:
+    ##    Orders_rows[id] = handle_Orders.get_first_info(id)
+
+    # group by CPT codes
+    status = {}
+    status_data = dt.get('Status').aslist()
+    for row in status_data:
+        status[int(row['PAT_ID'])] = row['STATUS']
+
+    med_rows = [r[1] for r in pro_rows if status[int(r[0])] == 'Medication']
+    pro_rows = [r[1] for r in pro_rows if status[int(r[0])] == 'Procedure']
+
+
+    return jsonify({
+        'PAT_ID': PAT_ID,
+        'ids': ids,
+        'similarity_scores': scores,
+        'target_Demo': handle_Demo.get_first_info(int(PAT_ID)),
+        'rows': pat_Demo_first,
+        'difference': difference,
+         #entries for score diagram
+        'target_PRO': get_all_info_for_pat('PRO', int(PAT_ID)),
+        'med_rows': med_rows,
+        'pro_rows': pro_rows
+    })
+
+
+# access directly from API: '/getWeights/<id>'
+def get_weights(id):
+    if id == 'Demo':
+        return handle_Demo.get_weights()
+    if id == 'CCI':
+        return handle_CCI.get_weights()
+    return jsonify({'message': 'error'})
+
+
+# access directly from API: '/updateWeights/<id>/<values>'
+def update_weights(id, values):
+    if id == 'Demo':
+        return handle_Demo.update_weights(values)
+    if id == 'CCI':
+        return handle_CCI.update_weights(values)
+    return jsonify({'message': 'error'})
+
+
+# access directly from API: '/getLatestInfo/<id>'
+def get_latest_info(id):
+    if id == 'Demo':
+        return handle_Demo.get_latest_info()
+    return jsonify({'message': 'error'})
+
+
+##=========== helper functions
+
+# used in several functions
+def get_all_info_for_pat(id, PAT_ID):
     my_data = dt.get(id)
 
     info_rows = []
@@ -39,74 +138,11 @@ def get_pat_info(id, PAT_ID):
     elif id == 'VAS':
         info_rows.sort(key=lambda r: parse_date(r["RECORDED_TIME"]))
 
-    return jsonify({
-      'PAT_ID': PAT_ID,
-      'rows': info_rows,
-      'indices': indices,
-      'dataset id': id
-    })
+    return info_rows
 
 
-def new_get_similar_rows(PAT_ID):
-
-    Demo_score = handle_Demo.get_similarity_score(int(PAT_ID))
-    CCI_score = handle_CCI.get_similarity_score(int(PAT_ID))
-    scores = []
-
-    pat_ids = set(list(Demo_score.keys()) + (list(CCI_score.keys())))
-
-    for id in pat_ids:
-        temp = 0
-        if id in Demo_score:
-            temp += Demo_score[id]
-        if id in CCI_score:
-            temp += CCI_score[id]
-        scores.append([id, temp])
-
-    scores.sort(key=lambda r: r[1], reverse=True)
-    ids = [d[0] for d in scores]
-    scores = [d[1] for d in scores]
-
-    pat_Demo_first = [handle_Demo.get_first_info(id) for id in ids]
-
-    return jsonify({
-        'PAT_ID': PAT_ID,
-        'ids': ids,
-        'scores': scores,
-        'rows': pat_Demo_first
-    })
-
-# Demo dataset
-
-def get_similar_rows(id, PAT_ID):
-    if id == 'Demo':
-        return handle_Demo.get_similar_demo(PAT_ID)
-    return jsonify({'message': 'error'})
-
-
-def get_weights(id):
-    if id == 'Demo':
-        return handle_Demo.get_weights()
-    if id == 'CCI':
-        return handle_CCI.get_weights()
-    return jsonify({'message': 'error'})
-
-
-def update_weights(id, values):
-    if id == 'Demo':
-        return handle_Demo.update_weights(values)
-    if id == 'CCI':
-        return handle_CCI.update_weights(values)
-    return jsonify({'message': 'error'})
-
-
-def get_latest_info(id):
-    if id == 'Demo':
-        return handle_Demo.get_latest_info()
-    return jsonify({'message': 'error'})
-
-
-# helper functions
+##============= utility functions
+# NEVER USED!
 def verify_int(s):
     try:
         int(s)

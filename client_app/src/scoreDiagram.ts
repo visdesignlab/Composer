@@ -46,6 +46,8 @@ export class ScoreDiagram {
   }
 
   private attachListener() {
+// TODO: Not active right now
+    /*
     events.on('init_score_diagram', (evt, item) => {
       const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
       const dic = {'func': 'init', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1]};
@@ -57,7 +59,14 @@ export class ScoreDiagram {
 
       this.drawDiagram(dic);
     });
+*/
+    events.on('similar_score_diagram', (evt, item) => { // created in svgTable
+      console.log('score diagram listener');
+      console.log(item[1]);
+    });
 
+    // TODO: Not active right now
+/*
     events.on('add_score_diagram', (evt, item) => {
       const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
       const dic = {'func': 'add', 'URL': url, 'arg': 'rows', 'PAT_ID': item[1]};
@@ -68,10 +77,10 @@ export class ScoreDiagram {
       this.removeFromDiagram(item[1]);
     });
 
+*/
   }
 
   /**
-   *
    * @param input
    * @returns {Promise<void>}
    */
@@ -220,6 +229,8 @@ export class ScoreDiagram {
 
   }
 
+  //TODO: Not active right now
+  /*
   private removeFromDiagram (patId) {
     for(let id in Constants.scoreIds){
       if( Constants.scoreIds.hasOwnProperty(id) ) {
@@ -228,6 +239,8 @@ export class ScoreDiagram {
       }
     }
   }
+  */
+
 }
 
 export function create(parent:Element, datasetId) {
