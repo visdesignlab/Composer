@@ -32,9 +32,9 @@ def _get_pat_info(id, PAT_ID):
     return data_handler.get_pat_info(id, PAT_ID)
 
 
-@app.route('/getSimilarRows/<PAT_ID>')
-def _get_similar_rows(PAT_ID):
-    return data_handler.get_similar_rows(PAT_ID)
+@app.route('/getSimilarRows/<PAT_ID>/<number>')
+def _get_similar_rows(PAT_ID, number):
+    return data_handler.get_similar_rows(PAT_ID, int(number))
 
 
 @app.route('/getWeights/<id>')
@@ -50,6 +50,11 @@ def _update_weights(id, values):
 @app.route('/getLatestInfo/<id>')
 def _get_latest_info(id):
     return data_handler.get_latest_info(id)
+
+
+@app.route('/getStat')
+def _get_stat():
+    return data_handler.get_stat()
 
 
 def create():

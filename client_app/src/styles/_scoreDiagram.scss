@@ -1,3 +1,7 @@
+.allDiagramDiv {
+  clear: left;
+}
+
 .diagramDiv {
   float: left;
   padding-right: 100px;
@@ -37,30 +41,37 @@
 
 /* For slider */
 
-.slider-tray {
-  position: absolute;
-  width: 100%;
-  height: 6px;
-  border: solid 1px #ccc;
-  border-top-color: #aaa;
-  border-radius: 4px;
-  background-color: #f0f0f0;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+.ticks {
+  font: 10px sans-serif;
 }
 
-.slider-handle {
-  position: absolute;
-  top: 3px;
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
 }
 
-.slider-handle-icon {
-  width: 14px;
-  height: 14px;
-  border: solid 1px #aaa;
-  position: absolute;
-  border-radius: 10px;
-  background-color: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  top: -7px;
-  left: -7px;
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  stroke: transparent;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
 }

@@ -4,17 +4,14 @@
 
 import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll} from 'd3-selection';
-//import {values,keys} from 'd3-collection'
 import * as events from 'phovea_core/src/event';
 
 export class QueryBox {
 
   private $node;
-  private datasetId;
+  private similarArgs;
 
-  constructor(parent: Element, datasetId) {
-
-    this.datasetId = datasetId;
+  constructor(parent: Element) {
 
     this.$node = select(parent)
       .append('div')
@@ -23,12 +20,12 @@ export class QueryBox {
     this.$node.append('input')
       .attr('type', 'button')
       .attr('value', 'Latest')
-      .on('click', () => events.fire('update_table_latest', ['func', 'latest']));
+      .on('click', () => events.fire('update_latest', ['func', 'latest'])); // only 'Demo' is updated
 
     this.$node.append('input')
       .attr('type', 'button')
       .attr('value', 'Reset')
-      .on('click', () => events.fire('update_table_init', ['func', 'init']));
+      .on('click', () => events.fire('update_init', ['func', 'init']));
 
     this.$node.append('input')
       .attr('type', 'text')
@@ -37,79 +34,107 @@ export class QueryBox {
 
     this.$node.append('input')
       .attr('type', 'button')
-      .attr('value', 'similar')
-      .on('click', () => this.updateTableSimilar());
-
-    // TODO: Not active right now
-    /*
-    this.$node.append('input')
-      .attr('type', 'button')
       .attr('value', 'All Info')
-      .on('click', () => this.updateTableInfo());
-
-
-    this.$node.append('input')
-      .attr('type', 'button')
-      .attr('value', 'Add Patient info')
-      .on('click', () => this.addInfo());
+      .on('click', () => this.updateAllInfo());
 
     this.$node.append('input')
       .attr('type', 'button')
-      .attr('value', 'Remove Patient info')
-      .on('click', () => this.removeInfo());
+      .attr('value', 'similar')
+      .on('click', () => this.updateSimilar());
 
-    //this.$node.append('p')
-    //  .text('A good example is 6790018');
+    this.$node.append('input')
+      .attr('type', 'text')
+      .attr('placeholder', 'Number of similar patients')
+      .attr('id', 'text_num_similar');
 
-*/
+    this.attachListener(); // TODO test!
+
   }
 
-  async updateTableSimilar() {
+  /**
+   * Attaching listener
+   */
+  private attachListener() {  // TODO test!
+    events.on('update_temp_similar', (evt, item) => {
+
+      const url = `/data_api/getSimilarRows/${item[1]}/${item[2]}`;
+      this.setBusy(true);
+      this.getData(url).then((args) => {
+
+        this.setBusy(false);
+        this.similarArgs = args;
+
+        events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
+      });
+    });
+  }
+
+
+  /**
+   * getting the similar patients info and firing events to update the vis
+   * @returns {Promise<void>}
+   */
+  private async updateSimilar() {
 
     const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-    if (!isNaN(+value)) {
-      events.fire('update_table_similar', ['PAT_ID', value]);
+    const number = (<HTMLInputElement>document.getElementById('text_num_similar')).value;
+
+    if (!isNaN(+value) && value) {
+      let n = !isNaN(+number) ? +number : 10;
+      n = n <= 0 ? 10 : n;
+      const url = `/data_api/getSimilarRows/${value}/${n}`;
+      this.setBusy(true);
+      this.getData(url).then((args) => {
+
+        this.setBusy(false);
+        this.similarArgs = args;
+
+        console.log(args);
+
+        events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
+      });
+
     } else {
       console.log('Not a Number');
     }
 
   }
 
-  updateTableInfo() {
+  /**
+   * firing event to update the vis for info of a patient
+   */
+  private updateAllInfo() {
     const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-    if (!isNaN(+value)) {
-      events.fire('update_table_all', ['PAT_ID', value]);
-      // TODO: Not active right now
-      //events.fire('init_score_diagram', ['PAT_ID', value]);
+    if (!isNaN(+value) && value) {
+      events.fire('update_all_info', ['PAT_ID', value]); // caught by svgTable
     } else {
       console.log('Not a Number');
     }
   }
 
-  // TODO: Not active right now
-/*
-  addInfo() {
-    const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-    if (!isNaN(+value)) {
-      events.fire('add_score_diagram', ['PAT_ID', value]);
-    } else {
-      console.log('Not a Number');
-    }
+
+  /**
+   * get Data by API
+   * @param URL
+   * @returns {Promise<any>}
+   */
+  private async getData(URL) {
+    return await ajax.getAPIJSON(URL);
   }
 
-  removeInfo() {
-    const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-    if (!isNaN(+value)) {
-      events.fire('remove_score_diagram', ['PAT_ID', value]);
-    } else {
-      console.log('Not a Number');
-    }
+  /**
+   * Show or hide the application loading indicator
+   * @param isBusy
+   */
+  setBusy(isBusy: boolean) {
+    let status = select('.busy').classed('hidden');
+    if (status == isBusy)
+      select('.busy').classed('hidden', !isBusy);
   }
-*/
 
 }
 
-export function create(parent:Element, datasetId) {
-  return new QueryBox(parent, datasetId);
+export function create(parent:Element) {
+  return new QueryBox(parent);
 }
 

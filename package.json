@@ -106,6 +106,8 @@
     "@types/d3-drag": "^1.0.7",
     "d3-drag": "^1.0.4",
     "d3-dispatch": "^1.0.3",
-    "@types/d3-dispatch": "^1.0.4"
+    "@types/d3-dispatch": "^1.0.4",
+    "@types/d3-brush": "^1.0.7",
+    "d3-brush": "^1.0.4"
   }
 }

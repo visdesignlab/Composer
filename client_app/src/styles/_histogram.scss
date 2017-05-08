@@ -1,0 +1,30 @@
+
+.allHistogramDiv {
+  width: 100%;
+  padding: 20px;
+  height: 200px;
+}
+
+.histogramDiv {
+  padding: 0 10px;
+  float: left;
+}
+
+.histogramSVG {
+  width: 270px;
+  height: 200px;
+}
+
+.midLine {
+  stroke: black;
+}
+
+.histogramRectSimilar {
+  stroke: none;
+  fill: #c6c5ff;
+}
+
+.histogramRectAll {
+  stroke: none;
+  fill: #adc9aa;
+}

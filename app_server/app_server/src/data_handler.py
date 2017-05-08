@@ -35,11 +35,11 @@ def get_pat_info(id, PAT_ID):
 
 
 # access directly from API: '/getSimilarRows/<PAT_ID>'
-def get_similar_rows(PAT_ID):
+def get_similar_rows(PAT_ID, number):
 
     Demo_score = handle_Demo.get_similarity_score(int(PAT_ID))
     CCI_score = handle_CCI.get_similarity_score(int(PAT_ID))
-    #Pro_score = handle_Pro.get_similarity_score(int(PAT_ID))
+    #Pro_score = handle_Pro.get_similarity_score(int(PAT_ID)) #TODO
     id_scores = []
 
     pat_ids = set(list(Demo_score.keys()) + (list(CCI_score.keys())))
@@ -53,8 +53,8 @@ def get_similar_rows(PAT_ID):
         id_scores.append([id, temp])
 
     id_scores.sort(key=lambda r: r[1], reverse=True)
-    ids = [d[0] for d in id_scores[:20]]
-    scores = [d[1] for d in id_scores[:20]]
+    ids = [d[0] for d in id_scores[:number]]
+    scores = [d[1] for d in id_scores[:number]]
 
     pat_Demo_first = [handle_Demo.get_first_info(id) for id in ([int(PAT_ID)] + ids)]
     difference = handle_Demo.get_difference(int(PAT_ID), ids)
@@ -74,7 +74,7 @@ def get_similar_rows(PAT_ID):
         status[int(row['PAT_ID'])] = row['STATUS']
 
     med_rows = [r[1] for r in pro_rows if status[int(r[0])] == 'Medication']
-    pro_rows = [r[1] for r in pro_rows if status[int(r[0])] == 'Procedure']
+    procedure_rows = [r[1] for r in pro_rows if status[int(r[0])] == 'Procedure']
 
 
     return jsonify({
@@ -87,7 +87,7 @@ def get_similar_rows(PAT_ID):
          #entries for score diagram
         'target_PRO': get_all_info_for_pat('PRO', int(PAT_ID)),
         'med_rows': med_rows,
-        'pro_rows': pro_rows
+        'pro_rows': procedure_rows
     })
 
 
@@ -114,6 +114,52 @@ def get_latest_info(id):
     if id == 'Demo':
         return handle_Demo.get_latest_info()
     return jsonify({'message': 'error'})
+
+
+# access directly from API: '/getStat'
+def get_stat():
+    my_data = dt.get('Demo')
+    data = my_data.aslist()
+    length = 0
+    males = 0
+    females = 0
+    bmi_none = 0
+    bmi_to_18 = 0
+    bmi_18_21 = 0
+    bmi_21_24 = 0
+    bmi_24_27 = 0
+    bmi_27_30 = 0
+    bmi_from_30 = 0
+
+    test = []
+
+    for row in data:
+        length += 1
+        if row['PAT_GENDER'] == 'F':
+            females += 1
+        elif row['PAT_GENDER'] == 'M':
+            males += 1
+        if not row['BMI']:
+            bmi_none += 1
+        elif row['BMI'] <= 18:
+            bmi_to_18 += 1
+        elif row['BMI'] > 18 and row['BMI'] <= 21:
+            bmi_18_21 += 1
+        elif row['BMI'] > 21 and row['BMI'] <= 24:
+            bmi_21_24 += 1
+        elif row['BMI'] > 24 and row['BMI'] <= 27:
+            bmi_24_27 += 1
+        elif row['BMI'] > 27 and row['BMI'] <= 30:
+            bmi_27_30 += 1
+        elif row['BMI'] > 30:
+            bmi_from_30 += 1
+
+    return jsonify ({
+       'length': length,
+       'gender': [females, males],
+       'bmi': [bmi_none, bmi_to_18, bmi_18_21, bmi_21_24, bmi_24_27, bmi_27_30, bmi_from_30]
+    })
+
 
 
 ##=========== helper functions
