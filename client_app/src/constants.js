@@ -58,4 +58,8 @@ Constants.sideBar = {
     },
     'CCI': { 'CCI_SCORE': 'CCI score' }
 };
+Constants.histogramLabels = {
+    'GENDER': ['Female', 'Male'],
+    'BMI': ['Unknown BMI', 'BMI≤18', '18<BMI≤21', '21<BMI≤24', '24<BMI≤27', '27<BMI≤30', '30<BMI']
+};
 //# sourceMappingURL=constants.js.map

@@ -16,6 +16,7 @@ export class SvgTable {
   private $node;
   datasetId;
   private rows;
+  private display = {from: 0, to: 20}; // TODO
 
   private cols = Constants.cols;
   private header = Constants.header;
@@ -29,6 +30,21 @@ export class SvgTable {
 
   async drawTable(datasetId) {
     this.datasetId = datasetId;
+
+    let arrowSpan = select(`#${this.datasetId}_arrow`);
+
+
+    arrowSpan.append("image")
+      .attr("xlink:href", "img/back.png")
+      .attr('width', 20)
+      .attr('height', 20)
+      .on('click', ()=>{});
+    arrowSpan.append("image")
+      .attr("xlink:href", "img/back.png")
+      .attr('width', 20)
+      .attr('height', 20)
+      .on('click', ()=>{});
+
 
     this.drawHeader();
 
@@ -54,7 +70,7 @@ export class SvgTable {
       .classed('header', true)
       .merge(header)
       .selectAll('.headercells')
-      .data(this.header[this.datasetId]) // changed!
+      .data(this.header[this.datasetId])
       .enter().append('div')
       .classed('headercells', true)
       .classed('superWideCell', (g, i) => {
@@ -105,7 +121,7 @@ export class SvgTable {
 
     console.log('Loading ' + this.datasetId);
 
-    const data = (input.func === 'init') ? input.args[input.arg].slice(0, 20)
+    const data = (input.func === 'init' || input.func === 'latest') ? input.args[input.arg].slice(0, 20)
       : input.args[input.arg];
 
     const diff = (input.func === 'similar') ? input.args.difference : [];
@@ -172,6 +188,10 @@ export class SvgTable {
 
   }
 
+  /**
+   * Drawing the changes in the weight in the table
+   * @param data
+   */
   private drawLineChart(data) {
 
     const scaleWeight = scaleLinear()
@@ -193,48 +213,58 @@ export class SvgTable {
   }
 
   private attachListener() {
-    events.on('update_table_all', (evt, item) => {
+    events.on('update_all_info', (evt, item) => {
       const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
-      const args = this.getData(url);
-      const dic = {'func': 'all', 'args': args, 'arg': 'rows'};
-      this.drawRows(dic);
+      this.setBusy(true);
+      this.getData(url).then((args) => {
+        const dic = {'func': 'all', 'args': args, 'arg': 'rows'};
+        this.drawRows(dic);
+        this.setBusy(false);
+      })
     });
 
-    events.on('update_table_similar', (evt, item) => {
+    events.on('update_similar', (evt, item) => {
       if (this.datasetId === 'Demo') {
-        const url = `/data_api/getSimilarRows/${item[1]}`;
-        console.log("start loading similar");
-        this.getData(url).then((args) => {
-          const dic = {'func': 'similar', 'args': args, 'arg': 'rows'};
-          console.log("start drawing similar");
-          console.log(args);
-          events.fire('similar_score_diagram', ['args', args]);
-          this.drawRows(dic);
-        });
+        const dic = {'func': 'similar', 'args': item[1], 'arg': 'rows'};
+        this.drawRows(dic);
       }
     });
 
-    events.on('update_table_latest', () => {
+    events.on('update_latest', () => {
       if (this.datasetId === 'Demo') {
         const url = `/data_api/getLatestInfo/${this.datasetId}`;
+        this.setBusy(true);
         this.getData(url).then((args) => {
           const dic = {'func': 'latest', 'args': args, 'arg': 'rows'};
           this.drawRows(dic);
+          this.setBusy(false);
         });
       }
     });
 
-    events.on('update_table_init', () => {
+    events.on('update_init', () => { // for reset
       const url = `/data_api/getAllRows/${this.datasetId}`;
+      this.setBusy(true);
       this.getData(url).then((args) => {
         const dic = {'func': 'init', 'args': args, 'arg': 'rows'};
         this.drawRows(dic);
+        this.setBusy(false);
       });
     });
   }
 
   private async getData(URL) {
     return await ajax.getAPIJSON(URL);
+  }
+
+  /**
+   * Show or hide the application loading indicator
+   * @param isBusy
+   */
+  setBusy(isBusy: boolean) {
+    let status = select('.busy').classed('hidden');
+    if (status == isBusy)
+      select('.busy').classed('hidden', !isBusy);
   }
 
 }

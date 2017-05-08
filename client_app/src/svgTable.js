@@ -12,6 +12,7 @@ import { scaleLinear } from 'd3-scale';
 import { line } from 'd3-shape';
 var SvgTable = (function () {
     function SvgTable(parent) {
+        this.display = { from: 0, to: 20 }; // TODO
         this.cols = Constants.cols;
         this.header = Constants.header;
         this.$node = select(parent)
@@ -22,9 +23,20 @@ var SvgTable = (function () {
     SvgTable.prototype.drawTable = function (datasetId) {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var url;
+            var arrowSpan, url;
             return tslib_1.__generator(this, function (_a) {
                 this.datasetId = datasetId;
+                arrowSpan = select("#" + this.datasetId + "_arrow");
+                arrowSpan.append("image")
+                    .attr("xlink:href", "img/back.png")
+                    .attr('width', 20)
+                    .attr('height', 20)
+                    .on('click', function () { });
+                arrowSpan.append("image")
+                    .attr("xlink:href", "img/back.png")
+                    .attr('width', 20)
+                    .attr('height', 20)
+                    .on('click', function () { });
                 this.drawHeader();
                 url = "/data_api/getAllRows/" + this.datasetId;
                 console.log("start loading init");
@@ -48,7 +60,7 @@ var SvgTable = (function () {
             .classed('header', true)
             .merge(header)
             .selectAll('.headercells')
-            .data(this.header[this.datasetId]) // changed!
+            .data(this.header[this.datasetId])
             .enter().append('div')
             .classed('headercells', true)
             .classed('superWideCell', function (g, i) {
@@ -96,7 +108,7 @@ var SvgTable = (function () {
     SvgTable.prototype.drawRows = function (input) {
         var _this = this;
         console.log('Loading ' + this.datasetId);
-        var data = (input.func === 'init') ? input.args[input.arg].slice(0, 20)
+        var data = (input.func === 'init' || input.func === 'latest') ? input.args[input.arg].slice(0, 20)
             : input.args[input.arg];
         var diff = (input.func === 'similar') ? input.args.difference : [];
         var rows = this.$node
@@ -153,6 +165,10 @@ var SvgTable = (function () {
         }
         console.log(this.datasetId + ' loaded');
     };
+    /**
+     * Drawing the changes in the weight in the table
+     * @param data
+     */
     SvgTable.prototype.drawLineChart = function (data) {
         var scaleWeight = scaleLinear()
             .domain([31, 205])
@@ -169,39 +185,39 @@ var SvgTable = (function () {
     };
     SvgTable.prototype.attachListener = function () {
         var _this = this;
-        events.on('update_table_all', function (evt, item) {
+        events.on('update_all_info', function (evt, item) {
             var url = "/data_api/getPatInfo/" + _this.datasetId + "/" + item[1];
-            var args = _this.getData(url);
-            var dic = { 'func': 'all', 'args': args, 'arg': 'rows' };
-            _this.drawRows(dic);
+            _this.setBusy(true);
+            _this.getData(url).then(function (args) {
+                var dic = { 'func': 'all', 'args': args, 'arg': 'rows' };
+                _this.drawRows(dic);
+                _this.setBusy(false);
+            });
         });
-        events.on('update_table_similar', function (evt, item) {
+        events.on('update_similar', function (evt, item) {
             if (_this.datasetId === 'Demo') {
-                var url = "/data_api/getSimilarRows/" + item[1];
-                console.log("start loading similar");
-                _this.getData(url).then(function (args) {
-                    var dic = { 'func': 'similar', 'args': args, 'arg': 'rows' };
-                    console.log("start drawing similar");
-                    console.log(args);
-                    events.fire('similar_score_diagram', ['args', args]);
-                    _this.drawRows(dic);
-                });
+                var dic = { 'func': 'similar', 'args': item[1], 'arg': 'rows' };
+                _this.drawRows(dic);
             }
         });
-        events.on('update_table_latest', function () {
+        events.on('update_latest', function () {
             if (_this.datasetId === 'Demo') {
                 var url = "/data_api/getLatestInfo/" + _this.datasetId;
+                _this.setBusy(true);
                 _this.getData(url).then(function (args) {
                     var dic = { 'func': 'latest', 'args': args, 'arg': 'rows' };
                     _this.drawRows(dic);
+                    _this.setBusy(false);
                 });
             }
         });
-        events.on('update_table_init', function () {
+        events.on('update_init', function () {
             var url = "/data_api/getAllRows/" + _this.datasetId;
+            _this.setBusy(true);
             _this.getData(url).then(function (args) {
                 var dic = { 'func': 'init', 'args': args, 'arg': 'rows' };
                 _this.drawRows(dic);
+                _this.setBusy(false);
             });
         });
     };
@@ -214,6 +230,15 @@ var SvgTable = (function () {
                 }
             });
         });
+    };
+    /**
+     * Show or hide the application loading indicator
+     * @param isBusy
+     */
+    SvgTable.prototype.setBusy = function (isBusy) {
+        var status = select('.busy').classed('hidden');
+        if (status == isBusy)
+            select('.busy').classed('hidden', !isBusy);
     };
     return SvgTable;
 }());

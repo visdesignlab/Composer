@@ -13,20 +13,23 @@ import {extent,min,max} from 'd3-array';
 import {axisBottom,axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import {Constants} from './constants';
-import {dispatch} from 'd3-dispatch'
+import {transition} from 'd3-transition';
+import {brush, brushY} from 'd3-brush';
 
 export class similarityScoreDiagram {
 
   private $node;
   private diagram;
-  private visitScale;
+  private timeScale;
   private scoreScale;
   private svg;
   private parseTime = timeParse('%x %X');
+  private brush;
 
   height = 400;
   width = 600;
-  margin = 40;
+  margin = {x: 80, y: 40};
+  sliderWidth = 10;
 
   constructor(parent: Element, diagram) {
 
@@ -40,34 +43,56 @@ export class similarityScoreDiagram {
       .attr('width', this.width);
 
     // scales
-    this.visitScale = scaleLinear().range([0, this.width - 2 * this.margin]); // changed from scaleTime()
+    this.timeScale = scaleLinear()
+      .range([0, this.width - 2 * this.margin.x]);
+
     this.scoreScale = scaleLinear()
       .domain([100, 0])
-      .range([0, this.height - 3 * this.margin]);
+      .range([0, this.height - 3 * this.margin.y]);
 
     // axis
     this.svg.append('g')
       .attr('class', 'xAxis')
-      .attr('transform', `translate(${this.margin},${this.height - 2 * this.margin})`);
+      .attr('transform', `translate(${this.margin.x},${this.height - 2 * this.margin.y})`);
 
     this.svg.append('text')
-      .text('Number of visits')
-      .attr('transform', `translate(${(this.width - this.margin) / 2},${this.height - this.margin})`);
+      .text('Days')
+      .attr('transform', `translate(${(this.width - this.margin.x) / 2},${this.height - this.margin.y})`);
 
     this.svg.append('g')
       .attr('class', 'yAxis')
-      .attr('transform', `translate(${this.margin},${this.margin})`)
+      .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`)
       .call(axisLeft(this.scoreScale));
+
+    // -----
+
+    let slider = this.svg.append('g')
+      .attr('class', 'slider')
+      .attr('transform', `translate(${(this.margin.x - this.sliderWidth + 2)},${this.margin.y})`);
+
+    this.brush = brushY()
+      .extent([[0, 0], [this.sliderWidth - 2, this.scoreScale.range()[1]]])
+      .on("end", () => {
+        let start = event.selection[0];
+        let end = event.selection[1];
+
+        this.updateSlider(start, end)
+      });
+
+    slider.call(this.brush)
+      .call(this.brush.move, this.scoreScale.range());
+
+    // -----
 
     this.svg.append('text')
       .text(`${this.diagram}`)
-      .attr('transform', `translate(${this.margin / 4},${this.height * 0.75}) rotate(-90)`);
+      .attr('transform', `translate(${this.margin.x / 4},${this.height * 0.75}) rotate(-90)`);
 
     this.svg.append('g')
       .attr('class', 'grid')
-      .attr('transform', `translate(${this.margin},${this.margin})`)
+      .attr('transform', `translate(${this.margin.x},${this.margin.y})`)
       .call(axisLeft(this.scoreScale)
-        .tickSize(-(this.width - this.margin))
+        .tickSize(-(this.width - this.margin.x))
       )
       .selectAll('text').remove();
 
@@ -80,7 +105,6 @@ export class similarityScoreDiagram {
     this.svg.append('g')
       .attr('id', 'pro_score');
 
-
     this.attachListener();
 
   }
@@ -89,7 +113,12 @@ export class similarityScoreDiagram {
    * Attach listeners
    */
   private attachListener() {
-    events.on('similar_score_diagram', (evt, item) => { // called in svgTable
+
+    events.on('update_similar', (evt, item) => { // called in queryBox
+      this.svg.select('.slider')  // reset slider
+        .call(this.brush)
+        .call(this.brush.move, this.scoreScale.range());
+
       this.drawDiagram(item[1]);
     });
   }
@@ -104,74 +133,78 @@ export class similarityScoreDiagram {
       return d['FORM'] == this.diagram
     });
 
-    let similarMedData = {};
+    let similarMedData = [];
     for (let index = 0; index < args['med_rows'].length; index++) {
       let curr_pat_info = args['med_rows'][index];
-      similarMedData[curr_pat_info[0]['PAT_ID']] = curr_pat_info.filter((d) => {
+      let filtered = curr_pat_info.filter((d) => {
         return d['FORM'] == this.diagram
       });
+      if (filtered.length)
+        similarMedData.push(filtered);
     }
 
-    let similarProData = {};
+    let similarProData = [];
     for (let index = 0; index < args['pro_rows'].length; index++) {
       let curr_pat_info = args['pro_rows'][index];
-      similarProData[curr_pat_info[0]['PAT_ID']] = curr_pat_info.filter((d) => {
+      let filtered = curr_pat_info.filter((d) => {
         return d['FORM'] == this.diagram
       });
+      if (filtered.length)
+        similarProData.push(filtered);
     }
 
-    //console.log(patData, similarMedData, similarProData);
+    // ----- add diff days to the data
+
+    let maxDiff = 0;
+
+    let minDate = this.findMinDate(patData);
+    patData.forEach((d) => {
+      d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM']).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+      maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+    });
+
+
+    similarMedData.forEach((g) => {
+      let minDate = this.findMinDate(g);
+      g.forEach((d) => {
+        try {
+          d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM']).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+          maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+        }
+        catch (TypeError) {
+          d.diff = -1;
+        }
+      })
+    });
+
+    similarProData.forEach((g) => {
+      let minDate = this.findMinDate(g);
+      g.forEach((d) => {
+        try {
+          d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM']).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+          maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+        }
+        catch (TypeError) {
+          d.diff = -1;
+        }
+      })
+    });
 
     // -----  set domains and axis
 
     // time scale
-    /*
-     let tempDates = this.findAllColValue(patData, entries(similarMedData), entries(similarProData), 'ASSESSMENT_START_DTM');
-     let dates = tempDates.map((d) => this.parseTime(d));
-     if (this.svg.selectAll('.diagrams').size() !== 0) {
-     dates.push(this.yearScale.domain()[0]);
-     dates.push(this.yearScale.domain()[1]);
-     }
-     this.yearScale.domain(extent(dates));
-     */
 
-    let maxLength = this.findLength(patData, entries(similarMedData), entries(similarProData));
-    this.visitScale.domain([0, maxLength]);
+    this.timeScale.domain([-1, maxDiff]);
 
-
-    // score scale
-    /*
-     const allScores = this.findAllColValue(patData, entries(similarMedData), entries(similarProData), 'SCORE');
-     this.scoreScale.domain([
-     max([this.scoreScale.domain()[0], max(allScores, (d) => +d)]),
-     min([this.scoreScale.domain()[1], min(allScores, (d) => +d)])
-     ]);
-     */
-
-    // set x-Axis and y-Axis
-    /*
-    this.svg.select('.grid')
-      .call(axisLeft(this.scoreScale)
-        .tickSize(-(this.width - this.margin))
-      )
-      .selectAll('text').remove();
-
-    this.svg.select('.yAxis')
-      .call(axisLeft(this.scoreScale));
-    */
-    
     this.svg.select('.xAxis')
-      .call(axisBottom(this.visitScale));
-
-
+      .call(axisBottom(this.timeScale));
 
     // -------  define line function
 
     const lineFunc = line()
       .curve(curveBasis)
-      .x((d,i) => {
-        return this.visitScale(i);
-        //return this.yearScale(this.parseTime(d['ASSESSMENT_START_DTM']));
+      .x((d) => {
+        return this.timeScale(d['diff']);
       })
       .y((d) => {
         return this.scoreScale(+d['SCORE']);
@@ -187,76 +220,92 @@ export class similarityScoreDiagram {
     const patLine = patScoreGroup
       .append('g')
       .attr('transform', () => {
-        return `translate(${this.margin},${this.margin})`;
+        return `translate(${this.margin.x},${this.margin.y})`;
       })
       .selectAll('.patLine')
       .data([patData])
       .enter()
       .append('path')
       .attr('class', 'patLine')
-      .attr('d', (d) => lineFunc(d));
+      .attr('d', (d) => lineFunc(d))
+      .on('click', (d) => console.log(d));
 
 
     const medScoreGroup = this.svg.select('#med_score');
     medScoreGroup.selectAll('.med_group')
-      .data(entries(similarMedData))
+      .data(similarMedData)
       .enter()
       .append('g')
       .attr('transform', () => {
-        return `translate(${this.margin},${this.margin})`;
+        return `translate(${this.margin.x},${this.margin.y})`;
       })
       .each(function (d) {
         let currGroup = select(this);
         currGroup.append('g')
           .append('path')
           .attr('class', 'medLine')
-          .attr('d', () => lineFunc(d.value));
+          .attr('d', () => lineFunc(d));
+      })
+      .on('click', (d) => console.log(d));
 
-      });
 
 
     const proScoreGroup = this.svg.select('#pro_score');
     proScoreGroup.selectAll('.med_group')
-      .data(entries(similarProData))
+      .data(similarProData)
       .enter()
       .append('g')
       .attr('transform', () => {
-        return `translate(${this.margin},${this.margin})`;
+        return `translate(${this.margin.x},${this.margin.y})`;
       })
       .each(function (d) {
         let currGroup = select(this);
         currGroup.append('g')
           .append('path')
           .attr('class', 'proLine')
-          .attr('d', () => lineFunc(d.value));
-
-      });
+          .attr('d', () => lineFunc(d));
+      })
+      .on('click', (d) => console.log(d));
 
 
   }
 
-  private findAllColValue(pat, medPats, proPats, col) {
-    let result = pat.map((d) => d[col]);
-    for (let i = 0; i < medPats.length; i++) {
-      let temp = medPats[i].value;
-      result = result.concat(temp.map((d) => d[col]));
+
+  private findMinDate(pat) {
+    let minDate = new Date();
+    minDate.setFullYear(3000);
+    for (let index = 0; index < pat.length; index++) {
+      if (!pat[index]['ASSESSMENT_START_DTM']) continue;
+      if (this.parseTime(pat[index]['ASSESSMENT_START_DTM']) < minDate)
+        minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'])
     }
-    for (let i = 0; i < proPats.length; i++) {
-      let temp = proPats[i].value;
-      result = result.concat(temp.map((d) => d[col]));
-    }
-    return result;
+    return minDate
   }
 
-  private findLength(pat, medPats, proPats) {
-    let result = pat.length;
-    for (let i = 0; i < medPats.length; i++) {
-      result = Math.max(result, medPats[i].value.length);
-    }
-    for (let i = 0; i < proPats.length; i++) {
-      result = Math.max(result, proPats[i].value.length);
-    }
-    return result;
+  private updateSlider(start, end) {
+
+    let lowScore = this.scoreScale.invert(end);
+    let highScore = this.scoreScale.invert(start);
+
+    let pro = this.svg.select('#pro_score')
+      .selectAll('path')
+      .style('opacity', 0);
+
+    pro.filter(function (d) {
+      if (!d.length) return false;
+      return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
+    }).style('opacity', 1);
+
+
+    let med = this.svg.select('#med_score')
+      .selectAll('path')
+      .style('opacity', 0);
+
+    med.filter(function (d) {
+      if (!d.length) return false;
+      return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
+    }).style('opacity', 1)
+
   }
 
 }

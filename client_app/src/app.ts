@@ -3,14 +3,13 @@
  */
 
 import {select} from 'd3-selection';
-import {scaleLinear} from 'd3-scale';
 import * as printLogs from './printLogs';
 import * as svgTable from './svgTable';
 import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
-import * as scoreDiagram from './scoreDiagram';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
+import * as statHistogram from './statHistogram';
 
 
 /**
@@ -44,24 +43,45 @@ export class App {
     //await pl.runDemo();
     //await pl.showInfo();
 
+
+    // loading header
     this.$node.select('h3').remove();
 
+/*
+    // create side bar
     const sideBarDiv = this.$node.append('div').classed('sideBar', true);
     const side = sideBar.create(sideBarDiv.node());
     await side.init();
+*/
 
+    // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
 
-    queryBox.create(main.node(), 'Demo');
 
-    //const scoreDgm = main.append('div'); // old one
-    const dgmPromisPhysicalDiv = main.append('Div');
+    // query box
+    queryBox.create(main.node());
 
+
+    // histogram
+    statHistogram.create(main.node());
+
+/*
+    // PROMIS diagrams
+    const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
+    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
+    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
+
+
+    // create table titles and div
     main.append('h3').text('Demo');
+    main.append('span').attr('id', 'Demo_arrow'); // TODO under construction
     const tableDemo = main.append('div');
     main.append('h3').text('PRO');
+    main.append('span').attr('id', 'PRO_arrow'); // TODO under construction
     const tablePro = main.append('div');
     main.append('h3').text('CCI');
+    main.append('span').attr('id', 'CCI_arrow'); // TODO under construction
     const tableCci = main.append('div');
     //main.append('h3').text('Codes');
     //const tableCodes = main.append('div');
@@ -73,12 +93,7 @@ export class App {
     //const tableVas = main.append('div');
 
 
-    //scoreDiagram.create(scoreDgm.node(), 'PRO'); // old one
-    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
-    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
-    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
-
-
+    // create the table
     const svgTableDemo = svgTable.create(tableDemo.node());
     const svgTablePro = svgTable.create(tablePro.node());
     const svgTableCci = svgTable.create(tableCci.node());
@@ -87,6 +102,8 @@ export class App {
     //const svgTablePt = svgTable.create(tablePt.node());
     //const svgTableVas = svgTable.create(tableVas.node());
 
+
+    // draw the table
     await svgTableDemo.drawTable('Demo');
     await svgTablePro.drawTable('PRO');
     await svgTableCci.drawTable('CCI');
@@ -94,11 +111,11 @@ export class App {
     //await svgTableOrders.drawTable('Orders');
     //await svgTablePt.drawTable('PT');
     //await svgTableVas.drawTable('VAS');
+*/
 
     this.setBusy(false);
 
-    //events.fire('draw_score_diagram', ['PAT_ID', '920736']);
-    //events.fire('update_table_similar', ['PAT_ID', '16182719']);
+    events.fire('update_temp_similar', ['PAT_ID', '2168417', 10]);
   }
 
   /**
