@@ -4,7 +4,7 @@
 import { select, event } from 'd3-selection';
 import * as events from 'phovea_core/src/event';
 import { scaleLinear } from 'd3-scale';
-import { line, curveBasis } from 'd3-shape';
+import { line } from 'd3-shape';
 import { timeParse } from 'd3-time-format';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { brushY } from 'd3-brush';
@@ -12,6 +12,7 @@ var similarityScoreDiagram = (function () {
     function similarityScoreDiagram(parent, diagram) {
         var _this = this;
         this.parseTime = timeParse('%x %X');
+        this.parseTimeOrders = timeParse('%x');
         this.height = 400;
         this.width = 600;
         this.margin = { x: 80, y: 40 };
@@ -56,7 +57,8 @@ var similarityScoreDiagram = (function () {
         // -----
         this.svg.append('text')
             .text("" + this.diagram)
-            .attr('transform', "translate(" + this.margin.x / 4 + "," + this.height * 0.75 + ") rotate(-90)");
+            .attr('text-anchor', 'middle')
+            .attr('transform', "translate(" + this.margin.x / 4 + "," + this.height * 0.5 + ") rotate(-90)");
         this.svg.append('g')
             .attr('class', 'grid')
             .attr('transform', "translate(" + this.margin.x + "," + this.margin.y + ")")
@@ -69,6 +71,8 @@ var similarityScoreDiagram = (function () {
             .attr('id', 'med_score');
         this.svg.append('g')
             .attr('id', 'pro_score');
+        this.svg.append('g')
+            .attr('id', 'pat_orders');
         this.attachListener();
     }
     /**
@@ -80,7 +84,18 @@ var similarityScoreDiagram = (function () {
             _this.svg.select('.slider') // reset slider
                 .call(_this.brush)
                 .call(_this.brush.move, _this.scoreScale.range());
+            _this.proInfo = item[1]['target_PRO'];
             _this.drawDiagram(item[1]);
+        });
+        events.on('update_pro_info', function (evt, item) {
+            _this.svg.select('.slider') // reset slider
+                .call(_this.brush)
+                .call(_this.brush.move, _this.scoreScale.range());
+            _this.proInfo = item[1]['rows'];
+            _this.drawDiagram({ 'target_PRO': item[1]['rows'], 'med_rows': [], 'pro_rows': [] });
+        });
+        events.on('update_orders_info', function (evt, item) {
+            _this.addProPoints(item[1]['rows']);
         });
     };
     /**
@@ -148,7 +163,6 @@ var similarityScoreDiagram = (function () {
             .call(axisBottom(this.timeScale));
         // -------  define line function
         var lineFunc = line()
-            .curve(curveBasis)
             .x(function (d) {
             return _this.timeScale(d['diff']);
         })
@@ -159,6 +173,7 @@ var similarityScoreDiagram = (function () {
         this.svg.select('#pat_score').selectAll('g').remove();
         this.svg.select('#med_score').selectAll('g').remove();
         this.svg.select('#pro_score').selectAll('g').remove();
+        this.svg.select('#pat_orders').selectAll('g').remove();
         var patScoreGroup = this.svg.select('#pat_score');
         var patLine = patScoreGroup
             .append('g')
@@ -205,6 +220,11 @@ var similarityScoreDiagram = (function () {
         })
             .on('click', function (d) { return console.log(d); });
     };
+    /**
+     * Utility method
+     * @param pat
+     * @returns {Date}
+     */
     similarityScoreDiagram.prototype.findMinDate = function (pat) {
         var minDate = new Date();
         minDate.setFullYear(3000);
@@ -216,6 +236,11 @@ var similarityScoreDiagram = (function () {
         }
         return minDate;
     };
+    /**
+     * Utility method
+     * @param start
+     * @param end
+     */
     similarityScoreDiagram.prototype.updateSlider = function (start, end) {
         var lowScore = this.scoreScale.invert(end);
         var highScore = this.scoreScale.invert(start);
@@ -235,6 +260,40 @@ var similarityScoreDiagram = (function () {
                 return false;
             return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
         }).style('opacity', 1);
+    };
+    /**
+     * add lines for orders for a patient
+     * @param ordersInfo
+     */
+    similarityScoreDiagram.prototype.addProPoints = function (ordersInfo) {
+        var _this = this;
+        var minDate = this.findMinDate(this.proInfo);
+        ordersInfo.forEach(function (d) {
+            var time = null;
+            try {
+                time = _this.parseTimeOrders(d['ORDER_DTM']).getTime();
+            }
+            catch (TypeError) {
+                time = _this.parseTime(d['ORDER_DTM']).getTime();
+            }
+            d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+        });
+        this.svg.select('#pat_orders').selectAll('g').remove();
+        this.svg.select('#pat_orders')
+            .append('g')
+            .attr('transform', function () {
+            return "translate(" + _this.margin.x + "," + _this.margin.y + ")";
+        })
+            .selectAll('.patOrder')
+            .data(ordersInfo)
+            .enter()
+            .append('line')
+            .attr('class', 'patOrder')
+            .attr('x1', function (d) { return _this.timeScale(d['diff']); })
+            .attr('y1', function (d) { return _this.scoreScale(0); })
+            .attr('x2', function (d) { return _this.timeScale(d['diff']); })
+            .attr('y2', function (d) { return _this.scoreScale(100); })
+            .on('click', function (d) { return console.log(d); });
     };
     return similarityScoreDiagram;
 }());

@@ -121,44 +121,35 @@ def get_stat():
     my_data = dt.get('Demo')
     data = my_data.aslist()
     length = 0
-    males = 0
-    females = 0
-    bmi_none = 0
-    bmi_to_18 = 0
-    bmi_18_21 = 0
-    bmi_21_24 = 0
-    bmi_24_27 = 0
-    bmi_27_30 = 0
-    bmi_from_30 = 0
-
-    test = []
+    gender = [0, 0]
+    bmi = [0, 0, 0, 0, 0, 0, 0]
 
     for row in data:
         length += 1
         if row['PAT_GENDER'] == 'F':
-            females += 1
+            gender[0] += 1
         elif row['PAT_GENDER'] == 'M':
-            males += 1
+            gender[1] += 1
         if not row['BMI']:
-            bmi_none += 1
+            bmi[0] += 1
         elif row['BMI'] <= 18:
-            bmi_to_18 += 1
+            bmi[1] += 1
         elif row['BMI'] > 18 and row['BMI'] <= 21:
-            bmi_18_21 += 1
+            bmi[2] += 1
         elif row['BMI'] > 21 and row['BMI'] <= 24:
-            bmi_21_24 += 1
+            bmi[3] += 1
         elif row['BMI'] > 24 and row['BMI'] <= 27:
-            bmi_24_27 += 1
+            bmi[4] += 1
         elif row['BMI'] > 27 and row['BMI'] <= 30:
-            bmi_27_30 += 1
+            bmi[5] += 1
         elif row['BMI'] > 30:
-            bmi_from_30 += 1
+            bmi[6] += 1
 
     return jsonify ({
        'length': length,
-       'gender': [females, males],
-       'bmi': [bmi_none, bmi_to_18, bmi_18_21, bmi_21_24, bmi_24_27, bmi_27_30, bmi_from_30]
-    })
+       'gender': gender,
+       'bmi': bmi
+       })
 
 
 

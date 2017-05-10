@@ -114,15 +114,18 @@ export class SvgTable {
    * Draw the rows of the table
    * args = {data}
    * arg = rows
-   * @param input dict= {'func': 'init'/'similar'/'all', 'args': {data}, 'arg': arg}
+   * @param input dict= {'func': 'init'/'similar'/'all'/'latest', 'args': {data}, 'arg': arg}
    * @returns {Promise<void>}
    */
   private drawRows(input) {
 
     console.log('Loading ' + this.datasetId);
 
-    const data = (input.func === 'init' || input.func === 'latest') ? input.args[input.arg].slice(0, 20)
+    let data = (input.func === 'init' || input.func === 'latest') ? input.args[input.arg].slice(0, 20)
       : input.args[input.arg];
+
+    data = (input.func === 'all') ? input.args[input.arg].slice(0, 25)
+      : data;
 
     const diff = (input.func === 'similar') ? input.args.difference : [];
 
@@ -219,6 +222,12 @@ export class SvgTable {
       this.getData(url).then((args) => {
         const dic = {'func': 'all', 'args': args, 'arg': 'rows'};
         this.drawRows(dic);
+        if (this.datasetId == 'PRO') {
+          events.fire('update_pro_info', ['PRO', args]);
+        }
+        if (this.datasetId == 'Orders') {
+          events.fire('update_orders_info', ['Orders', args]);
+        }
         this.setBusy(false);
       })
     });

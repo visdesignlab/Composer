@@ -24,7 +24,10 @@ export class similarityScoreDiagram {
   private scoreScale;
   private svg;
   private parseTime = timeParse('%x %X');
+  private parseTimeOrders = timeParse('%x');
   private brush;
+
+  private proInfo;
 
   height = 400;
   width = 600;
@@ -86,7 +89,8 @@ export class similarityScoreDiagram {
 
     this.svg.append('text')
       .text(`${this.diagram}`)
-      .attr('transform', `translate(${this.margin.x / 4},${this.height * 0.75}) rotate(-90)`);
+      .attr('text-anchor', 'middle')
+      .attr('transform', `translate(${this.margin.x / 4},${this.height * 0.5}) rotate(-90)`);
 
     this.svg.append('g')
       .attr('class', 'grid')
@@ -105,6 +109,9 @@ export class similarityScoreDiagram {
     this.svg.append('g')
       .attr('id', 'pro_score');
 
+    this.svg.append('g')
+      .attr('id', 'pat_orders');
+
     this.attachListener();
 
   }
@@ -119,8 +126,25 @@ export class similarityScoreDiagram {
         .call(this.brush)
         .call(this.brush.move, this.scoreScale.range());
 
+      this.proInfo = item[1]['target_PRO'];
+
       this.drawDiagram(item[1]);
     });
+
+    events.on('update_pro_info', (evt, item) => { // called in svgTable
+      this.svg.select('.slider')  // reset slider
+        .call(this.brush)
+        .call(this.brush.move, this.scoreScale.range());
+
+      this.proInfo = item[1]['rows'];
+
+      this.drawDiagram({'target_PRO': item[1]['rows'], 'med_rows': [], 'pro_rows': []});
+    });
+
+    events.on('update_orders_info', (evt, item) => { // called in svgTable called right after 'update_pro_info'
+      this.addProPoints(item[1]['rows']);
+    });
+
   }
 
   /**
@@ -202,7 +226,7 @@ export class similarityScoreDiagram {
     // -------  define line function
 
     const lineFunc = line()
-      .curve(curveBasis)
+      //.curve(curveBasis)
       .x((d) => {
         return this.timeScale(d['diff']);
       })
@@ -215,6 +239,7 @@ export class similarityScoreDiagram {
     this.svg.select('#pat_score').selectAll('g').remove();
     this.svg.select('#med_score').selectAll('g').remove();
     this.svg.select('#pro_score').selectAll('g').remove();
+    this.svg.select('#pat_orders').selectAll('g').remove();
 
     const patScoreGroup = this.svg.select('#pat_score');
     const patLine = patScoreGroup
@@ -249,7 +274,6 @@ export class similarityScoreDiagram {
       .on('click', (d) => console.log(d));
 
 
-
     const proScoreGroup = this.svg.select('#pro_score');
     proScoreGroup.selectAll('.med_group')
       .data(similarProData)
@@ -267,10 +291,13 @@ export class similarityScoreDiagram {
       })
       .on('click', (d) => console.log(d));
 
-
   }
 
-
+  /**
+   * Utility method
+   * @param pat
+   * @returns {Date}
+   */
   private findMinDate(pat) {
     let minDate = new Date();
     minDate.setFullYear(3000);
@@ -282,6 +309,12 @@ export class similarityScoreDiagram {
     return minDate
   }
 
+
+  /**
+   * Utility method
+   * @param start
+   * @param end
+   */
   private updateSlider(start, end) {
 
     let lowScore = this.scoreScale.invert(end);
@@ -305,6 +338,45 @@ export class similarityScoreDiagram {
       if (!d.length) return false;
       return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
     }).style('opacity', 1)
+
+  }
+
+
+  /**
+   * add lines for orders for a patient
+   * @param ordersInfo
+   */
+  private addProPoints (ordersInfo) {
+
+    let minDate = this.findMinDate(this.proInfo);
+    ordersInfo.forEach((d) => {
+      let time = null;
+      try {
+        time = this.parseTimeOrders(d['ORDER_DTM']).getTime();
+      }
+      catch (TypeError) {
+        time = this.parseTime(d['ORDER_DTM']).getTime();
+      }
+      d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+    });
+
+    this.svg.select('#pat_orders').selectAll('g').remove();
+
+    this.svg.select('#pat_orders')
+      .append('g')
+      .attr('transform', () => {
+        return `translate(${this.margin.x},${this.margin.y})`;
+      })
+      .selectAll('.patOrder')
+      .data(ordersInfo)
+      .enter()
+      .append('line')
+      .attr('class', 'patOrder')
+      .attr('x1', (d) => this.timeScale(d['diff']))
+      .attr('y1', (d) => this.scoreScale(0))
+      .attr('x2', (d) => this.timeScale(d['diff']))
+      .attr('y2', (d) => this.scoreScale(100))
+      .on('click', (d) => console.log(d));
 
   }
 

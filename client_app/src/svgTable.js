@@ -102,7 +102,7 @@ var SvgTable = (function () {
      * Draw the rows of the table
      * args = {data}
      * arg = rows
-     * @param input dict= {'func': 'init'/'similar'/'all', 'args': {data}, 'arg': arg}
+     * @param input dict= {'func': 'init'/'similar'/'all'/'latest', 'args': {data}, 'arg': arg}
      * @returns {Promise<void>}
      */
     SvgTable.prototype.drawRows = function (input) {
@@ -110,6 +110,8 @@ var SvgTable = (function () {
         console.log('Loading ' + this.datasetId);
         var data = (input.func === 'init' || input.func === 'latest') ? input.args[input.arg].slice(0, 20)
             : input.args[input.arg];
+        data = (input.func === 'all') ? input.args[input.arg].slice(0, 25)
+            : data;
         var diff = (input.func === 'similar') ? input.args.difference : [];
         var rows = this.$node
             .selectAll('.rows')
@@ -191,6 +193,12 @@ var SvgTable = (function () {
             _this.getData(url).then(function (args) {
                 var dic = { 'func': 'all', 'args': args, 'arg': 'rows' };
                 _this.drawRows(dic);
+                if (_this.datasetId == 'PRO') {
+                    events.fire('update_pro_info', ['PRO', args]);
+                }
+                if (_this.datasetId == 'Orders') {
+                    events.fire('update_orders_info', ['Orders', args]);
+                }
                 _this.setBusy(false);
             });
         });
