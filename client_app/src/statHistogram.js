@@ -194,9 +194,6 @@ var StatHistogram = (function () {
             .style('fill', function (d) {
             return _this.similarColorScale(d.length / _this.similarData['rows'].length * 100);
         });
-        //console.log(groups);
-        //console.log(allData);
-        //console.log(this.allData['test']);
         // proportion
         var histogramRectProportion = svg.selectAll('.histogramRectProportion')
             .data(groups);
@@ -226,7 +223,7 @@ var StatHistogram = (function () {
             return _this.xScale(d.length / allData[i] * 100);
         })
             .style('fill', function (d, i) {
-            return 'darkred';
+            return '#3838f5';
             //return this.similarColorScale(allData[i] - d.length / this.similarData['rows'].length * 100)
         });
     };

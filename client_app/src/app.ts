@@ -47,12 +47,12 @@ export class App {
     // loading header
     this.$node.select('h3').remove();
 
-/*
+
     // create side bar
     const sideBarDiv = this.$node.append('div').classed('sideBar', true);
     const side = sideBar.create(sideBarDiv.node());
     await side.init();
-*/
+
 
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
@@ -65,7 +65,7 @@ export class App {
     // histogram
     statHistogram.create(main.node());
 
-/*
+
     // PROMIS diagrams
     const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
     similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
@@ -85,8 +85,8 @@ export class App {
     const tableCci = main.append('div');
     //main.append('h3').text('Codes');
     //const tableCodes = main.append('div');
-    //main.append('h3').text('Orders');
-    //const tableOrders = main.append('div');
+    main.append('h3').text('Orders');
+    const tableOrders = main.append('div');
     //main.append('h3').text('PT');
     //const tablePt = main.append('div');
     //main.append('h3').text('VAS');
@@ -98,7 +98,7 @@ export class App {
     const svgTablePro = svgTable.create(tablePro.node());
     const svgTableCci = svgTable.create(tableCci.node());
     //const svgTableCodes = svgTable.create(tableCodes.node());
-    //const svgTableOrders = svgTable.create(tableOrders.node());
+    const svgTableOrders = svgTable.create(tableOrders.node());
     //const svgTablePt = svgTable.create(tablePt.node());
     //const svgTableVas = svgTable.create(tableVas.node());
 
@@ -108,14 +108,14 @@ export class App {
     await svgTablePro.drawTable('PRO');
     await svgTableCci.drawTable('CCI');
     //await svgTableCodes.drawTable('Codes');
-    //await svgTableOrders.drawTable('Orders');
+    await svgTableOrders.drawTable('Orders');
     //await svgTablePt.drawTable('PT');
     //await svgTableVas.drawTable('VAS');
-*/
+
 
     this.setBusy(false);
 
-    events.fire('update_temp_similar', ['PAT_ID', '2168417', 10]);
+    //events.fire('update_temp_similar', ['PAT_ID', '12431896', 10]);
   }
 
   /**
