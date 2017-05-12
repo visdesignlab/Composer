@@ -77,6 +77,22 @@
 }
 
 .patOrder {
+  stroke: #7b7b7b;
+}
+
+.selectedLine {
   stroke: #800000;
   stroke-dasharray: 5,5;
+}
+
+.selectedOrder {
+  fill: darkred !important;
+}
+
+.PROCEDURE {
+  fill: #8f8f8f;
+}
+
+.MEDICATION {
+  fill: #ddd
 }

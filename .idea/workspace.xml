@@ -42,14 +42,14 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.546875">
+    <splitter split-orientation="horizontal" split-proportion="0.67890626">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="app.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1620">
-                  <caret line="117" column="6" lean-forward="false" selection-start-line="117" selection-start-column="6" selection-end-line="117" selection-end-column="6" />
+                <state relative-caret-position="1725">
+                  <caret line="117" column="58" lean-forward="false" selection-start-line="117" selection-start-column="51" selection-end-line="117" selection-end-column="58" />
                   <folding>
                     <element signature="e#51#87#0" expanded="true" />
                   </folding>
@@ -60,25 +60,13 @@
           <file leaf-file-name="queryBox.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="120">
-                  <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+                <state relative-caret-position="298">
+                  <caret line="69" column="3" lean-forward="true" selection-start-line="69" selection-start-column="3" selection-end-line="69" selection-end-column="3" />
                   <folding>
-                    <element signature="n#!!block;n#constructor#0;n#QueryBox#0" expanded="false" />
+                    <element signature="e#48#93#0" expanded="true" />
                     <element signature="n#!!block;n#updateSimilar#0;n#QueryBox#0" expanded="false" />
                     <element signature="n#!!block;n#updateAllInfo#0;n#QueryBox#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="svgTable.ts" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/client_app/src/svgTable.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3330">
-                  <caret line="274" column="4" lean-forward="false" selection-start-line="274" selection-start-column="4" selection-end-line="274" selection-end-column="4" />
-                  <folding>
-                    <element signature="e#244#292#0" expanded="true" />
-                    <element signature="n#!!block;n#drawHeader#0;n#SvgTable#0" expanded="false" />
+                    <element signature="n#!!block;n#getData#0;n#QueryBox#0" expanded="false" />
                   </folding>
                 </state>
               </provider>
@@ -87,15 +75,21 @@
           <file leaf-file-name="similarityScoreDiagram.ts" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="15">
-                  <caret line="147" column="3" lean-forward="false" selection-start-line="147" selection-start-column="3" selection-end-line="147" selection-end-column="3" />
+                <state relative-caret-position="340">
+                  <caret line="482" column="4" lean-forward="false" selection-start-line="482" selection-start-column="4" selection-end-line="482" selection-end-column="4" />
                   <folding>
                     <element signature="e#49#94#0" expanded="true" />
                     <element signature="n#!!block;n#constructor#0;n#similarityScoreDiagram#0" expanded="false" />
+                    <element signature="n#!!block;n#attachListener#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#drawDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#findMinDate#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#updateSlider#0;n#similarityScoreDiagram#0" expanded="false" />
-                    <element signature="n#!!block;n#addProPoints#0;n#similarityScoreDiagram#0" expanded="false" />
+                    <element signature="n#!!block;n#addOrderPoints#0;n#similarityScoreDiagram#0" expanded="false" />
+                    <element signature="n#!!block;n#parseTime#0;n#similarityScoreDiagram#0" expanded="false" />
+                    <element signature="n#!!block;n#renderOrdersTooltip#0;n#similarityScoreDiagram#0" expanded="false" />
+                    <element signature="n#!!block;n#setBusy#0;n#similarityScoreDiagram#0" expanded="false" />
+                    <marker date="1494607879000" expanded="true" signature="14017:14775" ph="..." />
+                    <marker date="1494607879000" expanded="true" signature="14180:14199" ph="..." />
                   </folding>
                 </state>
               </provider>
@@ -104,13 +98,22 @@
           <file leaf-file-name="statHistogram.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1665">
-                  <caret line="131" column="36" lean-forward="false" selection-start-line="131" selection-start-column="6" selection-end-line="131" selection-end-column="36" />
+                <state relative-caret-position="208">
+                  <caret line="227" column="0" lean-forward="false" selection-start-line="227" selection-start-column="0" selection-end-line="227" selection-end-column="0" />
                   <folding>
                     <element signature="e#49#94#0" expanded="true" />
-                    <element signature="n#!!block;n#constructor#0;n#StatHistogram#0" expanded="false" />
-                    <element signature="n#!!block;n#updateHistogram#0;n#StatHistogram#0" expanded="false" />
+                    <element signature="n#!!block;n#drawHistogram#0;n#StatHistogram#0" expanded="false" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="_scoreDiagram.scss" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="412">
+                  <caret line="92" column="15" lean-forward="false" selection-start-line="92" selection-start-column="15" selection-end-line="92" selection-end-column="15" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -118,9 +121,22 @@
           <file leaf-file-name="constants.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="510">
-                  <caret line="34" column="47" lean-forward="false" selection-start-line="34" selection-start-column="38" selection-end-line="34" selection-end-column="47" />
-                  <folding />
+                <state relative-caret-position="331">
+                  <caret line="2360" column="6" lean-forward="true" selection-start-line="2360" selection-start-column="6" selection-end-line="2360" selection-end-column="6" />
+                  <folding>
+                    <element signature="e#3436#8933#0" expanded="false" />
+                    <element signature="e#8979#53054#0" expanded="false" />
+                    <element signature="e#53102#78359#0" expanded="false" />
+                    <element signature="e#78374#104649#0" expanded="false" />
+                    <element signature="e#104665#108809#0" expanded="false" />
+                    <element signature="e#108825#144933#0" expanded="false" />
+                    <element signature="e#144949#265834#0" expanded="false" />
+                    <element signature="e#265850#299402#0" expanded="false" />
+                    <element signature="e#299418#312238#0" expanded="false" />
+                    <element signature="e#312254#369151#0" expanded="false" />
+                    <element signature="e#369166#380950#0" expanded="false" />
+                    <element signature="e#380965#384292#0" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -132,8 +148,8 @@
           <file leaf-file-name="data_handler.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app_server/app_server/src/data_handler.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="15">
-                  <caret line="51" column="29" lean-forward="false" selection-start-line="51" selection-start-column="20" selection-end-line="51" selection-end-column="29" />
+                <state relative-caret-position="1353">
+                  <caret line="127" column="31" lean-forward="false" selection-start-line="127" selection-start-column="31" selection-end-line="127" selection-end-column="31" />
                   <folding />
                 </state>
               </provider>
@@ -142,8 +158,8 @@
           <file leaf-file-name="handle_pro.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_pro.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="450">
-                  <caret line="30" column="31" lean-forward="false" selection-start-line="30" selection-start-column="25" selection-end-line="30" selection-end-column="31" />
+                <state relative-caret-position="-344">
+                  <caret line="36" column="27" lean-forward="false" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="27" />
                   <folding />
                 </state>
               </provider>
@@ -152,15 +168,14 @@
           <file leaf-file-name="index.json" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app_server/data/index.json">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="30">
-                  <caret line="161" column="2" lean-forward="false" selection-start-line="161" selection-start-column="2" selection-end-line="161" selection-end-column="2" />
+                <state relative-caret-position="346">
+                  <caret line="28" column="30" lean-forward="false" selection-start-line="28" selection-start-column="17" selection-end-line="28" selection-end-column="30" />
                   <folding>
-                    <element signature="e#4#2758#0" expanded="false" />
-                    <element signature="e#262#2754#0" expanded="false" />
                     <element signature="e#2762#3705#0" expanded="false" />
                     <element signature="e#2994#3701#0" expanded="false" />
                     <element signature="e#3709#6222#0" expanded="false" />
                     <element signature="e#6226#7206#0" expanded="false" />
+                    <element signature="e#6468#7202#0" expanded="false" />
                     <element signature="e#7210#7634#0" expanded="false" />
                   </folding>
                 </state>
@@ -170,8 +185,8 @@
           <file leaf-file-name="handle_Demo.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1230">
-                  <caret line="82" column="20" lean-forward="false" selection-start-line="82" selection-start-column="4" selection-end-line="82" selection-end-column="20" />
+                <state relative-caret-position="314">
+                  <caret line="84" column="27" lean-forward="false" selection-start-line="84" selection-start-column="15" selection-end-line="84" selection-end-column="27" />
                   <folding />
                 </state>
               </provider>
@@ -192,28 +207,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>margin</find>
-      <find>.ticks</find>
-      <find>findMinDate</find>
-      <find>similarProData</find>
-      <find>similarMedData</find>
-      <find>visitScale</find>
-      <find>num</find>
-      <find>header</find>
-      <find>update_table_init</find>
-      <find>updateTableInfo</find>
-      <find>getData</find>
-      <find>update_similar</find>
-      <find>events.</find>
-      <find>drawLineChart</find>
-      <find>datasetId</find>
-      <find>colors</find>
-      <find>#</find>
-      <find>scaleLinear</find>
-      <find>ysca</find>
-      <find>//</find>
-      <find>transition</find>
-      <find>yScale</find>
       <find>xAxis</find>
       <find>updateSlider</find>
       <find>args</find>
@@ -221,7 +214,29 @@
       <find>20884588</find>
       <find>20958617</find>
       <find>5632013</find>
+      <find>height</find>
+      <find>this.hei</find>
+      <find>20559329</find>
+      <find>17596883</find>
+      <find>[19431659</find>
+      <find>[</find>
+      <find>'</find>
+      <find>5330196</find>
+      <find>getData</find>
+      <find>conso</find>
+      <find>2/26/2015</find>
       <find>addProPoints</find>
+      <find>proInfo</find>
+      <find>timeScale</find>
+      <find>tooltip</find>
+      <find>transition</find>
+      <find>parse_date</find>
+      <find>parseTime</find>
+      <find>findMinDate</find>
+      <find>'rect</find>
+      <find>transi</find>
+      <find>consol</find>
+      <find>line</find>
     </findStrings>
     <replaceStrings>
       <replace>.Wide</replace>
@@ -238,10 +253,13 @@
       <replace>get_all_info_for_pat</replace>
       <replace>visitScale</replace>
       <replace>timeScale</replace>
+      <replace>add</replace>
+      <replace>addOrderPoints</replace>
+      <replace>targetPatientProInfo</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/app_server" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/client_app" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -274,16 +292,18 @@
         <option value="$PROJECT_DIR$/client_app/src/styles/_svgtable.scss" />
         <option value="$PROJECT_DIR$/client_app/src/style.scss" />
         <option value="$PROJECT_DIR$/app_server/app_server/data_api.py" />
-        <option value="$PROJECT_DIR$/client_app/src/queryBox.ts" />
         <option value="$PROJECT_DIR$/client_app/src/styles/_histogram.scss" />
-        <option value="$PROJECT_DIR$/client_app/src/constants.ts" />
-        <option value="$PROJECT_DIR$/client_app/src/statHistogram.ts" />
-        <option value="$PROJECT_DIR$/app_server/app_server/src/data_handler.py" />
-        <option value="$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss" />
         <option value="$PROJECT_DIR$/app_server/data/index.json" />
-        <option value="$PROJECT_DIR$/client_app/src/app.ts" />
-        <option value="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts" />
         <option value="$PROJECT_DIR$/client_app/src/svgTable.ts" />
+        <option value="$PROJECT_DIR$/app_server/data/procedure_result.csv" />
+        <option value="$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv" />
+        <option value="$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss" />
+        <option value="$PROJECT_DIR$/client_app/src/queryBox.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/app.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/constants.ts" />
+        <option value="$PROJECT_DIR$/app_server/app_server/src/data_handler.py" />
+        <option value="$PROJECT_DIR$/client_app/src/statHistogram.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts" />
       </list>
     </option>
   </component>
@@ -304,7 +324,7 @@
     <option name="height" value="710" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -317,7 +337,11 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="ProjectPane" />
+      <pane id="Scratches" />
+      <pane id="Scope" />
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="fileTemplates" />
@@ -440,60 +464,38 @@
       <workItem from="1493913465746" duration="20518000" />
       <workItem from="1494200105877" duration="29344000" />
       <workItem from="1494344865332" duration="3590000" />
-      <workItem from="1494432090947" duration="44000" />
+      <workItem from="1494432090947" duration="26119000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="159408000" />
+    <option name="totallyTimeSpent" value="185483000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1280" height="710" extended-state="6" />
+    <frame x="0" y="23" width="1280" height="710" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
-    <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="processedProjectFiles" value="true" />
@@ -623,13 +625,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/procedure_result.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="46" column="18" lean-forward="false" selection-start-line="46" selection-start-column="18" selection-end-line="46" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_CCI_index.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -637,28 +632,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-720">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/sideBar.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="304">
           <caret line="73" column="32" lean-forward="false" selection-start-line="73" selection-start-column="32" selection-end-line="73" selection-end-column="32" />
+          <folding>
+            <marker date="1493659704000" expanded="true" signature="1342:1348" ph=" " />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/slider.ts" />
-    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Demo_index.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="11" lean-forward="false" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Orders.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -698,6 +682,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -713,14 +698,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="25" lean-forward="false" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1230">
-          <caret line="82" column="20" lean-forward="false" selection-start-line="82" selection-start-column="4" selection-end-line="82" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -759,21 +736,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="34" column="47" lean-forward="false" selection-start-line="34" selection-start-column="38" selection-end-line="34" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="547">
-          <caret line="80" column="24" lean-forward="false" selection-start-line="80" selection-start-column="24" selection-end-line="80" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app_server/data/Orders.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="163">
@@ -781,45 +743,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1665">
-          <caret line="131" column="36" lean-forward="false" selection-start-line="131" selection-start-column="6" selection-end-line="131" selection-end-column="36" />
-          <folding>
-            <element signature="e#49#94#0" expanded="true" />
-            <element signature="n#!!block;n#constructor#0;n#StatHistogram#0" expanded="false" />
-            <element signature="n#!!block;n#updateHistogram#0;n#StatHistogram#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-137">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_pro.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" column="31" lean-forward="false" selection-start-line="30" selection-start-column="25" selection-end-line="30" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/index.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="161" column="2" lean-forward="false" selection-start-line="161" selection-start-column="2" selection-end-line="161" selection-end-column="2" />
           <folding>
-            <element signature="e#4#2758#0" expanded="false" />
-            <element signature="e#262#2754#0" expanded="false" />
-            <element signature="e#2762#3705#0" expanded="false" />
-            <element signature="e#2994#3701#0" expanded="false" />
-            <element signature="e#3709#6222#0" expanded="false" />
-            <element signature="e#6226#7206#0" expanded="false" />
-            <element signature="e#7210#7634#0" expanded="false" />
+            <element signature="n#!!doc" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -828,28 +757,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="46">
           <caret line="29" column="12" lean-forward="false" selection-start-line="29" selection-start-column="12" selection-end-line="29" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding>
-            <element signature="n#!!block;n#constructor#0;n#QueryBox#0" expanded="false" />
-            <element signature="n#!!block;n#updateSimilar#0;n#QueryBox#0" expanded="false" />
-            <element signature="n#!!block;n#updateAllInfo#0;n#QueryBox#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1620">
-          <caret line="117" column="6" lean-forward="false" selection-start-line="117" selection-start-column="6" selection-end-line="117" selection-end-column="6" />
-          <folding>
-            <element signature="e#51#87#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -860,43 +768,168 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Orders_index.csv">
+    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Demo_index.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="62" column="11" lean-forward="false" selection-start-line="62" selection-start-column="11" selection-end-line="62" selection-end-column="11" />
+        <state relative-caret-position="165">
+          <caret line="11" column="11" lean-forward="false" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="11" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/data_handler.py">
+    <entry file="file://$PROJECT_DIR$/app_server/data/procedure_result.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="51" column="29" lean-forward="false" selection-start-line="51" selection-start-column="20" selection-end-line="51" selection-end-column="29" />
+        <state relative-caret-position="2265">
+          <caret line="151" column="0" lean-forward="false" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="59" column="12" lean-forward="false" selection-start-line="59" selection-start-column="5" selection-end-line="59" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Orders_index.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="982" column="13" lean-forward="false" selection-start-line="982" selection-start-column="6" selection-end-line="982" selection-end-column="13" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/svgTable.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3330">
-          <caret line="274" column="4" lean-forward="false" selection-start-line="274" selection-start-column="4" selection-end-line="274" selection-end-column="4" />
+        <state relative-caret-position="196">
+          <caret line="97" column="24" lean-forward="false" selection-start-line="97" selection-start-column="17" selection-end-line="97" selection-end-column="24" />
           <folding>
-            <element signature="e#244#292#0" expanded="true" />
-            <element signature="n#!!block;n#drawHeader#0;n#SvgTable#0" expanded="false" />
+            <element signature="n#!!block;n#drawRows#0;n#SvgTable#0" expanded="false" />
+            <element signature="n#!!block;n#drawLineChart#0;n#SvgTable#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_pro.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-344">
+          <caret line="36" column="27" lean-forward="false" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="314">
+          <caret line="84" column="27" lean-forward="false" selection-start-line="84" selection-start-column="15" selection-end-line="84" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/index.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="346">
+          <caret line="28" column="30" lean-forward="false" selection-start-line="28" selection-start-column="17" selection-end-line="28" selection-end-column="30" />
+          <folding>
+            <element signature="e#2762#3705#0" expanded="false" />
+            <element signature="e#2994#3701#0" expanded="false" />
+            <element signature="e#3709#6222#0" expanded="false" />
+            <element signature="e#6226#7206#0" expanded="false" />
+            <element signature="e#6468#7202#0" expanded="false" />
+            <element signature="e#7210#7634#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1725">
+          <caret line="117" column="58" lean-forward="false" selection-start-line="117" selection-start-column="51" selection-end-line="117" selection-end-column="58" />
+          <folding>
+            <element signature="e#51#87#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="2360" column="6" lean-forward="true" selection-start-line="2360" selection-start-column="6" selection-end-line="2360" selection-end-column="6" />
+          <folding>
+            <element signature="e#3436#8933#0" expanded="false" />
+            <element signature="e#8979#53054#0" expanded="false" />
+            <element signature="e#53102#78359#0" expanded="false" />
+            <element signature="e#78374#104649#0" expanded="false" />
+            <element signature="e#104665#108809#0" expanded="false" />
+            <element signature="e#108825#144933#0" expanded="false" />
+            <element signature="e#144949#265834#0" expanded="false" />
+            <element signature="e#265850#299402#0" expanded="false" />
+            <element signature="e#299418#312238#0" expanded="false" />
+            <element signature="e#312254#369151#0" expanded="false" />
+            <element signature="e#369166#380950#0" expanded="false" />
+            <element signature="e#380965#384292#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="92" column="15" lean-forward="false" selection-start-line="92" selection-start-column="15" selection-end-line="92" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/data_handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1353">
+          <caret line="127" column="31" lean-forward="false" selection-start-line="127" selection-start-column="31" selection-end-line="127" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="227" column="0" lean-forward="false" selection-start-line="227" selection-start-column="0" selection-end-line="227" selection-end-column="0" />
+          <folding>
+            <element signature="e#49#94#0" expanded="true" />
+            <element signature="n#!!block;n#drawHistogram#0;n#StatHistogram#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="69" column="3" lean-forward="true" selection-start-line="69" selection-start-column="3" selection-end-line="69" selection-end-column="3" />
+          <folding>
+            <element signature="e#48#93#0" expanded="true" />
+            <element signature="n#!!block;n#updateSimilar#0;n#QueryBox#0" expanded="false" />
+            <element signature="n#!!block;n#updateAllInfo#0;n#QueryBox#0" expanded="false" />
+            <element signature="n#!!block;n#getData#0;n#QueryBox#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="147" column="3" lean-forward="false" selection-start-line="147" selection-start-column="3" selection-end-line="147" selection-end-column="3" />
+        <state relative-caret-position="340">
+          <caret line="482" column="4" lean-forward="false" selection-start-line="482" selection-start-column="4" selection-end-line="482" selection-end-column="4" />
           <folding>
             <element signature="e#49#94#0" expanded="true" />
             <element signature="n#!!block;n#constructor#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#attachListener#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#drawDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#findMinDate#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#updateSlider#0;n#similarityScoreDiagram#0" expanded="false" />
-            <element signature="n#!!block;n#addProPoints#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#addOrderPoints#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#parseTime#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#renderOrdersTooltip#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#setBusy#0;n#similarityScoreDiagram#0" expanded="false" />
+            <marker date="1494607879000" expanded="true" signature="14017:14775" ph="..." />
+            <marker date="1494607879000" expanded="true" signature="14180:14199" ph="..." />
           </folding>
         </state>
       </provider>

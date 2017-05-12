@@ -71,7 +71,6 @@ var QueryBox = (function () {
                     this.getData(url).then(function (args) {
                         _this.setBusy(false);
                         _this.similarArgs = args;
-                        console.log(args);
                         events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
                     });
                 }
@@ -88,7 +87,7 @@ var QueryBox = (function () {
     QueryBox.prototype.updateAllInfo = function () {
         var value = document.getElementById('text_pat_id').value;
         if (!isNaN(+value) && value) {
-            events.fire('update_all_info', ['PAT_ID', value]); // caught by svgTable
+            events.fire('update_all_info', ['PAT_ID', value]); // caught by svgTable and similarityScoreDiagram
         }
         else {
             console.log('Not a Number');
