@@ -87,7 +87,8 @@ def get_similar_rows(PAT_ID, number):
          #entries for score diagram
         'target_PRO': get_all_info_for_pat('PRO', int(PAT_ID)),
         'med_rows': med_rows,
-        'pro_rows': procedure_rows
+        'pro_rows': procedure_rows#,
+        #'all_pro_rows': sum(pro_rows, get_all_info_for_pat('PRO', int(PAT_ID)))
     })
 
 
@@ -123,6 +124,9 @@ def get_stat():
     length = 0
     gender = [0, 0]
     bmi = [0, 0, 0, 0, 0, 0, 0]
+    age = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    today = pd.datetime.today()
+
 
     for row in data:
         length += 1
@@ -144,11 +148,36 @@ def get_stat():
             bmi[5] += 1
         elif row['BMI'] > 30:
             bmi[6] += 1
+        pat_age = int((today - to_data_time(row['PAT_BIRTHDATE'])).days / 365.25)
+        if pat_age <= 10:
+            age[0] += 1
+        elif pat_age > 10 and pat_age <=20:
+            age[1] += 1
+        elif pat_age > 20 and pat_age <=30:
+            age[2] += 1
+        elif pat_age > 30 and pat_age <=40:
+            age[3] += 1
+        elif pat_age > 40 and pat_age <=50:
+            age[4] += 1
+        elif pat_age > 50 and pat_age <=60:
+            age[5] += 1
+        elif pat_age > 60 and pat_age <=70:
+            age[6] += 1
+        elif pat_age > 70 and pat_age <=80:
+            age[7] += 1
+        elif pat_age > 80 and pat_age <=90:
+            age[8] += 1
+        elif pat_age > 90 and pat_age <=100:
+            age[9] += 1
+        elif pat_age > 100:
+            age[10] += 1
+
 
     return jsonify ({
        'length': length,
-       'gender': gender,
-       'bmi': bmi
+       'GENDER': gender,
+       'BMI': bmi,
+       'AGE': age
        })
 
 
@@ -167,13 +196,13 @@ def get_all_info_for_pat(id, PAT_ID):
             info_rows.append(my_data.aslist()[i])
 
     if id == 'Demo':
-        info_rows.sort(key=lambda r: parse_date_time(r["ADM_DATE"]))
+        info_rows.sort(key=lambda r: to_data_time(r["ADM_DATE"]))
     elif id == 'PRO':
-        info_rows.sort(key=lambda r: parse_date_time(r["ASSESSMENT_START_DTM"]))
+        info_rows.sort(key=lambda r: to_data_time(r["ASSESSMENT_START_DTM"]))
     elif id == 'PT':
-        info_rows.sort(key=lambda r: parse_date_time(r["ADM_DATE"]))
+        info_rows.sort(key=lambda r: to_data_time(r["ADM_DATE"]))
     elif id == 'VAS':
-        info_rows.sort(key=lambda r: parse_date(r["RECORDED_TIME"]))
+        info_rows.sort(key=lambda r: to_data_time(r["RECORDED_TIME"]))
 
     return info_rows
 
@@ -188,13 +217,27 @@ def verify_int(s):
         return 0
 
 
+# NEVER USED
 def parse_date_time(date):
     if not date:
         return pd.datetime.strptime('01/01/0001', '%m/%d/%Y')
     return pd.datetime.strptime(date, '%m/%d/%Y %I:%M:%S %p')
 
 
+# NEVER USED
 def parse_date(date):
     if not date:
       return pd.datetime.strptime('01/01/0001', '%m/%d/%Y')
     return pd.datetime.strptime(date, '%m/%d/%Y')
+
+
+def to_data_time(date):
+    if not date:
+        return pd.datetime.strptime('01/01/0001', '%m/%d/%Y')
+    if ':' in date:
+        time = pd.datetime.strptime(date, '%m/%d/%Y %I:%M:%S %p')
+    elif '/' in date:
+        time = pd.datetime.strptime(date, '%m/%d/%Y')
+    else:
+        time = pd.datetime.strptime('01/01/0001', '%m/%d/%Y')
+    return time

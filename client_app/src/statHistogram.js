@@ -7,6 +7,7 @@ import { select } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
 import { transition } from 'd3-transition';
 import { axisBottom } from 'd3-axis';
+import { timeParse } from 'd3-time-format';
 import { Constants } from './constants';
 import * as events from 'phovea_core/src/event';
 var StatHistogram = (function () {
@@ -28,6 +29,7 @@ var StatHistogram = (function () {
             _this.attachListener();
             _this.drawHistogram('GENDER');
             _this.drawHistogram('BMI');
+            _this.drawHistogram('AGE');
         });
     }
     /**
@@ -42,7 +44,7 @@ var StatHistogram = (function () {
             .append('svg')
             .classed('histogramSVG', true)
             .append('g')
-            .attr('transform', "translate(5,0)")
+            .attr('transform', "translate(5,10)")
             .attr('id', "histogram_" + hist);
         var midLine = svg
             .append('line')
@@ -51,15 +53,7 @@ var StatHistogram = (function () {
             .attr('y1', 0)
             .attr('x2', this.svgDimension.width / 2)
             .attr('y2', this.svgDimension.height);
-        var allData = [];
-        switch (hist) {
-            case 'GENDER':
-                allData = this.allData['gender'];
-                break;
-            case 'BMI':
-                allData = this.allData['bmi'];
-                break;
-        }
+        var allData = this.allData[hist];
         var histogramRectAll = svg.selectAll('.histogramRectAll')
             .data(allData);
         histogramRectAll
@@ -129,7 +123,11 @@ var StatHistogram = (function () {
     StatHistogram.prototype.updateHistogram = function (hist) {
         var _this = this;
         var groups = [];
-        var allData = [];
+        var allData = this.allData[hist];
+        this.similarData['rows'].forEach(function (d) {
+            var diff = Date.now() - _this.parseTime(d['PAT_BIRTHDATE'], null).getTime();
+            d.age = diff / (1000 * 60 * 60 * 24 * 365.25);
+        });
         switch (hist) {
             case 'GENDER':
                 groups.push(this.similarData['rows'].filter(function (d) {
@@ -138,7 +136,6 @@ var StatHistogram = (function () {
                 groups.push(this.similarData['rows'].filter(function (d) {
                     return d['PAT_GENDER'] == 'M';
                 }));
-                allData = this.allData['gender'];
                 break;
             case 'BMI':
                 groups.push(this.similarData['rows'].filter(function (d) {
@@ -162,7 +159,41 @@ var StatHistogram = (function () {
                 groups.push(this.similarData['rows'].filter(function (d) {
                     return +d['BMI'] > 30;
                 }));
-                allData = this.allData['bmi'];
+                break;
+            case 'AGE':
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] <= 10;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 10 && d['age'] <= 20;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 20 && d['age'] <= 30;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 30 && d['age'] <= 40;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 40 && d['age'] <= 50;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 50 && d['age'] <= 60;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 60 && d['age'] <= 70;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 70 && d['age'] <= 80;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 80 && d['age'] <= 90;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 90 && d['age'] <= 100;
+                }));
+                groups.push(this.similarData['rows'].filter(function (d) {
+                    return d['age'] > 100;
+                }));
                 break;
         }
         var svg = this.$node.select("#histogram_" + hist);
@@ -212,15 +243,22 @@ var StatHistogram = (function () {
             return _this.svgDimension.height / groups.length - _this.svgDimension.spacing;
         });
         histogramRectProportion = svg.selectAll('.histogramRectProportion')
+            .attr('x', function () {
+            return select(this).attr('x');
+        })
             .attr('width', function () {
             return select(this).attr('width');
         })
             .transition(t)
             .attr('x', function (d, i) {
-            return _this.xScale(100) - _this.xScale(d.length / allData[i] * 100);
+            if (allData[i] == 0)
+                return _this.xScale(0);
+            return _this.xScale(100) - _this.xScale(d.length / _this.allData['length'] * 100); //allData[i]
         })
             .attr('width', function (d, i) {
-            return _this.xScale(d.length / allData[i] * 100);
+            if (allData[i] == 0)
+                return _this.xScale(0);
+            return _this.xScale(d.length / _this.allData['length'] * 100);
         })
             .style('fill', function (d, i) {
             return '#3838f5';
@@ -236,6 +274,7 @@ var StatHistogram = (function () {
             _this.similarData = item[1];
             _this.updateHistogram('GENDER');
             _this.updateHistogram('BMI');
+            _this.updateHistogram('AGE');
         });
     };
     /**
@@ -252,6 +291,25 @@ var StatHistogram = (function () {
                 }
             });
         });
+    };
+    /**
+     * parse time
+     * @param date
+     * @param nullDate
+     * @returns {null}
+     */
+    StatHistogram.prototype.parseTime = function (date, nullDate) {
+        var parseT1 = timeParse('%x %X');
+        var parseT2 = timeParse('%x');
+        var time = nullDate;
+        if (date) {
+            if (date.split(' ').length > 1) {
+                time = parseT1(date);
+            }
+            else
+                time = parseT2(date);
+        }
+        return time;
     };
     /**
      * Show or hide the application loading indicator

@@ -215,19 +215,16 @@ export class SvgTable {
 
   }
 
+
   private attachListener() {
     events.on('update_all_info', (evt, item) => {
       const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
       this.setBusy(true);
       this.getData(url).then((args) => {
+
         const dic = {'func': 'all', 'args': args, 'arg': 'rows'};
         this.drawRows(dic);
-        if (this.datasetId == 'PRO') {
-          events.fire('update_pro_info', ['PRO', args]);
-        }
-        if (this.datasetId == 'Orders') {
-          events.fire('update_orders_info', ['Orders', args]);
-        }
+
         this.setBusy(false);
       })
     });

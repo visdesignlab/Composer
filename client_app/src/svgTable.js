@@ -193,12 +193,6 @@ var SvgTable = (function () {
             _this.getData(url).then(function (args) {
                 var dic = { 'func': 'all', 'args': args, 'arg': 'rows' };
                 _this.drawRows(dic);
-                if (_this.datasetId == 'PRO') {
-                    events.fire('update_pro_info', ['PRO', args]);
-                }
-                if (_this.datasetId == 'Orders') {
-                    events.fire('update_orders_info', ['Orders', args]);
-                }
                 _this.setBusy(false);
             });
         });

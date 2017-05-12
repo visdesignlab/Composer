@@ -89,8 +89,6 @@ export class QueryBox {
         this.setBusy(false);
         this.similarArgs = args;
 
-        console.log(args);
-
         events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
       });
 
@@ -106,7 +104,7 @@ export class QueryBox {
   private updateAllInfo() {
     const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
     if (!isNaN(+value) && value) {
-      events.fire('update_all_info', ['PAT_ID', value]); // caught by svgTable
+      events.fire('update_all_info', ['PAT_ID', value]); // caught by svgTable and similarityScoreDiagram
     } else {
       console.log('Not a Number');
     }

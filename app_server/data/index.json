@@ -6,7 +6,7 @@
     "quotechar": "\"",
     "id": "Demo",
     "size": [
-      300,
+      150,
       24
     ],
     "type": "table",
@@ -165,7 +165,7 @@
     "separator": ",",
     "id": "PRO",
     "size": [
-      2562,
+      1124,
       7
     ],
     "type": "table",
@@ -222,7 +222,7 @@
     "separator": ",",
     "id": "CCI",
     "size": [
-      300,
+      150,
       22
     ],
     "type": "table",
@@ -369,7 +369,7 @@
     "separator": ",",
     "id": "Orders",
     "size": [
-      37697,
+      17562,
       7
     ],
     "type": "table",
@@ -426,7 +426,7 @@
     "separator": ",",
     "id": "Status",
     "size": [
-      300,
+      150,
       2
     ],
     "type": "table",

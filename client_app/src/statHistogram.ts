@@ -9,6 +9,7 @@ import {scaleLinear,scaleTime,scaleOrdinal} from 'd3-scale';
 import {nest,values,keys,map,entries} from 'd3-collection';
 import {transition} from 'd3-transition';
 import {axisBottom,axisLeft} from 'd3-axis';
+import {timeParse} from 'd3-time-format';
 import {Constants} from './constants';
 import * as events from 'phovea_core/src/event';
 
@@ -42,6 +43,7 @@ export class StatHistogram {
 
       this.drawHistogram('GENDER');
       this.drawHistogram('BMI');
+      this.drawHistogram('AGE');
     });
 
   }
@@ -58,7 +60,7 @@ export class StatHistogram {
       .append('svg')
       .classed('histogramSVG', true)
       .append('g')
-      .attr('transform', `translate(5,0)`)
+      .attr('transform', `translate(5,10)`)
       .attr('id', `histogram_${hist}`);
 
     let midLine = svg
@@ -69,15 +71,7 @@ export class StatHistogram {
       .attr('x2', this.svgDimension.width / 2)
       .attr('y2', this.svgDimension.height);
 
-    let allData = [];
-    switch (hist) {
-      case 'GENDER':
-        allData = this.allData['gender'];
-        break;
-      case 'BMI':
-        allData = this.allData['bmi'];
-        break;
-    }
+    let allData = this.allData[hist];
 
     let histogramRectAll = svg.selectAll('.histogramRectAll')
       .data(allData);
@@ -158,7 +152,12 @@ export class StatHistogram {
   private updateHistogram (hist) {
 
     let groups = [];
-    let allData = [];
+    let allData = this.allData[hist];
+
+    this.similarData['rows'].forEach((d) => {
+      let diff = Date.now() - this.parseTime(d['PAT_BIRTHDATE'], null).getTime();
+      d.age = diff / (1000 * 60 * 60 * 24 * 365.25);
+    });
 
     switch (hist) {
       case 'GENDER':
@@ -168,9 +167,8 @@ export class StatHistogram {
         groups.push(this.similarData['rows'].filter((d) => {
           return d['PAT_GENDER'] == 'M';
         }));
-        allData = this.allData['gender'];
         break;
-      case 'BMI':
+      case 'BMI': //TODO d3.nest()
         groups.push(this.similarData['rows'].filter((d) => {
           return d['BMI'] == '';
         }));
@@ -192,7 +190,42 @@ export class StatHistogram {
         groups.push(this.similarData['rows'].filter((d) => {
           return +d['BMI'] > 30;
         }));
-        allData = this.allData['bmi'];
+        break;
+      case 'AGE': //TODO d3.nest()
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] <= 10;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 10 && d['age'] <= 20;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 20 && d['age'] <= 30;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 30 && d['age'] <= 40;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 40 && d['age'] <= 50;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 50 && d['age'] <= 60;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 60 && d['age'] <= 70;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 70 && d['age'] <= 80;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 80 && d['age'] <= 90;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 90 && d['age'] <= 100;
+        }));
+        groups.push(this.similarData['rows'].filter((d) => {
+          return d['age'] > 100;
+        }));
+
         break;
     }
 
@@ -250,20 +283,26 @@ export class StatHistogram {
       });
 
     histogramRectProportion = svg.selectAll('.histogramRectProportion')
+      .attr('x', function () {
+        return select(this).attr('x');
+      })
       .attr('width', function () {
         return select(this).attr('width');
       })
       .transition(t)
       .attr('x', (d, i) => {
-        return this.xScale(100) - this.xScale(d.length / allData[i] * 100)
+        if (allData[i] == 0) return this.xScale(0);
+        return this.xScale(100) - this.xScale(d.length / this.allData['length'] * 100) //allData[i]
       })
       .attr('width', (d, i) => {
-        return this.xScale(d.length / allData[i] * 100)
+        if (allData[i] == 0) return this.xScale(0);
+        return this.xScale(d.length / this.allData['length'] * 100)
       })
       .style('fill', (d, i) => {
         return '#3838f5';
         //return this.similarColorScale(allData[i] - d.length / this.similarData['rows'].length * 100)
       });
+
   }
 
   /**
@@ -275,7 +314,7 @@ export class StatHistogram {
       this.similarData = item[1];
       this.updateHistogram('GENDER');
       this.updateHistogram('BMI');
-
+      this.updateHistogram('AGE');
     });
 
   }
@@ -288,6 +327,28 @@ export class StatHistogram {
    */
   private async getData(URL) {
     return await ajax.getAPIJSON(URL);
+  }
+
+
+  /**
+   * parse time
+   * @param date
+   * @param nullDate
+   * @returns {null}
+   */
+  private parseTime(date, nullDate) {
+    let parseT1 = timeParse('%x %X');
+    let parseT2 = timeParse('%x');
+    let time = nullDate;
+
+    if (date) {
+      if(date.split(' ').length > 1){
+        time = parseT1(date);
+      }
+      else
+        time = parseT2(date)
+    }
+    return time
   }
 
   /**
