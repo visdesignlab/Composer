@@ -115,7 +115,7 @@ export class App {
 */
     this.setBusy(false);
 
-    events.fire('update_temp_similar', ['PAT_ID', '5330196', 10]);
+    //events.fire('update_temp_similar', ['PAT_ID', '5330196', 10]);
     //events.fire('update_all_info', ['PAT_ID', '5330196']);
   }
 

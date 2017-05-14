@@ -108,8 +108,8 @@ var similarityScoreDiagram = (function () {
              */
         });
         events.on('update_all_info', function (evt, item) {
-            var args = Constants.patientPRO.PRO;
-            var args2 = Constants.patientOrders.Orders;
+            var args = Constants.patientPRO.PRO; // test
+            var args2 = Constants.patientOrders.Orders; // test
             _this.svg.select('.slider') // reset slider
                 .call(_this.brush)
                 .call(_this.brush.move, _this.scoreScale.range());

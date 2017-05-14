@@ -6,7 +6,6 @@ import { select } from 'd3-selection';
 import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
-import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
 /**
  * The main class for the App app
@@ -95,7 +94,6 @@ var App = (function () {
                         
                         */
                         this.setBusy(false);
-                        events.fire('update_temp_similar', ['PAT_ID', '5330196', 10]);
                         return [2 /*return*/];
                 }
             });
