@@ -149,8 +149,8 @@ export class similarityScoreDiagram {
     events.on('update_all_info', (evt, item) => {  // called in query box
 
 
-      let args = Constants.patientPRO.PRO;
-      let args2 = Constants.patientOrders.Orders;
+      let args = Constants.patientPRO.PRO; // test
+      let args2 = Constants.patientOrders.Orders;  // test
 
       this.svg.select('.slider')  // reset slider
         .call(this.brush)
@@ -480,7 +480,7 @@ export class similarityScoreDiagram {
    * @param ordersInfo
    */
   private addSimilarOrderPoints (ordersInfo, patOrdersInfo) {
-    
+
   }
 
 
