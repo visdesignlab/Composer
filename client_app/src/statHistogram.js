@@ -5,6 +5,7 @@ import * as tslib_1 from "tslib";
 import * as ajax from 'phovea_core/src/ajax';
 import { select } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
+import { entries } from 'd3-collection';
 import { transition } from 'd3-transition';
 import { axisBottom } from 'd3-axis';
 import { timeParse } from 'd3-time-format';
@@ -124,74 +125,74 @@ var StatHistogram = (function () {
         var _this = this;
         var groups = [];
         var allData = this.allData[hist];
-        this.similarData['rows'].forEach(function (d) {
+        this.similarData.forEach(function (d) {
             var diff = Date.now() - _this.parseTime(d['PAT_BIRTHDATE'], null).getTime();
             d.age = diff / (1000 * 60 * 60 * 24 * 365.25);
         });
         switch (hist) {
             case 'GENDER':
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['PAT_GENDER'] == 'F';
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['PAT_GENDER'] == 'M';
                 }));
                 break;
             case 'BMI':
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['BMI'] == '';
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return +d['BMI'] <= 18 && d['BMI'];
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return +d['BMI'] > 18 && +d['BMI'] <= 21;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return +d['BMI'] > 21 && +d['BMI'] <= 24;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return +d['BMI'] > 24 && +d['BMI'] <= 27;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return +d['BMI'] > 27 && +d['BMI'] <= 30;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return +d['BMI'] > 30;
                 }));
                 break;
             case 'AGE':
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] <= 10;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 10 && d['age'] <= 20;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 20 && d['age'] <= 30;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 30 && d['age'] <= 40;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 40 && d['age'] <= 50;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 50 && d['age'] <= 60;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 60 && d['age'] <= 70;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 70 && d['age'] <= 80;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 80 && d['age'] <= 90;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 90 && d['age'] <= 100;
                 }));
-                groups.push(this.similarData['rows'].filter(function (d) {
+                groups.push(this.similarData.filter(function (d) {
                     return d['age'] > 100;
                 }));
                 break;
@@ -220,10 +221,10 @@ var StatHistogram = (function () {
         })
             .transition(t)
             .attr('width', function (d) {
-            return _this.xScale(d.length / _this.similarData['rows'].length * 100);
+            return _this.xScale(d.length / _this.similarData.length * 100);
         })
             .style('fill', function (d) {
-            return _this.similarColorScale(d.length / _this.similarData['rows'].length * 100);
+            return _this.similarColorScale(d.length / _this.similarData.length * 100);
         });
         // proportion
         var histogramRectProportion = svg.selectAll('.histogramRectProportion')
@@ -262,7 +263,7 @@ var StatHistogram = (function () {
         })
             .style('fill', function (d, i) {
             return '#3838f5';
-            //return this.similarColorScale(allData[i] - d.length / this.similarData['rows'].length * 100)
+            //return this.similarColorScale(allData[i] - d.length / this.similarData.length * 100)
         });
     };
     /**
@@ -270,8 +271,12 @@ var StatHistogram = (function () {
      */
     StatHistogram.prototype.attachListener = function () {
         var _this = this;
+        // item: pat_id, number of similar patients, DATA
         events.on('update_similar', function (evt, item) {
-            _this.similarData = item[1];
+            var data = entries(item[2]['similar_Demo']);
+            _this.similarData = data.map(function (d) {
+                return d.value[0];
+            });
             _this.updateHistogram('GENDER');
             _this.updateHistogram('BMI');
             _this.updateHistogram('AGE');

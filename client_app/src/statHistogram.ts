@@ -154,75 +154,75 @@ export class StatHistogram {
     let groups = [];
     let allData = this.allData[hist];
 
-    this.similarData['rows'].forEach((d) => {
+    this.similarData.forEach((d) => {
       let diff = Date.now() - this.parseTime(d['PAT_BIRTHDATE'], null).getTime();
       d.age = diff / (1000 * 60 * 60 * 24 * 365.25);
     });
 
     switch (hist) {
       case 'GENDER':
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['PAT_GENDER'] == 'F';
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['PAT_GENDER'] == 'M';
         }));
         break;
       case 'BMI': //TODO d3.nest()
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['BMI'] == '';
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return +d['BMI'] <= 18 && d['BMI'];
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return +d['BMI'] > 18 && +d['BMI'] <= 21;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return +d['BMI'] > 21 && +d['BMI'] <= 24;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return +d['BMI'] > 24 && +d['BMI'] <= 27;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return +d['BMI'] > 27 && +d['BMI'] <= 30;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return +d['BMI'] > 30;
         }));
         break;
       case 'AGE': //TODO d3.nest()
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] <= 10;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 10 && d['age'] <= 20;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 20 && d['age'] <= 30;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 30 && d['age'] <= 40;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 40 && d['age'] <= 50;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 50 && d['age'] <= 60;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 60 && d['age'] <= 70;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 70 && d['age'] <= 80;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 80 && d['age'] <= 90;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 90 && d['age'] <= 100;
         }));
-        groups.push(this.similarData['rows'].filter((d) => {
+        groups.push(this.similarData.filter((d) => {
           return d['age'] > 100;
         }));
 
@@ -257,10 +257,10 @@ export class StatHistogram {
       })
       .transition(t)
       .attr('width', (d) => {
-        return this.xScale(d.length / this.similarData['rows'].length * 100)
+        return this.xScale(d.length / this.similarData.length * 100)
       })
       .style('fill', (d) => {
-        return this.similarColorScale(d.length / this.similarData['rows'].length * 100)
+        return this.similarColorScale(d.length / this.similarData.length * 100)
       });
 
     // proportion
@@ -300,7 +300,7 @@ export class StatHistogram {
       })
       .style('fill', (d, i) => {
         return '#3838f5';
-        //return this.similarColorScale(allData[i] - d.length / this.similarData['rows'].length * 100)
+        //return this.similarColorScale(allData[i] - d.length / this.similarData.length * 100)
       });
 
   }
@@ -310,8 +310,12 @@ export class StatHistogram {
    */
   private attachListener() {
 
+    // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => {
-      this.similarData = item[1];
+      let data = entries(item[2]['similar_Demo']);
+      this.similarData = data.map(function (d) {
+        return d.value[0]
+      });
       this.updateHistogram('GENDER');
       this.updateHistogram('BMI');
       this.updateHistogram('AGE');

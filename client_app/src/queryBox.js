@@ -48,7 +48,7 @@ var QueryBox = (function () {
             _this.getData(url).then(function (args) {
                 _this.setBusy(false);
                 _this.similarArgs = args;
-                events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
+                events.fire('update_similar', [item[1], item[2], args]); // caught by svgTable and scoreDiagram and statHistogram
             });
         });
     };
@@ -59,19 +59,20 @@ var QueryBox = (function () {
     QueryBox.prototype.updateSimilar = function () {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var value, number, n, url;
+            var value, number, n_1, url;
             return tslib_1.__generator(this, function (_a) {
                 value = document.getElementById('text_pat_id').value;
                 number = document.getElementById('text_num_similar').value;
                 if (!isNaN(+value) && value) {
-                    n = !isNaN(+number) ? +number : 10;
-                    n = n <= 0 ? 10 : n;
-                    url = "/data_api/getSimilarRows/" + value + "/" + n;
+                    n_1 = !isNaN(+number) ? +number : 10;
+                    n_1 = n_1 <= 0 ? 10 : n_1;
+                    url = "/data_api/getSimilarRows/" + value + "/" + n_1;
                     this.setBusy(true);
                     this.getData(url).then(function (args) {
                         _this.setBusy(false);
                         _this.similarArgs = args;
-                        events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
+                        // caught by svgTable and scoreDiagram and statHistogram
+                        events.fire('update_similar', [value, n_1, args]);
                     });
                 }
                 else {
@@ -85,9 +86,16 @@ var QueryBox = (function () {
      * firing event to update the vis for info of a patient
      */
     QueryBox.prototype.updateAllInfo = function () {
+        var _this = this;
         var value = document.getElementById('text_pat_id').value;
         if (!isNaN(+value) && value) {
-            events.fire('update_all_info', ['PAT_ID', value]); // caught by svgTable and similarityScoreDiagram
+            var url = "/data_api/getPatInfo/" + value;
+            this.setBusy(true);
+            this.getData(url).then(function (args) {
+                // caught by svgTable and similarityScoreDiagram
+                events.fire('update_all_info', [value, args]);
+                _this.setBusy(false);
+            });
         }
         else {
             console.log('Not a Number');

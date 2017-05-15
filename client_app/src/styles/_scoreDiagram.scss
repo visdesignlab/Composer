@@ -76,7 +76,13 @@
   stroke-width: 1.25px;
 }
 
-.patOrder {
+.patOrder .PROCEDURE {
+  fill: #8d8d8d;
+  stroke: #7b7b7b;
+}
+
+.patOrder .MEDICATION {
+  fill: #ddd;
   stroke: #7b7b7b;
 }
 
@@ -89,10 +95,12 @@
   fill: darkred !important;
 }
 
-.PROCEDURE {
-  fill: #8f8f8f;
+.similarRect .PROCEDURE {
+  fill: #087b03;
+  opacity: 0.5;
 }
 
-.MEDICATION {
-  fill: #ddd
+.similarRect .MEDICATION {
+  fill: #4a6ffb;
+  opacity: 0.5;
 }

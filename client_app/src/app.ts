@@ -72,16 +72,13 @@ export class App {
     similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
     similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
 
-/*
+
     // create table titles and div
     main.append('h3').text('Demo');
-    main.append('span').attr('id', 'Demo_arrow'); // TODO under construction
     const tableDemo = main.append('div');
     main.append('h3').text('PRO');
-    main.append('span').attr('id', 'PRO_arrow'); // TODO under construction
     const tablePro = main.append('div');
     //main.append('h3').text('CCI');
-    //main.append('span').attr('id', 'CCI_arrow'); // TODO under construction
     //const tableCci = main.append('div');
     //main.append('h3').text('Codes');
     //const tableCodes = main.append('div');
@@ -112,10 +109,10 @@ export class App {
     //await svgTablePt.drawTable('PT');
     //await svgTableVas.drawTable('VAS');
 
-*/
+
     this.setBusy(false);
 
-    //events.fire('update_temp_similar', ['PAT_ID', '5330196', 10]);
+    events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
     //events.fire('update_all_info', ['PAT_ID', '5330196']);
   }
 

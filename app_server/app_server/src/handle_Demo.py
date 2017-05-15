@@ -45,12 +45,6 @@ def get_latest_info():
     })
 
 
-# NEVER USED!
-def get_similar_demo(PAT_ID):
-    data = dt.get('Demo').aslist()
-    return find_similar(data, PAT_ID)
-
-
 # used in data_handler.get_weights
 def get_weights():
     return jsonify({
@@ -72,21 +66,6 @@ def update_weights(values):
     return jsonify({
       'weights': weights_Demo
     })
-
-
-# used in data_handler.get_similar_rows
-def get_first_info(PAT_ID):
-    data = dt.get('Demo').aslist()
-    # find the first entry for each patient
-    first_ent = []
-    first_time = pd.datetime.today()
-    for row in data:
-        if row['PAT_ID'] == PAT_ID:
-            if to_data_time(row['ADM_DATE']) < first_time:
-                first_ent = row
-                first_time = to_data_time(row['ADM_DATE'])
-
-    return first_ent
 
 
 # used in data_handler.get_similar_rows
