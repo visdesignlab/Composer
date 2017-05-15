@@ -15,9 +15,6 @@ export class SvgTable {
 
   private $node;
   datasetId;
-  private rows;
-  private display = {from: 0, to: 20}; // TODO
-
   private cols = Constants.cols;
   private header = Constants.header;
 
@@ -49,9 +46,9 @@ export class SvgTable {
     this.drawHeader();
 
     const url = `/data_api/getAllRows/${this.datasetId}`;
-    console.log("start loading init");
+    console.log(`loading ${this.datasetId}`);
     this.getData(url).then((args) => {
-      const dic = {'func': 'init', 'args': args, 'arg': 'rows'};
+      const dic = {'func': 'init', 'data': args[this.datasetId]};
       this.drawRows(dic);
     });
 
@@ -112,22 +109,19 @@ export class SvgTable {
 
   /**
    * Draw the rows of the table
-   * args = {data}
+   * data = {data} list of objects (rows of the files)
    * arg = rows
-   * @param input dict= {'func': 'init'/'similar'/'all'/'latest', 'args': {data}, 'arg': arg}
+   * @param input dict= {'func': 'init'/'similar'/'all'/'latest', 'data': {data}}
    * @returns {Promise<void>}
    */
   private drawRows(input) {
 
     console.log('Loading ' + this.datasetId);
 
-    let data = (input.func === 'init' || input.func === 'latest') ? input.args[input.arg].slice(0, 20)
-      : input.args[input.arg];
+    let data = (input.func === 'init' || input.func === 'latest') ? input['data'].slice(0, 20)
+      : input.data;
 
-    data = (input.func === 'all') ? input.args[input.arg].slice(0, 25)
-      : data;
-
-    const diff = (input.func === 'similar') ? input.args.difference : [];
+    data = (input.func === 'all') ? input['data'].slice(0, 25) : data;
 
     const rows = this.$node
       .selectAll('.rows')
@@ -137,18 +131,12 @@ export class SvgTable {
       .classed('rows', true)
       .merge(rows)
       .selectAll('.cells')
-      .data((d,i) => {
-        const ent = entries(d);
+      .data((d) => {
+        const ent = entries(d).filter((d)=> d.key != 'diff');
         ent.sort((a, b) => {
           return this.header[this.datasetId].indexOf(a.key)
             - this.header[this.datasetId].indexOf(b.key);
         });
-
-        if (input.func === 'similar') {
-          for (let j = 0; j < ent.length; j++) {
-            ent[j]['diff'] = +diff[i][ent[j].key];
-          }
-        }
         return ent;
       });
 
@@ -165,15 +153,6 @@ export class SvgTable {
       .classed('mediumCell', (g, i) => {
         return this.cols[this.datasetId].Medium.indexOf(i) !== -1;
       })
-      .classed('sameValue', (g) => {
-        return input.func === 'similar' && g.diff === 0;
-      })
-      .classed('lowerValue', (g) => {
-        return input.func === 'similar' && g.diff === -1;
-      })
-      .classed('higherValue', (g) => {
-        return input.func === 'similar' && g.diff === +1;
-      })
       .html((g) => {
         if (g.key === 'WEIGHT_KG') {
           return `<svg width='50' height='20'><path class=\'lineChart\' d></svg>` + g.value;
@@ -184,7 +163,7 @@ export class SvgTable {
     rows.exit().remove();
 
     if (input.func === 'latest') {
-      this.drawLineChart(input.args.WEIGHT_KG);
+      this.drawLineChart(input.data.WEIGHT_KG);
     }
 
     console.log(this.datasetId + ' loaded');
@@ -217,50 +196,55 @@ export class SvgTable {
 
 
   private attachListener() {
+
+    // item: pat_id, DATA
     events.on('update_all_info', (evt, item) => {
-      const url = `/data_api/getPatInfo/${this.datasetId}/${item[1]}`;
-      this.setBusy(true);
-      this.getData(url).then((args) => {
-
-        const dic = {'func': 'all', 'args': args, 'arg': 'rows'};
-        this.drawRows(dic);
-
-        this.setBusy(false);
-      })
+      const dic = {'func': 'all', 'data': item[1][this.datasetId][Number(item[0])]};
+      this.drawRows(dic);
     });
 
+    // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => {
       if (this.datasetId === 'Demo') {
-        const dic = {'func': 'similar', 'args': item[1], 'arg': 'rows'};
+        let rawData = entries(item[2]['similar_Demo']);
+        let data = rawData.map(function (d) {
+          return d.value[0];
+        });
+
+        const dic = {'func': 'similar', 'data': data};
         this.drawRows(dic);
       }
     });
-
-    events.on('update_latest', () => {
+    /*
+    events.on('update_latest', () => { //TODO
       if (this.datasetId === 'Demo') {
         const url = `/data_api/getLatestInfo/${this.datasetId}`;
         this.setBusy(true);
         this.getData(url).then((args) => {
-          const dic = {'func': 'latest', 'args': args, 'arg': 'rows'};
+          const dic = {'func': 'latest', 'data': args, 'arg': 'rows'};
           this.drawRows(dic);
           this.setBusy(false);
         });
       }
     });
+    */
 
-    events.on('update_init', () => { // for reset
+    events.on('update_init', () => {
+
       const url = `/data_api/getAllRows/${this.datasetId}`;
-      this.setBusy(true);
+      console.log(`loading ${this.datasetId}`);
       this.getData(url).then((args) => {
-        const dic = {'func': 'init', 'args': args, 'arg': 'rows'};
+        const dic = {'func': 'init', 'data': args[this.datasetId]};
         this.drawRows(dic);
-        this.setBusy(false);
       });
     });
   }
 
   private async getData(URL) {
-    return await ajax.getAPIJSON(URL);
+    this.setBusy(true);
+    const res = await ajax.getAPIJSON(URL);
+    this.setBusy(false);
+    return res;
   }
 
   /**

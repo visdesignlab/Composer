@@ -22,14 +22,14 @@ def _get_all_rows(id):
     return data_handler.get_all_rows(id)
 
 
-@app.route('/getRows/<id>/<frm>/<t>')
+@app.route('/getRows/<id>/<frm>/<t>') # NOT USED YET
 def _get_rows(id, frm, t):
     return data_handler.get_rows(id, frm, t) # TODO implement
 
 
-@app.route('/getPatInfo/<id>/<PAT_ID>')
-def _get_pat_info(id, PAT_ID):
-    return data_handler.get_pat_info(id, PAT_ID)
+@app.route('/getPatInfo/<PAT_ID>')
+def _get_pat_info(PAT_ID):
+    return data_handler.get_pat_info(PAT_ID)
 
 
 @app.route('/getSimilarRows/<PAT_ID>/<number>')

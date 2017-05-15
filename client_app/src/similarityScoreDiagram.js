@@ -4,14 +4,13 @@
 import * as tslib_1 from "tslib";
 import * as ajax from 'phovea_core/src/ajax';
 import { select, event } from 'd3-selection';
-import { nest } from 'd3-collection';
+import { nest, entries } from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import { scaleLinear } from 'd3-scale';
 import { line, curveMonotoneX } from 'd3-shape';
 import { timeParse } from 'd3-time-format';
 import { ascending } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
-import { Constants } from './constants';
 import { transition } from 'd3-transition';
 import { brushY } from 'd3-brush';
 var similarityScoreDiagram = (function () {
@@ -23,6 +22,7 @@ var similarityScoreDiagram = (function () {
         this.ordersDimension = { height: 400, width: 600 };
         this.margin = { x: 80, y: 40 };
         this.sliderWidth = 10;
+        this.similarBar = { width: 4, height: 10 };
         this.diagram = diagram;
         this.$node = select(parent)
             .append('div')
@@ -77,9 +77,7 @@ var similarityScoreDiagram = (function () {
         this.svg.append('g')
             .attr('id', 'pat_score');
         this.svg.append('g')
-            .attr('id', 'med_score');
-        this.svg.append('g')
-            .attr('id', 'pro_score');
+            .attr('id', 'similar_score');
         this.svg.append('g')
             .attr('id', 'pat_orders');
         this.svg.append('g')
@@ -91,93 +89,46 @@ var similarityScoreDiagram = (function () {
      */
     similarityScoreDiagram.prototype.attachListener = function () {
         var _this = this;
+        // item: pat_id, number of similar patients, DATA
         events.on('update_similar', function (evt, item) {
             _this.svg.select('.slider') // reset slider
                 .call(_this.brush)
                 .call(_this.brush.move, _this.scoreScale.range());
-            _this.targetPatientProInfo = item[1]['target_PRO'];
-            _this.drawDiagram(item[1]);
-            /*
-             let url = `/data_api/getPatInfo/PRO/${item[1]['ids']}`;  // TODO create.generalize API
-             this.setBusy(true);
-      
-             this.getData(url).then((args) => {
-             this.drawDiagram({'rows': args['rows], 'target_PRO': args['rows'], 'med_rows': [], 'pro_rows': []});
-      
-             })
-             */
+            _this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
+            _this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+            _this.clearDiagram();
+            _this.drawDiagram();
+            _this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']));
         });
+        // item: pat_id, DATA
         events.on('update_all_info', function (evt, item) {
-            var args = Constants.patientPRO.PRO; // test
-            var args2 = Constants.patientOrders.Orders; // test
             _this.svg.select('.slider') // reset slider
                 .call(_this.brush)
                 .call(_this.brush.move, _this.scoreScale.range());
-            _this.targetPatientProInfo = args;
-            _this.drawDiagram({ 'rows': args, 'target_PRO': args, 'med_rows': [], 'pro_rows': [] });
-            _this.addOrderPoints(args2);
-            /*
-             let url = `/data_api/getPatInfo/PRO/${item[1]}`;
-             this.setBusy(true);
-      
-             this.getData(url).then((args) => {
-      
-             this.svg.select('.slider')  // reset slider
-             .call(this.brush)
-             .call(this.brush.move, this.scoreScale.range());
-      
-             this.targetPatientProInfo = args['rows'];
-      
-             this.addSimilarOrderPoints(args);
-      
-             url = `/data_api/getPatInfo/Orders/${item[1]}`;
-             this.getData(url).then((args2) => {
-             this.addOrderPoints(args2['rows']);
-             this.setBusy(false);
-             });
-      
-             })
-             */
+            _this.targetPatientProInfo = item[1]['PRO'][item[0]];
+            _this.similarPatientsProInfo = [];
+            _this.clearDiagram();
+            _this.drawDiagram();
+            _this.addOrderSquares(item[1]['Orders'][item[0]]);
         });
     };
     /**
      * Draw the diagram with the given data from getSimilarRows
      * @param args
      */
-    similarityScoreDiagram.prototype.drawDiagram = function (args) {
-        var _this = this;
-        var patData = args['target_PRO'].filter(function (d) {
-            return d['FORM'] == _this.diagram;
-        });
-        var similarMedData = [];
-        for (var index = 0; index < args['med_rows'].length; index++) {
-            var curr_pat_info = args['med_rows'][index];
-            var filtered = curr_pat_info.filter(function (d) {
-                return d['FORM'] == _this.diagram;
-            });
-            if (filtered.length)
-                similarMedData.push(filtered);
-        }
-        var similarProData = [];
-        for (var index = 0; index < args['pro_rows'].length; index++) {
-            var curr_pat_info = args['pro_rows'][index];
-            var filtered = curr_pat_info.filter(function (d) {
-                return d['FORM'] == _this.diagram;
-            });
-            if (filtered.length)
-                similarProData.push(filtered);
-        }
+    similarityScoreDiagram.prototype.drawDiagram = function () {
         // ----- add diff days to the data
+        var _this = this;
         var maxDiff = 0;
-        var minDate = this.findMinDate(patData);
-        patData.forEach(function (d) {
-            d.diff = Math.ceil((_this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+        var minPatDate = this.findMinDate(this.targetPatientProInfo);
+        this.targetPatientProInfo.forEach(function (d) {
+            d.diff = Math.ceil((_this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
             maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
         });
-        patData.sort(function (a, b) { return ascending(a.diff, b.diff); });
-        similarMedData.forEach(function (g) {
-            var minDate = _this.findMinDate(g);
-            g.forEach(function (d) {
+        this.targetPatientProInfo.sort(function (a, b) { return ascending(a.diff, b.diff); });
+        this.similarPatientsProInfo.forEach(function (g) {
+            var minDate = _this.findMinDate(g.value);
+            g.value.forEach(function (d) {
                 try {
                     d.diff = Math.ceil((_this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
                     maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
@@ -187,20 +138,16 @@ var similarityScoreDiagram = (function () {
                 }
             });
         });
-        similarMedData.sort(function (a, b) { return ascending(a.diff, b.diff); });
-        similarProData.forEach(function (g) {
-            var minDate = _this.findMinDate(g);
-            g.forEach(function (d) {
-                try {
-                    d.diff = Math.ceil((_this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                    maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
-                }
-                catch (TypeError) {
-                    d.diff = -1;
-                }
-            });
+        var patData = this.targetPatientProInfo.filter(function (d) {
+            return d['FORM'] == _this.diagram;
         });
-        similarProData.sort(function (a, b) { return ascending(a.diff, b.diff); });
+        var similarData = this.similarPatientsProInfo.map(function (d) {
+            var res = d.value.filter(function (g) {
+                return g['FORM'] == _this.diagram;
+            });
+            res.sort(function (a, b) { return ascending(a.diff, b.diff); });
+            return res;
+        });
         // -----  set domains and axis
         // time scale
         this.timeScale.domain([-1, maxDiff]);
@@ -216,10 +163,6 @@ var similarityScoreDiagram = (function () {
             return _this.scoreScale(+d['SCORE']);
         });
         // ------- draw
-        this.svg.select('#pat_score').selectAll('g').remove();
-        this.svg.select('#med_score').selectAll('g').remove();
-        this.svg.select('#pro_score').selectAll('g').remove();
-        this.svg.select('#pat_orders').selectAll('g').remove();
         var patScoreGroup = this.svg.select('#pat_score');
         var patLine = patScoreGroup
             .append('g')
@@ -233,9 +176,9 @@ var similarityScoreDiagram = (function () {
             .attr('class', 'patLine')
             .attr('d', function (d) { return lineFunc(d); })
             .on('click', function (d) { return console.log(d); });
-        var medScoreGroup = this.svg.select('#med_score');
+        var medScoreGroup = this.svg.select('#similar_score');
         medScoreGroup.selectAll('.med_group')
-            .data(similarMedData)
+            .data(similarData)
             .enter()
             .append('g')
             .attr('transform', function () {
@@ -245,41 +188,10 @@ var similarityScoreDiagram = (function () {
             var currGroup = select(this);
             currGroup.append('g')
                 .append('path')
-                .attr('class', 'medLine')
+                .attr('class', 'proLine') // TODO later after getting classification
                 .attr('d', function () { return lineFunc(d); });
         })
             .on('click', function (d) { return console.log(d); });
-        var proScoreGroup = this.svg.select('#pro_score');
-        proScoreGroup.selectAll('.med_group')
-            .data(similarProData)
-            .enter()
-            .append('g')
-            .attr('transform', function () {
-            return "translate(" + _this.margin.x + "," + _this.margin.y + ")";
-        })
-            .each(function (d) {
-            var currGroup = select(this);
-            currGroup.append('g')
-                .append('path')
-                .attr('class', 'proLine')
-                .attr('d', function () { return lineFunc(d); });
-        })
-            .on('click', function (d) { return console.log(d); });
-    };
-    /**
-     * Utility method
-     * @param pat
-     * @returns {Date}
-     */
-    similarityScoreDiagram.prototype.findMinDate = function (pat) {
-        var minDate = new Date();
-        for (var index = 0; index < pat.length; index++) {
-            if (!pat[index]['ASSESSMENT_START_DTM'])
-                continue;
-            if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
-                minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null);
-        }
-        return minDate;
     };
     /**
      * Utility method
@@ -297,7 +209,7 @@ var similarityScoreDiagram = (function () {
                 return false;
             return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
         }).style('opacity', 1);
-        var med = this.svg.select('#med_score')
+        var med = this.svg.select('#similar_score')
             .selectAll('path')
             .style('opacity', 0);
         med.filter(function (d) {
@@ -310,7 +222,7 @@ var similarityScoreDiagram = (function () {
      * add lines for orders for a patient
      * @param ordersInfo
      */
-    similarityScoreDiagram.prototype.addOrderPoints = function (ordersInfo) {
+    similarityScoreDiagram.prototype.addOrderSquares = function (ordersInfo) {
         var _this = this;
         var minDate = this.findMinDate(this.targetPatientProInfo);
         ordersInfo.forEach(function (d) {
@@ -337,11 +249,12 @@ var similarityScoreDiagram = (function () {
             .enter()
             .append('g')
             .attr('transform', function (d) { return "translate(0," + (_this.promisDimension.height - 50) + ")"; })
+            .classed('patOrder', true)
             .selectAll('rect')
             .data(function (d) { return d.values; })
             .enter()
             .append('rect')
-            .attr('class', function (d) { return "patOrder " + d['ORDER_CATALOG_TYPE']; })
+            .attr('class', function (d) { return "" + d['ORDER_CATALOG_TYPE']; })
             .attr('x', function (g) { return _this.timeScale(g.diff); })
             .attr('y', function (g, i) { return i * _this.timeScale(25); })
             .attr('width', this.timeScale(20))
@@ -386,7 +299,165 @@ var similarityScoreDiagram = (function () {
      *
      * @param ordersInfo
      */
-    similarityScoreDiagram.prototype.addSimilarOrderPoints = function (ordersInfo, patOrdersInfo) {
+    similarityScoreDiagram.prototype.addSimilarOrderPoints = function (ordersInfo, similarOrdersInfo) {
+        // -------  target patient
+        var _this = this;
+        var minDate = this.findMinDate(this.targetPatientProInfo);
+        ordersInfo.forEach(function (d) {
+            var time = _this.parseTime(d['ORDER_DTM'], minDate).getTime();
+            d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+        });
+        var self = this;
+        this.svg.select('#pat_orders')
+            .append('g')
+            .attr('transform', function () {
+            return "translate(" + _this.margin.x + ",0)"; // If there is a label for the x-axis change 0
+        })
+            .selectAll('.similarRect')
+            .data([ordersInfo])
+            .enter()
+            .append('g')
+            .attr('transform', function () { return "translate(0," + (_this.promisDimension.height - 50) + ")"; })
+            .classed('similarRect', true)
+            .selectAll('rect')
+            .data(function (d) { return d; })
+            .enter()
+            .append('rect')
+            .attr('class', function (d) { return "" + d['ORDER_CATALOG_TYPE']; })
+            .attr('x', function (g) { return _this.timeScale(g.diff); })
+            .attr('y', 0)
+            .attr('width', this.similarBar.width)
+            .attr('height', this.similarBar.height)
+            .on('click', function (d) {
+            if (!select(this).classed('selectedOrder')) {
+                select(this).classed('selectedOrder', true);
+                select(this.parentNode.parentNode.parentNode)
+                    .append('line')
+                    .classed('selectedLine', true)
+                    .attr('id', "orderLine_" + d['VISIT_NO'])
+                    .attr('x1', self.timeScale(d['diff']) + self.margin.x)
+                    .attr('x2', self.timeScale(d['diff']) + self.margin.x)
+                    .attr('y1', self.scoreScale(100) + self.margin.y)
+                    .attr('y2', self.scoreScale(0) + self.margin.y)
+                    .on('click', function () { return console.log(d); });
+                console.log(d);
+            }
+            else {
+                select(this).classed('selectedOrder', false);
+                select("#orderLine_" + d['VISIT_NO']).remove();
+            }
+        })
+            .on("mouseover", function (d) {
+            var t = transition('t').duration(500);
+            select(".tooltip")
+                .html(function () {
+                return _this.renderOrdersTooltip(d);
+            })
+                .transition(t)
+                .style("opacity", 1)
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY + 10 + "px");
+        })
+            .on("mouseout", function () {
+            var t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+                .style("opacity", 0);
+        });
+        // ----- add diff days to the data
+        similarOrdersInfo.forEach(function (g) {
+            var currPatient = _this.similarPatientsProInfo.filter(function (d) {
+                return d.key == g.key;
+            })[0];
+            var minDate = _this.findMinDate(currPatient.value);
+            g.value.forEach(function (d) {
+                try {
+                    d.diff = Math.ceil((_this.parseTime(d['ORDER_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                }
+                catch (TypeError) {
+                    console.log('error');
+                    d.diff = -1;
+                }
+            });
+        });
+        this.svg.select('#similar_orders')
+            .append('g')
+            .attr('transform', function () {
+            return "translate(" + _this.margin.x + ",0)"; // If there is a label for the x-axis change 0
+        })
+            .selectAll('.similarRect')
+            .data(similarOrdersInfo)
+            .enter()
+            .append('g')
+            .attr('transform', function (d, i) { return "translate(0," + (_this.promisDimension.height - 50 + i * (_this.similarBar.height + 5)) + ")"; })
+            .classed('similarRect', true)
+            .selectAll('rect')
+            .data(function (d) { return d.value; })
+            .enter()
+            .append('rect')
+            .attr('class', function (d) { return "" + d['ORDER_CATALOG_TYPE']; })
+            .attr('x', function (g) { return _this.timeScale(g.diff); })
+            .attr('y', 0)
+            .attr('width', this.similarBar.width)
+            .attr('height', this.similarBar.height)
+            .on('click', function (d) {
+            if (!select(this).classed('selectedOrder')) {
+                select(this).classed('selectedOrder', true);
+                select(this.parentNode.parentNode.parentNode)
+                    .append('line')
+                    .classed('selectedLine', true)
+                    .attr('id', "orderLine_" + d['VISIT_NO'])
+                    .attr('x1', self.timeScale(d['diff']) + self.margin.x)
+                    .attr('x2', self.timeScale(d['diff']) + self.margin.x)
+                    .attr('y1', self.scoreScale(100) + self.margin.y)
+                    .attr('y2', self.scoreScale(0) + self.margin.y)
+                    .on('click', function () { return console.log(d); });
+                console.log(d);
+            }
+            else {
+                select(this).classed('selectedOrder', false);
+                select("#orderLine_" + d['VISIT_NO']).remove();
+            }
+        })
+            .on("mouseover", function (d) {
+            var t = transition('t').duration(500);
+            select(".tooltip")
+                .html(function () {
+                return _this.renderOrdersTooltip(d);
+            })
+                .transition(t)
+                .style("opacity", 1)
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY + 10 + "px");
+        })
+            .on("mouseout", function () {
+            var t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+                .style("opacity", 0);
+        });
+    };
+    /**
+     * clear the diagram
+     */
+    similarityScoreDiagram.prototype.clearDiagram = function () {
+        this.svg.select('#pat_score').selectAll('g').remove();
+        this.svg.select('#similar_score').selectAll('g').remove();
+        this.svg.select('#pat_orders').selectAll('line,g').remove();
+        this.svg.select('#similar_orders').selectAll('g').remove();
+    };
+    /**
+     * Utility method
+     * @param pat
+     * @returns {Date}
+     */
+    similarityScoreDiagram.prototype.findMinDate = function (pat) {
+        var minDate = new Date();
+        for (var index = 0; index < pat.length; index++) {
+            if (!pat[index]['ASSESSMENT_START_DTM'])
+                continue;
+            if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
+                minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null);
+        }
+        return minDate;
     };
     /**
      * parse time

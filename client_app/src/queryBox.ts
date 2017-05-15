@@ -64,7 +64,7 @@ export class QueryBox {
         this.setBusy(false);
         this.similarArgs = args;
 
-        events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
+        events.fire('update_similar', [item[1], item[2], args]); // caught by svgTable and scoreDiagram and statHistogram
       });
     });
   }
@@ -89,7 +89,8 @@ export class QueryBox {
         this.setBusy(false);
         this.similarArgs = args;
 
-        events.fire('update_similar', ['args', args]); // caught by svgTable and scoreDiagram and statHistogram
+        // caught by svgTable and scoreDiagram and statHistogram
+        events.fire('update_similar', [value, n, args]);
       });
 
     } else {
@@ -104,7 +105,16 @@ export class QueryBox {
   private updateAllInfo() {
     const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
     if (!isNaN(+value) && value) {
-      events.fire('update_all_info', ['PAT_ID', value]); // caught by svgTable and similarityScoreDiagram
+      const url = `/data_api/getPatInfo/${value}`;
+      this.setBusy(true);
+      this.getData(url).then((args) => {
+
+        // caught by svgTable and similarityScoreDiagram
+        events.fire('update_all_info', [value, args]);
+
+        this.setBusy(false);
+      });
+
     } else {
       console.log('Not a Number');
     }

@@ -26,6 +26,7 @@ export class similarityScoreDiagram {
   private brush;
 
   private targetPatientProInfo;
+  private similarPatientsProInfo;
 
   height = 400;
   width = 600;
@@ -33,6 +34,7 @@ export class similarityScoreDiagram {
   ordersDimension = {height: 400, width : 600};
   margin = {x: 80, y: 40};
   sliderWidth = 10;
+  similarBar = {width: 4, height: 10};
 
   constructor(parent: Element, diagram) {
 
@@ -105,10 +107,7 @@ export class similarityScoreDiagram {
       .attr('id', 'pat_score');
 
     this.svg.append('g')
-      .attr('id', 'med_score');
-
-    this.svg.append('g')
-      .attr('id', 'pro_score');
+      .attr('id', 'similar_score');
 
     this.svg.append('g')
       .attr('id', 'pat_orders');
@@ -125,62 +124,36 @@ export class similarityScoreDiagram {
    */
   private attachListener() {
 
+    // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
       this.svg.select('.slider')  // reset slider
         .call(this.brush)
         .call(this.brush.move, this.scoreScale.range());
 
-      this.targetPatientProInfo = item[1]['target_PRO'];
+      this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
+      this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
 
-      this.drawDiagram(item[1]);
-
-      /*
-       let url = `/data_api/getPatInfo/PRO/${item[1]['ids']}`;  // TODO create.generalize API
-       this.setBusy(true);
-
-       this.getData(url).then((args) => {
-       this.drawDiagram({'rows': args['rows], 'target_PRO': args['rows'], 'med_rows': [], 'pro_rows': []});
-
-       })
-       */
+      this.clearDiagram();
+      this.drawDiagram();
+      this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']))
 
     });
 
+    // item: pat_id, DATA
     events.on('update_all_info', (evt, item) => {  // called in query box
-
-
-      let args = Constants.patientPRO.PRO; // test
-      let args2 = Constants.patientOrders.Orders;  // test
 
       this.svg.select('.slider')  // reset slider
         .call(this.brush)
         .call(this.brush.move, this.scoreScale.range());
-      this.targetPatientProInfo = args;
-      this.drawDiagram({'rows': args, 'target_PRO': args, 'med_rows': [], 'pro_rows': []});
-      this.addOrderPoints(args2);
 
-      /*
-       let url = `/data_api/getPatInfo/PRO/${item[1]}`;
-       this.setBusy(true);
+      this.targetPatientProInfo = item[1]['PRO'][item[0]];
+      this.similarPatientsProInfo = [];
 
-       this.getData(url).then((args) => {
+      this.clearDiagram();
+      this.drawDiagram();
+      this.addOrderSquares(item[1]['Orders'][item[0]]);
 
-       this.svg.select('.slider')  // reset slider
-       .call(this.brush)
-       .call(this.brush.move, this.scoreScale.range());
 
-       this.targetPatientProInfo = args['rows'];
-
-       this.addSimilarOrderPoints(args);
-
-       url = `/data_api/getPatInfo/Orders/${item[1]}`;
-       this.getData(url).then((args2) => {
-       this.addOrderPoints(args2['rows']);
-       this.setBusy(false);
-       });
-
-       })
-       */
     });
 
   }
@@ -189,47 +162,23 @@ export class similarityScoreDiagram {
    * Draw the diagram with the given data from getSimilarRows
    * @param args
    */
-  private drawDiagram(args) {
-
-    const patData = args['target_PRO'].filter((d) => {
-      return d['FORM'] == this.diagram
-    });
-
-    let similarMedData = [];
-    for (let index = 0; index < args['med_rows'].length; index++) {
-      let curr_pat_info = args['med_rows'][index];
-      let filtered = curr_pat_info.filter((d) => {
-        return d['FORM'] == this.diagram
-      });
-      if (filtered.length)
-        similarMedData.push(filtered);
-    }
-
-    let similarProData = [];
-    for (let index = 0; index < args['pro_rows'].length; index++) {
-      let curr_pat_info = args['pro_rows'][index];
-      let filtered = curr_pat_info.filter((d) => {
-        return d['FORM'] == this.diagram
-      });
-      if (filtered.length)
-        similarProData.push(filtered);
-    }
+  private drawDiagram() {
 
     // ----- add diff days to the data
 
     let maxDiff = 0;
 
-    let minDate = this.findMinDate(patData);
-    patData.forEach((d) => {
-      d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+    let minPatDate = this.findMinDate(this.targetPatientProInfo);
+    this.targetPatientProInfo.forEach((d) => {
+      d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
       maxDiff = d.diff > maxDiff ? d.diff : maxDiff
     });
-    patData.sort((a, b) => ascending(a.diff, b.diff));
+    this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
 
 
-    similarMedData.forEach((g) => {
-      let minDate = this.findMinDate(g);
-      g.forEach((d) => {
+    this.similarPatientsProInfo.forEach((g) => {
+      let minDate = this.findMinDate(g.value);
+      g.value.forEach((d) => {
         try {
           d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
           maxDiff = d.diff > maxDiff ? d.diff : maxDiff
@@ -239,22 +188,19 @@ export class similarityScoreDiagram {
         }
       })
     });
-    similarMedData.sort((a, b) => ascending(a.diff, b.diff));
 
 
-    similarProData.forEach((g) => {
-      let minDate = this.findMinDate(g);
-      g.forEach((d) => {
-        try {
-          d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-          maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-        }
-        catch (TypeError) {
-          d.diff = -1;
-        }
-      })
+    const patData = this.targetPatientProInfo.filter((d) => {
+      return d['FORM'] == this.diagram
     });
-    similarProData.sort((a, b) => ascending(a.diff, b.diff));
+
+    let similarData = this.similarPatientsProInfo.map((d) => {
+      let res = d.value.filter((g) => {
+        return g['FORM'] == this.diagram
+      });
+      res.sort((a, b) => ascending(a.diff, b.diff));
+      return res;
+    });
 
     // -----  set domains and axis
 
@@ -278,11 +224,6 @@ export class similarityScoreDiagram {
 
     // ------- draw
 
-    this.svg.select('#pat_score').selectAll('g').remove();
-    this.svg.select('#med_score').selectAll('g').remove();
-    this.svg.select('#pro_score').selectAll('g').remove();
-    this.svg.select('#pat_orders').selectAll('g').remove();
-
     const patScoreGroup = this.svg.select('#pat_score');
     const patLine = patScoreGroup
       .append('g')
@@ -298,9 +239,9 @@ export class similarityScoreDiagram {
       .on('click', (d) => console.log(d));
 
 
-    const medScoreGroup = this.svg.select('#med_score');
+    const medScoreGroup = this.svg.select('#similar_score');
     medScoreGroup.selectAll('.med_group')
-      .data(similarMedData)
+      .data(similarData)
       .enter()
       .append('g')
       .attr('transform', () => {
@@ -310,47 +251,13 @@ export class similarityScoreDiagram {
         let currGroup = select(this);
         currGroup.append('g')
           .append('path')
-          .attr('class', 'medLine')
+          .attr('class', 'proLine') // TODO later after getting classification
           .attr('d', () => lineFunc(d));
       })
       .on('click', (d) => console.log(d));
 
 
-    const proScoreGroup = this.svg.select('#pro_score');
-    proScoreGroup.selectAll('.med_group')
-      .data(similarProData)
-      .enter()
-      .append('g')
-      .attr('transform', () => {
-        return `translate(${this.margin.x},${this.margin.y})`;
-      })
-      .each(function (d) {
-        let currGroup = select(this);
-        currGroup.append('g')
-          .append('path')
-          .attr('class', 'proLine')
-          .attr('d', () => lineFunc(d));
-      })
-      .on('click', (d) => console.log(d));
-
   }
-
-  /**
-   * Utility method
-   * @param pat
-   * @returns {Date}
-   */
-  private findMinDate(pat) {
-
-    let minDate = new Date();
-    for (let index = 0; index < pat.length; index++) {
-      if (!pat[index]['ASSESSMENT_START_DTM']) continue;
-      if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
-        minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
-    }
-    return minDate
-  }
-
 
   /**
    * Utility method
@@ -372,7 +279,7 @@ export class similarityScoreDiagram {
     }).style('opacity', 1);
 
 
-    let med = this.svg.select('#med_score')
+    let med = this.svg.select('#similar_score')
       .selectAll('path')
       .style('opacity', 0);
 
@@ -388,7 +295,7 @@ export class similarityScoreDiagram {
    * add lines for orders for a patient
    * @param ordersInfo
    */
-  private addOrderPoints (ordersInfo) {
+  private addOrderSquares (ordersInfo) {
 
     let minDate = this.findMinDate(this.targetPatientProInfo);
 
@@ -423,11 +330,12 @@ export class similarityScoreDiagram {
       .enter()
       .append('g')
       .attr('transform', (d) => `translate(0,${this.promisDimension.height - 50})`)
+      .classed('patOrder', true)
       .selectAll('rect')
       .data((d) => d.values)
       .enter()
       .append('rect')
-      .attr('class', (d) => `patOrder ${d['ORDER_CATALOG_TYPE']}`)
+      .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
       .attr('x', (g) => this.timeScale(g.diff))
       .attr('y', (g, i) => i * this.timeScale(25))
       .attr('width', this.timeScale(20))
@@ -479,8 +387,189 @@ export class similarityScoreDiagram {
    *
    * @param ordersInfo
    */
-  private addSimilarOrderPoints (ordersInfo, patOrdersInfo) {
+  private addSimilarOrderPoints (ordersInfo, similarOrdersInfo) {
 
+    // -------  target patient
+
+    let minDate = this.findMinDate(this.targetPatientProInfo);
+
+    ordersInfo.forEach((d) => {
+      let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
+      d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+    });
+
+    const self = this;
+
+    this.svg.select('#pat_orders')
+      .append('g')
+      .attr('transform', () => {
+        return `translate(${this.margin.x},0)`; // If there is a label for the x-axis change 0
+      })
+      .selectAll('.similarRect')
+      .data([ordersInfo])
+      .enter()
+      .append('g')
+      .attr('transform', () => `translate(0,${this.promisDimension.height - 50})`)
+      .classed('similarRect', true)
+      .selectAll('rect')
+      .data((d) => d)
+      .enter()
+      .append('rect')
+      .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+      .attr('x', (g) => this.timeScale(g.diff))
+      .attr('y', 0)
+      .attr('width', this.similarBar.width)
+      .attr('height', this.similarBar.height)
+      .on('click', function (d) {
+
+        if (!select(this).classed('selectedOrder')) {
+
+          select(this).classed('selectedOrder', true);
+
+          select(this.parentNode.parentNode.parentNode)
+            .append('line')
+            .classed('selectedLine', true)
+            .attr('id', `orderLine_${d['VISIT_NO']}`)
+            .attr('x1', self.timeScale(d['diff']) + self.margin.x)
+            .attr('x2', self.timeScale(d['diff']) + self.margin.x)
+            .attr('y1', self.scoreScale(100) + self.margin.y)
+            .attr('y2', self.scoreScale(0) + self.margin.y)
+            .on('click', () => console.log(d));
+
+          console.log(d);
+        }
+        else {
+          select(this).classed('selectedOrder', false);
+          select(`#orderLine_${d['VISIT_NO']}`).remove();
+        }
+      })
+      .on("mouseover", (d) => {
+        let t = transition('t').duration(500);
+        select(".tooltip")
+          .html(() => {
+            return this.renderOrdersTooltip(d);
+          })
+          .transition(t)
+          .style("opacity", 1)
+          .style("left", `${event.pageX + 10}px`)
+          .style("top", `${event.pageY + 10}px`);
+      })
+      .on("mouseout", () => {
+        let t = transition('t').duration(500);
+        select(".tooltip").transition(t)
+          .style("opacity", 0);
+      });
+
+
+    // ----- add diff days to the data
+
+    similarOrdersInfo.forEach((g) => {
+
+      let currPatient = this.similarPatientsProInfo.filter((d) => {
+        return d.key == g.key
+      })[0];
+
+      let minDate = this.findMinDate(currPatient.value);
+      g.value.forEach((d) => {
+        try {
+          d.diff = Math.ceil((this.parseTime(d['ORDER_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+        }
+        catch (TypeError) {
+          console.log('error');
+          d.diff = -1;
+        }
+      })
+    });
+
+    this.svg.select('#similar_orders')
+      .append('g')
+      .attr('transform', () => {
+        return `translate(${this.margin.x},0)`; // If there is a label for the x-axis change 0
+      })
+      .selectAll('.similarRect')
+      .data(similarOrdersInfo)
+      .enter()
+      .append('g')
+      .attr('transform', (d, i) => `translate(0,${this.promisDimension.height - 50 + i * (this.similarBar.height + 5)})`)
+      .classed('similarRect', true)
+      .selectAll('rect')
+      .data((d) => d.value)
+      .enter()
+      .append('rect')
+      .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+      .attr('x', (g) => this.timeScale(g.diff))
+      .attr('y', 0)
+      .attr('width', this.similarBar.width)
+      .attr('height', this.similarBar.height)
+      .on('click', function (d) {
+
+        if (!select(this).classed('selectedOrder')) {
+
+          select(this).classed('selectedOrder', true);
+
+          select(this.parentNode.parentNode.parentNode)
+            .append('line')
+            .classed('selectedLine', true)
+            .attr('id', `orderLine_${d['VISIT_NO']}`)
+            .attr('x1', self.timeScale(d['diff']) + self.margin.x)
+            .attr('x2', self.timeScale(d['diff']) + self.margin.x)
+            .attr('y1', self.scoreScale(100) + self.margin.y)
+            .attr('y2', self.scoreScale(0) + self.margin.y)
+            .on('click', () => console.log(d));
+
+          console.log(d);
+        }
+        else {
+          select(this).classed('selectedOrder', false);
+          select(`#orderLine_${d['VISIT_NO']}`).remove();
+        }
+      })
+      .on("mouseover", (d) => {
+        let t = transition('t').duration(500);
+        select(".tooltip")
+          .html(() => {
+            return this.renderOrdersTooltip(d);
+          })
+          .transition(t)
+          .style("opacity", 1)
+          .style("left", `${event.pageX + 10}px`)
+          .style("top", `${event.pageY + 10}px`);
+      })
+      .on("mouseout", () => {
+        let t = transition('t').duration(500);
+        select(".tooltip").transition(t)
+          .style("opacity", 0);
+      });
+
+  }
+
+
+  /**
+   * clear the diagram
+   */
+  private clearDiagram() {
+
+    this.svg.select('#pat_score').selectAll('g').remove();
+    this.svg.select('#similar_score').selectAll('g').remove();
+    this.svg.select('#pat_orders').selectAll('line,g').remove();
+    this.svg.select('#similar_orders').selectAll('g').remove();
+  }
+
+
+  /**
+   * Utility method
+   * @param pat
+   * @returns {Date}
+   */
+  private findMinDate(pat) {
+
+    let minDate = new Date();
+    for (let index = 0; index < pat.length; index++) {
+      if (!pat[index]['ASSESSMENT_START_DTM']) continue;
+      if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
+        minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
+    }
+    return minDate
   }
 
 

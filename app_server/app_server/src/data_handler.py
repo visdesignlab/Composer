@@ -15,22 +15,20 @@ __author__ = 'Sahar'
 
 # TODO from and to: '/getRows/<id>/<frm>/<t>'
 # access directly from API: '/getAllRows/<id>'
-def get_all_rows(id):
-    my_data = dt.get(id)
+def get_all_rows(dataset_id):
+    my_data = dt.get(dataset_id)
     rows = my_data.aslist()
     return jsonify({
-      'rows': rows[:50]
+      dataset_id: rows[:50]
     })
 
 
-# access directly from API: '/getPatInfo/<id>/<PAT_ID>'
-def get_pat_info(id, PAT_ID):
-    info_rows = get_all_info_for_pat(id, PAT_ID)
+# access directly from API: '/getPatInfo/<PAT_ID>'
+def get_pat_info(PAT_ID):
     return jsonify({
-      'PAT_ID': PAT_ID,
-      'rows': info_rows,
-      #'indices': indices,
-      'dataset id': id
+      'Demo': get_info([int(PAT_ID)], 'Demo'),
+      'Orders': get_info([int(PAT_ID)], 'Orders'),
+      'PRO': get_info([int(PAT_ID)], 'PRO')
     })
 
 
@@ -56,63 +54,54 @@ def get_similar_rows(PAT_ID, number):
     ids = [d[0] for d in id_scores[:number]]
     scores = [d[1] for d in id_scores[:number]]
 
-    pat_Demo_first = [handle_Demo.get_first_info(id) for id in ([int(PAT_ID)] + ids)]
-    difference = handle_Demo.get_difference(int(PAT_ID), ids)
+    pat_demo_info = get_info([int(PAT_ID)], 'Demo')
+    demo_info = get_info(ids, 'Demo')
+    pat_pro_info = get_info([int(PAT_ID)], 'PRO')
+    pro_info = get_info(ids, 'PRO')
+    pat_orders_info = get_info([int(PAT_ID)], 'Orders')
+    orders_info = get_info(ids, 'Orders')
 
-    pro_rows = [[id, get_all_info_for_pat('PRO', id)] for id in ids]
-
-
-    # group them based on first ORDER_CATALOG_TYPE in Orders: Medication, Procedure        Orders_rows = {}
-    ##Orders_rows = {}
-    ##for id in ids:
-    ##    Orders_rows[id] = handle_Orders.get_first_info(id)
-
-    # group by CPT codes
-    status = {}
-    status_data = dt.get('Status').aslist()
-    for row in status_data:
-        status[int(row['PAT_ID'])] = row['STATUS']
-
-    med_rows = [r[1] for r in pro_rows if status[int(r[0])] == 'Medication']
-    procedure_rows = [r[1] for r in pro_rows if status[int(r[0])] == 'Procedure']
-
+    #difference = handle_Demo.get_difference(int(PAT_ID), ids) # maybe in the client?!
 
     return jsonify({
         'PAT_ID': PAT_ID,
         'ids': ids,
         'similarity_scores': scores,
-        'target_Demo': handle_Demo.get_first_info(int(PAT_ID)),
-        'rows': pat_Demo_first,
-        'difference': difference,
-         #entries for score diagram
-        'target_PRO': get_all_info_for_pat('PRO', int(PAT_ID)),
-        'med_rows': med_rows,
-        'pro_rows': procedure_rows#,
+
+        'pat_Demo': pat_demo_info,
+        'pat_PRO': pat_pro_info,
+        'pat_Orders': pat_orders_info,
+
+        'similar_Demo': demo_info,
+        'similar_PRO': pro_info,
+        'similar_Orders': orders_info#,
+
+        #'difference': difference
         #'all_pro_rows': sum(pro_rows, get_all_info_for_pat('PRO', int(PAT_ID)))
     })
 
 
 # access directly from API: '/getWeights/<id>'
-def get_weights(id):
-    if id == 'Demo':
+def get_weights(dataset_id):
+    if dataset_id == 'Demo':
         return handle_Demo.get_weights()
-    if id == 'CCI':
+    if dataset_id == 'CCI':
         return handle_CCI.get_weights()
     return jsonify({'message': 'error'})
 
 
 # access directly from API: '/updateWeights/<id>/<values>'
-def update_weights(id, values):
-    if id == 'Demo':
+def update_weights(dataset_id, values):
+    if dataset_id == 'Demo':
         return handle_Demo.update_weights(values)
-    if id == 'CCI':
+    if dataset_id == 'CCI':
         return handle_CCI.update_weights(values)
     return jsonify({'message': 'error'})
 
 
 # access directly from API: '/getLatestInfo/<id>'
-def get_latest_info(id):
-    if id == 'Demo':
+def get_latest_info(dataset_id):
+    if dataset_id == 'Demo':
         return handle_Demo.get_latest_info()
     return jsonify({'message': 'error'})
 
@@ -184,9 +173,9 @@ def get_stat():
 
 ##=========== helper functions
 
-# used in several functions
-def get_all_info_for_pat(id, PAT_ID):
-    my_data = dt.get(id)
+# NEVER USED!
+def get_all_info_for_pat(dataset_id, PAT_ID):
+    my_data = dt.get(dataset_id)
 
     info_rows = []
     indices = []
@@ -195,16 +184,30 @@ def get_all_info_for_pat(id, PAT_ID):
             indices.append(i)
             info_rows.append(my_data.aslist()[i])
 
-    if id == 'Demo':
+    if dataset_id == 'Demo':
         info_rows.sort(key=lambda r: to_data_time(r["ADM_DATE"]))
-    elif id == 'PRO':
+    elif dataset_id == 'PRO':
         info_rows.sort(key=lambda r: to_data_time(r["ASSESSMENT_START_DTM"]))
-    elif id == 'PT':
+    elif dataset_id == 'PT':
         info_rows.sort(key=lambda r: to_data_time(r["ADM_DATE"]))
-    elif id == 'VAS':
+    elif dataset_id == 'VAS':
         info_rows.sort(key=lambda r: to_data_time(r["RECORDED_TIME"]))
 
     return info_rows
+
+
+# used in many methods
+def get_info(ids, dataset_id):
+    data = dt.get(dataset_id).aslist()
+    # find the first entry for each patient
+    result = {}
+    for id in ids:
+        result[id] = []
+    for row in data:
+        if int(row['PAT_ID']) in ids:
+            result[int(row['PAT_ID'])].append(row)
+    return result
+
 
 
 ##============= utility functions
