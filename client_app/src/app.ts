@@ -16,6 +16,8 @@ import ReactDOM from 'react-dom';
 import SideBarComponent from './ReactComponents/SideBarComponent';
 
 
+
+
 /**
  * The main class for the App app
  */
@@ -57,7 +59,8 @@ export class App {
     // const side = sideBar.create(sideBarDiv.node());
     // await side.init();
 
-    const sideBarDiv = this.$node.append('div').attr('id','sideBar');
+    
+    this.$node.append('div').attr('id','sideBar');
 
 
 
