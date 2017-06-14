@@ -25,7 +25,7 @@
 
 .sideBar {
   float: left;
-  width: 300px;
+  width: 20%;
   padding: 10px;
 }
 
@@ -34,3 +34,14 @@
   width: 20%;
   padding: 20px;
 }
+
+.label{
+  line-height: 22px;
+  top: 38px;
+  transform: scale(0.75) translate(0px, -28px);
+  transform-origin: left top 0px; 
+  pointer-events: none;
+  user-select: none;
+  color: rgba(0, 0, 0, 0.3)
+}
+

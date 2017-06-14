@@ -2,6 +2,8 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
+import AppBar from 'material-ui/AppBar';
+
 import WeightInput from './WeightInput'
 
 import * as ajax from 'phovea_core/src/ajax';
@@ -15,9 +17,8 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 const style = {
-  height: 700,
+  height: 760,
   width: '100%',
-  textAlign: 'center',
   display: 'inline-block',
 };
 
@@ -54,9 +55,14 @@ return (
   <MuiThemeProvider>
   <div>
     <Paper style={style} zDepth={2} >
+
+    <AppBar
+    showMenuIconButton={false} title="Weight Panel" titleStyle={{'color':'rgba(0,0,0,0.4)','font-size':'16px','text-align':'center'}} style={{'background-color':'rgb(232, 232, 232)'}}
+  />
+
        {this.state.weights && 
         this.state.inputs.map((d, i) => {return (
-        <WeightInput key={d.key} id={d.key} value={this.state.weights[d.key]}/>
+        <WeightInput key={d.key} id={d.value} value={this.state.weights[d.key]}/>
           )})}
       
         
