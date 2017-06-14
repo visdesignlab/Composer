@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+     "allowJs": true,
     "module": "es6",
     "target": "es5",
     "importHelpers": true,
@@ -18,6 +19,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
+    "src/**/*.jsx",
     "tests/**/*.ts",
     "index.ts",
     "tsd.d.ts"
