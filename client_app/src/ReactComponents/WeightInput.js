@@ -32,12 +32,16 @@ class SideBarComponent extends React.Component{
 render(){
 return (
   <MuiThemeProvider>
-  <div>
-
+  <div style = {{'marginTop':10,'marginRight':20, 'marginLeft':20}}>
+          <span className='label'>{this.props.id + ': '}</span>
+          <span className='label'>{this.props.value}</span>
+        
   <Slider min={0}
           max={10} 
           defaultValue={this.props.value}
-         style={{ margin: 0 }}/>
+         sliderStyle = {{'marginTop':5, 'marginBottom':10}}/>
+
+         
 
   </div>
    </MuiThemeProvider>)
