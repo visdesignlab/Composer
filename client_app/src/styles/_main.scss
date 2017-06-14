@@ -1,5 +1,5 @@
 #app {
-  width: 3200px;
+  /*width: 3200px;*/
 }
 
 #caleydoHeader {
@@ -20,10 +20,17 @@
 .main {
   float: left;
   padding-left: 10px;
+  width:80%;
 }
 
 .sideBar {
   float: left;
   width: 300px;
   padding: 10px;
+}
+
+#sideBar {
+  float: left;
+  width: 20%;
+  padding: 20px;
 }
