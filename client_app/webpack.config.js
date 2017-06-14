@@ -29,6 +29,8 @@ const webpackloaders = [
   {test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader'},
   {test: /\.tsx?$/, loader: 'awesome-typescript-loader'},
   {test: /\.json$/, loader: 'json-loader'},
+  { test: /\.(js)$/, use: 'babel-loader' },
+  { test: /\.css$/, use: [ 'style-loader', 'css-loader' ]},
   {
     test: /\.(png|jpg)$/,
     loader: 'url-loader',

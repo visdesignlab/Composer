@@ -11,6 +11,10 @@ import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+import SideBarComponent from './ReactComponents/SideBarComponent';
+
 
 /**
  * The main class for the App app
@@ -49,9 +53,19 @@ export class App {
 
 
     // create side bar
-    const sideBarDiv = this.$node.append('div').classed('sideBar', true);
-    const side = sideBar.create(sideBarDiv.node());
-    await side.init();
+    // const sideBarDiv = this.$node.append('div').classed('sideBar', true);
+    // const side = sideBar.create(sideBarDiv.node());
+    // await side.init();
+
+    const sideBarDiv = this.$node.append('div').attr('id','sideBar');
+
+
+
+    ReactDOM.render(
+      React.createElement(SideBarComponent),
+      document.getElementById('sideBar')
+    );
+
 
 
     // main div - all div are within this div
