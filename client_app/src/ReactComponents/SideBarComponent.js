@@ -57,7 +57,7 @@ return (
     <Paper style={style} zDepth={2} >
 
     <AppBar
-    showMenuIconButton={false} title="Weight Panel" titleStyle={{'color':'rgba(0,0,0,0.4)','font-size':'16px','text-align':'center'}} style={{'background-color':'rgb(232, 232, 232)'}}
+    showMenuIconButton={false} title="Weight Panel" titleStyle={{'color':'rgba(0,0,0,0.4)','fontSize':'16px','textAlign':'center'}} style={{'backgroundColor':'rgb(232, 232, 232)'}}
   />
 
        {this.state.weights && 
