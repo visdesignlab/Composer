@@ -19,14 +19,19 @@ const styles = {
 
 
 
-class SideBarComponent extends React.Component{
+class WeightInput extends React.Component{
 
   constructor(props) {
     super(props);
 
     this.state = {
-      value:1
+      value: this.props.value,
     };
+
+     this.handleSlider=(event, value) => {
+    this.setState({value: value});
+  };
+
   }
 
 render(){
@@ -34,11 +39,13 @@ return (
   <MuiThemeProvider>
   <div style = {{'marginTop':10,'marginRight':20, 'marginLeft':20}}>
           <span className='label'>{this.props.id + ': '}</span>
-          <span className='label'>{this.props.value}</span>
+          <span className='label'>{this.state.value}</span>
         
   <Slider min={0}
           max={10} 
-          defaultValue={this.props.value}
+          step={1}
+          defaultValue={this.state.value}
+          onChange={this.handleSlider}
          sliderStyle = {{'marginTop':5, 'marginBottom':10}}/>
 
          
@@ -51,4 +58,4 @@ return (
 
 }
 
-export default SideBarComponent;
+export default WeightInput;

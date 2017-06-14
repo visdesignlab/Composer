@@ -78,7 +78,11 @@
     "typescript": "2.2.0",
     "url-loader": "0.5.7",
     "webpack": "2.2.1",
-    "webpack-dev-server": "2.3.0"
+    "webpack-dev-server": "2.3.0",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "babel-preset-env": "^1.2.2",
+    "babel-preset-react": "^6.23.0"
   },
   "dependencies": {
     "phovea_core": "github:phovea/phovea_core#develop",
@@ -108,6 +112,11 @@
     "d3-dispatch": "^1.0.3",
     "@types/d3-dispatch": "^1.0.4",
     "@types/d3-brush": "^1.0.7",
-    "d3-brush": "^1.0.4"
+    "d3-brush": "^1.0.4",
+    "material-ui": "^0.18.1",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-tap-event-plugin": "^2.0.1",
+    "prop-types": "^15.5.4"
   }
 }
