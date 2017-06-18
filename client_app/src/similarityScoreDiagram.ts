@@ -28,10 +28,11 @@ export class similarityScoreDiagram {
   private targetPatientProInfo;
   private similarPatientsProInfo;
 
+//where are these used?
   height = 400;
-  width = 600;
-  promisDimension = {height: 400, width : 600};
-  ordersDimension = {height: 400, width : 600};
+  width = 800;
+  promisDimension = {height: 400, width : 900};
+  ordersDimension = {height: 400, width : 900};
   margin = {x: 80, y: 40};
   sliderWidth = 10;
   similarBar = {width: 4, height: 10};

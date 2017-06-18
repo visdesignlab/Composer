@@ -2,9 +2,12 @@
   clear: left;
 }
 
+//container div for the line graph?
 .diagramDiv {
   float: left;
   padding-right: 100px;
+  //added max-height to div to move boxs closer together
+  max-height: 530px;
 }
 
 .scoreLine {

@@ -3,7 +3,7 @@
 }
 
 #caleydoHeader {
-  width: 3200px;
+  width: 100%;
 }
 
 .tooltip {
@@ -39,9 +39,8 @@
   line-height: 22px;
   top: 38px;
   transform: scale(0.75) translate(0px, -28px);
-  transform-origin: left top 0px; 
+  transform-origin: left top 0px;
   pointer-events: none;
   user-select: none;
   color: rgba(0, 0, 0, 0.3)
 }
-
