@@ -4,6 +4,8 @@
 
 #caleydoHeader {
   width: 100%;
+  position:fixed;
+  z-index:100000;
 }
 
 .tooltip {
@@ -21,18 +23,22 @@
   float: left;
   padding-left: 10px;
   width:80%;
+  margin-top: 50px;
+  
 }
 
 .sideBar {
   float: left;
   width: 20%;
   padding: 10px;
+  
 }
 
 #sideBar {
   float: left;
   width: 20%;
   padding: 20px;
+  margin-top: 50px;
 }
 
 .label{
