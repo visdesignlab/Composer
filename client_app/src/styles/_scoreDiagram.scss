@@ -22,7 +22,7 @@
 
 .patLine {
   fill: none;
-  stroke: forestgreen;
+  stroke: #FF5733;
   stroke-width: 2px;
 }
 
@@ -34,12 +34,13 @@
 
 .proLine {
   fill: none;
-  stroke: darkred;
-  stroke-width: 2px;
+  stroke: #21618C;
+  stroke-width: 1px; //changed the stoke of the similar lines to add more emphasis on the selected patient
 }
 
 .grid line {
   stroke: #979797;
+  stroke-opacity: 0.5;//adjusted the stroke opacity to the horizontal grid lines for more subtlety 
 }
 
 /* For slider */
@@ -100,6 +101,7 @@
 
 .similarRect .PROCEDURE {
   fill: #087b03;
+//  fill: #FF5733;
   opacity: 0.5;
 }
 
