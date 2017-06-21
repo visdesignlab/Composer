@@ -31,6 +31,7 @@ export class similarityScoreDiagram {
 //where are these used?
   height = 400;
   width = 800;
+  
   promisDimension = {height: 400, width : 900};
   ordersDimension = {height: 400, width : 900};
   margin = {x: 80, y: 40};
