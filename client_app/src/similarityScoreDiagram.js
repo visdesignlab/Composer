@@ -17,9 +17,9 @@ var similarityScoreDiagram = (function () {
     function similarityScoreDiagram(parent, diagram) {
         var _this = this;
         this.height = 400;
-        this.width = 900;
-        this.promisDimension = { height: 400, width: 900 };
-        this.ordersDimension = { height: 400, width: 900 };
+        this.width = 600;
+        this.promisDimension = { height: 400, width: 600 };
+        this.ordersDimension = { height: 400, width: 600 };
         this.margin = { x: 80, y: 40 };
         this.sliderWidth = 10;
         this.similarBar = { width: 4, height: 10 };
@@ -122,7 +122,6 @@ var similarityScoreDiagram = (function () {
         var maxDiff = 0;
         var minPatDate = this.findMinDate(this.targetPatientProInfo);
         this.targetPatientProInfo.forEach(function (d) {
-          //this is finding the differnce between the selected patient 
             d.diff = Math.ceil((_this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
             maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
         });
@@ -228,7 +227,6 @@ var similarityScoreDiagram = (function () {
         var minDate = this.findMinDate(this.targetPatientProInfo);
         ordersInfo.forEach(function (d) {
             var time = _this.parseTime(d['ORDER_DTM'], minDate).getTime();
-            //findin the difference between the first recorded visit and current day? rounding up to the nearest integer 
             d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
         });
         var nestedData = nest()
@@ -259,7 +257,7 @@ var similarityScoreDiagram = (function () {
             .attr('class', function (d) { return "" + d['ORDER_CATALOG_TYPE']; })
             .attr('x', function (g) { return _this.timeScale(g.diff); })
             .attr('y', function (g, i) { return i * _this.timeScale(25); })
-            .attr('width', this.timeScale(20))//this might be what I was looking for?
+            .attr('width', this.timeScale(20))
             .attr('height', this.timeScale(20))
             .on('click', function (d) {
             if (!select(this).classed('selectedOrder')) {
@@ -298,7 +296,7 @@ var similarityScoreDiagram = (function () {
         });
     };
     /**
-     *This sets up the order bars 
+     *
      * @param ordersInfo
      */
     similarityScoreDiagram.prototype.addSimilarOrderPoints = function (ordersInfo, similarOrdersInfo) {
