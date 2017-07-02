@@ -10,6 +10,7 @@ import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
+import * as rectExploration from './rectExploration';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -81,6 +82,9 @@ export class App {
 
     // histogram
     statHistogram.create(main.node());
+
+    //rect
+    rectExploration.create(main.node());
 
 
     // PROMIS diagrams
