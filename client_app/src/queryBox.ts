@@ -47,6 +47,8 @@ export class QueryBox {
       .attr('placeholder', 'Number of similar patients')
       .attr('id', 'text_num_similar');
 
+      
+
     this.attachListener(); // TODO test!
 
   }
@@ -68,7 +70,6 @@ export class QueryBox {
       });
     });
   }
-
 
   /**
    * getting the similar patients info and firing events to update the vis

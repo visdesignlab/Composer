@@ -52,6 +52,8 @@ export class similarityScoreDiagram {
       .range([0, this.promisDimension.width - 2 * this.margin.x])
       .clamp(true);
 
+
+
     this.scoreScale = scaleLinear()
       .domain([100, 0])
       .range([0, this.promisDimension.height - 3 * this.margin.y]);
@@ -155,6 +157,12 @@ export class similarityScoreDiagram {
 
 
     });
+
+   events.on('brushed', (evt, item) => { // called from rect exploration
+
+
+
+   })
 
   }
 
