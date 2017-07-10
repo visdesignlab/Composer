@@ -1,19 +1,54 @@
-.orderRect .PROCEDURE {
-  fill: #087b03;
+.PROCEDURE.COMPLETED {
+  fill: red;
   opacity: 0.5;
 }
 
-.orderRect .PROCEDURE {
-  fill: #087b03;
+.PROCEDURE.ORDERED {
+   fill: orange;
   opacity: 0.5;
 }
 
- .MEDICATION {
+ .MEDICATION.ORDERED {
   fill: #4a6ffb;
   opacity: 0.5;
 }
 
-.orderRect .PROCEDURE .ORDERED {
-   fill: black;
+ .MEDICATION.SENT {
+  fill: #4a6ffb;
   opacity: 0.5;
 }
+
+.MEDICATION.COMPLETED {
+  fill: green;
+  opacity: 0.5;
+}
+
+
+.MEDICATION.DISCONTINUED {
+  fill: purple;
+  opacity: 0.5;
+}
+
+.MEDICATION.SUSPEND {
+  fill: purple;
+  opacity: 0.5;
+}
+
+#pat_rect_line {
+  float: left;
+  padding-right: 100px;
+
+}
+
+.orderRectMini {
+  opacity: 0.5;
+  color: grey;
+}
+
+.xAxisMini {
+  stroke-opacity: .4;
+  stroke-width: .5;
+}
+
+
+
