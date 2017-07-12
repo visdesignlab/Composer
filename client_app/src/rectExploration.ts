@@ -25,6 +25,7 @@ export class rectExploration {
   private container: d3.Selection<SVGElement>;
   private brush;
   private targetPatientOrders;
+  private currentlySelectedName;
 
 
 
@@ -89,10 +90,6 @@ export class rectExploration {
         this.drawMiniRects();
       });
     
-    //this.svg.select('#pat_rect_line')//attaching the brush to the pat_order id allows the tooltips to show.
-    //this.svg.append('g') having the brush in own group covers the tooltip
-    //.attr('class', 'brush')
-    // .call(this.brush)
     context.append('g')
     .attr('class', 'brush')
       .call(this.brush)
@@ -263,6 +260,36 @@ export class rectExploration {
       .attr('y', 0)
       .attr('width', this.orderBar.width)
       .attr('height', this.orderBar.height)
+      .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
+      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
+      //this is the mousclick event that adds a line to the graphs
+        .on('click', d => {
+          if (this.currentlySelectedName === undefined) {
+            this.currentlySelectedName = d.ORDER_MNEMONIC;
+          } else {
+            this.currentlySelectedName = undefined;
+          }
+          
+          this.drawPatOrderRects();
+        /*if (!select(this).classed('selectedOrder')) {
+         
+          select(this).classed('selectedOrder', true)
+           .html(()=> {
+             console.log(this.renderOrdersTooltip(d)) 
+             return this.renderOrdersTooltip(d);
+           })
+          
+
+         
+        
+
+          console.log(d);
+        }
+        else {
+          select(this).classed('selectedOrder', false);
+          select(`#orderLine_${d['VISIT_NO']}`).remove();
+        }*/
+      })//end the mousclick event that shows the graph
       .on("mouseover", (d) => {
         let t = transition('t').duration(500);
         select(".tooltip")
@@ -401,7 +428,6 @@ let newMax = end;
 
 
 events.fire('brushed', [newMin, newMax]);
-
 
 }
 

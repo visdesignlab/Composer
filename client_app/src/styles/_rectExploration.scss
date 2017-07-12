@@ -51,4 +51,16 @@
 }
 
 
+.PROCEDURE.selectedOrder,
+.MEDICATION.selectedOrder {
+  fill: darkred;// !important;
+}
+.PROCEDURE.unselectedOrder,
+.MEDICATION.unselectedOrder {
+  opacity: 0.2;
+  fill: grey;// !important;
+}
+
+
+
 
