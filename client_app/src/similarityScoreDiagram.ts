@@ -134,7 +134,7 @@ export class similarityScoreDiagram {
 
       this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
       this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
-
+      this.setOrderScale();
       this.clearDiagram();
       this.drawDiagram();
       this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']))
@@ -150,7 +150,7 @@ export class similarityScoreDiagram {
 
       this.targetPatientProInfo = item[1]['PRO'][item[0]];
       this.similarPatientsProInfo = [];
-
+      this.setOrderScale();
       this.clearDiagram();
       this.drawDiagram();
       this.addOrderSquares(item[1]['Orders'][item[0]]);
@@ -160,12 +160,52 @@ export class similarityScoreDiagram {
 
    events.on('brushed', (evt, item) => { // called from rect exploration
 
-
+    this.svg.select('diagramDiv');
 
    })
 
   }
 
+  private setOrderScale() {
+    // find the max difference between the first patient visit and the last visit. This determines the domain scale of the graph.
+    // ----- add diff days to the data
+
+    let maxDiff = 0;
+
+    let minPatDate = this.findMinDate(this.targetPatientProInfo);
+    this.targetPatientProInfo.forEach((d) => {
+      d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
+      maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+      return maxDiff;
+    });
+    this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
+
+    const patData = this.targetPatientProInfo.filter((d) => {
+      return d['FORM'] == this.svg//changed to svg because I dont have a diagram
+    });
+
+
+    // -----  set domain for initial draw call
+    this.timeScale.domain([-1, maxDiff]);
+    events.on('brushed', (newMin, newMax) => {  // from brushed in rect exploration
+    
+   //------- set domain after brush event
+    console.log(newMax[1]);
+    if (this.brush.move != null) {
+      this.timeScale.domain([newMax[0], newMax[1]])
+    }
+    
+    
+    return this.timeScale.domain([newMax[0], newMax[1]]);
+   
+    });
+    
+    this.svg.select('.xAxis')
+      .call(axisBottom(this.timeScale));
+
+   
+        console.log(this.targetPatientProInfo.filter( (d) => {  return d['PAT_ID'] }));
+  }
   /**
    * Draw the diagram with the given data from getSimilarRows
    * @param args
@@ -214,7 +254,7 @@ export class similarityScoreDiagram {
 
     // time scale
 
-    this.timeScale.domain([-1, maxDiff]);
+    //this.timeScale.domain([-1, maxDiff]);
 
     this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale));
@@ -394,7 +434,7 @@ export class similarityScoreDiagram {
   /**
    *
    * @param ordersInfo
-   */
+   */ // this adds the colored rectangles for orders on target and similar patients
   private addSimilarOrderPoints (ordersInfo, similarOrdersInfo) {
 
     // -------  target patient
