@@ -17,14 +17,14 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.81171876">
+    <splitter split-orientation="horizontal" split-proportion="0.815625">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="app.ts" pinned="false" current-in-tab="false">
+          <file leaf-file-name="app.ts" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-776">
-                  <caret line="60" column="50" lean-forward="false" selection-start-line="60" selection-start-column="50" selection-end-line="60" selection-end-column="50" />
+                <state relative-caret-position="482">
+                  <caret line="126" column="56" lean-forward="false" selection-start-line="126" selection-start-column="49" selection-end-line="126" selection-end-column="56" />
                   <folding>
                     <element signature="e#51#87#0" expanded="true" />
                   </folding>
@@ -35,11 +35,10 @@
           <file leaf-file-name="queryBox.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="187">
-                  <caret line="38" column="53" lean-forward="false" selection-start-line="38" selection-start-column="53" selection-end-line="38" selection-end-column="53" />
+                <state relative-caret-position="361">
+                  <caret line="75" column="65" lean-forward="true" selection-start-line="75" selection-start-column="65" selection-end-line="75" selection-end-column="65" />
                   <folding>
                     <element signature="e#48#93#0" expanded="true" />
-                    <element signature="n#!!block;n#attachListener#0;n#QueryBox#0" expanded="false" />
                     <element signature="n#!!block;n#updateSimilar#0;n#QueryBox#0" expanded="false" />
                     <element signature="n#!!block;n#updateAllInfo#0;n#QueryBox#0" expanded="false" />
                   </folding>
@@ -50,11 +49,10 @@
           <file leaf-file-name="statHistogram.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="727">
-                  <caret line="416" column="9" lean-forward="true" selection-start-line="416" selection-start-column="9" selection-end-line="416" selection-end-column="9" />
+                <state relative-caret-position="464">
+                  <caret line="44" column="28" lean-forward="true" selection-start-line="44" selection-start-column="28" selection-end-line="44" selection-end-column="28" />
                   <folding>
                     <element signature="e#49#94#0" expanded="true" />
-                    <element signature="n#!!block;n#constructor#0;n#StatHistogram#0" expanded="false" />
                     <element signature="n#!!block;n#drawHistogram#0;n#StatHistogram#0" expanded="false" />
                     <element signature="n#!!block;n#updateOverallHistogram#0;n#StatHistogram#0" expanded="false" />
                     <element signature="n#!!block;n#updateHistogram#0;n#StatHistogram#0" expanded="false" />
@@ -65,26 +63,34 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="similarityScoreDiagram.ts" pinned="false" current-in-tab="true">
+          <file leaf-file-name="similarityScoreDiagram.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="810">
-                  <caret line="266" column="0" lean-forward="false" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+                <state relative-caret-position="306">
+                  <caret line="316" column="40" lean-forward="false" selection-start-line="316" selection-start-column="40" selection-end-line="316" selection-end-column="40" />
                   <folding>
                     <element signature="e#49#94#0" expanded="true" />
                     <element signature="n#!!block;n#constructor#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#attachListener#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#drawDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#updateSlider#0;n#similarityScoreDiagram#0" expanded="false" />
-                    <element signature="n#!!block;n#addOrderSquares#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#addSimilarOrderPoints#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#clearDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#findMinDate#0;n#similarityScoreDiagram#0" expanded="false" />
-                    <element signature="n#!!block;n#parseTime#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#getData#0;n#similarityScoreDiagram#0" expanded="false" />
                     <element signature="n#!!block;n#renderOrdersTooltip#0;n#similarityScoreDiagram#0" expanded="false" />
-                    <marker date="1499654723000" expanded="true" signature="17343:17362" ph="..." />
+                    <marker date="1500235810000" expanded="true" signature="20722:20741" ph="..." />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="_scoreDiagram.scss" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="460">
+                  <caret line="114" column="8" lean-forward="true" selection-start-line="114" selection-start-column="8" selection-end-line="114" selection-end-column="8" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -177,8 +183,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>transition</find>
-      <find>parse_date</find>
       <find>parseTime</find>
       <find>findMinDate</find>
       <find>'rect</find>
@@ -207,6 +211,8 @@
       <find>to_date_time</find>
       <find>ajax</find>
       <find>getData</find>
+      <find>similarRect</find>
+      <find>pat</find>
     </findStrings>
     <replaceStrings>
       <replace>.Wide</replace>
@@ -267,8 +273,6 @@
         <option value="$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv" />
         <option value="$PROJECT_DIR$/client_app/src/constants.ts" />
         <option value="$PROJECT_DIR$/client_app/src/svgTable.ts" />
-        <option value="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts" />
-        <option value="$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss" />
         <option value="$PROJECT_DIR$/app_server/data/index.json" />
         <option value="$PROJECT_DIR$/client_app/src/ReactComponents/WeightInput.js" />
         <option value="$PROJECT_DIR$/client_app/src/ReactComponents/SideBarComponent.js" />
@@ -277,9 +281,11 @@
         <option value="$PROJECT_DIR$/app_server/app_server/src/handle_CCI.py" />
         <option value="$PROJECT_DIR$/app_server/app_server/src/data_handler.py" />
         <option value="$PROJECT_DIR$/app_server/app_server/data_api.py" />
-        <option value="$PROJECT_DIR$/client_app/src/statHistogram.ts" />
         <option value="$PROJECT_DIR$/client_app/src/app.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/statHistogram.ts" />
         <option value="$PROJECT_DIR$/client_app/src/queryBox.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss" />
+        <option value="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts" />
       </list>
     </option>
   </component>
@@ -500,12 +506,12 @@
       <workItem from="1494784483090" duration="13381000" />
       <workItem from="1499657995271" duration="1362000" />
       <workItem from="1499705743563" duration="5213000" />
-      <workItem from="1500219645633" duration="6327000" />
+      <workItem from="1500219645633" duration="11013000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="212403000" />
+    <option name="totallyTimeSpent" value="217089000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="713" extended-state="6" />
@@ -926,14 +932,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="101">
-          <caret line="85" column="1" lean-forward="false" selection-start-line="85" selection-start-column="1" selection-end-line="85" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app_server/app_server/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -994,16 +992,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-776">
-          <caret line="60" column="50" lean-forward="false" selection-start-line="60" selection-start-column="50" selection-end-line="60" selection-end-column="50" />
-          <folding>
-            <element signature="e#51#87#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app_server/data/index.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -1023,24 +1011,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="38" column="53" lean-forward="false" selection-start-line="38" selection-start-column="53" selection-end-line="38" selection-end-column="53" />
+        <state relative-caret-position="361">
+          <caret line="75" column="65" lean-forward="true" selection-start-line="75" selection-start-column="65" selection-end-line="75" selection-end-column="65" />
           <folding>
             <element signature="e#48#93#0" expanded="true" />
-            <element signature="n#!!block;n#attachListener#0;n#QueryBox#0" expanded="false" />
             <element signature="n#!!block;n#updateSimilar#0;n#QueryBox#0" expanded="false" />
             <element signature="n#!!block;n#updateAllInfo#0;n#QueryBox#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="114" column="8" lean-forward="true" selection-start-line="114" selection-start-column="8" selection-end-line="114" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="727">
-          <caret line="416" column="9" lean-forward="true" selection-start-line="416" selection-start-column="9" selection-end-line="416" selection-end-column="9" />
+        <state relative-caret-position="464">
+          <caret line="44" column="28" lean-forward="true" selection-start-line="44" selection-start-column="28" selection-end-line="44" selection-end-column="28" />
           <folding>
             <element signature="e#49#94#0" expanded="true" />
-            <element signature="n#!!block;n#constructor#0;n#StatHistogram#0" expanded="false" />
             <element signature="n#!!block;n#drawHistogram#0;n#StatHistogram#0" expanded="false" />
             <element signature="n#!!block;n#updateOverallHistogram#0;n#StatHistogram#0" expanded="false" />
             <element signature="n#!!block;n#updateHistogram#0;n#StatHistogram#0" expanded="false" />
@@ -1052,22 +1046,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="810">
-          <caret line="266" column="0" lean-forward="false" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+        <state relative-caret-position="306">
+          <caret line="316" column="40" lean-forward="false" selection-start-line="316" selection-start-column="40" selection-end-line="316" selection-end-column="40" />
           <folding>
             <element signature="e#49#94#0" expanded="true" />
             <element signature="n#!!block;n#constructor#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#attachListener#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#drawDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#updateSlider#0;n#similarityScoreDiagram#0" expanded="false" />
-            <element signature="n#!!block;n#addOrderSquares#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#addSimilarOrderPoints#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#clearDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#findMinDate#0;n#similarityScoreDiagram#0" expanded="false" />
-            <element signature="n#!!block;n#parseTime#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#getData#0;n#similarityScoreDiagram#0" expanded="false" />
             <element signature="n#!!block;n#renderOrdersTooltip#0;n#similarityScoreDiagram#0" expanded="false" />
-            <marker date="1499654723000" expanded="true" signature="17343:17362" ph="..." />
+            <marker date="1500235810000" expanded="true" signature="20722:20741" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="482">
+          <caret line="126" column="56" lean-forward="false" selection-start-line="126" selection-start-column="49" selection-end-line="126" selection-end-column="56" />
+          <folding>
+            <element signature="e#51#87#0" expanded="true" />
           </folding>
         </state>
       </provider>

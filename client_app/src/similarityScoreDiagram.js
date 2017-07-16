@@ -9,7 +9,7 @@ import * as events from 'phovea_core/src/event';
 import { scaleLinear } from 'd3-scale';
 import { line, curveMonotoneX } from 'd3-shape';
 import { timeParse } from 'd3-time-format';
-import { ascending } from 'd3-array';
+import { max, ascending } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { transition } from 'd3-transition';
 import { brushY } from 'd3-brush';
@@ -28,7 +28,7 @@ var similarityScoreDiagram = (function () {
             .append('div')
             .classed('diagramDiv', true);
         this.svg = this.$node.append('svg')
-            .attr('height', this.promisDimension.height + this.ordersDimension.height)
+            .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
         // scales
         this.timeScale = scaleLinear()
@@ -42,10 +42,10 @@ var similarityScoreDiagram = (function () {
             .attr('class', 'xAxis')
             .attr('transform', "translate(" + this.margin.x + "," + (this.promisDimension.height - 2 * this.margin.y) + ")");
         /*
-            this.svg.append('text')
-              .text('Days')
-              .attr('transform', `translate(${(this.promisDimension.width - this.margin.x) / 2},${this.promisDimension.height - this.margin.y})`);
-        */
+         this.svg.append('text')
+         .text('Days')
+         .attr('transform', `translate(${(this.promisDimension.width - this.margin.x) / 2},${this.promisDimension.height - this.margin.y})`);
+         */
         this.svg.append('g')
             .attr('class', 'yAxis')
             .attr('transform', "translate(" + (this.margin.x - this.sliderWidth) + "," + this.margin.y + ")")
@@ -219,7 +219,7 @@ var similarityScoreDiagram = (function () {
         }).style('opacity', 1);
     };
     /**
-     * add lines for orders for a patient
+     * add small squares for orders of one (target) patient
      * @param ordersInfo
      */
     similarityScoreDiagram.prototype.addOrderSquares = function (ordersInfo) {
@@ -229,6 +229,7 @@ var similarityScoreDiagram = (function () {
             var time = _this.parseTime(d['ORDER_DTM'], minDate).getTime();
             d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
         });
+        var self = this;
         var nestedData = nest()
             .key(function (d) {
             return (Math.floor(d['diff'] / 60) * 100).toString();
@@ -236,9 +237,11 @@ var similarityScoreDiagram = (function () {
             .entries(ordersInfo);
         nestedData.forEach(function (d) {
             d.values = d.values.sort(function (a, b) { return ascending(a.diff, b.diff); });
+            // rollup was not successful
+            d['sumUp'] = nest().key(function (g) { return g['diff']; }).entries(d.values); // TODO visualize collapsible squares
         });
+        console.log(nestedData);
         this.svg.select('#pat_orders').selectAll('g').remove();
-        var self = this;
         this.svg.select('#pat_orders')
             .append('g')
             .attr('transform', function () {
@@ -294,6 +297,11 @@ var similarityScoreDiagram = (function () {
             select(".tooltip").transition(t)
                 .style("opacity", 0);
         });
+        var maxLength = max(nestedData, function (d) {
+            return d.values.length;
+        });
+        this.svg
+            .attr('height', this.promisDimension.height - 50 + this.timeScale(25) * maxLength);
     };
     /**
      *
@@ -313,12 +321,12 @@ var similarityScoreDiagram = (function () {
             .attr('transform', function () {
             return "translate(" + _this.margin.x + ",0)"; // If there is a label for the x-axis change 0
         })
-            .selectAll('.similarRect')
+            .selectAll('.patRect')
             .data([ordersInfo])
             .enter()
             .append('g')
             .attr('transform', function () { return "translate(0," + (_this.promisDimension.height - 50) + ")"; })
-            .classed('similarRect', true)
+            .classed('patRect', true)
             .selectAll('rect')
             .data(function (d) { return d; })
             .enter()
@@ -388,7 +396,7 @@ var similarityScoreDiagram = (function () {
             .data(similarOrdersInfo)
             .enter()
             .append('g')
-            .attr('transform', function (d, i) { return "translate(0," + (_this.promisDimension.height - 50 + i * (_this.similarBar.height + 5)) + ")"; })
+            .attr('transform', function (d, i) { return "translate(0," + (_this.promisDimension.height - 50 + (i + 1) * (_this.similarBar.height + 5)) + ")"; })
             .classed('similarRect', true)
             .selectAll('rect')
             .data(function (d) { return d.value; })
@@ -434,6 +442,9 @@ var similarityScoreDiagram = (function () {
             select(".tooltip").transition(t)
                 .style("opacity", 0);
         });
+        // fix height of the svg
+        this.svg
+            .attr('height', this.promisDimension.height - 50 + (this.similarBar.height + 5) * similarOrdersInfo.length);
     };
     /**
      * clear the diagram

@@ -14,7 +14,7 @@ export class QueryBox {
 
     constructor(parent: Element) {
 
-        this.dataset = 'all';
+        this.dataset = 'selected';
 
         this.$node = select(parent)
             .append('div')
@@ -26,7 +26,7 @@ export class QueryBox {
 
         this.$node.append('input')
             .attr('type', 'checkbox')
-            .attr('checked', true)
+            .property('checked', false)
             .attr('id', 'dataset_selection')
             .on('change', () => {
                 if (select("#dataset_selection").property("checked"))
@@ -73,6 +73,8 @@ export class QueryBox {
 
     /**
      * Attaching listener
+     * Only used for the initial testing (events fired in app.ts).
+     * Should be removed at the end.
      */
     private attachListener() {  // TODO test!
         events.on('update_temp_similar', (evt, item) => {
