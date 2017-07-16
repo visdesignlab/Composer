@@ -5,16 +5,23 @@ from phovea_server.util import jsonify
 import pandas as pd
 import operator
 import json
+import math
 
 import handle_Demo
 import handle_CCI
 import handle_Orders
+import handle_pro
 
 __author__ = 'Sahar'
 
+dataset_hash = {'Demo': {'all': 'Demo', 'selected': 'Demo_selected'},
+                'Orders': {'all': 'Orders', 'selected': 'Orders_selected'},
+                'PRO': {'all': 'PRO', 'selected': 'PRO_selected'},
+                'CCI': {'all': 'CCI', 'selected': 'CCI_selected'}
+                }
 
-# TODO from and to: '/getRows/<id>/<frm>/<t>'
-# access directly from API: '/getAllRows/<id>'
+# TODO from and to: '/getRows/<dataset_id>/<frm>/<t>'
+# access directly from API: '/getAllRows/<dataset_id>'
 def get_all_rows(dataset_id):
     my_data = dt.get(dataset_id)
     rows = my_data.aslist()
@@ -23,21 +30,21 @@ def get_all_rows(dataset_id):
     })
 
 
-# access directly from API: '/getPatInfo/<PAT_ID>'
-def get_pat_info(PAT_ID):
+# access directly from API: '/getPatInfo/<PAT_ID>/<dataset>'
+def get_pat_info(PAT_ID, dataset):
     return jsonify({
-      'Demo': get_info([int(PAT_ID)], 'Demo'),
-      'Orders': get_info([int(PAT_ID)], 'Orders'),
-      'PRO': get_info([int(PAT_ID)], 'PRO')
+      'Demo': get_info([int(PAT_ID)], dataset_hash['Demo'][dataset]),
+      'Orders': get_info([int(PAT_ID)], dataset_hash['Orders'][dataset]),
+      'PRO': get_info([int(PAT_ID)], dataset_hash['PRO'][dataset])
     })
 
 
-# access directly from API: '/getSimilarRows/<PAT_ID>'
-def get_similar_rows(PAT_ID, number):
+# access directly from API: '/getSimilarRows/<PAT_ID>/<number>/<dataset>'
+def get_similar_rows(PAT_ID, number, dataset):
 
-    Demo_score = handle_Demo.get_similarity_score(int(PAT_ID))
-    CCI_score = handle_CCI.get_similarity_score(int(PAT_ID))
-    #Pro_score = handle_Pro.get_similarity_score(int(PAT_ID)) #TODO
+    Demo_score = handle_Demo.get_similarity_score(int(PAT_ID), dataset_hash['Demo'][dataset])
+    CCI_score = handle_CCI.get_similarity_score(int(PAT_ID), dataset_hash['CCI'][dataset])
+    Pro_score = handle_pro.get_similarity_score(int(PAT_ID), dataset_hash['PRO'][dataset])
     id_scores = []
 
     pat_ids = set(list(Demo_score.keys()) + (list(CCI_score.keys())))
@@ -48,24 +55,27 @@ def get_similar_rows(PAT_ID, number):
             temp += Demo_score[id]
         if id in CCI_score:
             temp += CCI_score[id]
+        if id in Pro_score:
+            temp += Pro_score[id]
         id_scores.append([id, temp])
 
     id_scores.sort(key=lambda r: r[1], reverse=True)
     ids = [d[0] for d in id_scores[:number]]
     scores = [d[1] for d in id_scores[:number]]
 
-    pat_demo_info = get_info([int(PAT_ID)], 'Demo')
-    demo_info = get_info(ids, 'Demo')
-    pat_pro_info = get_info([int(PAT_ID)], 'PRO')
-    pro_info = get_info(ids, 'PRO')
-    pat_orders_info = get_info([int(PAT_ID)], 'Orders')
-    orders_info = get_info(ids, 'Orders')
+    pat_demo_info = get_info([int(PAT_ID)], dataset_hash['Demo'][dataset])
+    demo_info = get_info(ids, dataset_hash['Demo'][dataset])
+    pat_pro_info = get_info([int(PAT_ID)], dataset_hash['PRO'][dataset])
+    pro_info = get_info(ids, dataset_hash['PRO'][dataset])
+    pat_orders_info = get_info([int(PAT_ID)], dataset_hash['Orders'][dataset])
+    orders_info = get_info(ids, dataset_hash['Orders'][dataset])
 
     #difference = handle_Demo.get_difference(int(PAT_ID), ids) # maybe in the client?!
 
     return jsonify({
         'PAT_ID': PAT_ID,
         'ids': ids,
+        'scores': scores,
         'similarity_scores': scores,
 
         'pat_Demo': pat_demo_info,
@@ -81,7 +91,7 @@ def get_similar_rows(PAT_ID, number):
     })
 
 
-# access directly from API: '/getWeights/<id>'
+# access directly from API: '/getWeights/<dataset_id>'
 def get_weights(dataset_id):
     if dataset_id == 'Demo':
         return handle_Demo.get_weights()
@@ -90,7 +100,7 @@ def get_weights(dataset_id):
     return jsonify({'message': 'error'})
 
 
-# access directly from API: '/updateWeights/<id>/<values>'
+# access directly from API: '/updateWeights/<dataset_id>/<values>'
 def update_weights(dataset_id, values):
     if dataset_id == 'Demo':
         return handle_Demo.update_weights(values)
@@ -99,23 +109,22 @@ def update_weights(dataset_id, values):
     return jsonify({'message': 'error'})
 
 
-# access directly from API: '/getLatestInfo/<id>'
+# access directly from API: '/getLatestInfo/<dataset_id>'
 def get_latest_info(dataset_id):
     if dataset_id == 'Demo':
         return handle_Demo.get_latest_info()
     return jsonify({'message': 'error'})
 
 
-# access directly from API: '/getStat'
-def get_stat():
-    my_data = dt.get('Demo')
+# access directly from API: '/getStat/<dataset>'
+def get_stat(dataset):
+    my_data = dt.get(dataset_hash['Demo'][dataset])
     data = my_data.aslist()
     length = 0
     gender = [0, 0]
     bmi = [0, 0, 0, 0, 0, 0, 0]
     age = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     today = pd.datetime.today()
-
 
     for row in data:
         length += 1
@@ -127,48 +136,25 @@ def get_stat():
             bmi[0] += 1
         elif row['BMI'] <= 18:
             bmi[1] += 1
-        elif row['BMI'] > 18 and row['BMI'] <= 21:
-            bmi[2] += 1
-        elif row['BMI'] > 21 and row['BMI'] <= 24:
-            bmi[3] += 1
-        elif row['BMI'] > 24 and row['BMI'] <= 27:
-            bmi[4] += 1
-        elif row['BMI'] > 27 and row['BMI'] <= 30:
-            bmi[5] += 1
         elif row['BMI'] > 30:
             bmi[6] += 1
-        pat_age = int((today - to_data_time(row['PAT_BIRTHDATE'])).days / 365.25)
+        else:
+            bmi[int(math.ceil((row['BMI']-15) / 3))] += 1
+
+        pat_age = int((today - to_date_time(row['PAT_BIRTHDATE'])).days / 365.25)
         if pat_age <= 10:
             age[0] += 1
-        elif pat_age > 10 and pat_age <=20:
-            age[1] += 1
-        elif pat_age > 20 and pat_age <=30:
-            age[2] += 1
-        elif pat_age > 30 and pat_age <=40:
-            age[3] += 1
-        elif pat_age > 40 and pat_age <=50:
-            age[4] += 1
-        elif pat_age > 50 and pat_age <=60:
-            age[5] += 1
-        elif pat_age > 60 and pat_age <=70:
-            age[6] += 1
-        elif pat_age > 70 and pat_age <=80:
-            age[7] += 1
-        elif pat_age > 80 and pat_age <=90:
-            age[8] += 1
-        elif pat_age > 90 and pat_age <=100:
-            age[9] += 1
         elif pat_age > 100:
             age[10] += 1
+        else:
+            age[int(math.floor((pat_age - 1) / 10))] += 1
 
-
-    return jsonify ({
+    return jsonify({
        'length': length,
        'GENDER': gender,
        'BMI': bmi,
        'AGE': age
        })
-
 
 
 ##=========== helper functions
@@ -185,13 +171,13 @@ def get_all_info_for_pat(dataset_id, PAT_ID):
             info_rows.append(my_data.aslist()[i])
 
     if dataset_id == 'Demo':
-        info_rows.sort(key=lambda r: to_data_time(r["ADM_DATE"]))
+        info_rows.sort(key=lambda r: to_date_time(r["ADM_DATE"]))
     elif dataset_id == 'PRO':
-        info_rows.sort(key=lambda r: to_data_time(r["ASSESSMENT_START_DTM"]))
+        info_rows.sort(key=lambda r: to_date_time(r["ASSESSMENT_START_DTM"]))
     elif dataset_id == 'PT':
-        info_rows.sort(key=lambda r: to_data_time(r["ADM_DATE"]))
+        info_rows.sort(key=lambda r: to_date_time(r["ADM_DATE"]))
     elif dataset_id == 'VAS':
-        info_rows.sort(key=lambda r: to_data_time(r["RECORDED_TIME"]))
+        info_rows.sort(key=lambda r: to_date_time(r["RECORDED_TIME"]))
 
     return info_rows
 
@@ -234,7 +220,7 @@ def parse_date(date):
     return pd.datetime.strptime(date, '%m/%d/%Y')
 
 
-def to_data_time(date):
+def to_date_time(date):
     if not date:
         return pd.datetime.strptime('01/01/0001', '%m/%d/%Y')
     if ':' in date:
