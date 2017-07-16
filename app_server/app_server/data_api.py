@@ -17,44 +17,44 @@ def _func():
     })
 
 
-@app.route('/getAllRows/<id>')
-def _get_all_rows(id):
-    return data_handler.get_all_rows(id)
+@app.route('/getAllRows/<dataset_id>')
+def _get_all_rows(dataset_id):
+    return data_handler.get_all_rows(dataset_id)
 
 
-@app.route('/getRows/<id>/<frm>/<t>') # NOT USED YET
-def _get_rows(id, frm, t):
-    return data_handler.get_rows(id, frm, t) # TODO implement
+@app.route('/getRows/<dataset_id>/<frm>/<t>') # NOT USED YET
+def _get_rows(dataset_id, frm, t):
+    return data_handler.get_rows(dataset_id, frm, t) # TODO implement
 
 
-@app.route('/getPatInfo/<PAT_ID>')
-def _get_pat_info(PAT_ID):
-    return data_handler.get_pat_info(PAT_ID)
+@app.route('/getPatInfo/<PAT_ID>/<dataset>') # dataset: all/selected
+def _get_pat_info(PAT_ID, dataset):
+    return data_handler.get_pat_info(PAT_ID, dataset)
 
 
-@app.route('/getSimilarRows/<PAT_ID>/<number>')
-def _get_similar_rows(PAT_ID, number):
-    return data_handler.get_similar_rows(PAT_ID, int(number))
+@app.route('/getSimilarRows/<PAT_ID>/<number>/<dataset>')
+def _get_similar_rows(PAT_ID, number, dataset):
+    return data_handler.get_similar_rows(PAT_ID, int(number), dataset)
 
 
-@app.route('/getWeights/<id>')
-def _get_weights(id):
-    return data_handler.get_weights(id)
+@app.route('/getWeights/<dataset_id>')
+def _get_weights(dataset_id):
+    return data_handler.get_weights(dataset_id)
 
 
-@app.route('/updateWeights/<id>/<values>')
-def _update_weights(id, values):
+@app.route('/updateWeights/<dataset_id>/<values>')
+def _update_weights(dataset_id, values):
     return data_handler.update_weights(id, values)
 
 
-@app.route('/getLatestInfo/<id>')
-def _get_latest_info(id):
-    return data_handler.get_latest_info(id)
+@app.route('/getLatestInfo/<dataset_id>')
+def _get_latest_info(dataset_id):
+    return data_handler.get_latest_info(dataset_id)
 
 
-@app.route('/getStat')
-def _get_stat():
-    return data_handler.get_stat()
+@app.route('/getStat/<dataset>')
+def _get_stat(dataset):
+    return data_handler.get_stat(dataset)
 
 
 def create():

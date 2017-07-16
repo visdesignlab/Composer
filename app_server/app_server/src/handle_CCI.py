@@ -38,8 +38,8 @@ def update_weights(values):
 
 
 # used in data_handler.get_similar_rows
-def get_similarity_score(PAT_ID):
-    data = dt.get('CCI').aslist()
+def get_similarity_score(PAT_ID, dataset_id):
+    data = dt.get(dataset_id).aslist()
     pat_ids = set([int(d['PAT_ID']) for d in data])
 
     # find the first entry for each patient
@@ -77,11 +77,11 @@ def get_similarity_score(PAT_ID):
 
 ##============= utility functions
 def extract_year(date):
-    time = to_data_time(date)
+    time = to_date_time(date)
     return time.year
 
 
-def to_data_time(date):
+def to_date_time(date):
     if ':' in date:
         time = pd.datetime.strptime(date, '%m/%d/%Y %I:%M:%S %p')
     elif '/' in date:

@@ -19,6 +19,7 @@ export class StatHistogram {
   private xScale;
   private similarData;
   private allData;
+  private dataset; // all or selected
 
   private svgDimension = {width: 250, height: 150, title: 180, spacing: 2};
 
@@ -37,7 +38,7 @@ export class StatHistogram {
       .domain([0, 100])
       .range([0, this.svgDimension.width/2 - this.svgDimension.spacing]);
 
-    this.getData('/data_api/getStat').then((args) => {
+    this.getData('/data_api/getStat/all').then((args) => {
       this.allData = args;
       this.attachListener();
 
@@ -145,6 +146,48 @@ export class StatHistogram {
 
   }
 
+
+  /**
+   * update the general part of the histogram after updating the sataset
+   * @param hist
+   */
+  private updateOverallHistogram (hist) {
+
+    let allData = this.allData[hist];
+
+    let histogramRectAll = this.$node
+        .select(`#histogram_${hist}`)
+        .selectAll('rect')
+        .data(allData);
+
+    histogramRectAll
+        .enter()
+        .append('rect')
+        .classed('histogramRectAll', true)
+        .attr('x', this.xScale(100))
+        .attr('y', (d, i) => {
+          return i * this.svgDimension.height / allData.length + this.svgDimension.spacing
+        })
+        .attr('width', 0)
+        .attr('height', () => {
+          return this.svgDimension.height / allData.length - this.svgDimension.spacing
+        });
+
+    let t = transition('t').duration(1000);
+
+    histogramRectAll.enter()
+        .merge(histogramRectAll)
+        .transition(t)
+        .attr('x', (d) => {
+          return this.xScale(100) - this.xScale(d / this.allData['length'] * 100)
+        })
+        .attr('width', (d) => {
+          return this.xScale(d / this.allData['length'] * 100)
+        })
+        .style('fill', (d) => {
+          return this.allColorScale(d / this.allData['length'] * 100)
+        });
+  }
   /**
    * Draw/Update the histogram for similar patients
    * @param hist
@@ -319,6 +362,18 @@ export class StatHistogram {
       this.updateHistogram('GENDER');
       this.updateHistogram('BMI');
       this.updateHistogram('AGE');
+    });
+
+    events.on('update_dataset', (evt, item) => {
+      this.dataset = item[1];
+
+      this.getData(`/data_api/getStat/${this.dataset}`).then((args) => {
+        this.allData = args;
+
+        this.updateOverallHistogram('GENDER');
+        this.updateOverallHistogram('BMI');
+        this.updateOverallHistogram('AGE');
+      });
     });
 
   }
