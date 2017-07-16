@@ -8,7 +8,7 @@ import * as events from 'phovea_core/src/event';
 var QueryBox = (function () {
     function QueryBox(parent) {
         var _this = this;
-        this.dataset = 'all';
+        this.dataset = 'selected';
         this.$node = select(parent)
             .append('div')
             .classed('queryDiv', true);
@@ -17,7 +17,7 @@ var QueryBox = (function () {
             .text('Consider All (6071) Patients?');
         this.$node.append('input')
             .attr('type', 'checkbox')
-            .attr('checked', true)
+            .property('checked', false)
             .attr('id', 'dataset_selection')
             .on('change', function () {
             if (select("#dataset_selection").property("checked"))
@@ -56,6 +56,8 @@ var QueryBox = (function () {
     }
     /**
      * Attaching listener
+     * Only used for the initial testing (events fired in app.ts).
+     * Should be removed at the end.
      */
     QueryBox.prototype.attachListener = function () {
         var _this = this;

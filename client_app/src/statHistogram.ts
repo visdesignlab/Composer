@@ -30,6 +30,8 @@ export class StatHistogram {
 
   constructor(parent: Element) {
 
+    this.dataset = 'selected';
+
     this.$node = select(parent)
       .append('div')
       .classed('allHistogramDiv', true);
@@ -38,7 +40,7 @@ export class StatHistogram {
       .domain([0, 100])
       .range([0, this.svgDimension.width/2 - this.svgDimension.spacing]);
 
-    this.getData('/data_api/getStat/all').then((args) => {
+    this.getData(`/data_api/getStat/${this.dataset}`).then((args) => {
       this.allData = args;
       this.attachListener();
 

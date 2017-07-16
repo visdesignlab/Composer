@@ -19,13 +19,14 @@ var StatHistogram = (function () {
         this.similarColorScale = scaleLinear().domain([0, 100]).range(this.colorRangeSimilar);
         this.colorRangeAll = ['#adc9aa', '#05c95d'];
         this.allColorScale = scaleLinear().domain([0, 100]).range(this.colorRangeAll);
+        this.dataset = 'selected';
         this.$node = select(parent)
             .append('div')
             .classed('allHistogramDiv', true);
         this.xScale = scaleLinear()
             .domain([0, 100])
             .range([0, this.svgDimension.width / 2 - this.svgDimension.spacing]);
-        this.getData('/data_api/getStat/all').then(function (args) {
+        this.getData("/data_api/getStat/" + this.dataset).then(function (args) {
             _this.allData = args;
             _this.attachListener();
             _this.drawHistogram('GENDER');
