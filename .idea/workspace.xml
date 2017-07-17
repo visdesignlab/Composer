@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ec6e26d3-ba22-4955-ae1c-c975133d7235" name="Default" comment="" />
+    <list default="true" id="ec6e26d3-ba22-4955-ae1c-c975133d7235" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client_app/src/constants.ts" afterPath="$PROJECT_DIR$/client_app/src/constants.ts" />
+    </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -20,7 +22,7 @@
     <splitter split-orientation="horizontal" split-proportion="0.6828125">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="app.ts" pinned="false" current-in-tab="true">
+          <file leaf-file-name="app.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="260">
@@ -28,6 +30,16 @@
                   <folding>
                     <element signature="e#51#87#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="constants.ts" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="484">
+                  <caret line="66" column="2" lean-forward="false" selection-start-line="66" selection-start-column="2" selection-end-line="66" selection-end-column="2" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -244,7 +256,6 @@
         <option value="$PROJECT_DIR$/client_app/src/styles/_histogram.scss" />
         <option value="$PROJECT_DIR$/app_server/data/procedure_result.csv" />
         <option value="$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv" />
-        <option value="$PROJECT_DIR$/client_app/src/constants.ts" />
         <option value="$PROJECT_DIR$/client_app/src/svgTable.ts" />
         <option value="$PROJECT_DIR$/app_server/data/index.json" />
         <option value="$PROJECT_DIR$/client_app/src/ReactComponents/WeightInput.js" />
@@ -263,6 +274,7 @@
         <option value="$PROJECT_DIR$/client_app/src/app.ts" />
         <option value="$PROJECT_DIR$/client_app/src/styles/_distributionDiagram.scss" />
         <option value="$PROJECT_DIR$/client_app/src/distributionDiagram.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/constants.ts" />
       </list>
     </option>
   </component>
@@ -465,12 +477,12 @@
       <workItem from="1494784483090" duration="13381000" />
       <workItem from="1499657995271" duration="1362000" />
       <workItem from="1499705743563" duration="5213000" />
-      <workItem from="1500219645633" duration="19808000" />
+      <workItem from="1500219645633" duration="20203000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="225884000" />
+    <option name="totallyTimeSpent" value="226279000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="713" extended-state="6" />
@@ -796,26 +808,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app_server/data/procedure_result.csv" />
-    <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3338">
-          <caret line="2360" column="6" lean-forward="false" selection-start-line="2360" selection-start-column="6" selection-end-line="2360" selection-end-column="6" />
-          <folding>
-            <element signature="e#8979#53054#0" expanded="false" />
-            <element signature="e#53102#78359#0" expanded="false" />
-            <element signature="e#78374#104649#0" expanded="false" />
-            <element signature="e#104665#108809#0" expanded="false" />
-            <element signature="e#108825#144933#0" expanded="false" />
-            <element signature="e#144949#265834#0" expanded="false" />
-            <element signature="e#265850#299402#0" expanded="false" />
-            <element signature="e#299418#312238#0" expanded="false" />
-            <element signature="e#312254#369151#0" expanded="false" />
-            <element signature="e#369166#380950#0" expanded="false" />
-            <element signature="e#380965#384292#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Demo_index.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="189">
@@ -1037,6 +1029,14 @@
           <folding>
             <element signature="e#51#87#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="484">
+          <caret line="66" column="2" lean-forward="false" selection-start-line="66" selection-start-column="2" selection-end-line="66" selection-end-column="2" />
+          <folding />
         </state>
       </provider>
     </entry>
