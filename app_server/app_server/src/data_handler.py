@@ -28,7 +28,8 @@ def get_pat_info(PAT_ID):
     return jsonify({
       'Demo': get_info([int(PAT_ID)], 'Demo'),
       'Orders': get_info([int(PAT_ID)], 'Orders'),
-      'PRO': get_info([int(PAT_ID)], 'PRO')
+      'PRO': get_info([int(PAT_ID)], 'PRO'),
+      'CCI': get_info([int(PAT_ID)], 'CCI')
     })
 
 
@@ -60,6 +61,8 @@ def get_similar_rows(PAT_ID, number):
     pro_info = get_info(ids, 'PRO')
     pat_orders_info = get_info([int(PAT_ID)], 'Orders')
     orders_info = get_info(ids, 'Orders')
+    pat_cci_info = get_info([int(PAT_ID)], 'CCI')
+    cci_info = get_info(ids, 'CCI')
 
     #difference = handle_Demo.get_difference(int(PAT_ID), ids) # maybe in the client?!
 
@@ -71,10 +74,12 @@ def get_similar_rows(PAT_ID, number):
         'pat_Demo': pat_demo_info,
         'pat_PRO': pat_pro_info,
         'pat_Orders': pat_orders_info,
+        'pat_CCI': pat_cci_info,
 
         'similar_Demo': demo_info,
         'similar_PRO': pro_info,
-        'similar_Orders': orders_info#,
+        'similar_Orders': orders_info,
+        'similar_CCI': cci_info
 
         #'difference': difference
         #'all_pro_rows': sum(pro_rows, get_all_info_for_pat('PRO', int(PAT_ID)))
