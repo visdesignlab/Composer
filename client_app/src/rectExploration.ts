@@ -22,10 +22,13 @@ export class rectExploration {
   private patientInfo;
   private svg;
   private targetPatientProInfo;
-  private container: d3.Selection<SVGElement>;
+ // private container: d3.Selection<SVGElement>;
   private brush;
   private targetPatientOrders;
   private currentlySelectedName;
+  private similarData;
+  private allData;
+  private selectedOrder;
 
 
 
@@ -125,6 +128,7 @@ export class rectExploration {
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
       
+ 
 
      this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
 
@@ -132,7 +136,6 @@ export class rectExploration {
       this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
       this.drawPatOrderRects();
       this.drawMiniRects();
-
     });
 
     // item: pat_id, DATA
@@ -260,35 +263,30 @@ export class rectExploration {
       .attr('y', 0)
       .attr('width', this.orderBar.width)
       .attr('height', this.orderBar.height)
-      .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
-      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
-      //this is the mousclick event that adds a line to the graphs
+      //.classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
+      //.classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
+      //this is the mousclick event that greys rects
         .on('click', d => {
+          this.svg.selectAll('rects');
           if (this.currentlySelectedName === undefined) {
             this.currentlySelectedName = d.ORDER_MNEMONIC;
+           console.log(this.currentlySelectedName);
+       
+           
+           
+          // var selectedOrder = this.currentlySelectedName;
+           //return selectedOrder;
+           
+          
           } else {
             this.currentlySelectedName = undefined;
           }
           
           this.drawPatOrderRects();
-        /*if (!select(this).classed('selectedOrder')) {
-         
-          select(this).classed('selectedOrder', true)
-           .html(()=> {
-             console.log(this.renderOrdersTooltip(d)) 
-             return this.renderOrdersTooltip(d);
-           })
-          
-
-         
-        
-
-          console.log(d);
-        }
-        else {
-          select(this).classed('selectedOrder', false);
-          select(`#orderLine_${d['VISIT_NO']}`).remove();
-        }*/
+         // console.log(selectedOrder);
+         var selectedGroup = d3.selectAll('.selectedOrder');
+         console.log(selectedGroup.size());
+    
       })//end the mousclick event that shows the graph
       .on("mouseover", (d) => {
         let t = transition('t').duration(500);
@@ -306,11 +304,19 @@ export class rectExploration {
         select(".tooltip").transition(t)
           .style("opacity", 0);
       });
-
+      
+      d3.selectAll('.MEDICATION, .PROCEDURE')
+      .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
+      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName);
+      
        this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale))
         
-  
+      if (this.currentlySelectedName) {
+        // 
+      } else {
+        // empty the bar chart
+      }
   }
 
   private drawMiniRects() {
@@ -338,7 +344,6 @@ export class rectExploration {
       .attr('y', 0)
       .attr('width', 2)
       .attr('height', 15);
-      
       
   }
 
@@ -430,7 +435,6 @@ let newMax = end;
 events.fire('brushed', [newMin, newMax]);
 
 }
-
 
 
 /**

@@ -86,6 +86,9 @@ export class App {
     //rect
     rectExploration.create(main.node());
 
+    //order historgram
+    //statOrder.create(main.node());
+
 
     // PROMIS diagrams
     const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
