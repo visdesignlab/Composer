@@ -27,6 +27,7 @@ export class similarityScoreDiagram {
 
   private targetPatientProInfo;
   private similarPatientsProInfo;
+  private currentlySelectedName;
 
   height = 400;
   width = 600;
@@ -448,6 +449,16 @@ export class similarityScoreDiagram {
 
     const self = this;
 
+     function getClassAssignment (attString) {
+      //this uses a work around to use a function with classed. As well it preserves the already assinged classes
+        
+        return function (d) { 
+          let element = select(this);
+          element.classed (d[attString], true);
+          return element.attr('class');
+        }
+      }
+
     this.svg.select('#pat_orders')
       .append('g')
       .attr('transform', () => {
@@ -463,17 +474,27 @@ export class similarityScoreDiagram {
       .data((d) => d)
       .enter()
       .append('rect')
-      .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+      .attr('class', getClassAssignment('ORDER_CATALOG_TYPE'))
+      .attr('class', getClassAssignment('ORDER_STATUS'))
+      //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
       .attr('x', (g) => this.timeScale(g.diff))
       .attr('y', 0)
       .attr('width', this.similarBar.width)
       .attr('height', this.similarBar.height)
+      .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
+      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
       .on('click', function (d) {
+        //this.svg.selectAll('rect');
+        /*if (this.currentlySelectedName === undefined) {
+            this.currentlySelectedName = d.ORDER_MNEMONIC;
+          } else {
+            this.currentlySelectedName = undefined;
 
+          }*/
         if (!select(this).classed('selectedOrder')) {
 
           select(this).classed('selectedOrder', true);
-
+          
           select(this.parentNode.parentNode.parentNode)
             .append('line')
             .classed('selectedLine', true)
@@ -549,8 +570,14 @@ export class similarityScoreDiagram {
       .attr('y', 0)
       .attr('width', this.similarBar.width)
       .attr('height', this.similarBar.height)
+      .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
+      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
       .on('click', function (d) {
-
+         /*if (this.currentlySelectedName === undefined) {
+            this.currentlySelectedName = d.ORDER_MNEMONIC;
+          } else {
+            this.currentlySelectedName = undefined;
+          }*/
         if (!select(this).classed('selectedOrder')) {
 
           select(this).classed('selectedOrder', true);
