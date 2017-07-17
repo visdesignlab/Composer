@@ -19,7 +19,6 @@ var similarityScoreDiagram = (function () {
         this.height = 400;
         this.width = 600;
         this.promisDimension = { height: 400, width: 600 };
-        this.ordersDimension = { height: 400, width: 600 };
         this.margin = { x: 80, y: 40 };
         this.sliderWidth = 10;
         this.similarBar = { width: 4, height: 10 };

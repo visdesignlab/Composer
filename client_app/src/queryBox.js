@@ -90,6 +90,7 @@ var QueryBox = (function () {
                     this.getData(url).then(function (args) {
                         _this.setBusy(false);
                         _this.similarArgs = args;
+                        //console.log(args);
                         // caught by svgTable and scoreDiagram and statHistogram
                         events.fire('update_similar', [value, n_1, args]);
                     });

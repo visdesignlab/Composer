@@ -111,6 +111,8 @@ export class QueryBox {
                 this.setBusy(false);
                 this.similarArgs = args;
 
+                //console.log(args);
+
                 // caught by svgTable and scoreDiagram and statHistogram
                 events.fire('update_similar', [value, n, args]);
             });

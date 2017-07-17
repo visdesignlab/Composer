@@ -62,6 +62,7 @@ def get_similar_rows(PAT_ID, number, dataset):
     id_scores.sort(key=lambda r: r[1], reverse=True)
     ids = [d[0] for d in id_scores[:number]]
     scores = [d[1] for d in id_scores[:number]]
+    all_scores = [d[1] for d in id_scores]
 
     pat_demo_info = get_info([int(PAT_ID)], dataset_hash['Demo'][dataset])
     demo_info = get_info(ids, dataset_hash['Demo'][dataset])
@@ -75,7 +76,7 @@ def get_similar_rows(PAT_ID, number, dataset):
     return jsonify({
         'PAT_ID': PAT_ID,
         'ids': ids,
-        'scores': scores,
+        'all_scores': all_scores,
         'similarity_scores': scores,
 
         'pat_Demo': pat_demo_info,

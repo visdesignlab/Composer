@@ -10,6 +10,7 @@ import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
+import * as distributionDiagram from './distributionDiagram';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -73,6 +74,10 @@ export class App {
     queryBox.create(main.node());
 
 
+    // distributionDiagram
+    distributionDiagram.create(main.node());
+
+
     // histogram
     statHistogram.create(main.node());
 
@@ -123,7 +128,7 @@ export class App {
 
     this.setBusy(false);
 
-    //events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
+    events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
     //events.fire('update_all_info', ['PAT_ID', '5330196']);
   }
 
