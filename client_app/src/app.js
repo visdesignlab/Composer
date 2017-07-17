@@ -5,7 +5,9 @@ import * as tslib_1 from "tslib";
 import { select } from 'd3-selection';
 import * as queryBox from './queryBox';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
+import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
+import * as distributionDiagram from './distributionDiagram';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SideBarComponent from './ReactComponents/SideBarComponent';
@@ -47,6 +49,8 @@ var App = (function () {
                 main = this.$node.append('div').classed('main', true);
                 // query box
                 queryBox.create(main.node());
+                // distributionDiagram
+                distributionDiagram.create(main.node());
                 // histogram
                 statHistogram.create(main.node());
                 dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
@@ -89,6 +93,7 @@ var App = (function () {
                 // //await svgTablePt.drawTable('PT');
                 // //await svgTableVas.drawTable('VAS');
                 this.setBusy(false);
+                events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
                 return [2 /*return*/];
             });
         });
