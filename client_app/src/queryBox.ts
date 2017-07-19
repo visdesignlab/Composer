@@ -84,6 +84,7 @@ export class QueryBox {
       let n = !isNaN(+number) ? +number : 10;
       n = n <= 0 ? 10 : n;
       const url = `/data_api/getSimilarRows/${value}/${n}`;
+    
       this.setBusy(true);
       this.getData(url).then((args) => {
 
@@ -112,7 +113,7 @@ export class QueryBox {
 
         // caught by svgTable and similarityScoreDiagram
         events.fire('update_all_info', [value, args]);
-
+   
         this.setBusy(false);
       });
 

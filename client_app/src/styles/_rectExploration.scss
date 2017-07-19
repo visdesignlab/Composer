@@ -1,38 +1,40 @@
-.PROCEDURE.COMPLETED {
+.PROCEDURE.COMPLETED,
+.pro-swatch.COMPLETED {
   fill: red;
   opacity: 0.5;
 }
 
-.PROCEDURE.ORDERED {
+.PROCEDURE.ORDERED,
+.pro-swatch.ORDERED {
    fill: orange;
   opacity: 0.5;
 }
 
- .MEDICATION.ORDERED {
+ .MEDICATION.ORDERED,  
+ .med-swatch.ORDERED,
+ .MEDICATION.SENT,
+ .med-swatch.SENT
+ {
   fill: #4a6ffb;
   opacity: 0.5;
 }
 
- .MEDICATION.SENT {
-  fill: #4a6ffb;
-  opacity: 0.5;
-}
-
-.MEDICATION.COMPLETED {
+.MEDICATION.COMPLETED,
+.med-swatch.COMPLETED {
   fill: green;
   opacity: 0.5;
 }
 
 
-.MEDICATION.DISCONTINUED {
+.MEDICATION.DISCONTINUED,
+.med-swatch.DISCONTINUED,
+.MEDICATION.SUSPEND,
+.med-swatch.SUSPEND
+ {
   fill: purple;
   opacity: 0.5;
 }
 
-.MEDICATION.SUSPEND {
-  fill: purple;
-  opacity: 0.5;
-}
 
 #pat_rect_line {
   float: left;
@@ -59,6 +61,19 @@
 .MEDICATION.unselectedOrder {
   opacity: 0.2;
   fill: grey;// !important;
+}
+
+.checkbox-med, .checkbox-pro {
+  //align-content: right;
+  float: right;
+  width:100px;
+  padding: 0px 5px 0px 0px;
+}
+
+.rectDiv {
+  clear: right;
+  max-width: 1100px;
+  height: 300px;
 }
 
 
