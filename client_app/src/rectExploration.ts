@@ -32,7 +32,7 @@ export class rectExploration {
 
 
 
-  rectBoxDimension = {width: 1100, height: 100 };
+  rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
   margin = {top: 20, right: 10, bottom: 10, left: 10};
   contextDimension = {width: this.rectBoxDimension.width, height:55};
@@ -41,7 +41,7 @@ export class rectExploration {
 
     this.$node = select(parent)
         .append('div')
-        .classed('rectDiv', true)
+        .classed('rectDiv', true);
     
     this.svg = this.$node.append('svg')
         .attr('width', this.rectBoxDimension.width)
@@ -128,8 +128,6 @@ export class rectExploration {
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
       
- 
-
      this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
 
       this.setOrderScale();
@@ -198,9 +196,6 @@ export class rectExploration {
     
     this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale));
-
-   
-        console.log(this.targetPatientProInfo.filter( (d) => {  return d['PAT_ID'] }));
   }
 
 
@@ -239,10 +234,7 @@ export class rectExploration {
       }
 
       let orderRect = this.svg.select('#pat_rect_line')
-      /* .append('g')
-      .attr('transform', () => {
-        return `translate(${this.margin.bottom},0)`; // If there is a label for the x-axis change 0
-      })*/
+     
       .selectAll('.orderRect')
       .data([ordersInfo]);
       let orderRectEnter = orderRect.enter()
@@ -352,30 +344,74 @@ export class rectExploration {
    * 
    */
   private drawCheckboxes() {
+      this.svg.append('g')
+              .attr('class', 'colorLabels')
+              .attr('transform', () => `translate(${this.rectBoxDimension.width - 200},${this.rectBoxDimension.height+ 70})`)
+              .append('rect')
+              .attr('width', '20')
+              .attr('height', '20')
+              .attr('class', 'med-swatch ORDERED');
+      this.svg.select('.colorLabels')
+                .append('rect')
+              .attr('width', '20')
+              .attr('height', '20')
+              .attr('x', '25')
+              .attr('class', 'med-swatch COMPLETED');
+
+      this.svg.select('.colorLabels')
+              .append('rect')
+              .attr('width', '20')
+              .attr('height', '20')
+              .attr('x', '50')
+              .attr('class', 'med-swatch DISCONTINUED');
+
+      this.svg.select('.colorLabels')
+              .append('rect')
+              .attr('width', '20')
+              .attr('height', '20')
+              .attr('x', '100')
+              .attr('class', 'pro-swatch ORDERED');
+      
+      
+      this.svg.select('.colorLabels')
+              .append('rect')
+              .attr('width', '20')
+              .attr('height', '20')
+              .attr('x', '125')
+              .attr('class', 'pro-swatch COMPLETED');
 
       //input checkboxes for hiding orders
-      this.$node.append('input')
+        d3.select('.rectDiv')
+            .append('div')
+            .classed('checkbox-pro', true)
+              .append('input')
+              .attr('type', 'checkbox')
+              .attr('checked', true)
+              .attr('value', 'Pro')
+               .attr('x', 175)
+              .attr('id', 'pro-check')
+              .on('click', () => this.updateRectPro());
+
+      this.$node.select('.checkbox-pro')
+            .append('text')
+            .text('Procedures')
+
+      d3.select('.rectDiv')
+            .append('div')
+            .classed('checkbox-med', true)
+             .append('input')
               .attr('type', 'checkbox')
               .attr('checked', true)
               .attr('value', 'med')
               .attr('id', 'med-check')
-              .on('click', () => this.updateRectMed());
+              .on('click', () => this.updateRectMed())
 
-      this.$node.append('text')
+             this.$node.select('.checkbox-med')
+            .append('text')
             .text('Medications')
-            .attr('padding', 5);
-
-
-      this.$node.append('input')
-              .attr('type', 'checkbox')
-              .attr('checked', true)
-              .attr('value', 'Pro')
-              .attr('id', 'pro-check')
-              .on('click', () => this.updateRectPro());
-
-      this.$node.append('text')
-            .text('Procedures')
-            .attr('padding', 5);
+            
+          
+           
   
   }
 
@@ -453,6 +489,7 @@ events.fire('brushed', [newMin, newMax]);
     text += "<span>" + tooltip_data['ORDER_DTM'] + "</span></br>";
     return text;
   }
+
   /**
    * Show or hide the application loading indicator
    * @param isBusy
@@ -468,4 +505,3 @@ events.fire('brushed', [newMin, newMax]);
 export function create(parent:Element) {
   return new rectExploration(parent);
 }
-

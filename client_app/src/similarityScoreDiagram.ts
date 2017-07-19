@@ -484,13 +484,7 @@ export class similarityScoreDiagram {
       .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
       .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
       .on('click', function (d) {
-        //this.svg.selectAll('rect');
-        /*if (this.currentlySelectedName === undefined) {
-            this.currentlySelectedName = d.ORDER_MNEMONIC;
-          } else {
-            this.currentlySelectedName = undefined;
-
-          }*/
+     
         if (!select(this).classed('selectedOrder')) {
 
           select(this).classed('selectedOrder', true);
