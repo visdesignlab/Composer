@@ -19,6 +19,7 @@ export class rectExploration {
   private $node;
   private timeScale;
   private timeScaleMini;
+  //scoreScale;
   private patientInfo;
   private svg;
   private targetPatientProInfo;
@@ -29,6 +30,11 @@ export class rectExploration {
   private similarData;
   private allData;
   private selectedOrder;
+  private orderLabel;
+ private selectedTargetPatOrderCount;
+ private selectedSimilarOrderCount;
+
+  private similarPatientsProInfo;
 
 
 
@@ -54,6 +60,7 @@ export class rectExploration {
     this.timeScaleMini = scaleLinear()
         .range([0, this.contextDimension.width])
         .clamp(true);
+  
 
      // axis
      this.svg.append('g')
@@ -140,7 +147,7 @@ export class rectExploration {
     events.on('update_all_info', (evt, item) => {  // called in query box
 
       
-      // this.targetPatientProInfo = item[1]['PRO'][item[0]];
+      this.targetPatientProInfo = item[1]['PRO'][item[0]];
       this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
 
       this.setOrderScale();
@@ -239,7 +246,6 @@ export class rectExploration {
       .data([ordersInfo]);
       let orderRectEnter = orderRect.enter()
       .append('g')
-      //.attr('transform', () => `translate(0,${this.rectBoxDimension.height - 50})`)
       .classed('orderRect', true);
       orderRect = orderRectEnter.merge(orderRect);
 
@@ -250,34 +256,59 @@ export class rectExploration {
       rects = rectsEnter.merge(rects);
       rects.attr('class', getClassAssignment('ORDER_CATALOG_TYPE'))
       .attr('class', getClassAssignment('ORDER_STATUS'))
-      //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']} ${d['ORDER_STATUS']}`) //this assigns the multiple class names but erases the eld classes
       .attr('x', (g) => this.timeScale(g.diff))
       .attr('y', 0)
       .attr('width', this.orderBar.width)
       .attr('height', this.orderBar.height)
-      //.classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
-      //.classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
+     
       //this is the mousclick event that greys rects
         .on('click', d => {
           this.svg.selectAll('rects');
           if (this.currentlySelectedName === undefined) {
             this.currentlySelectedName = d.ORDER_MNEMONIC;
            console.log(this.currentlySelectedName);
+           this.orderLabel = this.currentlySelectedName;//adds the order name to the label
+           
+             
+
+           //let rectPosition = rects.x;
+        
        
-           
-           
-          // var selectedOrder = this.currentlySelectedName;
-           //return selectedOrder;
-           
-          
           } else {
             this.currentlySelectedName = undefined;
+            this.orderLabel = "Select An Order";
+            this.selectedTargetPatOrderCount = "  ";
+             this.selectedSimilarOrderCount = "   ";
+             d3.selectAll('.orderLabel').remove();
+            //this.drawOrderLabel();
           }
           
           this.drawPatOrderRects();
-         // console.log(selectedOrder);
-         var selectedGroup = d3.selectAll('.selectedOrder');
-         console.log(selectedGroup.size());
+          this.selectedTargetPatOrderCount = this.svg.selectAll('.selectedOrder').size();
+           this.selectedSimilarOrderCount = d3.selectAll('#similar_orders').selectAll('.selectedOrder').size()/3;
+           this.drawOrderLabel();//draws the label with the order count for patient and similar patients
+          let selectedGroupTargetPat = this.svg.selectAll('.selectedOrder');
+          let selectedGroupSimilar = d3.selectAll('#similar_orders').selectAll('.selectedOrder');
+         
+          /*
+       this.orderLabel = (label) => {
+         if (this.currentlySelectedName) label = this.currentlySelectedName;
+         else label = "Select Order";
+         return label;
+      }*/
+         /*
+          let rectXArray = this.svg.selectAll('rects').selectAll('.selectedOrder').map( 
+            let rectPosition = 
+            (d) => {return d.getAttribute('x'); });
+          */
+          //let rectX = this.svg.selectAll('rects').size;
+         // console.log(rectX.length);
+         
+          
+           console.log(selectedGroupTargetPat.size());//logs the number of orders in the selected order for target patient
+          //console.log(selectedGroupAll.size());
+           console.log(selectedGroupSimilar.size()/3);//logs the number of orders in the selected order of similar patients
+      
     
       })//end the mousclick event that shows the graph
       .on("mouseover", (d) => {
@@ -303,14 +334,9 @@ export class rectExploration {
       
        this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale))
-        
-      if (this.currentlySelectedName) {
-        // 
-      } else {
-        // empty the bar chart
-      }
-  }
 
+  }
+  
   private drawMiniRects() {
 
       let ordersInfo2 = this.targetPatientOrders;
@@ -408,12 +434,42 @@ export class rectExploration {
 
              this.$node.select('.checkbox-med')
             .append('text')
-            .text('Medications')
-            
-          
-           
+            .text('Medications');
+/*
+         this.orderLabel = (label) => {
+         if (this.currentlySelectedName) label = this.currentlySelectedName;
+        
+         else label = "Select Order";
+         return label;
+         }*/
+        
   
   }
+
+  private drawOrderLabel() {
+    d3.selectAll('.orderLabel').remove();
+    
+    d3.select('.rectDiv ')
+        .append('div')
+        .classed('orderLabel', true)
+        .append('text')
+        .text(this.orderLabel);
+          
+        d3.select('.rectDiv')
+           .append('div')
+        .classed('orderLabel', true)
+        .append('text')
+        .text('Order Frequency for Target Patient: ' + this.selectedTargetPatOrderCount);
+
+        d3.select('.orderLabel')
+           .append('div')
+        .classed('orderLabel', true)
+        .append('text')
+        .text('Orders found in Similar Patients: ' + this.selectedSimilarOrderCount);
+          
+  
+  }
+  
 
  
 private updateRectMed() {
