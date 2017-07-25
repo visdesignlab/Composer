@@ -19,11 +19,8 @@ export class StatHistogram {
   private xScale;
   private similarData;
   private allData;
-<<<<<<< HEAD
   private CCIData;
-=======
   private dataset; // all or selected
->>>>>>> SaharBranch
 
   private svgDimension = {width: 250, height: 150, title: 180, spacing: 2};
 
