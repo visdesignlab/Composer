@@ -47,6 +47,8 @@ export class QueryBox {
       .attr('placeholder', 'Number of similar patients')
       .attr('id', 'text_num_similar');
 
+      
+
     this.attachListener(); // TODO test!
 
   }
@@ -69,7 +71,6 @@ export class QueryBox {
     });
   }
 
-
   /**
    * getting the similar patients info and firing events to update the vis
    * @returns {Promise<void>}
@@ -83,6 +84,7 @@ export class QueryBox {
       let n = !isNaN(+number) ? +number : 10;
       n = n <= 0 ? 10 : n;
       const url = `/data_api/getSimilarRows/${value}/${n}`;
+    
       this.setBusy(true);
       this.getData(url).then((args) => {
 
@@ -111,7 +113,7 @@ export class QueryBox {
 
         // caught by svgTable and similarityScoreDiagram
         events.fire('update_all_info', [value, args]);
-
+   
         this.setBusy(false);
       });
 

@@ -1,9 +1,11 @@
 #app {
-  width: 3200px;
+  /*width: 3200px;*/
 }
 
 #caleydoHeader {
-  width: 3200px;
+  width: 100%;
+  position:fixed;
+  z-index:100000;
 }
 
 .tooltip {
@@ -20,10 +22,31 @@
 .main {
   float: left;
   padding-left: 10px;
+  width:80%;
+  margin-top: 50px;
+  
 }
 
 .sideBar {
   float: left;
-  width: 300px;
+  width: 20%;
   padding: 10px;
+  
+}
+
+#sideBar {
+  float: left;
+  width: 20%;
+  padding: 20px;
+  margin-top: 50px;
+}
+
+.label{
+  line-height: 22px;
+  top: 38px;
+  transform: scale(0.75) translate(0px, -28px);
+  transform-origin: left top 0px;
+  pointer-events: none;
+  user-select: none;
+  color: rgba(0, 0, 0, 0.3)
 }

@@ -236,6 +236,7 @@ export class SvgTable {
       this.getData(url).then((args) => {
         const dic = {'func': 'init', 'data': args[this.datasetId]};
         this.drawRows(dic);
+
       });
     });
   }

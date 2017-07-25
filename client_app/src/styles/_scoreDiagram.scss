@@ -2,9 +2,12 @@
   clear: left;
 }
 
+//container div for the line graph?
 .diagramDiv {
   float: left;
   padding-right: 100px;
+  //added max-height to div to move boxs closer together
+  min-height: 530px;
 }
 
 .scoreLine {
@@ -19,7 +22,7 @@
 
 .patLine {
   fill: none;
-  stroke: forestgreen;
+  stroke: #FF5733;
   stroke-width: 2px;
 }
 
@@ -31,12 +34,13 @@
 
 .proLine {
   fill: none;
-  stroke: darkred;
-  stroke-width: 2px;
+  stroke: #21618C;
+  stroke-width: 1px; //changed the stoke of the similar lines to add more emphasis on the selected patient
 }
 
 .grid line {
   stroke: #979797;
+  stroke-opacity: 0.5;//adjusted the stroke opacity to the horizontal grid lines for more subtlety 
 }
 
 /* For slider */
@@ -90,13 +94,19 @@
   stroke: #800000;
   stroke-dasharray: 5,5;
 }
-
+/*
 .selectedOrder {
   fill: darkred !important;
 }
 
+.unselectedOrder {
+  opacity: 0.2;
+  fill: grey;
+}*/
+
 .similarRect .PROCEDURE {
-  fill: #087b03;
+  //fill: #087b03;
+  fill: #FF5733;
   opacity: 0.5;
 }
 
@@ -104,3 +114,15 @@
   fill: #4a6ffb;
   opacity: 0.5;
 }
+
+.PROCEDURE.selectedOrder,
+.MEDICATION.selectedOrder {
+ // fill: darkred;// !important;
+  opacity: .6;
+}
+.PROCEDURE.unselectedOrder,
+.MEDICATION.unselectedOrder {
+  opacity: 0.2;
+  fill: grey;// !important;
+}
+

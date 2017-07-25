@@ -1,12 +1,14 @@
 
 .cells {
   float: left;
-  padding-bottom: 0.5em;
-  border: 1px solid steelblue;
-  width: 50px;
-  height: 2em;
-  font-size: small;
-  padding-left: 2px;
+  display: inline-block; //added this to scale divs
+  border-bottom: 1px solid steelblue;
+  min-width: 70px;
+  min-height: 2em;
+  font-size: 11px; //changed from small sizing
+  //padding: top, right, bottom, left
+  padding: 0.25em 0.5em 0.5em 0.25em;
+  word-wrap: break-word;  
 }
 
 .rows{
@@ -24,24 +26,27 @@
 
 .headercells{
   float: left;
-  padding-bottom: 0.5em;
-  border: 1px solid steelblue;
-  width: 50px;
+  display: inline;
+  //padding: top, right, bottom, left
+  padding: 0.25em 0.5em 0.5em 0.25em;
+  border-right: 1px solid steelblue;
+  min-width: 80px;
   height: 2em;
   font-weight: bold;
   background-color: aliceblue;
 }
 
-.superWideCell {
-  width: 440px;
-}
-
-.wideCell {
+//we can get rid of superWideCell
+.superWideCell { 
   width: 220px;
 }
 
+.wideCell {
+  min-width: 150px;
+}
+
 .mediumCell {
-  width: 100px;
+  min-width: 80px;
 }
 
 .sameValue {
@@ -64,6 +69,8 @@ h3 {
 
 .tableDiv {
   padding-bottom: 1em;
+  min-width: 2000px;
+  display: inline-block;
 }
 
 .lineChart {
