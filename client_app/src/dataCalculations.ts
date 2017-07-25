@@ -1,3 +1,7 @@
+/**
+ * Created by Jen Rogers 07/20/2017.
+ */
+
 import * as ajax from 'phovea_core/src/ajax';
 import {BaseType, select, selectAll, event} from 'd3-selection';
 import {nest, values, keys, map, entries} from 'd3-collection'
@@ -5,9 +9,8 @@ import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
-import {axisBottom, axisLeft} from 'd3-axis';
-import {drag} from 'd3-drag';
 import {Constants} from './constants';
+import {axisBottom, axisLeft} from 'd3-axis';
 
 export class dataCalc {
 
