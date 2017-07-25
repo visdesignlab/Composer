@@ -33,16 +33,9 @@ def get_all_rows(dataset_id):
 # access directly from API: '/getPatInfo/<PAT_ID>/<dataset>'
 def get_pat_info(PAT_ID, dataset):
     return jsonify({
-<<<<<<< HEAD
-      'Demo': get_info([int(PAT_ID)], 'Demo'),
-      'Orders': get_info([int(PAT_ID)], 'Orders'),
-      'PRO': get_info([int(PAT_ID)], 'PRO'),
-      'CCI': get_info([int(PAT_ID)], 'CCI')
-=======
       'Demo': get_info([int(PAT_ID)], dataset_hash['Demo'][dataset]),
       'Orders': get_info([int(PAT_ID)], dataset_hash['Orders'][dataset]),
       'PRO': get_info([int(PAT_ID)], dataset_hash['PRO'][dataset])
->>>>>>> SaharBranch
     })
 
 
@@ -71,23 +64,12 @@ def get_similar_rows(PAT_ID, number, dataset):
     scores = [d[1] for d in id_scores[:number]]
     all_scores = [d[1] for d in id_scores]
 
-<<<<<<< HEAD
-    pat_demo_info = get_info([int(PAT_ID)], 'Demo')
-    demo_info = get_info(ids, 'Demo')
-    pat_pro_info = get_info([int(PAT_ID)], 'PRO')
-    pro_info = get_info(ids, 'PRO')
-    pat_orders_info = get_info([int(PAT_ID)], 'Orders')
-    orders_info = get_info(ids, 'Orders')
-    pat_cci_info = get_info([int(PAT_ID)], 'CCI')
-    cci_info = get_info(ids, 'CCI')
-=======
     pat_demo_info = get_info([int(PAT_ID)], dataset_hash['Demo'][dataset])
     demo_info = get_info(ids, dataset_hash['Demo'][dataset])
     pat_pro_info = get_info([int(PAT_ID)], dataset_hash['PRO'][dataset])
     pro_info = get_info(ids, dataset_hash['PRO'][dataset])
     pat_orders_info = get_info([int(PAT_ID)], dataset_hash['Orders'][dataset])
     orders_info = get_info(ids, dataset_hash['Orders'][dataset])
->>>>>>> SaharBranch
 
     #difference = handle_Demo.get_difference(int(PAT_ID), ids) # maybe in the client?!
 
@@ -100,12 +82,10 @@ def get_similar_rows(PAT_ID, number, dataset):
         'pat_Demo': pat_demo_info,
         'pat_PRO': pat_pro_info,
         'pat_Orders': pat_orders_info,
-        'pat_CCI': pat_cci_info,
 
         'similar_Demo': demo_info,
         'similar_PRO': pro_info,
-        'similar_Orders': orders_info,
-        'similar_CCI': cci_info
+        'similar_Orders': orders_info#,
 
         #'difference': difference
         #'all_pro_rows': sum(pro_rows, get_all_info_for_pat('PRO', int(PAT_ID)))

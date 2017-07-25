@@ -71,11 +71,6 @@ export class QueryBox {
 
     }
 
-<<<<<<< HEAD
-      
-
-    this.attachListener(); // TODO test!
-=======
     /**
      * Attaching listener
      * Only used for the initial testing (events fired in app.ts).
@@ -83,7 +78,6 @@ export class QueryBox {
      */
     private attachListener() {  // TODO test!
         events.on('update_temp_similar', (evt, item) => {
->>>>>>> SaharBranch
 
             const url = `/data_api/getSimilarRows/${item[1]}/${item[2]}/${this.dataset}`;
             this.setBusy(true);
@@ -104,13 +98,6 @@ export class QueryBox {
      */
     private async updateSimilar() {
 
-<<<<<<< HEAD
-  /**
-   * getting the similar patients info and firing events to update the vis
-   * @returns {Promise<void>}
-   */
-  private async updateSimilar() {
-=======
         const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
         const number = (<HTMLInputElement>document.getElementById('text_num_similar')).value;
 
@@ -120,22 +107,11 @@ export class QueryBox {
             const url = `/data_api/getSimilarRows/${value}/${n}/${this.dataset}`;
             this.setBusy(true);
             this.getData(url).then((args) => {
->>>>>>> SaharBranch
 
                 this.setBusy(false);
                 this.similarArgs = args;
 
-<<<<<<< HEAD
-    if (!isNaN(+value) && value) {
-      let n = !isNaN(+number) ? +number : 10;
-      n = n <= 0 ? 10 : n;
-      const url = `/data_api/getSimilarRows/${value}/${n}`;
-    
-      this.setBusy(true);
-      this.getData(url).then((args) => {
-=======
                 //console.log(args);
->>>>>>> SaharBranch
 
                 // caught by svgTable and scoreDiagram and statHistogram
                 events.fire('update_similar', [value, n, args]);
@@ -168,13 +144,6 @@ export class QueryBox {
         }
     }
 
-<<<<<<< HEAD
-        // caught by svgTable and similarityScoreDiagram
-        events.fire('update_all_info', [value, args]);
-   
-        this.setBusy(false);
-      });
-=======
 
     /**
      * get Data by API
@@ -184,7 +153,6 @@ export class QueryBox {
     private async getData(URL) {
         return await ajax.getAPIJSON(URL);
     }
->>>>>>> SaharBranch
 
     /**
      * Show or hide the application loading indicator
@@ -201,4 +169,3 @@ export class QueryBox {
 export function create(parent: Element) {
     return new QueryBox(parent);
 }
-
