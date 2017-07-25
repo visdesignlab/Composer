@@ -9,6 +9,9 @@
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
+        <editorconfig>
+          <option name="ENABLED" value="false" />
+        </editorconfig>
         <codeStyleSettings language="Python">
           <indentOptions>
             <option name="INDENT_SIZE" value="2" />

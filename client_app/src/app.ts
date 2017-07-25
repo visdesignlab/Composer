@@ -10,13 +10,15 @@ import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
+<<<<<<< HEAD
 import * as rectExploration from './rectExploration';
+=======
+import * as distributionDiagram from './distributionDiagram';
+>>>>>>> SaharBranch
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SideBarComponent from './ReactComponents/SideBarComponent';
-
-
 
 
 /**
@@ -60,17 +62,13 @@ export class App {
     // const side = sideBar.create(sideBarDiv.node());
     // await side.init();
 
-    
+
     this.$node.append('div').attr('id','sideBar');
-
-
 
     ReactDOM.render(
       React.createElement(SideBarComponent),
       document.getElementById('sideBar')
     );
-
-
 
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
@@ -78,6 +76,10 @@ export class App {
 
     // query box
     queryBox.create(main.node());
+
+
+    // distributionDiagram
+    distributionDiagram.create(main.node());
 
 
     // histogram
@@ -97,41 +99,41 @@ export class App {
     similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
 
 
-    // create table titles and div
-    main.append('h3').text('Demo');
-    const tableDemo = main.append('div');
-    main.append('h3').text('PRO');
-    const tablePro = main.append('div');
-    //main.append('h3').text('CCI');
-    //const tableCci = main.append('div');
-    //main.append('h3').text('Codes');
-    //const tableCodes = main.append('div');
-    main.append('h3').text('Orders');
-    const tableOrders = main.append('div');
-    //main.append('h3').text('PT');
-    //const tablePt = main.append('div');
-    //main.append('h3').text('VAS');
-    //const tableVas = main.append('div');
-
-
-    // create the table
-    const svgTableDemo = svgTable.create(tableDemo.node());
-    const svgTablePro = svgTable.create(tablePro.node());
-    //const svgTableCci = svgTable.create(tableCci.node());
-    //const svgTableCodes = svgTable.create(tableCodes.node());
-    const svgTableOrders = svgTable.create(tableOrders.node());
-    //const svgTablePt = svgTable.create(tablePt.node());
-    //const svgTableVas = svgTable.create(tableVas.node());
-
-
-    // draw the table
-    await svgTableDemo.drawTable('Demo');
-    await svgTablePro.drawTable('PRO');
-    //await svgTableCci.drawTable('CCI');
-    //await svgTableCodes.drawTable('Codes');
-    await svgTableOrders.drawTable('Orders');
-    //await svgTablePt.drawTable('PT');
-    //await svgTableVas.drawTable('VAS');
+    // // create table titles and div
+    // main.append('h3').text('Demo');
+    // const tableDemo = main.append('div');
+    // main.append('h3').text('PRO');
+    // const tablePro = main.append('div');
+    // //main.append('h3').text('CCI');
+    // //const tableCci = main.append('div');
+    // //main.append('h3').text('Codes');
+    // //const tableCodes = main.append('div');
+    // main.append('h3').text('Orders');
+    // const tableOrders = main.append('div');
+    // //main.append('h3').text('PT');
+    // //const tablePt = main.append('div');
+    // //main.append('h3').text('VAS');
+    // //const tableVas = main.append('div');
+    //
+    //
+    // // create the table
+    // const svgTableDemo = svgTable.create(tableDemo.node());
+    // const svgTablePro = svgTable.create(tablePro.node());
+    // //const svgTableCci = svgTable.create(tableCci.node());
+    // //const svgTableCodes = svgTable.create(tableCodes.node());
+    // const svgTableOrders = svgTable.create(tableOrders.node());
+    // //const svgTablePt = svgTable.create(tablePt.node());
+    // //const svgTableVas = svgTable.create(tableVas.node());
+    //
+    //
+    // // draw the table
+    // await svgTableDemo.drawTable('Demo');
+    // await svgTablePro.drawTable('PRO');
+    // //await svgTableCci.drawTable('CCI');
+    // //await svgTableCodes.drawTable('Codes');
+    // await svgTableOrders.drawTable('Orders');
+    // //await svgTablePt.drawTable('PT');
+    // //await svgTableVas.drawTable('VAS');
 
 
     this.setBusy(false);
