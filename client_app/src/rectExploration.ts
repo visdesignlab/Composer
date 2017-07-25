@@ -1,3 +1,6 @@
+/**
+ * Created by Jen Rogers on 7/21/17.
+ */
 import * as ajax from 'phovea_core/src/ajax';
 import {BaseType, select, selectAll,event} from 'd3-selection';
 import {nest,values,keys,map,entries} from 'd3-collection'
@@ -9,6 +12,7 @@ import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom,axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import {Constants} from './constants';
+import * as dataCalc from './dataCalculations';
 import {transition} from 'd3-transition';
 import {brush, brushY, brushX} from 'd3-brush';
 import * as similarityScore  from './similarityScoreDiagram';
@@ -19,11 +23,9 @@ export class rectExploration {
   private $node;
   private timeScale;
   private timeScaleMini;
-  //scoreScale;
   private patientInfo;
   private svg;
   private targetPatientProInfo;
- // private container: d3.Selection<SVGElement>;
   private brush;
   private targetPatientOrders;
   private currentlySelectedName;
@@ -31,12 +33,14 @@ export class rectExploration {
   private allData;
   private selectedOrder;
   private orderLabel;
- private selectedTargetPatOrderCount;
- private selectedSimilarOrderCount;
+  private selectedTargetPatOrderCount;
+  private selectedSimilarOrderCount;
 
   private similarPatientsProInfo;
-
-
+ 
+  private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
+  private parseTime = dataCalc.parseTime;
+  private setOrderScale = dataCalc.setOrderScale;
 
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
@@ -103,30 +107,14 @@ export class rectExploration {
     context.append('g')
     .attr('class', 'brush')
       .call(this.brush)
-      //.call(this.brush.move, this.brush.extent());
+    
     
   this.attachListener();
   this.drawCheckboxes();
       }
   
- /**
-   * Utility method
-   * @param pat
-   * @returns {Date}
-   */
-  
-  private findMinDate(pat) {
-
-    let minDate = new Date();
-    for (let index = 0; index < pat.length; index++) {
-      if (!pat[index]['ASSESSMENT_START_DTM']) continue;
-      if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
-        minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
-    }
-    return minDate
-  }
-
-   /**
+ 
+  /**
    * Attach listeners
    */
   
@@ -134,77 +122,30 @@ export class rectExploration {
 
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
-      
-     this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
+
+       this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
+       this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
 
       this.setOrderScale();
       this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
       this.drawPatOrderRects();
       this.drawMiniRects();
+
+
     });
 
     // item: pat_id, DATA
     events.on('update_all_info', (evt, item) => {  // called in query box
-
-      
       this.targetPatientProInfo = item[1]['PRO'][item[0]];
-      this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
+      this.similarPatientsProInfo = [];
 
       this.setOrderScale();
-      this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
+ 
       this.drawPatOrderRects();
       this.drawMiniRects();
     });
 
   }
-
-
-
-
- /**
-   * Draw the diagram with the given data from getSimilarRows
-   * @param args
-   */
-  private setOrderScale() {
-    // find the max difference between the first patient visit and the last visit. This determines the domain scale of the graph.
-    // ----- add diff days to the data
-
-    let maxDiff = 0;
-
-    let minPatDate = this.findMinDate(this.targetPatientProInfo);
-    this.targetPatientProInfo.forEach((d) => {
-      d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
-      maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-    });
-    this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
-
-    const patData = this.targetPatientProInfo.filter((d) => {
-      return d['FORM'] == this.svg//changed to svg because I dont have a diagram
-    });
-
-
-    // -----  set domain for initial draw call
-    this.timeScale.domain([-1, maxDiff]);
-    this.timeScaleMini.domain([-1,maxDiff]);
-    
-
-    events.on('brushed', (newMin, newMax) => {  // from brushed in rect exploration
-    
-   //------- set domain after brush event
-    console.log(newMax[1]);
-    if (this.brush.move != null) {
-      this.timeScale.domain([newMax[0], newMax[1]])
-    }
-    
-    
-    return this.timeScale.domain([newMax[0], newMax[1]]);
-   
-    });
-    
-    this.svg.select('.xAxis')
-      .call(axisBottom(this.timeScale));
-  }
-
 
   /**
    *
@@ -215,8 +156,8 @@ export class rectExploration {
 
      let ordersInfo = this.targetPatientOrders;
      // let ordersInfo = this.targetPatientProInfo; why is this not determining the date??
-
       let minDate = this.findMinDate(this.targetPatientProInfo);
+  
  
       ordersInfo.forEach((d) => {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
@@ -269,11 +210,6 @@ export class rectExploration {
            console.log(this.currentlySelectedName);
            this.orderLabel = this.currentlySelectedName;//adds the order name to the label
            
-             
-
-           //let rectPosition = rects.x;
-        
-       
           } else {
             this.currentlySelectedName = undefined;
             this.orderLabel = "Select An Order";
@@ -290,23 +226,17 @@ export class rectExploration {
           let selectedGroupTargetPat = this.svg.selectAll('.selectedOrder');
           let selectedGroupSimilar = d3.selectAll('#similar_orders').selectAll('.selectedOrder');
          
-          /*
-       this.orderLabel = (label) => {
-         if (this.currentlySelectedName) label = this.currentlySelectedName;
-         else label = "Select Order";
-         return label;
-      }*/
+  
          /*
-          let rectXArray = this.svg.selectAll('rects').selectAll('.selectedOrder').map( 
-            let rectPosition = 
+          let rectXArray = this.svg.selectAll('rects').selectAll('.selectedOrder').nodes().map( let rectPosition = 
             (d) => {return d.getAttribute('x'); });
-          */
+          
           //let rectX = this.svg.selectAll('rects').size;
          // console.log(rectX.length);
          
-          
+          */
            console.log(selectedGroupTargetPat.size());//logs the number of orders in the selected order for target patient
-          //console.log(selectedGroupAll.size());
+         
            console.log(selectedGroupSimilar.size()/3);//logs the number of orders in the selected order of similar patients
       
     
@@ -341,7 +271,7 @@ export class rectExploration {
 
       let ordersInfo2 = this.targetPatientOrders;
       let minDate = this.findMinDate(this.targetPatientProInfo);
-  
+   
       ordersInfo2.forEach((d) => {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
         d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -435,13 +365,6 @@ export class rectExploration {
              this.$node.select('.checkbox-med')
             .append('text')
             .text('Medications');
-/*
-         this.orderLabel = (label) => {
-         if (this.currentlySelectedName) label = this.currentlySelectedName;
-        
-         else label = "Select Order";
-         return label;
-         }*/
         
   
   }
@@ -467,7 +390,6 @@ export class rectExploration {
         .append('text')
         .text('Orders found in Similar Patients: ' + this.selectedSimilarOrderCount);
           
-  
   }
   
 
@@ -485,7 +407,6 @@ private updateRectMed() {
 
 private updateRectPro() {
       
-      
      var cbPro = this.$node.select("#pro-check").property("checked");
       if (!cbPro) selectAll(".PROCEDURE").classed('hidden', true);
       
@@ -493,27 +414,6 @@ private updateRectPro() {
       
 }
 
-
-  /**
-   * parse time
-   * @param date
-   * @param nullDate
-   * @returns {null}
-   */
-  private parseTime(date, nullDate) {
-    let parseT1 = timeParse('%x %X');
-    let parseT2 = timeParse('%x');
-    let time = nullDate;
-
-    if (date) {
-      if(date.split(' ').length > 1){
-        time = parseT1(date);
-      }
-      else
-        time = parseT2(date)
-    }
-    return time
-  }
 
 //sets up the brush for brush business
 private brushed (start, end ){
@@ -537,6 +437,7 @@ events.fire('brushed', [newMin, newMax]);
   private async getData(URL) {
     return await ajax.getAPIJSON(URL);
   }
+
   //tooltip
   private renderOrdersTooltip(tooltip_data) {
 
