@@ -9,3 +9,5 @@
  */
 //other modules
 import 'client_app/phovea_registry.js';
+import 'phovea_core/phovea_registry.js';
+import 'phovea_ui/phovea_registry.js';
