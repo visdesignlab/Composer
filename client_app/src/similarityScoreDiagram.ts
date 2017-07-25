@@ -61,11 +61,7 @@ export class similarityScoreDiagram {
         this.svg.append('g')
             .attr('class', 'xAxis')
             .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
-        /*
-         this.svg.append('text')
-         .text('Days')
-         .attr('transform', `translate(${(this.promisDimension.width - this.margin.x) / 2},${this.promisDimension.height - this.margin.y})`);
-         */
+    
         this.svg.append('g')
             .attr('class', 'yAxis')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`)

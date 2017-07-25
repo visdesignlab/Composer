@@ -55,7 +55,8 @@
 
 .PROCEDURE.selectedOrder,
 .MEDICATION.selectedOrder {
-  fill: darkred;// !important;
+  //fill: darkred;// !important;
+  opacity: .6;
 }
 .PROCEDURE.unselectedOrder,
 .MEDICATION.unselectedOrder {
