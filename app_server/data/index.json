@@ -4,7 +4,7 @@
     "path": "shrank_cleaned_Demo_index.csv",
     "separator": ",",
     "quotechar": "\"",
-    "id": "Demo",
+    "id": "Demo_selected",
     "size": [
       150,
       24
@@ -163,7 +163,7 @@
     "name": "PRO_selected",
     "path": "shrank_cleaned_PRO_index.csv",
     "separator": ",",
-    "id": "PRO",
+    "id": "PRO_selected",
     "size": [
       1124,
       7
@@ -220,7 +220,7 @@
     "name": "CCI_selected",
     "path": "shrank_cleaned_CCI_index.csv",
     "separator": ",",
-    "id": "CCI",
+    "id": "CCI_selected",
     "size": [
       150,
       22
@@ -367,7 +367,7 @@
     "name": "Orders_selected",
     "path": "shrank_cleaned_Orders_index.csv",
     "separator": ",",
-    "id": "Orders",
+    "id": "Orders_selected",
     "size": [
       17562,
       7
@@ -420,19 +420,21 @@
       }
     ]
   },
+
   {
-    "name": "status",
-    "path": "procedure_result.csv",
+    "name": "Demo",
+    "path": "Demo_index.csv",
     "separator": ",",
-    "id": "Status",
+    "quotechar": "\"",
+    "id": "Demo",
     "size": [
-      150,
-      2
+      6071,
+      24
     ],
     "type": "table",
     "idtype": "INDEX",
     "idcolumn": 0,
-    "columns":[
+    "columns": [
       {
         "name": "PAT_ID",
         "value": {
@@ -440,12 +442,404 @@
         }
       },
       {
-        "name": "STATUS",
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "PAT_BIRTHDATE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PAT_GENDER",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PAT_ETHNICITY",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "D_ETHNICITY_DESC",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PAT_RACE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "D_RACE_DESC",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PAT_ZIP",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PAT_MARITAL_STAT",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PAT_DEATH_DATE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PAT_DEATH_IND",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "BMI",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "HEIGHT_CM",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "WEIGHT_KG",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "ADM_DATE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "DSCH_DATE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ATT_PROV_ID",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "ATT_PROV_FULLNAME",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "INS_PAY_CAT",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "INS_PAY_GRP",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TOBACCO_USER",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ALCOHOL_USER",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ILLICIT_DRUG_USER",
+        "value": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "name": "PRO",
+    "path": "PRO_index.csv",
+    "separator": ",",
+    "id": "PRO",
+    "size": [
+      51548,
+      7
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ASSESSMENT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ASSESSMENT_START_DTM",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "FORM_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "FORM",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SCORE",
+        "value": {
+          "type": "float"
+        }
+      }
+    ]
+  },
+  {
+    "name": "CCI",
+    "path": "CCI_index.csv",
+    "separator": ",",
+    "id": "CCI",
+    "size": [
+      6070,
+      22
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "CCI_MI",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_CHF",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_PVD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_CVD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_DEMENTIA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_COPD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_RHEUM_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_PUD",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_DM_WO_COMPL",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_DM_W_COMPL",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_PARAPLEGIA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_RENAL_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_MALIGNANT_TUMOR",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LYMPHOMA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LEUKEMIA",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LIVER_MILD_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_LIVER_SEVERE_DZ",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_METAST_TUMOR",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_HIV_AIDS",
+        "value": {
+          "type": "float"
+        }
+      },
+      {
+        "name": "CCI_SCORE",
+        "value": {
+          "type": "float"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Orders",
+    "path": "Orders_index.csv",
+    "separator": ",",
+    "id": "Orders",
+    "size": [
+      792122,
+      7
+    ],
+    "type": "table",
+    "idtype": "INDEX",
+    "idcolumn": 0,
+    "columns": [
+      {
+        "name": "PAT_ID",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "VISIT_NO",
+        "value": {
+          "type": "int"
+        }
+      },
+      {
+        "name": "ORDER_DTM",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ORDER_STATUS",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ORDER_CATALOG_TYPE",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "PRIMARY_MNEMONIC",
+        "value": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ORDER_MNEMONIC",
         "value": {
           "type": "string"
         }
       }
     ]
   }
-
 ]

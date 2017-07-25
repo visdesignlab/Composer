@@ -7,7 +7,7 @@
   float: left;
   padding-right: 100px;
   //added max-height to div to move boxs closer together
-  min-height: 530px;
+  //min-height: 530px;
 }
 
 .scoreLine {
@@ -115,6 +115,7 @@
   opacity: 0.5;
 }
 
+<<<<<<< HEAD
 .PROCEDURE.selectedOrder,
 .MEDICATION.selectedOrder {
  // fill: darkred;// !important;
@@ -126,3 +127,15 @@
   fill: grey;// !important;
 }
 
+=======
+.patRect .PROCEDURE {
+  //fill: #087b03;
+  fill: #0da201;
+  opacity: 0.5;
+}
+
+.patRect .MEDICATION {
+  fill: #c37e45;
+  opacity: 0.5;
+}
+>>>>>>> SaharBranch

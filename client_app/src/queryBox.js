@@ -8,17 +8,34 @@ import * as events from 'phovea_core/src/event';
 var QueryBox = (function () {
     function QueryBox(parent) {
         var _this = this;
+        this.dataset = 'selected';
         this.$node = select(parent)
             .append('div')
             .classed('queryDiv', true);
+        this.$node.append('label')
+            .attr('for', 'dataset_selection')
+            .text('Consider All (6071) Patients?');
         this.$node.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Latest')
-            .on('click', function () { return events.fire('update_latest', ['func', 'latest']); }); // only 'Demo' is updated
-        this.$node.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Reset')
-            .on('click', function () { return events.fire('update_init', ['func', 'init']); });
+            .attr('type', 'checkbox')
+            .property('checked', false)
+            .attr('id', 'dataset_selection')
+            .on('change', function () {
+            if (select("#dataset_selection").property("checked"))
+                _this.dataset = 'all';
+            else
+                _this.dataset = 'selected';
+            events.fire('update_dataset', ['dataset', _this.dataset]);
+        });
+        // // these events are only handled in tables
+        // this.$node.append('input')
+        //     .attr('type', 'button')
+        //     .attr('value', 'Latest')
+        //     .on('click', () => events.fire('update_latest', ['func', 'latest'])); // only 'Demo' is updated
+        //
+        // this.$node.append('input')
+        //     .attr('type', 'button')
+        //     .attr('value', 'Reset')
+        //     .on('click', () => events.fire('update_init', ['func', 'init']));
         this.$node.append('input')
             .attr('type', 'text')
             .attr('placeholder', 'Search PAT_ID')
@@ -39,11 +56,13 @@ var QueryBox = (function () {
     }
     /**
      * Attaching listener
+     * Only used for the initial testing (events fired in app.ts).
+     * Should be removed at the end.
      */
     QueryBox.prototype.attachListener = function () {
         var _this = this;
         events.on('update_temp_similar', function (evt, item) {
-            var url = "/data_api/getSimilarRows/" + item[1] + "/" + item[2];
+            var url = "/data_api/getSimilarRows/" + item[1] + "/" + item[2] + "/" + _this.dataset;
             _this.setBusy(true);
             _this.getData(url).then(function (args) {
                 _this.setBusy(false);
@@ -66,11 +85,12 @@ var QueryBox = (function () {
                 if (!isNaN(+value) && value) {
                     n_1 = !isNaN(+number) ? +number : 10;
                     n_1 = n_1 <= 0 ? 10 : n_1;
-                    url = "/data_api/getSimilarRows/" + value + "/" + n_1;
+                    url = "/data_api/getSimilarRows/" + value + "/" + n_1 + "/" + this.dataset;
                     this.setBusy(true);
                     this.getData(url).then(function (args) {
                         _this.setBusy(false);
                         _this.similarArgs = args;
+                        //console.log(args);
                         // caught by svgTable and scoreDiagram and statHistogram
                         events.fire('update_similar', [value, n_1, args]);
                     });
@@ -89,7 +109,7 @@ var QueryBox = (function () {
         var _this = this;
         var value = document.getElementById('text_pat_id').value;
         if (!isNaN(+value) && value) {
-            var url = "/data_api/getPatInfo/" + value;
+            var url = "/data_api/getPatInfo/" + value + "/" + this.dataset;
             this.setBusy(true);
             this.getData(url).then(function (args) {
                 // caught by svgTable and similarityScoreDiagram

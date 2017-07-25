@@ -2,30 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec6e26d3-ba22-4955-ae1c-c975133d7235" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/data_api.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/general_api.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/src/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/src/data_handler.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/src/general_data_handler.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/src/handle_CCI.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/src/handle_Orders.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/app_server/src/handle_pro.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_server/data/index.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/constants.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/dataExplorations.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/printLogs.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/queryBox.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/sideBar.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/statHistogram.ts" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/styles/_histogram.scss" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/styles/_main.scss" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/styles/_querybox.scss" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/styles/_sidebar.scss" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/styles/_svgtable.scss" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client_app/src/svgTable.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client_app/src/constants.ts" afterPath="$PROJECT_DIR$/client_app/src/constants.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -42,16 +19,38 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.52734375">
+    <splitter split-orientation="horizontal" split-proportion="0.6828125">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="app.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="211">
-                  <caret line="115" column="56" lean-forward="false" selection-start-line="115" selection-start-column="49" selection-end-line="115" selection-end-column="56" />
+                <state relative-caret-position="260">
+                  <caret line="131" column="52" lean-forward="false" selection-start-line="131" selection-start-column="49" selection-end-line="131" selection-end-column="56" />
                   <folding>
                     <element signature="e#51#87#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="constants.ts" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="484">
+                  <caret line="66" column="2" lean-forward="false" selection-start-line="66" selection-start-column="2" selection-end-line="66" selection-end-column="2" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="distributionDiagram.ts" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/client_app/src/distributionDiagram.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="304">
+                  <caret line="75" column="44" lean-forward="false" selection-start-line="75" selection-start-column="44" selection-end-line="75" selection-end-column="44" />
+                  <folding>
+                    <element signature="e#49#94#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -60,66 +59,22 @@
           <file leaf-file-name="queryBox.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="310">
-                  <caret line="66" column="54" lean-forward="false" selection-start-line="66" selection-start-column="54" selection-end-line="66" selection-end-column="54" />
+                <state relative-caret-position="78">
+                  <caret line="91" column="5" lean-forward="true" selection-start-line="91" selection-start-column="5" selection-end-line="91" selection-end-column="5" />
                   <folding>
                     <element signature="e#48#93#0" expanded="true" />
                     <element signature="n#!!block;n#constructor#0;n#QueryBox#0" expanded="false" />
+                    <element signature="n#!!block;n#updateAllInfo#0;n#QueryBox#0" expanded="false" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="svgTable.ts" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/client_app/src/svgTable.ts">
+          <file leaf-file-name="_distributionDiagram.scss" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/client_app/src/styles/_distributionDiagram.scss">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="223">
-                  <caret line="48" column="10" lean-forward="false" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="10" />
-                  <folding>
-                    <element signature="n#!!block;n#drawHeader#0;n#SvgTable#0" expanded="false" />
-                    <element signature="n#!!block;n#drawLineChart#0;n#SvgTable#0" expanded="false" />
-                    <element signature="n#!!block;n#attachListener#0;n#SvgTable#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="similarityScoreDiagram.ts" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="373">
-                  <caret line="498" column="55" lean-forward="false" selection-start-line="498" selection-start-column="55" selection-end-line="498" selection-end-column="55" />
-                  <folding>
-                    <element signature="e#49#94#0" expanded="true" />
-                    <element signature="n#!!block;n#constructor#0;n#similarityScoreDiagram#0" expanded="false" />
-                    <element signature="n#!!block;n#addOrderSquares#0;n#similarityScoreDiagram#0" expanded="false" />
-                    <marker date="1494805474000" expanded="false" signature="16037:16294" ph="{...}" />
-                    <marker date="1494805474000" expanded="true" signature="17343:17362" ph="..." />
-                    <marker date="1494805474000" expanded="false" signature="17694:17827" ph="{...}" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="statHistogram.ts" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="223">
-                  <caret line="315" column="33" lean-forward="false" selection-start-line="315" selection-start-column="30" selection-end-line="315" selection-end-column="33" />
-                  <folding>
-                    <element signature="e#49#94#0" expanded="true" />
-                    <element signature="n#!!block;n#drawHistogram#0;n#StatHistogram#0" expanded="false" />
-                    <element signature="n#!!block;n#updateHistogram#0;n#StatHistogram#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="_scoreDiagram.scss" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="323">
-                  <caret line="85" column="18" lean-forward="true" selection-start-line="85" selection-start-column="18" selection-end-line="85" selection-end-column="18" />
+                <state relative-caret-position="45">
+                  <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -132,8 +87,8 @@
           <file leaf-file-name="data_api.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app_server/app_server/data_api.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="10">
-                  <caret line="24" column="52" lean-forward="false" selection-start-line="24" selection-start-column="52" selection-end-line="24" selection-end-column="52" />
+                <state relative-caret-position="810">
+                  <caret line="54" column="30" lean-forward="false" selection-start-line="54" selection-start-column="30" selection-end-line="54" selection-end-column="30" />
                   <folding />
                 </state>
               </provider>
@@ -142,9 +97,58 @@
           <file leaf-file-name="data_handler.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app_server/app_server/src/data_handler.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="179">
-                  <caret line="76" column="23" lean-forward="false" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="23" />
+                <state relative-caret-position="129">
+                  <caret line="64" column="9" lean-forward="false" selection-start-line="64" selection-start-column="9" selection-end-line="64" selection-end-column="9" />
                   <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="handle_pro.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_pro.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="284">
+                  <caret line="26" column="28" lean-forward="false" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="handle_Demo.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="197">
+                  <caret line="72" column="28" lean-forward="false" selection-start-line="72" selection-start-column="28" selection-end-line="72" selection-end-column="28" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="handle_CCI.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_CCI.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="247">
+                  <caret line="41" column="28" lean-forward="false" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="index.json" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app_server/data/index.json">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="15">
+                  <caret line="1" column="2" lean-forward="false" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
+                  <folding>
+                    <element signature="e#4#2767#0" expanded="false" />
+                    <element signature="e#2771#3723#0" expanded="false" />
+                    <element signature="e#3727#6249#0" expanded="false" />
+                    <element signature="e#6253#7242#0" expanded="false" />
+                    <element signature="e#7247#9978#0" expanded="false" />
+                    <element signature="e#9982#10902#0" expanded="false" />
+                    <element signature="e#10906#13396#0" expanded="false" />
+                    <element signature="e#13400#14357#0" expanded="false" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -164,36 +168,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>20958617</find>
-      <find>5632013</find>
-      <find>height</find>
-      <find>this.hei</find>
-      <find>17596883</find>
-      <find>[19431659</find>
-      <find>[</find>
-      <find>'</find>
-      <find>5330196</find>
-      <find>getData</find>
-      <find>conso</find>
-      <find>2/26/2015</find>
-      <find>addProPoints</find>
-      <find>proInfo</find>
-      <find>timeScale</find>
-      <find>tooltip</find>
-      <find>transition</find>
-      <find>parse_date</find>
-      <find>parseTime</find>
-      <find>findMinDate</find>
-      <find>'rect</find>
-      <find>transi</find>
-      <find>line</find>
-      <find>5898531</find>
       <find>69</find>
       <find>20559329</find>
       <find>consol</find>
       <find>map</find>
       <find>addOrderPoints</find>
       <find>addOrderRects</find>
+      <find>getS</find>
+      <find>a</find>
+      <find>data</find>
+      <find>category_replacement</find>
+      <find>weights_PRO</find>
+      <find>categorical_data</find>
+      <find>pats</find>
+      <find>[h]</find>
+      <find>updateWeights`</find>
+      <find>to_data_time</find>
+      <find>dt.get('CCI')</find>
+      <find>to_data</find>
+      <find>get_info</find>
+      <find>to_date_time</find>
+      <find>ajax</find>
+      <find>getData</find>
+      <find>similarRect</find>
+      <find>pat</find>
+      <find>$node</find>
+      <find>forma</find>
+      <find>let t</find>
+      <find>trans</find>
+      <find>transitio</find>
+      <find>yScale2</find>
     </findStrings>
     <replaceStrings>
       <replace>.Wide</replace>
@@ -215,6 +219,9 @@
       <replace>targetPatientProInfo</replace>
       <replace>addOrderRects</replace>
       <replace>addOrderSquares</replace>
+      <replace>['SCORE']</replace>
+      <replace>to_date</replace>
+      <replace>yScale</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -243,32 +250,43 @@
         <option value="$PROJECT_DIR$/app_server/data/shrank_cleaned_CCI_index.csv" />
         <option value="$PROJECT_DIR$/app_server/data/shrank_cleaned_Demo_index.csv" />
         <option value="$PROJECT_DIR$/app_server/data/shrank_cleaned_Orders_index.csv" />
-        <option value="$PROJECT_DIR$/app_server/app_server/src/handle_CCI.py" />
-        <option value="$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py" />
         <option value="$PROJECT_DIR$/client_app/src/sideBar.ts" />
         <option value="$PROJECT_DIR$/client_app/package.json" />
-        <option value="$PROJECT_DIR$/app_server/app_server/src/handle_pro.py" />
         <option value="$PROJECT_DIR$/client_app/src/styles/_svgtable.scss" />
-        <option value="$PROJECT_DIR$/client_app/src/style.scss" />
         <option value="$PROJECT_DIR$/client_app/src/styles/_histogram.scss" />
-        <option value="$PROJECT_DIR$/app_server/data/index.json" />
         <option value="$PROJECT_DIR$/app_server/data/procedure_result.csv" />
         <option value="$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv" />
-        <option value="$PROJECT_DIR$/client_app/src/constants.ts" />
-        <option value="$PROJECT_DIR$/app_server/app_server/data_api.py" />
-        <option value="$PROJECT_DIR$/app_server/app_server/src/data_handler.py" />
-        <option value="$PROJECT_DIR$/client_app/src/statHistogram.ts" />
-        <option value="$PROJECT_DIR$/client_app/src/queryBox.ts" />
-        <option value="$PROJECT_DIR$/client_app/src/app.ts" />
         <option value="$PROJECT_DIR$/client_app/src/svgTable.ts" />
-        <option value="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts" />
+        <option value="$PROJECT_DIR$/app_server/data/index.json" />
+        <option value="$PROJECT_DIR$/client_app/src/ReactComponents/WeightInput.js" />
+        <option value="$PROJECT_DIR$/client_app/src/ReactComponents/SideBarComponent.js" />
+        <option value="$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py" />
+        <option value="$PROJECT_DIR$/app_server/app_server/src/handle_pro.py" />
+        <option value="$PROJECT_DIR$/app_server/app_server/src/handle_CCI.py" />
+        <option value="$PROJECT_DIR$/app_server/app_server/data_api.py" />
+        <option value="$PROJECT_DIR$/client_app/src/statHistogram.ts" />
         <option value="$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss" />
+        <option value="$PROJECT_DIR$/app_server/app_server/src/data_handler.py" />
+        <option value="$PROJECT_DIR$/client_app/src/distribution.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/queryBox.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/style.scss" />
+        <option value="$PROJECT_DIR$/client_app/src/app.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/styles/_distributionDiagram.scss" />
+        <option value="$PROJECT_DIR$/client_app/src/distributionDiagram.ts" />
+        <option value="$PROJECT_DIR$/client_app/src/constants.ts" />
       </list>
     </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER">
     <package-json value="$PROJECT_DIR$/package.json" />
+  </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <annotation-enable>false</annotation-enable>
+    <other-services-enabled>true</other-services-enabled>
   </component>
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
@@ -280,10 +298,10 @@
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
     <option name="width" value="1280" />
-    <option name="height" value="710" />
+    <option name="height" value="713" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -296,10 +314,41 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dataExploration" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dataExploration" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dataExploration" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dataExploration" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client_app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scratches" />
+    </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="fileTemplates" />
+    <property name="settings.editor.selected.configurable" value="Settings.JavaScript" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="nodejs_interpreter_path" value="/usr/local/bin/node" />
@@ -307,6 +356,9 @@
     <property name="node.js.selected.package.tslint" value="$PROJECT_DIR$/node_modules/tslint" />
     <property name="typescript-compiler-editor-notification" value="false" />
     <property name="list.type.of.created.stylesheet" value="SCSS" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="JavaScriptPreferStrict" value="false" />
+    <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -423,27 +475,30 @@
       <workItem from="1494617904300" duration="519000" />
       <workItem from="1494782778259" duration="118000" />
       <workItem from="1494784483090" duration="13381000" />
+      <workItem from="1499657995271" duration="1362000" />
+      <workItem from="1499705743563" duration="5213000" />
+      <workItem from="1500219645633" duration="20203000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="199501000" />
+    <option name="totallyTimeSpent" value="226279000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1280" height="710" extended-state="6" />
+    <frame x="0" y="23" width="1280" height="713" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -483,6 +538,146 @@
         <option value="$PROJECT_DIR$/client_app/src/similarityScoreDiagram.js.map" />
         <option value="$PROJECT_DIR$/client_app/src/statHistogram.js" />
         <option value="$PROJECT_DIR$/client_app/src/statHistogram.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/MultiTableVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/VectorTable.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/TableNameVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/TableNameVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/TableVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/MultiTableVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/TableVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/VectorTable.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/internal/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/node_modules/phovea_core/src/ajax.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/node_modules/phovea_core/src/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/node_modules/phovea_core/src/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/node_modules/phovea_core/src/ajax.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/ProjectedAtom.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/ANameVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/VectorNameVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/StratificationVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/ProjectedAtom.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/ANameVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/StratificationVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/internal/VectorNameVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/internal/StratificationNameVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/internal/StratificationNameVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/event.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/data.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/event.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/iterator.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/math.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/datatype.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/math.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/security.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/security.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/ajax.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/ajax.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/iterator.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/session.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/plugin.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/datatype.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/data.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/session.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/plugin.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/atom/IAtom.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/atom/AAtom.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/atom/IAtom.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/atom/AAtom.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/CompositeRange1D.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/CompositeRange1D.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/Range1D.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/Range.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/parser.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/Range1D.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/parser.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/Range1DGroup.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/Range.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/Range1DGroup.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/ATable.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/Table.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/ITable.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/loader.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/ITable.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/ATable.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/Table.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/table/loader.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/ASelectAble.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/AProductSelectAble.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/LocalIDAssigner.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/IDType.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/ProductIDType.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/IIDType.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/manager.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/IIDType.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/ObjectManager.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/ObjectManager.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/AProductSelectAble.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/ProductIDType.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/LocalIDAssigner.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/ASelectAble.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/manager.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/IDType.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/idtype/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/IVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/Vector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/IVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/loader.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/AVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/AVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/loader.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/vector/Vector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/IdPool.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/array.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/unique.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/RemoveNodeObserver.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/unique.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/PropertyHandler.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/dnd.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/HashProperties.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/IdPool.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/dnd.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/array.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/HashProperties.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/RemoveNodeObserver.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/internal/PropertyHandler.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/StratificationVector.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/Stratification.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/Stratification.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/StratificationVector.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/IStratification.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/StratificationGroup.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/loader.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/IStratification.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/loader.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/stratification/StratificationGroup.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/internal/RangeElem.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/internal/index.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/internal/index.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/internal/SingleRangeElem.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/internal/SingleRangeElem.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_core/src/range/internal/RangeElem.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/buildInfo.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/buildInfo.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/_font-awesome.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/_bootstrap.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/_font-awesome.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/header.js" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/_bootstrap.js.map" />
+        <option value="$PROJECT_DIR$/node_modules/phovea_ui/src/header.js.map" />
+        <option value="$PROJECT_DIR$/client_app/src/distributionDiagram.js" />
+        <option value="$PROJECT_DIR$/client_app/src/distributionDiagram.js.map" />
       </list>
     </option>
   </component>
@@ -491,53 +686,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="7" />
+      <option name="time" value="10" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/node_modules/phovea_ui/src/header.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="248" column="48" lean-forward="false" selection-start-line="248" selection-start-column="33" selection-end-line="248" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/phovea_ui/src/style.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/phovea_ui/phovea_registry.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/phovea_ui/phovea.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/phovea_ui/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-27">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/phovea_ui/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/phovea_ui/LICENSE">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -546,36 +699,12 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app_server/app_server/src/similar_score.py" />
-    <entry file="file://$PROJECT_DIR$/app_server/data/CCI.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/pat_ids.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="7" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/CCI.csv" />
+    <entry file="file://$PROJECT_DIR$/app_server/data/pat_ids.csv" />
     <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Codes.py" />
     <entry file="file://$PROJECT_DIR$/app_server/data/cleaned_Demo_index_shrank.csv" />
-    <entry file="file://$PROJECT_DIR$/app_server/data/PT.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/Codes.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="21" lean-forward="false" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/PT.csv" />
+    <entry file="file://$PROJECT_DIR$/app_server/data/Codes.csv" />
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="436">
@@ -594,9 +723,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="304">
           <caret line="73" column="32" lean-forward="false" selection-start-line="73" selection-start-column="32" selection-end-line="73" selection-end-column="32" />
-          <folding>
-            <marker date="1493659704000" expanded="true" signature="1342:1348" ph=" " />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -605,13 +732,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="20" lean-forward="true" selection-start-line="13" selection-start-column="20" selection-end-line="13" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_CCI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="47" column="33" lean-forward="false" selection-start-line="47" selection-start-column="33" selection-end-line="47" selection-end-column="33" />
         </state>
       </provider>
     </entry>
@@ -651,13 +771,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/style.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="25" lean-forward="false" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../lineage/lineage/src/histogram.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-566">
@@ -669,13 +782,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
           <caret line="381" column="0" lean-forward="true" selection-start-line="381" selection-start-column="0" selection-end-line="381" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="73" column="32" lean-forward="true" selection-start-line="73" selection-start-column="4" selection-end-line="73" selection-end-column="32" />
         </state>
       </provider>
     </entry>
@@ -693,16 +799,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/Orders.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="601" column="13" lean-forward="false" selection-start-line="601" selection-start-column="6" selection-end-line="601" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/Orders.csv" />
     <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-137">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/procedure_result.csv" />
+    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Demo_index.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="127" column="55" lean-forward="false" selection-start-line="127" selection-start-column="55" selection-end-line="127" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="312" column="20" lean-forward="true" selection-start-line="312" selection-start-column="20" selection-end-line="312" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Orders_index.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="174" column="34" lean-forward="false" selection-start-line="174" selection-start-column="24" selection-end-line="174" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/ReactComponents/WeightSelector.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="262">
+          <caret line="19" column="20" lean-forward="true" selection-start-line="19" selection-start-column="20" selection-end-line="19" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/ReactComponents/SideBarComponent.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="64" column="29" lean-forward="false" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/ReactComponents/WeightInput.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-297">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
@@ -711,64 +854,42 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="19" column="31" lean-forward="false" selection-start-line="19" selection-start-column="23" selection-end-line="19" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/procedure_result.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2265">
-          <caret line="151" column="0" lean-forward="false" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3338">
-          <caret line="2360" column="6" lean-forward="false" selection-start-line="2360" selection-start-column="6" selection-end-line="2360" selection-end-column="6" />
-          <folding>
-            <element signature="e#8979#53054#0" expanded="false" />
-            <element signature="e#53102#78359#0" expanded="false" />
-            <element signature="e#78374#104649#0" expanded="false" />
-            <element signature="e#104665#108809#0" expanded="false" />
-            <element signature="e#108825#144933#0" expanded="false" />
-            <element signature="e#144949#265834#0" expanded="false" />
-            <element signature="e#265850#299402#0" expanded="false" />
-            <element signature="e#299418#312238#0" expanded="false" />
-            <element signature="e#312254#369151#0" expanded="false" />
-            <element signature="e#369166#380950#0" expanded="false" />
-            <element signature="e#380965#384292#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Demo_index.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="127" column="55" lean-forward="false" selection-start-line="127" selection-start-column="55" selection-end-line="127" selection-end-column="55" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_pro.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="284">
+          <caret line="26" column="28" lean-forward="false" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_CCI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="41" column="28" lean-forward="false" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/svgTable.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="242" column="23" lean-forward="false" selection-start-line="242" selection-start-column="16" selection-end-line="242" selection-end-column="23" />
+          <folding>
+            <element signature="e#48#93#0" expanded="false" />
+            <element signature="e#244#292#0" expanded="false" />
+            <element signature="n#!!block;n#attachListener#0;n#SvgTable#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app_server/app_server/data_api.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10">
-          <caret line="24" column="52" lean-forward="false" selection-start-line="24" selection-start-column="52" selection-end-line="24" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_PRO_index.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="312" column="20" lean-forward="true" selection-start-line="312" selection-start-column="20" selection-end-line="312" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+        <state relative-caret-position="810">
+          <caret line="54" column="30" lean-forward="false" selection-start-line="54" selection-start-column="30" selection-end-line="54" selection-end-column="30" />
           <folding />
         </state>
       </provider>
@@ -778,106 +899,144 @@
         <state relative-caret-position="15">
           <caret line="1" column="2" lean-forward="false" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
           <folding>
-            <element signature="e#4#2758#0" expanded="false" />
-            <element signature="e#2762#3705#0" expanded="false" />
-            <element signature="e#2994#3701#0" expanded="false" />
-            <element signature="e#3709#6222#0" expanded="false" />
-            <element signature="e#6226#7206#0" expanded="false" />
-            <element signature="e#6468#7202#0" expanded="false" />
-            <element signature="e#7210#7634#0" expanded="false" />
+            <element signature="e#4#2767#0" expanded="false" />
+            <element signature="e#2771#3723#0" expanded="false" />
+            <element signature="e#3727#6249#0" expanded="false" />
+            <element signature="e#6253#7242#0" expanded="false" />
+            <element signature="e#7247#9978#0" expanded="false" />
+            <element signature="e#9982#10902#0" expanded="false" />
+            <element signature="e#10906#13396#0" expanded="false" />
+            <element signature="e#13400#14357#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_pro.py">
+    <entry file="file://$PROJECT_DIR$/app_server/app_server/src/handle_Demo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="36" column="27" lean-forward="false" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_server/data/shrank_cleaned_Orders_index.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="174" column="34" lean-forward="false" selection-start-line="174" selection-start-column="24" selection-end-line="174" selection-end-column="34" />
+        <state relative-caret-position="197">
+          <caret line="72" column="28" lean-forward="false" selection-start-line="72" selection-start-column="28" selection-end-line="72" selection-end-column="28" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app_server/app_server/src/data_handler.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="179">
-          <caret line="76" column="23" lean-forward="false" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="23" />
+        <state relative-caret-position="129">
+          <caret line="64" column="9" lean-forward="false" selection-start-line="64" selection-start-column="9" selection-end-line="64" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/distribution.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-431">
+          <caret line="138" column="4" lean-forward="false" selection-start-line="138" selection-start-column="4" selection-end-line="138" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-109">
+          <caret line="88" column="25" lean-forward="false" selection-start-line="88" selection-start-column="20" selection-end-line="88" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="114" column="8" lean-forward="false" selection-start-line="114" selection-start-column="8" selection-end-line="114" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/style.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="35" lean-forward="false" selection-start-line="9" selection-start-column="35" selection-end-line="9" selection-end-column="35" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/similarityScoreDiagram.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="498" column="55" lean-forward="false" selection-start-line="498" selection-start-column="55" selection-end-line="498" selection-end-column="55" />
+        <state relative-caret-position="219">
+          <caret line="368" column="54" lean-forward="true" selection-start-line="368" selection-start-column="16" selection-end-line="368" selection-end-column="54" />
           <folding>
             <element signature="e#49#94#0" expanded="true" />
             <element signature="n#!!block;n#constructor#0;n#similarityScoreDiagram#0" expanded="false" />
-            <element signature="n#!!block;n#addOrderSquares#0;n#similarityScoreDiagram#0" expanded="false" />
-            <marker date="1494805474000" expanded="false" signature="16037:16294" ph="{...}" />
-            <marker date="1494805474000" expanded="true" signature="17343:17362" ph="..." />
-            <marker date="1494805474000" expanded="false" signature="17694:17827" ph="{...}" />
+            <element signature="n#!!block;n#drawDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#updateSlider#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#addSimilarOrderPoints#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#clearDiagram#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#findMinDate#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#getData#0;n#similarityScoreDiagram#0" expanded="false" />
+            <element signature="n#!!block;n#renderOrdersTooltip#0;n#similarityScoreDiagram#0" expanded="false" />
+            <marker date="1500241106000" expanded="true" signature="20673:20692" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/styles/_distributionDiagram.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="341">
+          <caret line="94" column="21" lean-forward="false" selection-start-line="94" selection-start-column="12" selection-end-line="94" selection-end-column="21" />
+          <folding>
+            <element signature="e#49#94#0" expanded="true" />
+            <element signature="n#!!block;n#updateOverallHistogram#0;n#StatHistogram#0" expanded="false" />
+            <element signature="n#!!block;n#updateHistogram#0;n#StatHistogram#0" expanded="false" />
+            <element signature="n#!!block;n#attachListener#0;n#StatHistogram#0" expanded="false" />
+            <element signature="n#!!block;n#parseTime#0;n#StatHistogram#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/queryBox.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="310">
-          <caret line="66" column="54" lean-forward="false" selection-start-line="66" selection-start-column="54" selection-end-line="66" selection-end-column="54" />
+        <state relative-caret-position="78">
+          <caret line="91" column="5" lean-forward="true" selection-start-line="91" selection-start-column="5" selection-end-line="91" selection-end-column="5" />
           <folding>
             <element signature="e#48#93#0" expanded="true" />
             <element signature="n#!!block;n#constructor#0;n#QueryBox#0" expanded="false" />
+            <element signature="n#!!block;n#updateAllInfo#0;n#QueryBox#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/statHistogram.ts">
+    <entry file="file://$PROJECT_DIR$/client_app/src/distributionDiagram.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="315" column="33" lean-forward="false" selection-start-line="315" selection-start-column="30" selection-end-line="315" selection-end-column="33" />
+        <state relative-caret-position="304">
+          <caret line="75" column="44" lean-forward="false" selection-start-line="75" selection-start-column="44" selection-end-line="75" selection-end-column="44" />
           <folding>
             <element signature="e#49#94#0" expanded="true" />
-            <element signature="n#!!block;n#drawHistogram#0;n#StatHistogram#0" expanded="false" />
-            <element signature="n#!!block;n#updateHistogram#0;n#StatHistogram#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/styles/_scoreDiagram.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="85" column="18" lean-forward="true" selection-start-line="85" selection-start-column="18" selection-end-line="85" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client_app/src/app.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="115" column="56" lean-forward="false" selection-start-line="115" selection-start-column="49" selection-end-line="115" selection-end-column="56" />
+        <state relative-caret-position="260">
+          <caret line="131" column="52" lean-forward="false" selection-start-line="131" selection-start-column="49" selection-end-line="131" selection-end-column="56" />
           <folding>
             <element signature="e#51#87#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client_app/src/svgTable.ts">
+    <entry file="file://$PROJECT_DIR$/client_app/src/constants.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="48" column="10" lean-forward="false" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="10" />
-          <folding>
-            <element signature="n#!!block;n#drawHeader#0;n#SvgTable#0" expanded="false" />
-            <element signature="n#!!block;n#drawLineChart#0;n#SvgTable#0" expanded="false" />
-            <element signature="n#!!block;n#attachListener#0;n#SvgTable#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="484">
+          <caret line="66" column="2" lean-forward="false" selection-start-line="66" selection-start-column="2" selection-end-line="66" selection-end-column="2" />
+          <folding />
         </state>
       </provider>
     </entry>
