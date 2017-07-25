@@ -33,9 +33,19 @@
     "npm": ">= 3",
     "node": ">= 6"
   },
+  "babel": {
+    "presets": [
+      "env",
+      "react"
+    ]
+  },
   "devDependencies": {
     "@types/jasmine": "2.5.41",
     "awesome-typescript-loader": "3.0.3",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "babel-preset-env": "^1.2.2",
+    "babel-preset-react": "^6.23.0",
     "css-loader": "0.26.1",
     "extract-text-webpack-plugin": "2.0.0-rc.3",
     "extract-loader": "0.1.0",
@@ -91,7 +101,12 @@
     "d3-time-format": "^2.0.5",
     "d3-drag": "^1.0.4",
     "d3-dispatch": "^1.0.3",
-    "d3-brush": "^1.0.4"
+    "d3-brush": "^1.0.4",
+    "material-ui": "^0.18.1",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-tap-event-plugin": "^2.0.1",
+    "prop-types": "^15.5.4"
   },
   "name": "client_app",
   "description": "",

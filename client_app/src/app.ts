@@ -10,6 +10,13 @@ import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
+import * as rectExploration from './rectExploration';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import SideBarComponent from './ReactComponents/SideBarComponent';
+
+
 
 
 /**
@@ -49,9 +56,20 @@ export class App {
 
 
     // create side bar
-    const sideBarDiv = this.$node.append('div').classed('sideBar', true);
-    const side = sideBar.create(sideBarDiv.node());
-    await side.init();
+    // const sideBarDiv = this.$node.append('div').classed('sideBar', true);
+    // const side = sideBar.create(sideBarDiv.node());
+    // await side.init();
+
+    
+    this.$node.append('div').attr('id','sideBar');
+
+
+
+    ReactDOM.render(
+      React.createElement(SideBarComponent),
+      document.getElementById('sideBar')
+    );
+
 
 
     // main div - all div are within this div
@@ -64,6 +82,12 @@ export class App {
 
     // histogram
     statHistogram.create(main.node());
+
+    //rect
+    rectExploration.create(main.node());
+
+    //order historgram
+    //statOrder.create(main.node());
 
 
     // PROMIS diagrams
