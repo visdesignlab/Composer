@@ -1,0 +1,7 @@
+/_backup
+/_data
+node_modules
+/*/tests/
+/*/data/
+/*/docs/
+/*/src/
