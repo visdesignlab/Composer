@@ -136,3 +136,35 @@
   fill: #c37e45;
   opacity: 0.5;
 }
+
+
+.patRect.PROCEDURE.COMPLETED {
+  fill: red;
+  opacity: 0.5;
+}
+
+.patRect.PROCEDURE.ORDERED {
+   fill: orange;
+  opacity: 0.5;
+}
+
+ .MEDICATION.ORDERED,  
+ .MEDICATION.SENT
+ {
+  fill: #4a6ffb;
+  opacity: 0.5;
+}
+
+.MEDICATION.COMPLETED {
+  fill: green;
+  opacity: 0.5;
+}
+
+
+.MEDICATION.DISCONTINUED,
+.MEDICATION.SUSPEND
+ {
+  fill: purple;
+  opacity: 0.5;
+}
+

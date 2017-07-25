@@ -15,6 +15,7 @@ import {drag} from 'd3-drag';
 import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
+import * as dataCalc from './dataCalculations';
 
 export class similarityScoreDiagram {
 
@@ -27,6 +28,7 @@ export class similarityScoreDiagram {
 
     private targetPatientProInfo;
     private similarPatientsProInfo;
+    private getClassAssignment = dataCalc.getClassAssignment;
 
     height = 400;
     width = 600;
@@ -337,7 +339,9 @@ export class similarityScoreDiagram {
             .data((d) => d.values)
             .enter()
             .append('rect')
-            .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+            .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+             .attr('class', this.getClassAssignment('ORDER_STATUS'))
+            //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
             .attr('x', (g) => this.timeScale(g.diff))
             .attr('y', (g, i) => i * this.timeScale(25))
             .attr('width', this.timeScale(20))

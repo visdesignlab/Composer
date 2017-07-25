@@ -41,6 +41,7 @@ export class rectExploration {
   private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
   private parseTime = dataCalc.parseTime;
   private setOrderScale = dataCalc.setOrderScale;
+  private getClassAssignment = dataCalc.getClassAssignment;
 
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
@@ -171,6 +172,7 @@ export class rectExploration {
  
 
       const self = this;
+      /*
       function getClassAssignment (attString) {
       //this uses a work around to use a function with classed. As well it preserves the already assinged classes
         
@@ -179,7 +181,7 @@ export class rectExploration {
           element.classed (d[attString], true);
           return element.attr('class');
         }
-      }
+      }*/
 
       let orderRect = this.svg.select('#pat_rect_line')
      
@@ -195,8 +197,8 @@ export class rectExploration {
       let rectsEnter = rects.enter()
       .append('rect');
       rects = rectsEnter.merge(rects);
-      rects.attr('class', getClassAssignment('ORDER_CATALOG_TYPE'))
-      .attr('class', getClassAssignment('ORDER_STATUS'))
+      rects.attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+      .attr('class', this.getClassAssignment('ORDER_STATUS'))
       .attr('x', (g) => this.timeScale(g.diff))
       .attr('y', 0)
       .attr('width', this.orderBar.width)
