@@ -12,20 +12,39 @@ var QueryBox = (function () {
         this.$node = select(parent)
             .append('div')
             .classed('queryDiv', true);
-        this.$node.append('label')
+        var self = this;
+        var form = this.$node.append('form');
+        form.append('label')
             .attr('for', 'dataset_selection')
-            .text('Consider All (6071) Patients?');
-        this.$node.append('input')
-            .attr('type', 'checkbox')
-            .property('checked', false)
-            .attr('id', 'dataset_selection')
-            .on('change', function () {
-            if (select("#dataset_selection").property("checked"))
-                _this.dataset = 'all';
-            else
-                _this.dataset = 'selected';
-            events.fire('update_dataset', ['dataset', _this.dataset]);
+            .text('Dataset: ');
+        form.append("input")
+            .attr('type', 'radio')
+            .attr("name", "dataset_selection")
+            .attr("value", "selected")
+            .property('checked', true)
+            .on("click", function () {
+            var val = select(this).attr("value");
+            if (val !== self.dataset) {
+                self.dataset = val;
+                events.fire('update_dataset', ['dataset', self.dataset]);
+            }
         });
+        form.append('label')
+            .html('Selected');
+        form.append('input')
+            .attr('type', 'radio')
+            .attr('value', 'all')
+            .attr('name', 'dataset_selection')
+            .on('click', function () {
+            var val = select(this).attr("value");
+            if (val !== self.dataset) {
+                self.dataset = val;
+                events.fire('update_dataset', ['dataset', self.dataset]);
+            }
+        });
+        form.append('label')
+            .html('All');
+        form.append('br');
         // // these events are only handled in tables
         // this.$node.append('input')
         //     .attr('type', 'button')
@@ -36,31 +55,40 @@ var QueryBox = (function () {
         //     .attr('type', 'button')
         //     .attr('value', 'Reset')
         //     .on('click', () => events.fire('update_init', ['func', 'init']));
-        this.$node.append('input')
+        form.append('label')
+            .attr('for', 'text_pat_id')
+            .text('Patient ID');
+        form.append('input')
             .attr('type', 'text')
             .attr('placeholder', 'Search PAT_ID')
-            .attr('id', 'text_pat_id');
-        this.$node.append('input')
+            .attr('id', 'text_pat_id')
+            .attr('value', '20559329');
+        form.append('input')
             .attr('type', 'button')
             .attr('value', 'All Info')
             .on('click', function () { return _this.updateAllInfo(); });
-        this.$node.append('input')
+        form.append('input')
             .attr('type', 'button')
             .attr('value', 'similar')
             .on('click', function () { return _this.updateSimilar(); });
-        this.$node.append('input')
+        form.append('label')
+            .attr('for', 'text_num_similar')
+            .text('Number of similar patients');
+        form.append('input')
             .attr('type', 'text')
             .attr('placeholder', 'Number of similar patients')
-            .attr('id', 'text_num_similar');
-        this.attachListener(); // TODO test!
+            .attr('id', 'text_num_similar')
+            .attr('value', '10');
+        this.attachListener();
     }
     /**
      * Attaching listener
-     * Only used for the initial testing (events fired in app.ts).
-     * Should be removed at the end.
      */
     QueryBox.prototype.attachListener = function () {
         var _this = this;
+        // TODO test!
+        // Only used for the initial testing (events fired in app.ts).
+        // Should be removed at the end.
         events.on('update_temp_similar', function (evt, item) {
             var url = "/data_api/getSimilarRows/" + item[1] + "/" + item[2] + "/" + _this.dataset;
             _this.setBusy(true);
@@ -69,6 +97,10 @@ var QueryBox = (function () {
                 _this.similarArgs = args;
                 events.fire('update_similar', [item[1], item[2], args]); // caught by svgTable and scoreDiagram and statHistogram
             });
+        });
+        events.on('number_of_similar_patients', function (evt, item) {
+            select('#text_num_similar').attr('value', item[0]);
+            _this.updateSimilar();
         });
     };
     /**
