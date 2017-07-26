@@ -98,3 +98,13 @@ export class dataCalc {
     this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale));
   }
+
+  export function getClassAssignment (attString) {
+      //this uses a work around to use a function with classed. As well it preserves the already assinged classes
+        
+        return function (d) { 
+          let element = select(this);
+          element.classed (d[attString], true);
+          return element.attr('class');
+        }
+  }
