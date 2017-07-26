@@ -15,6 +15,7 @@ import {drag} from 'd3-drag';
 import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
+import * as dataCalc from './dataCalculations';
 
 export class similarityScoreDiagram {
 
@@ -27,8 +28,7 @@ export class similarityScoreDiagram {
 
     private targetPatientProInfo;
     private similarPatientsProInfo;
-   
-    private currentlySelectedName;
+    private getClassAssignment = dataCalc.getClassAssignment;
 
     height = 400;
     width = 600;
@@ -61,7 +61,11 @@ export class similarityScoreDiagram {
         this.svg.append('g')
             .attr('class', 'xAxis')
             .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
-    
+        /*
+         this.svg.append('text')
+         .text('Days')
+         .attr('transform', `translate(${(this.promisDimension.width - this.margin.x) / 2},${this.promisDimension.height - this.margin.y})`);
+         */
         this.svg.append('g')
             .attr('class', 'yAxis')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`)
@@ -335,28 +339,30 @@ export class similarityScoreDiagram {
             .data((d) => d.values)
             .enter()
             .append('rect')
-            .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+            .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+             .attr('class', this.getClassAssignment('ORDER_STATUS'))
+            //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
             .attr('x', (g) => this.timeScale(g.diff))
             .attr('y', (g, i) => i * this.timeScale(25))
             .attr('width', this.timeScale(20))
             .attr('height', this.timeScale(20))
             .on('click', function (d) {
 
-                 if (!select(this).classed('selectedOrder')) {
+                if (!select(this).classed('selectedOrder')) {
 
-          select(this).classed('selectedOrder', true);
+                    select(this).classed('selectedOrder', true);
 
-          select(this.parentNode.parentNode.parentNode)
-            .append('line')
-            .classed('selectedLine', true)
-            .attr('id',`orderLine_${d['VISIT_NO']}`)
-            .attr('x1', self.timeScale(d['diff']) + self.margin.x)
-            .attr('x2', self.timeScale(d['diff']) + self.margin.x)
-            .attr('y1', self.scoreScale(100) + self.margin.y)
-            .attr('y2', self.scoreScale(0) + self.margin.y)
-            .on('click', () => console.log(d));
+                    select(this.parentNode.parentNode.parentNode)
+                        .append('line')
+                        .classed('selectedLine', true)
+                        .attr('id', `orderLine_${d['VISIT_NO']}`)
+                        .attr('x1', self.timeScale(d['diff']) + self.margin.x)
+                        .attr('x2', self.timeScale(d['diff']) + self.margin.x)
+                        .attr('y1', self.scoreScale(100) + self.margin.y)
+                        .attr('y2', self.scoreScale(0) + self.margin.y)
+                        .on('click', () => console.log(d));
 
-          console.log(d);
+                    console.log(d);
                 }
                 else {
                     select(this).classed('selectedOrder', false);
@@ -408,65 +414,49 @@ export class similarityScoreDiagram {
 
         const self = this;
 
-         function getClassAssignment (attString) {
-      //this uses a work around to use a function with classed. As well it preserves the already assinged classes
-        
-        return function (d) { 
-          let element = select(this);
-          element.classed (d[attString], true);
-          return element.attr('class');
-        }
-      }
+        this.svg.select('#pat_orders')
+            .append('g')
+            .attr('transform', () => {
+                return `translate(${this.margin.x},0)`; // If there is a label for the x-axis change 0
+            })
+            .selectAll('.patRect')
+            .data([ordersInfo])
+            .enter()
+            .append('g')
+            .attr('transform', () => `translate(0,${this.promisDimension.height - 50})`)
+            .classed('patRect', true)
+            .selectAll('rect')
+            .data((d) => d)
+            .enter()
+            .append('rect')
+            .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+            .attr('x', (g) => this.timeScale(g.diff))
+            .attr('y', 0)
+            .attr('width', this.similarBar.width)
+            .attr('height', this.similarBar.height)
+            .on('click', function (d) {
 
-    this.svg.select('#pat_orders')
-      .append('g')
-      .attr('transform', () => {
-        return `translate(${this.margin.x},0)`; // If there is a label for the x-axis change 0
-      })
-      .selectAll('.patRect')
-      .data([ordersInfo])
-      .enter()
-      .append('g')
-      .attr('transform', () => `translate(0,${this.promisDimension.height - 50})`)
-      .classed('patRect', true)//changed this to pat rect to diferentiate similar from target pat orders
-      .selectAll('rect')
-      .data((d) => d)
-      .enter()
-      .append('rect')
-      .attr('class', getClassAssignment('ORDER_CATALOG_TYPE'))
-      .attr('class', getClassAssignment('ORDER_STATUS'))
-      //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
-      .attr('x', (g) => this.timeScale(g.diff))
-      .attr('y', 0)
-      .attr('width', this.similarBar.width)
-      .attr('height', this.similarBar.height)
-      .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
-      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName)
-      
-      .on('click', function (d) {
-     
-        if (!select(this).classed('selectedOrder')) {
+                if (!select(this).classed('selectedOrder')) {
 
-          select(this).classed('selectedOrder', true);
-          
-          select(this.parentNode.parentNode.parentNode)
-            .append('line')
-            .classed('selectedLine', true)
-            .attr('id', `orderLine_${d['VISIT_NO']}`)
-            .attr('x1', self.timeScale(d['diff']) + self.margin.x)
-            .attr('x2', self.timeScale(d['diff']) + self.margin.x)
-            .attr('y1', self.scoreScale(100) + self.margin.y)
-            .attr('y2', self.scoreScale(0) + self.margin.y)
-            .on('click', () => console.log(d));
+                    select(this).classed('selectedOrder', true);
 
-          console.log(d);
-        }
-        else {
-          select(this).classed('selectedOrder', false);
-          select(`#orderLine_${d['VISIT_NO']}`).remove();
-        }
-      })
-       
+                    select(this.parentNode.parentNode.parentNode)
+                        .append('line')
+                        .classed('selectedLine', true)
+                        .attr('id', `orderLine_${d['VISIT_NO']}`)
+                        .attr('x1', self.timeScale(d['diff']) + self.margin.x)
+                        .attr('x2', self.timeScale(d['diff']) + self.margin.x)
+                        .attr('y1', self.scoreScale(100) + self.margin.y)
+                        .attr('y2', self.scoreScale(0) + self.margin.y)
+                        .on('click', () => console.log(d));
+
+                    console.log(d);
+                }
+                else {
+                    select(this).classed('selectedOrder', false);
+                    select(`#orderLine_${d['VISIT_NO']}`).remove();
+                }
+            })
             .on("mouseover", (d) => {
                 let t = transition('t').duration(500);
                 select(".tooltip")

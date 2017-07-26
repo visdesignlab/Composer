@@ -35,7 +35,7 @@ def get_latest_info():
         for row in data:
             if row['PAT_ID'] == id:
                 temp_pat.append(row)
-        temp_pat.sort(key=lambda x: to_data_time(x['ADM_DATE']), reverse=True)
+        temp_pat.sort(key=lambda x: to_date_time(x['ADM_DATE']), reverse=True)
         pats.append(temp_pat[0])
         pat_weights.append([t['WEIGHT_KG'] for t in temp_pat if t['WEIGHT_KG']])
 
@@ -69,8 +69,8 @@ def update_weights(values):
 
 
 # used in data_handler.get_similar_rows
-def get_similarity_score(PAT_ID):
-    data = dt.get('Demo').aslist()
+def get_similarity_score(PAT_ID, dataset_id):
+    data = dt.get(dataset_id).aslist()
     pat_ids = set([int(d['PAT_ID']) for d in data])
 
     # find the first entry for each patient
@@ -150,11 +150,11 @@ def get_difference(PAT_ID, ids):
 
 ##============= utility functions
 def extract_year(date):
-    time = to_data_time(date)
+    time = to_date_time(date)
     return time.year
 
 
-def to_data_time(date):
+def to_date_time(date):
     if ':' in date:
         time = pd.datetime.strptime(date, '%m/%d/%Y %I:%M:%S %p')
     elif '/' in date:

@@ -19,13 +19,14 @@ var StatHistogram = (function () {
         this.similarColorScale = scaleLinear().domain([0, 100]).range(this.colorRangeSimilar);
         this.colorRangeAll = ['#adc9aa', '#05c95d'];
         this.allColorScale = scaleLinear().domain([0, 100]).range(this.colorRangeAll);
+        this.dataset = 'selected';
         this.$node = select(parent)
             .append('div')
             .classed('allHistogramDiv', true);
         this.xScale = scaleLinear()
             .domain([0, 100])
             .range([0, this.svgDimension.width / 2 - this.svgDimension.spacing]);
-        this.getData('/data_api/getStat').then(function (args) {
+        this.getData("/data_api/getStat/" + this.dataset).then(function (args) {
             _this.allData = args;
             _this.attachListener();
             _this.drawHistogram('GENDER');
@@ -116,6 +117,43 @@ var StatHistogram = (function () {
             .attr('transform', "translate(0," + this.svgDimension.height + ")")
             .call(axisBottom(leftScale)
             .ticks(5));
+    };
+    /**
+     * update the general part of the histogram after updating the sataset
+     * @param hist
+     */
+    StatHistogram.prototype.updateOverallHistogram = function (hist) {
+        var _this = this;
+        var allData = this.allData[hist];
+        var histogramRectAll = this.$node
+            .select("#histogram_" + hist)
+            .selectAll('rect')
+            .data(allData);
+        histogramRectAll
+            .enter()
+            .append('rect')
+            .classed('histogramRectAll', true)
+            .attr('x', this.xScale(100))
+            .attr('y', function (d, i) {
+            return i * _this.svgDimension.height / allData.length + _this.svgDimension.spacing;
+        })
+            .attr('width', 0)
+            .attr('height', function () {
+            return _this.svgDimension.height / allData.length - _this.svgDimension.spacing;
+        });
+        var t = transition('t').duration(1000);
+        histogramRectAll.enter()
+            .merge(histogramRectAll)
+            .transition(t)
+            .attr('x', function (d) {
+            return _this.xScale(100) - _this.xScale(d / _this.allData['length'] * 100);
+        })
+            .attr('width', function (d) {
+            return _this.xScale(d / _this.allData['length'] * 100);
+        })
+            .style('fill', function (d) {
+            return _this.allColorScale(d / _this.allData['length'] * 100);
+        });
     };
     /**
      * Draw/Update the histogram for similar patients
@@ -280,6 +318,15 @@ var StatHistogram = (function () {
             _this.updateHistogram('GENDER');
             _this.updateHistogram('BMI');
             _this.updateHistogram('AGE');
+        });
+        events.on('update_dataset', function (evt, item) {
+            _this.dataset = item[1];
+            _this.getData("/data_api/getStat/" + _this.dataset).then(function (args) {
+                _this.allData = args;
+                _this.updateOverallHistogram('GENDER');
+                _this.updateOverallHistogram('BMI');
+                _this.updateOverallHistogram('AGE');
+            });
         });
     };
     /**
