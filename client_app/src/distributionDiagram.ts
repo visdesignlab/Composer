@@ -35,8 +35,8 @@ export class distributionDiagram {
             .classed('hidden', true);
 
         this.svg = this.$node.append('svg')
-            .attr('height', this.distributionDimension.height + 40)
-            .attr('width', this.distributionDimension.width + 40);
+            .attr('height', this.distributionDimension.height + 60)
+            .attr('width', this.distributionDimension.width + 60);
 
         this.xScale = scaleLinear()
             .rangeRound([0, this.distributionDimension.width]);
@@ -46,11 +46,15 @@ export class distributionDiagram {
 
         this.group = this.svg
             .append("g")
-            .attr("transform", "translate(20,20)");
+            .attr("transform", "translate(40,40)");
 
         this.group.append("g")
             .attr("class", "axis axis--x")
             .attr("transform", "translate(0," + this.distributionDimension.height + ")");
+
+        this.group.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", "translate(0,0)");
 
         this.attachListener();
     }
@@ -72,6 +76,7 @@ export class distributionDiagram {
      * Draw the diagram with the given data from getSimilarRows
      */
     private drawDiagram() {
+        var self = this;
 
         this.$node.classed('hidden', false);
 
@@ -79,19 +84,29 @@ export class distributionDiagram {
             return d
         });
 
-        this.xScale.domain([0, maxValue]).nice();
+        let normalize = scaleLinear().domain([0, maxValue + 0.01]).range([0, 1]);
+        let data = this.distributionData.map((d: number) => normalize(d));
+
+        this.xScale.domain([0, 1/*maxValue*/]).nice();
 
         let bins = histogram()
-            .domain([0, maxValue])
+            .domain([0, 1/*maxValue*/])
             .thresholds(this.xScale.ticks(20))
-            (this.distributionData);
+            //(this.distributionData);
+            (data);
+
+        let totalPatients = data.length;
+        let histogramData = bins.map(function (d) {
+            totalPatients -= d.length;
+            return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length}
+        });
 
         this.yScale.domain([0, max(bins, function (d) {
             return d.length;
         })]);
 
         let barGroups = this.group.selectAll(".bar")
-            .data(bins);
+            .data(histogramData);
 
         barGroups.enter().append("g")
             .attr("class", "bar")
@@ -106,6 +121,47 @@ export class distributionDiagram {
             .attr("width", this.xScale(bins[0].x1) - this.xScale(bins[0].x0) - 3)
             .attr("height", (d) => {
                 return this.yScale(d.length);
+            })
+            .on("mouseover", function () {
+                let currElement = this.parentNode;
+                while (currElement) {
+                    select(currElement).select('rect').classed('selectedRect', true);
+                    currElement = currElement.nextSibling;
+                }
+                let totalPatients = (select(this.parentNode).datum())['totalPatients'];
+                let t = transition('t').duration(500);
+                select(".tooltip")
+                    .html(`Total patients: ${totalPatients}`)
+                    .transition(t)
+                    .style("opacity", 1)
+                    .style("left", `${event.pageX + 10}px`)
+                    .style("top", `${event.pageY + 10}px`);
+
+            })
+            .on("mouseout", function () {
+                let currElement = this.parentNode;
+                while (currElement) {
+                    select(currElement).select('rect').classed('selectedRect', false);
+                    currElement = currElement.nextSibling;
+                }
+
+                let t = transition('t').duration(500);
+                select(".tooltip").transition(t)
+                    .style("opacity", 0);
+            })
+            .on('click', function () {
+                let totalPatients = (select(this.parentNode).datum())['totalPatients'];
+
+                select(this.parentNode.parentNode).selectAll('rect').classed('displayedRect', false);
+
+                let currElement = this.parentNode;
+                while (currElement) {
+                    select(currElement).select('rect').classed('displayedRect', true);
+                    currElement = currElement.nextSibling;
+                }
+
+                // received in queryBox
+                events.fire("number_of_similar_patients", [totalPatients]);
             });
 
         let t = transition('t').duration(2000);
@@ -124,6 +180,7 @@ export class distributionDiagram {
 
         barGroups.enter().merge(barGroups)
             .selectAll("rect")
+            //.classed('displayedRect', false)
             .transition(t)
             .attr("y", (d) => {
                 return this.distributionDimension.height - this.yScale(d.length);
@@ -133,9 +190,19 @@ export class distributionDiagram {
                 return this.yScale(d.length);
             });
 
+        // update the axis
+
         this.group.select(".axis--x")
             .transition(t)
             .call(axisBottom(this.xScale));
+
+        this.group.select(".axis--y")
+            .transition(t)
+            .call(axisLeft(scaleLinear()
+                .range([this.distributionDimension.height, 0])
+                .domain([0, max(bins, function (d) {
+                    return d.length;
+                })])));
     }
 
 }
