@@ -12,14 +12,14 @@ if "%1"=="backup" (
   if "%2"=="" (
     call :backup
   ) else (
-    call :backup_one %2%
+    call :backup_one %PREFIX%_%1%
   )
 )
 if "%1"=="restore" (
   if "%2"=="" (
     call :restore
   ) else (
-    call :restore_one %2%
+    call :restore_one %PREFIX%_%1%
   )
 )
 
