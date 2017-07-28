@@ -39,7 +39,7 @@ backup)
   if [ "$#" -ne 1 ]; then
     backup
   else
-    backup_one $2
+    backup_one $1
   fi
   ;;
 restore)
@@ -47,7 +47,7 @@ restore)
   if [ "$#" -ne 1 ]; then
     restore
   else
-    restore_one $2
+    restore_one $1
   fi;;
 esac
 

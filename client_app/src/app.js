@@ -7,6 +7,7 @@ import * as queryBox from './queryBox';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
+import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -53,6 +54,8 @@ var App = (function () {
                 distributionDiagram.create(main.node());
                 // histogram
                 statHistogram.create(main.node());
+                //rect
+                rectExploration.create(main.node());
                 dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
                 similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
                 similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
