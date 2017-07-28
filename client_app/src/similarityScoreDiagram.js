@@ -13,9 +13,11 @@ import { max, ascending } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { transition } from 'd3-transition';
 import { brushY } from 'd3-brush';
+import * as dataCalc from './dataCalculations';
 var similarityScoreDiagram = (function () {
     function similarityScoreDiagram(parent, diagram) {
         var _this = this;
+        this.getClassAssignment = dataCalc.getClassAssignment;
         this.height = 400;
         this.width = 600;
         this.promisDimension = { height: 400, width: 600 };
@@ -256,7 +258,8 @@ var similarityScoreDiagram = (function () {
             .data(function (d) { return d.values; })
             .enter()
             .append('rect')
-            .attr('class', function (d) { return "" + d['ORDER_CATALOG_TYPE']; })
+            .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+            .attr('class', this.getClassAssignment('ORDER_STATUS'))
             .attr('x', function (g) { return _this.timeScale(g.diff); })
             .attr('y', function (g, i) { return i * _this.timeScale(25); })
             .attr('width', this.timeScale(20))
