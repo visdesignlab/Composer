@@ -28,7 +28,11 @@ export class similarityScoreDiagram {
 
     private targetPatientProInfo;
     private similarPatientsProInfo;
+    private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
+    private parseTime = dataCalc.parseTime;
+    private setOrderScale = dataCalc.setOrderScale;
     private getClassAssignment = dataCalc.getClassAssignment;
+
 
     height = 400;
     width = 600;
@@ -61,11 +65,7 @@ export class similarityScoreDiagram {
         this.svg.append('g')
             .attr('class', 'xAxis')
             .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
-        /*
-         this.svg.append('text')
-         .text('Days')
-         .attr('transform', `translate(${(this.promisDimension.width - this.margin.x) / 2},${this.promisDimension.height - this.margin.y})`);
-         */
+      
         this.svg.append('g')
             .attr('class', 'yAxis')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`)
@@ -133,6 +133,8 @@ export class similarityScoreDiagram {
 
             this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
             this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+            //console.log(this.similarPatientsProInfo);
+            console.log(item[2]);
 
             this.clearDiagram();
             this.drawDiagram();
@@ -429,7 +431,9 @@ export class similarityScoreDiagram {
             .data((d) => d)
             .enter()
             .append('rect')
-            .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+             .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+             .attr('class', this.getClassAssignment('ORDER_STATUS'))
+           // .attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
             .attr('x', (g) => this.timeScale(g.diff))
             .attr('y', 0)
             .attr('width', this.similarBar.width)
@@ -554,6 +558,10 @@ export class similarityScoreDiagram {
                 select(".tooltip").transition(t)
                     .style("opacity", 0);
             });
+            
+              this.svg.select('#similar_orders').selectAll('.similarRect')
+                    .append('text')
+                    .text(similarOrdersInfo.pat_id);
 
         // fix height of the svg
         this.svg
@@ -574,45 +582,7 @@ export class similarityScoreDiagram {
     }
 
 
-    /**
-     * Utility method
-     * @param pat
-     * @returns {Date}
-     */
-    private findMinDate(pat) {
-
-        let minDate = new Date();
-        for (let index = 0; index < pat.length; index++) {
-            if (!pat[index]['ASSESSMENT_START_DTM']) continue;
-            if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
-                minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
-        }
-        return minDate
-    }
-
-
-    /**
-     * parse time
-     * @param date
-     * @param nullDate
-     * @returns {null}
-     */
-    private parseTime(date, nullDate) {
-        let parseT1 = timeParse('%x %X');
-        let parseT2 = timeParse('%x');
-        let time = nullDate;
-
-        if (date) {
-            if (date.split(' ').length > 1) {
-                time = parseT1(date);
-            }
-            else
-                time = parseT2(date)
-        }
-        return time
-    }
-
-
+    
     /**
      * Get the data via API
      * @param URL
