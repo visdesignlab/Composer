@@ -148,6 +148,21 @@ export class rectExploration {
 
   }
 
+  private findOrders () {
+
+ let dataset = 'selected';
+      let targetOrder = 'OMEPRAZOLE';
+      let monthYear = '11-8-2013';
+      const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}/${monthYear}`;
+      this.setBusy(true);
+      this.getData(url).then((args) => {
+        events.fire('find_orders', [args]);
+        this.setBusy(false);
+        console.log('this is my function')
+        console.log(args);
+      });
+  }
+
   /**
    *
    * @param ordersInfo
@@ -164,24 +179,10 @@ export class rectExploration {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
         d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
       });
-/*
-      ordersInfo.forEach((d) => {
-      let time = this.parseTime(d['ASSESSMENT_START_DTM'], minDate).getTime();
-      d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
-      });*/
  
 
       const self = this;
-      /*
-      function getClassAssignment (attString) {
-      //this uses a work around to use a function with classed. As well it preserves the already assinged classes
-        
-        return function (d) { 
-          let element = select(this);
-          element.classed (d[attString], true);
-          return element.attr('class');
-        }
-      }*/
+
 
       let orderRect = this.svg.select('#pat_rect_line')
      
@@ -211,6 +212,9 @@ export class rectExploration {
             this.currentlySelectedName = d.ORDER_MNEMONIC;
            console.log(this.currentlySelectedName);
            this.orderLabel = this.currentlySelectedName;//adds the order name to the label
+          // events.fire()
+           this.findOrders();
+          // console.log(d.similar_orders);
            
           } else {
             this.currentlySelectedName = undefined;
@@ -228,17 +232,7 @@ export class rectExploration {
           let selectedGroupTargetPat = this.svg.selectAll('.selectedOrder');
           let selectedGroupSimilar = d3.selectAll('#similar_orders').selectAll('.selectedOrder');
          
-  
-         /*
-          let rectXArray = this.svg.selectAll('rects').selectAll('.selectedOrder').nodes().map( let rectPosition = 
-            (d) => {return d.getAttribute('x'); });
-          
-          //let rectX = this.svg.selectAll('rects').size;
-         // console.log(rectX.length);
-         
-          */
            console.log(selectedGroupTargetPat.size());//logs the number of orders in the selected order for target patient
-         
            console.log(selectedGroupSimilar.size()/3);//logs the number of orders in the selected order of similar patients
       
     
@@ -448,6 +442,14 @@ events.fire('brushed', [newMin, newMax]);
     text += "<span>" + tooltip_data['ORDER_DTM'] + "</span></br>";
     return text;
   }
+
+/*
+ const url = `/data_api/getSimilarRows/${value}/${n}/${this.dataset}`;
+            this.setBusy(true);
+            this.getData(url).then((args) => {
+
+                this.setBusy(false);
+                this.similarArgs = args;*/
 
   /**
    * Show or hide the application loading indicator

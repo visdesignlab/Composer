@@ -19,10 +19,19 @@ def get_first_info(PAT_ID):
 
     return first_ent
 
+# used in data_handler.get_filtered_orders_by_month
+def get_filteres_orders(dataset_id, order, dateTime):
+    data = dt.get(dataset_id).aslist()
+    filtered_data = [x for x in data if x['ORDER_MNEMONIC'] == order and to_data_time(x['ORDER_DTM']).month == to_data_time(dateTime).month and to_data_time(x['ORDER_DTM']).year == to_data_time(dateTime).year]
+    filtered_data.sort(key=lambda x: to_data_time(x['ORDER_DTM']), reverse=True)
+    return filtered_data
+
 
 ##============= utility functions
 def to_data_time(date):
-    if ':' in date:
+    if '-' in date:
+        time = pd.datetime.strptime(date, '%m-%d-%Y')
+    elif ':' in date:
         time = pd.datetime.strptime(date, '%m/%d/%Y %I:%M:%S %p')
     elif '/' in date:
         time = pd.datetime.strptime(date, '%m/%d/%Y')

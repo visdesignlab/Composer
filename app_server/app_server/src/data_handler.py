@@ -29,7 +29,6 @@ def get_all_rows(dataset_id):
       dataset_id: rows[:50]
     })
 
-
 # access directly from API: '/getPatInfo/<PAT_ID>/<dataset>'
 def get_pat_info(PAT_ID, dataset):
     return jsonify({
@@ -37,7 +36,6 @@ def get_pat_info(PAT_ID, dataset):
       'Orders': get_info([int(PAT_ID)], dataset_hash['Orders'][dataset]),
       'PRO': get_info([int(PAT_ID)], dataset_hash['PRO'][dataset])
     })
-
 
 # access directly from API: '/getSimilarRows/<PAT_ID>/<number>/<dataset>'
 def get_similar_rows(PAT_ID, number, dataset):
@@ -85,12 +83,11 @@ def get_similar_rows(PAT_ID, number, dataset):
 
         'similar_Demo': demo_info,
         'similar_PRO': pro_info,
-        'similar_Orders': orders_info#,
+        'similar_Orders': orders_info
 
         #'difference': difference
         #'all_pro_rows': sum(pro_rows, get_all_info_for_pat('PRO', int(PAT_ID)))
     })
-
 
 # access directly from API: '/getWeights/<dataset_id>'
 def get_weights(dataset_id):
@@ -116,6 +113,10 @@ def get_latest_info(dataset_id):
         return handle_Demo.get_latest_info()
     return jsonify({'message': 'error'})
 
+# access directly from API: 'filteredOrdersByMonth/<dataset_id>/<order>/<dateTime>'
+def get_filtered_orders_by_month(dataset, order, dateTime):
+     filtered_orders = handle_Orders.get_filteres_orders(dataset_hash['Orders'][dataset], order, dateTime)
+     return jsonify({'filtered_Orders': filtered_orders})
 
 # access directly from API: '/getStat/<dataset>'
 def get_stat(dataset):
@@ -156,7 +157,6 @@ def get_stat(dataset):
        'BMI': bmi,
        'AGE': age
        })
-
 
 ##=========== helper functions
 
