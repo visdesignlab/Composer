@@ -17,6 +17,17 @@ import {transition} from 'd3-transition';
 import {brush, brushY, brushX} from 'd3-brush';
 import * as similarityScore  from './similarityScoreDiagram';
 import * as d3 from 'd3';
+import {ITable, asTable} from 'phovea_core/src/table';
+import {IAnyVector} from 'phovea_core/src/vector';
+import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
+//import * as csvUrl from 'file-loader!../data/number_one_artists.csv';
+import {tsv} from 'd3-request';
+import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
+import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
+import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
+import {asVector} from 'phovea_core/src/vector/Vector';
+import {argFilter} from 'phovea_core/src/';
+
 
 export class rectExploration {
 
@@ -29,6 +40,7 @@ export class rectExploration {
   private brush;
   private targetPatientOrders;
   private currentlySelectedName;
+  private currentlySelectedNameDate;
   private similarData;
   private allData;
   private selectedOrder;
@@ -47,6 +59,9 @@ export class rectExploration {
   orderBar = {width: 10, height: 60 };
   margin = {top: 20, right: 10, bottom: 10, left: 10};
   contextDimension = {width: this.rectBoxDimension.width, height:55};
+
+  table: ITable;
+  table2: ITable;
     
   constructor(parent: Element) {
 
@@ -150,10 +165,13 @@ export class rectExploration {
 
   private findOrders () {
 
- let dataset = 'selected';
+      let dataset = 'selected';
       let targetOrder = 'OMEPRAZOLE';
+     // let targetOrder = this.currentlySelectedName;
       let monthYear = '11-8-2013';
+      //let monthYear = this.currentlySelectedNameDate;
       const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}/${monthYear}`;
+       //const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
       this.setBusy(true);
       this.getData(url).then((args) => {
         events.fire('find_orders', [args]);
@@ -210,6 +228,7 @@ export class rectExploration {
           this.svg.selectAll('rects');
           if (this.currentlySelectedName === undefined) {
             this.currentlySelectedName = d.ORDER_MNEMONIC;
+            this.currentlySelectedNameDate = d.ORDER_DTM;
            console.log(this.currentlySelectedName);
            this.orderLabel = this.currentlySelectedName;//adds the order name to the label
           // events.fire()
@@ -234,7 +253,8 @@ export class rectExploration {
          
            console.log(selectedGroupTargetPat.size());//logs the number of orders in the selected order for target patient
            console.log(selectedGroupSimilar.size()/3);//logs the number of orders in the selected order of similar patients
-      
+          
+           this.loadDataFromServer();
     
       })//end the mousclick event that shows the graph
       .on("mouseover", (d) => {
@@ -442,6 +462,42 @@ events.fire('brushed', [newMin, newMax]);
     text += "<span>" + tooltip_data['ORDER_DTM'] + "</span></br>";
     return text;
   }
+
+   public async loadDataFromServer() {
+     
+   
+    console.log('Loading Data from the a Server');
+    // listData() returns a list of all datasets loaded by the server
+    // notice the await keyword - you'll see an explanation below
+    const allDatasets = await listData();
+    //console.log('All loaded datasets:');
+    //console.log(allDatasets);
+     // we could use those dataset to filter them based on their description and pick the one(s) we're interested in
+    // here we pick the first dataset and cast it to ITable - by default the datasets are returned as IDataType
+    let tempTable: ITable;
+    let orderArray = [];
+    // retrieving a dataset by name. Note that only the first dataset will be returned.
+    tempTable = <ITable> await getById('Orders');
+    //console.log(await tempTable.cols()[5]);
+    //console.log(await tempTable.cols()[5].data());
+   // console.log(await tempTable.nrow);
+    let tempVector = await tempTable.cols()[5].data();
+    console.log(tempVector);
+    console.log(this.currentlySelectedName);
+    //console.log(await tempTable.cols()[5].data());
+   /*
+    for (let i = 0; i < tempTable.nrow; i++){   
+        if (tempTable.cols()[5].data() == this.currentlySelectedName) {
+     // console.log(await tempTable.col(i)[5].data());
+      console.log(await tempTable.colData);
+    }
+    }*/
+
+    //console.log(tempTable);
+    //console.log(await tempTable.data());
+     //console.log(await this.table.objects());
+
+   }
 
 /*
  const url = `/data_api/getSimilarRows/${value}/${n}/${this.dataset}`;
