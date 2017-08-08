@@ -127,6 +127,7 @@ export class rectExploration {
     
   this.attachListener();
   this.drawCheckboxes();
+  this.drawQueryBox();
       }
   
  
@@ -161,17 +162,37 @@ export class rectExploration {
       this.drawMiniRects();
     });
 
+
+
   }
+
+     /**
+     * firing event to update the vis for info of a patient
+     */
+    private queryOrder() {
+           const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+        
+            //const url = `/data_api/getPatInfo/${value}/${this.dataset}`;
+            this.setBusy(true);
+            console.log(value);
+            this.currentlySelectedName = value;
+            console.log(this.currentlySelectedName);
+            this.svg.selectAll('.selectedOrder')
+            .remove('.selectedOrder');
+            this.svg.selectAll('unselectedOrder')
+            .remove('.unselectedOrder');
+            events.fire('query_search', value);
+            //d3.selectAll('rects').selectAll('.selectedOrders')
+            this.setBusy(false);
+            
+    }
 
   private findOrders () {
 
       let dataset = 'selected';
-      let targetOrder = 'OMEPRAZOLE';
-     // let targetOrder = this.currentlySelectedName;
-      let monthYear = '11-8-2013';
-      //let monthYear = this.currentlySelectedNameDate;
-      const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}/${monthYear}`;
-       //const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
+     // let targetOrder = 'OMEPRAZOLE';
+      let targetOrder = this.currentlySelectedName;
+      const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
       this.setBusy(true);
       this.getData(url).then((args) => {
         events.fire('find_orders', [args]);
@@ -192,7 +213,6 @@ export class rectExploration {
      // let ordersInfo = this.targetPatientProInfo; why is this not determining the date??
       let minDate = this.findMinDate(this.targetPatientProInfo);
   
- 
       ordersInfo.forEach((d) => {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
         d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -385,6 +405,23 @@ export class rectExploration {
   
   }
 
+      //this is where your order search starts
+private drawQueryBox (){
+  let form= this.$node.append('form');
+
+        form.append('input')
+            .attr('type', 'text')
+            .attr('placeholder', 'Search Order Name')
+            .attr('id', 'order_search')
+            .attr('value');
+
+        form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'order_search')
+            .on('click', () => this.queryOrder());
+}
+       
+
   private drawOrderLabel() {
     d3.selectAll('.orderLabel').remove();
     
@@ -478,24 +515,10 @@ events.fire('brushed', [newMin, newMax]);
     let orderArray = [];
     // retrieving a dataset by name. Note that only the first dataset will be returned.
     tempTable = <ITable> await getById('Orders');
-    //console.log(await tempTable.cols()[5]);
-    //console.log(await tempTable.cols()[5].data());
-   // console.log(await tempTable.nrow);
+   
     let tempVector = await tempTable.cols()[5].data();
-    console.log(tempVector);
-    console.log(this.currentlySelectedName);
-    //console.log(await tempTable.cols()[5].data());
-   /*
-    for (let i = 0; i < tempTable.nrow; i++){   
-        if (tempTable.cols()[5].data() == this.currentlySelectedName) {
-     // console.log(await tempTable.col(i)[5].data());
-      console.log(await tempTable.colData);
-    }
-    }*/
-
-    //console.log(tempTable);
-    //console.log(await tempTable.data());
-     //console.log(await this.table.objects());
+    //console.log(tempVector);
+    //console.log(this.currentlySelectedName);
 
    }
 

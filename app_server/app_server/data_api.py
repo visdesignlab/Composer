@@ -56,9 +56,9 @@ def _get_latest_info(dataset_id):
 def _get_stat(dataset):
     return data_handler.get_stat(dataset)
 
-@app.route('/filteredOrdersByMonth/<dataset_id>/<order>/<dateTime>')
-def _get_filtered_orders_by_month(dataset_id, order, dateTime):
-    return data_handler.get_filtered_orders_by_month(dataset_id, order, dateTime)
+@app.route('/filteredOrdersByMonth/<dataset_id>/<order>')
+def _get_filtered_orders_by_month(dataset_id, order):
+    return data_handler.get_filtered_orders_by_month(dataset_id, order)
 
 def create():
     return app
