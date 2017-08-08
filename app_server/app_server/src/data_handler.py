@@ -114,8 +114,8 @@ def get_latest_info(dataset_id):
     return jsonify({'message': 'error'})
 
 # access directly from API: 'filteredOrdersByMonth/<dataset_id>/<order>/<dateTime>'
-def get_filtered_orders_by_month(dataset, order, dateTime):
-     filtered_orders = handle_Orders.get_filteres_orders(dataset_hash['Orders'][dataset], order, dateTime)
+def get_filtered_orders_by_month(dataset, order):
+     filtered_orders = handle_Orders.get_filteres_orders(dataset_hash['Orders'][dataset], order)
      return jsonify({'filtered_Orders': filtered_orders})
 
 # access directly from API: '/getStat/<dataset>'

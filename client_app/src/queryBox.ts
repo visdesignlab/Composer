@@ -186,7 +186,6 @@ export class QueryBox {
         }
     }
 
-
     /**
      * get Data by API
      * @param URL
