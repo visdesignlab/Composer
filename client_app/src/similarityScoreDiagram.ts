@@ -134,11 +134,12 @@ export class similarityScoreDiagram {
             this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
             this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
             //console.log(this.similarPatientsProInfo);
-            console.log(item[2]);
-
+           // console.log(item[2]);
+            console.log(item[2]['pat_Orders']);
             this.clearDiagram();
             this.drawDiagram();
             this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']))
+            //this.orderHierarchy(item[1]['Orders'][item[0]]);
 
         });
 
@@ -155,7 +156,7 @@ export class similarityScoreDiagram {
             this.clearDiagram();
             this.drawDiagram();
             this.addOrderSquares(item[1]['Orders'][item[0]]);
-
+            this.orderHierarchy(item[1]['Orders'][item[0]]);
 
         });
 
@@ -293,7 +294,41 @@ export class similarityScoreDiagram {
 
     }
 
+  /**
+     * add small squares for orders of one (target) patient
+     * @param ordersInfo
+     */
+    private orderHierarchy(ordersInfo) {
 
+        let minDate = this.findMinDate(this.targetPatientProInfo);
+        let procedureGroup = [];
+        let medicationGroup = [];
+
+        ordersInfo.forEach((d) => {
+            
+            if (d['ORDER_CATALOG_TYPE'] == 'PROCEDURE') {
+                procedureGroup.push(d);
+                //console.log('pro added');
+            }else if(d['ORDER_CATALOG_TYPE'] == 'MEDICATION'){
+                medicationGroup.push(d);
+                //console.log(d['PRIMARY_MNEMONIC']);
+            }else { console.log('type not found');  }
+           
+        });
+
+        console.log(procedureGroup.length);
+        console.log(medicationGroup.length);
+
+         this.svg.select('#pat_orders')
+         .append('text')
+         .text('Procedure Orders for patient:   ' + procedureGroup.length)
+         .attr('transform', 'translate(450, 100)');
+          this.svg.select('#pat_orders')
+         .append('text')
+         .text('Procedure Orders for patient:   ' + medicationGroup.length)
+         .attr('transform', 'translate(450, 120)');
+
+    }
     /**
      * add small squares for orders of one (target) patient
      * @param ordersInfo
