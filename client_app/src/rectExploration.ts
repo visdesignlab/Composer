@@ -170,17 +170,21 @@ export class rectExploration {
      * firing event to update the vis for info of a patient
      */
     private queryOrder() {
+          
+           this.$node.selectAll('rect')
+            .classed('.selectedOrder', false);
+            this.svg.selectAll('rect')
+            .classed('.unselectedOrder', false);
+
            const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-        
+           this.currentlySelectedName = value;
             //const url = `/data_api/getPatInfo/${value}/${this.dataset}`;
             this.setBusy(true);
-            console.log(value);
-            this.currentlySelectedName = value;
-            console.log(this.currentlySelectedName);
-            this.svg.selectAll('.selectedOrder')
-            .remove('.selectedOrder');
-            this.svg.selectAll('unselectedOrder')
-            .remove('.unselectedOrder');
+           // console.log(value);
+           // this.currentlySelectedName = value;
+            //console.log(this.currentlySelectedName);
+            
+
             events.fire('query_search', value);
             //d3.selectAll('rects').selectAll('.selectedOrders')
             this.setBusy(false);
@@ -188,17 +192,22 @@ export class rectExploration {
     }
 
   private findOrders () {
+      //this.currentlySelectedName = undefined;
+     // const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+     // this.currentlySelectedName = value;
+    
+      console.log(this.currentlySelectedName);
 
       let dataset = 'selected';
-     // let targetOrder = 'OMEPRAZOLE';
       let targetOrder = this.currentlySelectedName;
       const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
       this.setBusy(true);
       this.getData(url).then((args) => {
         events.fire('find_orders', [args]);
         this.setBusy(false);
-        console.log('this is my function')
         console.log(args);
+
+        
       });
   }
 
@@ -213,7 +222,7 @@ export class rectExploration {
      // let ordersInfo = this.targetPatientProInfo; why is this not determining the date??
       let minDate = this.findMinDate(this.targetPatientProInfo);
   
-      ordersInfo.forEach((d) => {
+         ordersInfo.forEach((d) => {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
         d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
       });
@@ -247,8 +256,7 @@ export class rectExploration {
         .on('click', d => {
           this.svg.selectAll('rects');
           if (this.currentlySelectedName === undefined) {
-            this.currentlySelectedName = d.ORDER_MNEMONIC;
-            this.currentlySelectedNameDate = d.ORDER_DTM;
+            this.currentlySelectedName = d.PRIMARY_MNEMONIC;
            console.log(this.currentlySelectedName);
            this.orderLabel = this.currentlySelectedName;//adds the order name to the label
           // events.fire()
@@ -295,8 +303,8 @@ export class rectExploration {
       });
       
       d3.selectAll('.MEDICATION, .PROCEDURE')
-      .classed('selectedOrder', d => d.ORDER_MNEMONIC === this.currentlySelectedName)
-      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.ORDER_MNEMONIC !== this.currentlySelectedName);
+      .classed('selectedOrder', d => d.PRIMARY_MNEMONIC === this.currentlySelectedName)
+      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.PRIMARY_MNEMONIC !== this.currentlySelectedName);
       
        this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale))
@@ -407,7 +415,7 @@ export class rectExploration {
 
       //this is where your order search starts
 private drawQueryBox (){
-  let form= this.$node.append('form');
+  let form = this.$node.append('form');
 
         form.append('input')
             .attr('type', 'text')
@@ -464,7 +472,6 @@ private updateRectPro() {
       if (!cbPro) selectAll(".PROCEDURE").classed('hidden', true);
       
       else selectAll(".PROCEDURE").classed('hidden', false);
-      
 }
 
 
@@ -508,7 +515,7 @@ events.fire('brushed', [newMin, newMax]);
     // notice the await keyword - you'll see an explanation below
     const allDatasets = await listData();
     //console.log('All loaded datasets:');
-    //console.log(allDatasets);
+    console.log(allDatasets);
      // we could use those dataset to filter them based on their description and pick the one(s) we're interested in
     // here we pick the first dataset and cast it to ITable - by default the datasets are returned as IDataType
     let tempTable: ITable;
@@ -517,7 +524,7 @@ events.fire('brushed', [newMin, newMax]);
     tempTable = <ITable> await getById('Orders');
    
     let tempVector = await tempTable.cols()[5].data();
-    //console.log(tempVector);
+    console.log(tempVector);
     //console.log(this.currentlySelectedName);
 
    }
