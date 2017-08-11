@@ -163,54 +163,37 @@ export class rectExploration {
     });
 
 
-
   }
 
-     /**
+    /**
      * firing event to update the vis for info of a patient
      */
     private queryOrder() {
           
-           this.$node.selectAll('rect')
-            .classed('.selectedOrder', false);
-            this.svg.selectAll('rect')
-            .classed('.unselectedOrder', false);
+      if (this.currentlySelectedName != undefined ){
+        this.currentlySelectedName = undefined;
+      }
 
-           const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-           this.currentlySelectedName = value;
-            //const url = `/data_api/getPatInfo/${value}/${this.dataset}`;
-            this.setBusy(true);
-           // console.log(value);
-           // this.currentlySelectedName = value;
-            //console.log(this.currentlySelectedName);
-            
-
-            events.fire('query_search', value);
-            //d3.selectAll('rects').selectAll('.selectedOrders')
-            this.setBusy(false);
-            
-    }
-
-  private findOrders () {
-      //this.currentlySelectedName = undefined;
-     // const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-     // this.currentlySelectedName = value;
+    const value = (<HTMLInputElement>document.getElementById('order_search')).value;
     
-      console.log(this.currentlySelectedName);
+      console.log(value);
 
       let dataset = 'selected';
-      let targetOrder = this.currentlySelectedName;
+      let targetOrder = value;
       const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
       this.setBusy(true);
       this.getData(url).then((args) => {
+
         events.fire('find_orders', [args]);
         this.setBusy(false);
         console.log(args);
-
+      
+        events.fire('query_order', value);
+        this.drawPatOrderRects();
+       // this.loadDataFromServer();
         
       });
   }
-
   /**
    *
    * @param ordersInfo
@@ -229,6 +212,11 @@ export class rectExploration {
  
 
       const self = this;
+
+      events.on ('query_order', event => {
+          this.currentlySelectedName = event.args[0];
+         // console.log(event);
+      });
 
 
       let orderRect = this.svg.select('#pat_rect_line')
@@ -253,38 +241,7 @@ export class rectExploration {
       .attr('height', this.orderBar.height)
      
       //this is the mousclick event that greys rects
-        .on('click', d => {
-          this.svg.selectAll('rects');
-          if (this.currentlySelectedName === undefined) {
-            this.currentlySelectedName = d.PRIMARY_MNEMONIC;
-           console.log(this.currentlySelectedName);
-           this.orderLabel = this.currentlySelectedName;//adds the order name to the label
-          // events.fire()
-           this.findOrders();
-          // console.log(d.similar_orders);
-           
-          } else {
-            this.currentlySelectedName = undefined;
-            this.orderLabel = "Select An Order";
-            this.selectedTargetPatOrderCount = "  ";
-             this.selectedSimilarOrderCount = "   ";
-             d3.selectAll('.orderLabel').remove();
-            //this.drawOrderLabel();
-          }
-          
-          this.drawPatOrderRects();
-          this.selectedTargetPatOrderCount = this.svg.selectAll('.selectedOrder').size();
-           this.selectedSimilarOrderCount = d3.selectAll('#similar_orders').selectAll('.selectedOrder').size()/3;
-           this.drawOrderLabel();//draws the label with the order count for patient and similar patients
-          let selectedGroupTargetPat = this.svg.selectAll('.selectedOrder');
-          let selectedGroupSimilar = d3.selectAll('#similar_orders').selectAll('.selectedOrder');
-         
-           console.log(selectedGroupTargetPat.size());//logs the number of orders in the selected order for target patient
-           console.log(selectedGroupSimilar.size()/3);//logs the number of orders in the selected order of similar patients
-          
-           this.loadDataFromServer();
-    
-      })//end the mousclick event that shows the graph
+      .on('click', this.assignCurrentName.bind(this))//end the mousclick event that shows the graph
       .on("mouseover", (d) => {
         let t = transition('t').duration(500);
         select(".tooltip")
@@ -302,8 +259,9 @@ export class rectExploration {
           .style("opacity", 0);
       });
       
+      
       d3.selectAll('.MEDICATION, .PROCEDURE')
-      .classed('selectedOrder', d => d.PRIMARY_MNEMONIC === this.currentlySelectedName)
+      .classed('selectedOrder', d =>  d.PRIMARY_MNEMONIC == this.currentlySelectedName)
       .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.PRIMARY_MNEMONIC !== this.currentlySelectedName);
       
        this.svg.select('.xAxis')
@@ -321,7 +279,6 @@ export class rectExploration {
         d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
       }); 
 
-      const self = this;
      this.svg.select('.context')
      .selectAll('.orderRectMini')
       .data([ordersInfo2])
@@ -425,11 +382,10 @@ private drawQueryBox (){
 
         form.append('input')
             .attr('type', 'button')
-            .attr('value', 'order_search')
+            .attr('value', 'order search')
             .on('click', () => this.queryOrder());
 }
        
-
   private drawOrderLabel() {
     d3.selectAll('.orderLabel').remove();
     
@@ -475,16 +431,47 @@ private updateRectPro() {
 }
 
 
-//sets up the brush for brush business
-private brushed (start, end ){
 
-//var selectBool = event.selection;
+private assignCurrentName (d) {
+          
+          //this.svg.selectAll('rects').classed('selectedOrder', false);
+          //this.svg.selectAll('rects').classed('unselectedOrder', false);
 
-let newMin = start;
-let newMax = end;
+        
+          /*
+          if (this.currentlySelectedName === undefined) {
+            this.currentlySelectedName = d.PRIMARY_MNEMONIC;
+           console.log(this.currentlySelectedName);
+           this.orderLabel = this.currentlySelectedName;//adds the order name to the label
+        
+           this.findOrders();
+           
+          } else {
+            this.currentlySelectedName = undefined;
+            this.orderLabel = "Select An Order";
+            this.selectedTargetPatOrderCount = "  ";
+             this.selectedSimilarOrderCount = "   ";
+             d3.selectAll('.orderLabel').remove();
+            //this.drawOrderLabel();
+          }*/
+          if (this.currentlySelectedName != undefined){
+            this.currentlySelectedName = undefined;
+          }
 
-
-events.fire('brushed', [newMin, newMax]);
+          this.drawPatOrderRects();
+          /*
+          this.selectedTargetPatOrderCount = this.svg.selectAll('.selectedOrder').size();
+           this.selectedSimilarOrderCount = d3.selectAll('#similar_orders').selectAll('.selectedOrder').size()/3;
+           this.drawOrderLabel();//draws the label with the order count for patient and similar patients
+          let selectedGroupTargetPat = this.svg.selectAll('.selectedOrder');
+          let selectedGroupSimilar = d3.selectAll('#similar_orders').selectAll('.selectedOrder');
+         
+         //  console.log(selectedGroupTargetPat.size());//logs the number of orders in the selected order for target patient
+          // console.log(selectedGroupSimilar.size()/3);//logs the number of orders in the selected order of similar patients
+          
+           this.loadDataFromServer();
+    */
+      
 
 }
 
@@ -533,7 +520,6 @@ events.fire('brushed', [newMin, newMax]);
  const url = `/data_api/getSimilarRows/${value}/${n}/${this.dataset}`;
             this.setBusy(true);
             this.getData(url).then((args) => {
-
                 this.setBusy(false);
                 this.similarArgs = args;*/
 
