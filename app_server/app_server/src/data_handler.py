@@ -118,6 +118,11 @@ def get_filtered_orders_by_month(dataset, order):
      filtered_orders = handle_Orders.get_filteres_orders(dataset_hash['Orders'][dataset], order)
      return jsonify({'filtered_Orders': filtered_orders})
 
+#access directly from API: '/filteredOrderType/<dataset_id>/<ordertype>'
+def get_order_type(dataset, ordertype):
+     filtered_orders = handle_Orders.get_order_type(dataset_hash['Orders'][dataset], ordertype)
+     return jsonify({'filtered_Orders': filtered_orders})
+
 # access directly from API: '/getStat/<dataset>'
 def get_stat(dataset):
     my_data = dt.get(dataset_hash['Demo'][dataset])

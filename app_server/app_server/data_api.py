@@ -60,5 +60,9 @@ def _get_stat(dataset):
 def _get_filtered_orders_by_month(dataset_id, order):
     return data_handler.get_filtered_orders_by_month(dataset_id, order)
 
+@app.route('/filteredOrderType/<dataset_id>/<ordertype>')
+def _get_order_type(dataset_id, ordertype):
+    return data_handler.get_order_type(dataset_id, ordertype)
+
 def create():
     return app

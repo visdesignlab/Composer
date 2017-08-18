@@ -6,6 +6,7 @@ import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll} from 'd3-selection';
 import * as events from 'phovea_core/src/event';
 
+
 export class QueryBox {
 
     private $node;
@@ -157,6 +158,7 @@ export class QueryBox {
 
                 // caught by svgTable and scoreDiagram and statHistogram
                 events.fire('update_similar', [value, n, args]);
+                events.fire('update_hierarchy');
             });
 
         } else {
@@ -178,7 +180,7 @@ export class QueryBox {
                 // caught by svgTable and similarityScoreDiagram
                 events.fire('update_all_info', [value, args]);
 
-                this.setBusy(false);
+                this.setBusy(false)
             });
 
         } else {
