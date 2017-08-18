@@ -12,6 +12,7 @@ import * as events from 'phovea_core/src/event';
 import * as statHistogram from './statHistogram';
 import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
+import * as patOrderBreakdown from './patOrderBreakdown';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -74,10 +75,8 @@ export class App {
     // query box
     queryBox.create(main.node());
 
-
     // distributionDiagram
     distributionDiagram.create(main.node());
-
 
     // histogram
     statHistogram.create(main.node());
@@ -85,8 +84,38 @@ export class App {
     //rect
     rectExploration.create(main.node());
 
-    //order historgram
-    //statOrder.create(main.node());
+      //order hierarchy
+    patOrderBreakdown.create(main.node());
+    this.$node.select('.orderBreakdownDiv').classed('hidden', true);
+
+     // item: pat_id, DATA
+        events.on('update_all_info', (evt, item) => {  // called in query box
+
+            
+
+            const targetPatientProInfo = item[1]['PRO'][item[0]];
+            const similarPatientsProInfo = [];
+
+            this.$node.select('.orderBreakdownDiv').classed('hidden', false);
+            this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
+           
+
+            console.log('added similarity score diagram');
+
+        });
+        
+          // item: pat_id, DATA
+        events.on('update_hierarchy', () => {  // called in query box
+
+
+              //order hierarchy
+           // this.$node.remove(patOrderBreakdown);
+           // patOrderBreakdown.create(main.node());
+            this.$node.select('.main').select('.allDiagramDiv').classed('hidden', false);
+            this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+            console.log('remove pat hierarchy');
+
+        });
 
 
     // PROMIS diagrams

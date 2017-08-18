@@ -17,6 +17,8 @@ import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
 
+export const filteredOrders = this.filteredOrders;
+
 export class similarityScoreDiagram {
 
     private $node;
@@ -32,7 +34,12 @@ export class similarityScoreDiagram {
     private parseTime = dataCalc.parseTime;
     private setOrderScale = dataCalc.setOrderScale;
     private getClassAssignment = dataCalc.getClassAssignment;
+    private orderHierarchy = dataCalc.orderHierarchy;
 
+   filteredOrders = {
+       medGroup : [],
+       proGroup : [],
+   }
 
     height = 400;
     width = 600;
@@ -135,7 +142,7 @@ export class similarityScoreDiagram {
             this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
             //console.log(this.similarPatientsProInfo);
            // console.log(item[2]);
-            console.log(item[2]['pat_Orders']);
+           // console.log(item[2]['pat_Orders']);
             this.clearDiagram();
             this.drawDiagram();
             this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']))
@@ -156,8 +163,12 @@ export class similarityScoreDiagram {
             this.clearDiagram();
             this.drawDiagram();
             this.addOrderSquares(item[1]['Orders'][item[0]]);
-            this.orderHierarchy(item[1]['Orders'][item[0]]);
-
+            //this splits the order hierarchy into 2 arrays of medicaiton and procedures for the patient but it is
+            //not recognized in the drawpatientrects();
+            this.filteredOrders.medGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).medicationGroup;
+            this.filteredOrders.proGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).procedureGroup;
+           // console.log(this.medGroup.length);
+           // console.log(this.proGroup.length);
         });
 
     }
@@ -294,42 +305,8 @@ export class similarityScoreDiagram {
 
     }
 
-  /**
-     * add small squares for orders of one (target) patient
-     * @param ordersInfo
-     */
-    private orderHierarchy(ordersInfo) {
-
-        let minDate = this.findMinDate(this.targetPatientProInfo);
-        let procedureGroup = [];
-        let medicationGroup = [];
-
-        ordersInfo.forEach((d) => {
-            
-            if (d['ORDER_CATALOG_TYPE'] == 'PROCEDURE') {
-                procedureGroup.push(d);
-                //console.log('pro added');
-            }else if(d['ORDER_CATALOG_TYPE'] == 'MEDICATION'){
-                medicationGroup.push(d);
-                //console.log(d['PRIMARY_MNEMONIC']);
-            }else { console.log('type not found');  }
-           
-        });
-
-        console.log(procedureGroup.length);
-        console.log(medicationGroup.length);
-
-         this.svg.select('#pat_orders')
-         .append('text')
-         .text('Procedure Orders for patient:   ' + procedureGroup.length)
-         .attr('transform', 'translate(450, 100)');
-          this.svg.select('#pat_orders')
-         .append('text')
-         .text('Procedure Orders for patient:   ' + medicationGroup.length)
-         .attr('transform', 'translate(450, 120)');
-
-    }
-    /**
+    
+ /** 
      * add small squares for orders of one (target) patient
      * @param ordersInfo
      */
@@ -356,7 +333,7 @@ export class similarityScoreDiagram {
             d['sumUp'] = nest().key((g) => g['diff']).entries(d.values); // TODO visualize collapsible squares
         });
 
-        console.log(nestedData);
+       // console.log(nestedData);
 
         this.svg.select('#pat_orders').selectAll('g').remove();
 
@@ -647,6 +624,8 @@ export class similarityScoreDiagram {
     }
 
 }
+
+export let targetPatientOrders;
 
 
 export function create(parent: Element, diagram) {

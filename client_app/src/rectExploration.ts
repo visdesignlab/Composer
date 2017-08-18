@@ -40,7 +40,6 @@ export class rectExploration {
   private brush;
   private targetPatientOrders;
   private currentlySelectedName;
-  private currentlySelectedNameDate;
   private similarData;
   private allData;
   private selectedOrder;
@@ -54,6 +53,8 @@ export class rectExploration {
   private parseTime = dataCalc.parseTime;
   private setOrderScale = dataCalc.setOrderScale;
   private getClassAssignment = dataCalc.getClassAssignment;
+  private drawPatOrderRects = dataCalc.drawPatOrderRects;
+  private orderType = dataCalc.orderType;
 
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
@@ -92,11 +93,16 @@ export class rectExploration {
       .attr('id', 'pat_rect_line')
        .attr('transform', `translate(${this.margin.left},${this.margin.top})`); 
 
-  let context = this.svg.append('g')
+   let context = this.svg.append('g')
             .attr('class', 'context')
             .attr('width', this.contextDimension.width)
             .attr('height', this.contextDimension.height)
-            .attr('transform', `translate(${this.margin.left},${this.rectBoxDimension.height + this.margin.top})`);
+            .attr('transform', `translate(${this.margin.left},${this.rectBoxDimension.height + this.margin.top})`)
+            .on("click", () => {
+              if(event.selection != null) {
+                this.setOrderScale();
+              }
+            });
 
       this.brush = brushX()
       .extent([[0, -.50], [this.contextDimension.width, this.contextDimension.height- 30]])
@@ -116,7 +122,7 @@ export class rectExploration {
           .attr('transform', () => `translate(0,${this.contextDimension.height- 30})`)
           .call(axisBottom(this.timeScaleMini));
         }
-        this.drawPatOrderRects();
+        this.drawPatOrderRects(this.targetPatientOrders);
         this.drawMiniRects();
       });
     
@@ -145,7 +151,7 @@ export class rectExploration {
 
       this.setOrderScale();
       this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
-      this.drawPatOrderRects();
+      this.drawPatOrderRects(this.targetPatientOrders);
       this.drawMiniRects();
 
 
@@ -158,8 +164,9 @@ export class rectExploration {
 
       this.setOrderScale();
  
-      this.drawPatOrderRects();
+      this.drawPatOrderRects(this.targetPatientOrders);
       this.drawMiniRects();
+      this.orderType('MEDICATION');
     });
 
 
@@ -189,85 +196,12 @@ export class rectExploration {
         console.log(args);
       
         events.fire('query_order', value);
-        this.drawPatOrderRects();
+        this.drawPatOrderRects(this.targetPatientOrders);
        // this.loadDataFromServer();
         
       });
   }
-  /**
-   *
-   * @param ordersInfo
-   */
-
-  private drawPatOrderRects() {
-
-     let ordersInfo = this.targetPatientOrders;
-     // let ordersInfo = this.targetPatientProInfo; why is this not determining the date??
-      let minDate = this.findMinDate(this.targetPatientProInfo);
-  
-         ordersInfo.forEach((d) => {
-        let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
-        d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
-      });
  
-
-      const self = this;
-
-      events.on ('query_order', event => {
-          this.currentlySelectedName = event.args[0];
-         // console.log(event);
-      });
-
-
-      let orderRect = this.svg.select('#pat_rect_line')
-     
-      .selectAll('.orderRect')
-      .data([ordersInfo]);
-      let orderRectEnter = orderRect.enter()
-      .append('g')
-      .classed('orderRect', true);
-      orderRect = orderRectEnter.merge(orderRect);
-
-      let rects = orderRect.selectAll('rect')
-      .data((d) => d);
-      let rectsEnter = rects.enter()
-      .append('rect');
-      rects = rectsEnter.merge(rects);
-      rects.attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
-      .attr('class', this.getClassAssignment('ORDER_STATUS'))
-      .attr('x', (g) => this.timeScale(g.diff))
-      .attr('y', 0)
-      .attr('width', this.orderBar.width)
-      .attr('height', this.orderBar.height)
-     
-      //this is the mousclick event that greys rects
-      .on('click', this.assignCurrentName.bind(this))//end the mousclick event that shows the graph
-      .on("mouseover", (d) => {
-        let t = transition('t').duration(500);
-        select(".tooltip")
-          .html(() => {
-            return this.renderOrdersTooltip(d);
-          })
-          .transition(t)
-          .style("opacity", 1)
-          .style("left", `${event.pageX + 10}px`)
-          .style("top", `${event.pageY + 10}px`);
-      })
-      .on("mouseout", () => {
-        let t = transition('t').duration(500);
-        select(".tooltip").transition(t)
-          .style("opacity", 0);
-      });
-      
-      
-      d3.selectAll('.MEDICATION, .PROCEDURE')
-      .classed('selectedOrder', d =>  d.PRIMARY_MNEMONIC == this.currentlySelectedName)
-      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.PRIMARY_MNEMONIC !== this.currentlySelectedName);
-      
-       this.svg.select('.xAxis')
-      .call(axisBottom(this.timeScale))
-
-  }
   
   private drawMiniRects() {
 
@@ -458,7 +392,7 @@ private assignCurrentName (d) {
             this.currentlySelectedName = undefined;
           }
 
-          this.drawPatOrderRects();
+          this.drawPatOrderRects(this.targetPatientOrders);
           /*
           this.selectedTargetPatOrderCount = this.svg.selectAll('.selectedOrder').size();
            this.selectedSimilarOrderCount = d3.selectAll('#similar_orders').selectAll('.selectedOrder').size()/3;
