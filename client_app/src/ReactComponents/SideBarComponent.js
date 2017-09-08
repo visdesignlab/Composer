@@ -1,18 +1,14 @@
 import React from 'react';
 import Paper from 'material-ui/Paper';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-
 import AppBar from 'material-ui/AppBar';
-
 import WeightInput from './WeightInput'
-
 import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
 //import {transition} from 'd3-transition';
 import {Constants} from '../constants';
-
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
