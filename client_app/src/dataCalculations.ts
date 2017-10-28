@@ -130,7 +130,6 @@ export class dataCalc {
 //get med and pro groups for target patient
         export function orderType(type) {
           
-
        const value = type;
     
       console.log(value);
