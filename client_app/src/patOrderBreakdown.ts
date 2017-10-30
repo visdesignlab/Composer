@@ -354,13 +354,6 @@ export class patOrderBreakdown {
     console.log(list(indices).filter(await this.table.data()));
   }
   }
-}
-
-
-   
-
-
-
    
 
 export function create(parent:Element) {
