@@ -236,7 +236,10 @@ export class parallel {
 
 this.brush.on('end', brush);
 
-this.plotPatients(this.selectedData);
+this.plotLines = this.svg.append('g')
+.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotGroup');
+
+this.plotPatients(this.selectedData, this.plotLines);
 
 this.SelectedCounter = this.svg.append('g')
 .attr('transform', 'translate(30,' + (this.plotDimension.height + 30) + ')')
@@ -245,12 +248,14 @@ this.SelectedCounter = this.svg.append('g')
 
 }
 
-private plotPatients(data){
+private plotPatients(data, plotLines){
 
   //console.log(this.selectedData);
-  this.plotLines = this.svg.append('g')
-  .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
-  .attr('id', 'plotGroup').selectAll('path').data(data);
+ 
+  plotLines = select('#plotGroup')
+  .selectAll('path').data(data);
+
+  console.log(data.length);
 
    // Add grey background lines for context.
    /*
@@ -261,15 +266,15 @@ private plotPatients(data){
    .enter().append("path")
    .attr("d", path);*/
 
-  let linesEnter = this.plotLines.enter().append('path');
-  this.plotLines = this.plotLines.merge(linesEnter);
+  let linesEnter = plotLines.enter().append('path');
+  plotLines = plotLines.merge(linesEnter);
 
-  this.plotLines.exit().remove();
+  plotLines.exit().remove();
 
-  this.plotLines.attr('d', d => this.path(d));
+  plotLines.attr('d', d => this.path(d));
 
-  this.plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.1);
-  this.plotLines.on('mouseover', (d)=> console.log(d));
+  plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.1);
+  plotLines.on('mouseover', (d)=> console.log(d));
 
 
 }
@@ -281,7 +286,7 @@ let parent = d[1];
 
     let lines = select('#plotGroup').selectAll('path');
 
-    // let filterGroup = selected.filter(d => d[parent] == choice);
+    let filterGroup = selected.filter(d => d[parent] == choice);
 
     // let reject = lines.filter(d => d[parent] == choice);
 
@@ -291,16 +296,17 @@ let parent = d[1];
      console.log(rejectData);
      console.log(filteredData);
 
-   // filterGroup.classed(parent, true);
+    filterGroup.classed(parent, true);
 
   //  this.plotLines = filterGroup;
 
   //  console.log(filterGroup);
    // console.log(reject);
 
-    this.SelectedCounter.text('Selected Patients:   ' + this.plotLines.size());
+    this.SelectedCounter.text('Selected Patients:   ' + filteredData.length);
 
-    this.plotPatients(filteredData);
+    this.plotPatients(filteredData, this.plotLines);
+    this.selectedData = filteredData;
 
 }
 
