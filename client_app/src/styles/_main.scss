@@ -49,27 +49,55 @@
     color: rgba(0, 0, 0, 0.3)
 }
 
+.axis line,
+.axis path {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1px;
+}
+
+.background path {
+    fill: none;
+    stroke: #ddd;
+    stroke-opacity: .5;
+}
+
+.foreground path {
+    fill: none;
+    stroke: steelblue;
+}
+
+.reject {
+    stroke: gainsboro;
+    stroke-opacity: .2;
+}
+
 .GENDER {
-    stroke: red;
+    stroke: #873600;
     stroke-opacity: .5;
 }
 
 .TOBACCO {
-    stroke: blue;
+    stroke: #1B4F72;
     stroke-opacity: .5;
 }
 
 .ALCOHOL {
-    stroke: purple;
+    stroke: #633974;
     stroke-opacity: .5;
 }
 
 .DRUG_USER {
-    stroke: greenyellow;
+    stroke: #1D8348;
     stroke-opacity: .3;
 }
 
 .MARITAL_STATUS {
-    stroke: green;
+    stroke: #7D6608;
+    stroke-opacity: .3;
+}
+
+.RACE {
+    stroke: #7D6608;
     stroke-opacity: .3;
 }
