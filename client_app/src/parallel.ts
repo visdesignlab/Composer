@@ -239,7 +239,10 @@ this.brush.on('end', brush);
 this.plotLines = this.svg.append('g')
 .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotGroup');
 
-this.plotPatients(this.selectedData, this.plotLines);
+this.svg.append('g')
+.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotRejects');
+
+this.plotPatients(this.selectedData, this.contextData);
 
 this.SelectedCounter = this.svg.append('g')
 .attr('transform', 'translate(30,' + (this.plotDimension.height + 30) + ')')
@@ -248,34 +251,35 @@ this.SelectedCounter = this.svg.append('g')
 
 }
 
-private plotPatients(data, plotLines){
+private plotPatients(data, rejectData){
 
   //console.log(this.selectedData);
  
-  plotLines = select('#plotGroup')
+ let plotLines = select('#plotGroup')
   .selectAll('path').data(data);
 
-  console.log(data.length);
-
-   // Add grey background lines for context.
-   /*
-   this.backgroundLines = this.svg.append('g')
-   .attr('class', "background")
-    .selectAll('path')
-   .data(this.contextData)
-   .enter().append("path")
-   .attr("d", path);*/
-
-  let linesEnter = plotLines.enter().append('path');
-  plotLines = plotLines.merge(linesEnter);
-
   plotLines.exit().remove();
+  
+  let linesEnter = plotLines.enter().append('path');
+  plotLines = linesEnter.merge(plotLines);
 
   plotLines.attr('d', d => this.path(d));
 
-  plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.1);
+  plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
   plotLines.on('mouseover', (d)=> console.log(d));
+/*
+  let background = select('#plotRejects')
+  .selectAll('path').data(rejectData);
 
+  background.exit().remove();
+
+  let bgEnter = background.enter().append('path');
+  background = bgEnter.merge(background);
+
+  background.attr('d', d=> this.path(d));
+
+  background.attr('fill', 'none').attr('stroke', 'grey').attr('stroke-width', .1).attr('stroke-opacity', 0);
+*/
 
 }
 
@@ -285,8 +289,9 @@ let choice = d[0];
 let parent = d[1];
 
     let lines = select('#plotGroup').selectAll('path');
+    console.log(lines.size());
 
-    let filterGroup = selected.filter(d => d[parent] == choice);
+    let filterGroup = lines.filter(d => d[parent] == choice);
 
     // let reject = lines.filter(d => d[parent] == choice);
 
@@ -305,7 +310,7 @@ let parent = d[1];
 
     this.SelectedCounter.text('Selected Patients:   ' + filteredData.length);
 
-    this.plotPatients(filteredData, this.plotLines);
+    this.plotPatients(filteredData, rejectData);
     this.selectedData = filteredData;
 
 }

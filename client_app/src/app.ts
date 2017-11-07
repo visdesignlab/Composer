@@ -75,8 +75,6 @@ export class App {
     //parallel coord plot 
     parallel.create(main.node());
 
-
-
     //rect
     rectExploration.create(main.node());
 
