@@ -6,6 +6,7 @@ import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
+import * as events from 'phovea_core/src/event';
 //import {transition} from 'd3-transition';
 import {Constants} from './constants';
 import * as parallel from './parallel';
@@ -17,7 +18,7 @@ export class SideBar {
       private header = [
         {'key': 'PAT_ETHNICITY', 'value': ['W', 'H' ]},
         {'key': 'GENDER', 'value': ['M', 'F' ]},
-        {'key': 'PAT_RACE', 'value': ['C', 'B', 'O' ]},
+        {'key': 'RACE', 'value': ['C', 'B', 'O' ]},
         {'key': 'MARITAL_STATUS', 'value': ['M', 'W', 'S', 'D', 'U' ]},
         {'key': 'TOBACCO', 'value': ['Quit', 'Yes', 'NaN', 'Never' ]},
         {'key': 'ALCOHOL', 'value': ['Yes', 'No', 'Not Asked', 'NaN' ]},
@@ -46,10 +47,10 @@ export class SideBar {
         
         listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
         listlabel.on('click', function(d){
-         // console.log(this.parentNode.attributes[0].value);
+    
           let parentValue = this.parentNode.attributes[0].value;
-          parallel.filterPlot(d, parentValue);
-
+         
+          events.fire('filter_data', [d, parentValue]);
         } );
   }
 
