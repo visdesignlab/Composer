@@ -67,6 +67,7 @@ export class parallel {
     this.mapPatientData();
     this.attachListener();
     
+    this.plotLines = select('#plotGroup').selectAll('path');
     
   }
 
@@ -79,6 +80,11 @@ export class parallel {
               this.updatePlot(this.plotLines, item);
 
             });
+
+            events.on('brushes', (evt, item) => {
+              console.log(item);
+              this.plotPatients(item, null);
+            })
     
         }
   
@@ -116,7 +122,7 @@ export class parallel {
 
     patDOB.forEach((d) => { 
         let diff = Date.now() - d.getTime();
-        patAge.push(diff / (1000 * 60 * 60 * 24 * 365.25));// = diff / (1000 * 60 * 60 * 24 * 365.25);
+        patAge.push(diff / (1000 * 60 * 60 * 24 * 365.25));
        
       });
   
@@ -135,11 +141,38 @@ export class parallel {
         };
       });
 
+      let types = {
+        "Number": {
+          key: "Number",
+          coerce: function(d) { return +d; },
+          extent: d3.extent,
+          within: function(d, extent, dim) { return extent[0] <= dim.scale(d) && dim.scale(d) <= extent[1]; },
+          defaultScale: scaleLinear().range([innerHeight, 0])
+        },
+        "String": {
+          key: "String",
+          coerce: String,
+          extent: function (data) { return data.sort(); },
+          within: function(d, extent, dim) { return extent[0] <= dim.scale(d) && dim.scale(d) <= extent[1]; },
+         // defaultScale: scalePoint().range([0, innerHeight])
+        },
+        "Date": {
+          key: "Date",
+          coerce: function(d) { return new Date(d); },
+          extent: d3.extent,
+          within: function(d, extent, dim) { return extent[0] <= dim.scale(d) && dim.scale(d) <= extent[1]; },
+          defaultScale: scaleTime().range([0, innerHeight])
+        }
+      };
+
   this.dimension = [
 
-     {'value' : 'AGE', 'data':  patAge, 'scale': scaleLinear().range(this.yscale.range()).domain([d3.max(patAge),d3.min(patAge)]).clamp(true) },
-      {'value': 'BMI', 'data': BMI, 'scale': scaleLinear().range(this.yscale.range()).domain([d3.max(BMI),d3.min(BMI)]).clamp(true) },
-      {'value': 'CCI', 'data': CCI, 'scale': scaleLinear().range(this.yscale.range()).domain([d3.max(CCI),d3.min(CCI)]).clamp(true) }
+     {'value' : 'AGE', 'data':  patAge, 'type': types['Number'], 
+     'scale': scaleLinear().range(this.yscale.range()).domain([d3.max(patAge),d3.min(patAge)]).clamp(true) },
+      {'value': 'BMI', 'data': BMI, 'type': types['Number'], 
+      'scale': scaleLinear().range(this.yscale.range()).domain([d3.max(BMI),d3.min(BMI)]).clamp(true) },
+      {'value': 'CCI', 'data': CCI, 'type': types['Number'], 
+      'scale': scaleLinear().range(this.yscale.range()).domain([d3.max(CCI),d3.min(CCI)]).clamp(true) }
 
     ];
  
@@ -196,15 +229,12 @@ export class parallel {
    .attr("class", "brush")
    .call(this.brush);
 
-   // Handles a brush event, toggling the display of foreground lines.
-   let brushed = function() {
-    console.log('brushed');
-    }
+    let brushed = function() {
+      let lines = select('#plotGroup').selectAll('path');
 
-    let brush = function() {
-      
+      //console.log(lines);
            // render.invalidate();
-          var actives = [];
+          let actives = [];
           dimensionGroup.selectAll(".brush")
             .filter(function(d) {
               return brushSelection(this);
@@ -213,30 +243,36 @@ export class parallel {
               actives.push({
                 dimension: d,
                 extent: brushSelection(this)
+               
               });
             });
-
+           // console.log(actives);
+          
+           let activeData = [];
+           let rejectData;
       
-          var selected = this.plotLines.filter(function(d) {
+          let selected = lines.filter(function(d) {
             if (actives.every(function(active) {
 
                var dim = active.dimension;
-               console.log(d);
+            
                 // test if point is within extents for each active brush
-               return dim.type.within(d[dim.key], active.extent, dim);
-
+                return dim.type.within(d[dim.value], active.extent, dim);
               })) 
               {
               return true;
             }
           });
 
+         selected.each((d)=> activeData.push(d));
+        console.log(activeData);
+        events.fire('brushes', activeData, rejectData);
       
         }
 
-this.brush.on('end', brush);
+this.brush.on('end', brushed);
 
-this.plotLines = this.svg.append('g')
+this.svg.append('g')
 .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotGroup');
 
 this.svg.append('g')
@@ -251,37 +287,37 @@ this.SelectedCounter = this.svg.append('g')
 
 }
 
-private plotPatients(data, rejectData){
-
-  //console.log(this.selectedData);
- 
- let plotLines = select('#plotGroup')
-  .selectAll('path').data(data);
-
-  plotLines.exit().remove();
+private async plotPatients(data, rejectData){
   
-  let linesEnter = plotLines.enter().append('path');
-  plotLines = linesEnter.merge(plotLines);
-
-  plotLines.attr('d', d => this.path(d));
-
-  plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
-  plotLines.on('mouseover', (d)=> console.log(d));
-/*
-  let background = select('#plotRejects')
-  .selectAll('path').data(rejectData);
-
-  background.exit().remove();
-
-  let bgEnter = background.enter().append('path');
-  background = bgEnter.merge(background);
-
-  background.attr('d', d=> this.path(d));
-
-  background.attr('fill', 'none').attr('stroke', 'grey').attr('stroke-width', .1).attr('stroke-opacity', 0);
-*/
-
-}
+    console.log(rejectData);
+   
+   let plotLines = select('#plotGroup')
+    .selectAll('path').data(data);
+  
+    plotLines.exit().remove();
+    
+    let linesEnter = plotLines.enter().append('path');
+    plotLines = linesEnter.merge(plotLines);
+  
+    plotLines.attr('d', d => this.path(d));
+  
+    plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
+    plotLines.on('mouseover', (d)=> console.log(d));
+  /*
+    let background = select('#plotRejects')
+    .selectAll('path').data(rejectData);
+  
+    background.exit().remove();
+  
+    let bgEnter = background.enter().append('path');
+    background = bgEnter.merge(background);
+  
+    background.attr('d', d=> this.path(d));
+  
+    background.attr('fill', 'none').attr('stroke', 'grey').attr('stroke-width', .1).attr('stroke-opacity', 0);
+  */
+  
+  }
 
 private updatePlot(selected, d) {
 
@@ -289,24 +325,16 @@ let choice = d[0];
 let parent = d[1];
 
     let lines = select('#plotGroup').selectAll('path');
-    console.log(lines.size());
+    //console.log(lines.size());
 
     let filterGroup = lines.filter(d => d[parent] == choice);
 
     // let reject = lines.filter(d => d[parent] == choice);
 
      let filteredData = this.selectedData.filter(d => d[parent] == choice);
-
      let rejectData = this.selectedData.filter(d => d[parent] !== choice);//.classed('hidden', true);
-     console.log(rejectData);
-     console.log(filteredData);
 
     filterGroup.classed(parent, true);
-
-  //  this.plotLines = filterGroup;
-
-  //  console.log(filterGroup);
-   // console.log(reject);
 
     this.SelectedCounter.text('Selected Patients:   ' + filteredData.length);
 
