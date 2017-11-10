@@ -75,16 +75,19 @@ export class parallel {
     
             // item: pat_id, number of similar patients, DATA
             events.on('filter_data', (evt, item) => { // called in queryBox
-              console.log(event);
-              console.log(item);
               this.updatePlot(this.plotLines, item);
 
             });
 
             events.on('brushes', (evt, item) => {
-              console.log(item);
+             // console.log(item);
               this.plotPatients(item, null);
-            })
+            });
+
+            events.on('dataUpdated', (evt, item) =>{
+              console.log(item);
+              this.updateCounter(item);
+            }) 
     
         }
   
@@ -141,6 +144,8 @@ export class parallel {
         };
       });
 
+      let allData = this.selectedData;
+
       let types = {
         "Number": {
           key: "Number",
@@ -184,13 +189,7 @@ export class parallel {
     
       let coordinateList = this.dimension.map((p, i) => {
 
-        if(p.value !== d.ID //&& 
-          // p.value !== d.TOBACCO && 
-          // p.value !== d.ALCOHOL && 
-          // p.value !== d.GENDER && 
-          // p.value !== d.PAT_MARITAL_STAT &&
-          // p.value !== d.DRUG_USER &&
-          // p.value !== d.RACE
+        if(p.value !== d.ID
           ){
       
               let axisXCoord = this.xscale(i);
@@ -232,8 +231,6 @@ export class parallel {
     let brushed = function() {
       let lines = select('#plotGroup').selectAll('path');
 
-      //console.log(lines);
-           // render.invalidate();
           let actives = [];
           dimensionGroup.selectAll(".brush")
             .filter(function(d) {
@@ -246,7 +243,6 @@ export class parallel {
                
               });
             });
-           // console.log(actives);
           
            let activeData = [];
            let rejectData;
@@ -265,8 +261,9 @@ export class parallel {
           });
 
          selected.each((d)=> activeData.push(d));
-        console.log(activeData);
-        events.fire('brushes', activeData, rejectData);
+        
+        events.fire('brushes', activeData);
+        events.fire('dataUpdated', activeData);
       
         }
 
@@ -279,6 +276,7 @@ this.svg.append('g')
 .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotRejects');
 
 this.plotPatients(this.selectedData, this.contextData);
+events.fire('dataLoaded', allData);
 
 this.SelectedCounter = this.svg.append('g')
 .attr('transform', 'translate(30,' + (this.plotDimension.height + 30) + ')')
@@ -289,7 +287,7 @@ this.SelectedCounter = this.svg.append('g')
 
 private async plotPatients(data, rejectData){
   
-    console.log(rejectData);
+   // console.log(rejectData);
    
    let plotLines = select('#plotGroup')
     .selectAll('path').data(data);
@@ -302,21 +300,10 @@ private async plotPatients(data, rejectData){
     plotLines.attr('d', d => this.path(d));
   
     plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
-    plotLines.on('mouseover', (d)=> console.log(d));
-  /*
-    let background = select('#plotRejects')
-    .selectAll('path').data(rejectData);
-  
-    background.exit().remove();
-  
-    let bgEnter = background.enter().append('path');
-    background = bgEnter.merge(background);
-  
-    background.attr('d', d=> this.path(d));
-  
-    background.attr('fill', 'none').attr('stroke', 'grey').attr('stroke-width', .1).attr('stroke-opacity', 0);
-  */
-  
+  //  plotLines.on('mouseover', (d)=> console.log(d));
+
+   // this.selectedData = data;
+
   }
 
 private updatePlot(selected, d) {
@@ -336,11 +323,16 @@ let parent = d[1];
 
     filterGroup.classed(parent, true);
 
-    this.SelectedCounter.text('Selected Patients:   ' + filteredData.length);
-
     this.plotPatients(filteredData, rejectData);
-    this.selectedData = filteredData;
+    //this.selectedData = filteredData;
 
+    events.fire('dataUpdated', filteredData);
+
+}
+
+private updateCounter(data){
+  this.selectedData = data;
+  this.SelectedCounter.text('Selected Patients:   ' + data.length);
 }
 
 

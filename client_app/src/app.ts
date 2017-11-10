@@ -72,8 +72,12 @@ export class App {
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
 
+
     //parallel coord plot 
     parallel.create(main.node());
+
+     // distributionDiagram
+    distributionDiagram.create(main.node());
 
     //rect
     rectExploration.create(main.node());
