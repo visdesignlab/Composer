@@ -12,9 +12,11 @@ import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending, histogram} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
+import { format } from 'd3-format';
 import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
+
 
 export class distributionDiagram {
 
@@ -24,6 +26,10 @@ export class distributionDiagram {
     private distributionData;
     private xScale;
     private yScale;
+    private BMI;
+    private AGE;
+    private CCI;
+
 
     private distributionDimension = {height: 200, width: 300};
 
@@ -34,9 +40,19 @@ export class distributionDiagram {
             .classed('distributionDiv', true)
             .classed('hidden', true);
 
-        this.svg = this.$node.append('svg')
+        this.BMI = this.$node.append('svg').attr('id', 'BMI')
             .attr('height', this.distributionDimension.height + 60)
             .attr('width', this.distributionDimension.width + 60);
+
+        this.AGE = this.$node.append('svg').attr('id', 'AGE')
+        .attr('height', this.distributionDimension.height + 60)
+        .attr('width', this.distributionDimension.width + 60);
+
+        this.CCI = this.$node.append('svg').attr('id', 'CCI')
+        .attr('height', this.distributionDimension.height + 60)
+        .attr('width', this.distributionDimension.width + 60);
+
+        this.svg =  this.$node.selectAll('svg');
 
         this.xScale = scaleLinear()
             .rangeRound([0, this.distributionDimension.width]);
@@ -55,6 +71,8 @@ export class distributionDiagram {
         this.group.append("g")
             .attr("class", "axis axis--y")
             .attr("transform", "translate(0,0)");
+        
+        this.group.append('g').classed('COHORT', true);
 
         this.attachListener();
     }
@@ -64,10 +82,20 @@ export class distributionDiagram {
      */
     private attachListener() {
 
-        // item: pat_id, number of similar patients, DATA
-        events.on('update_similar', (evt, item) => { // called in queryBox
-            this.distributionData = item[2]['all_scores'];
-            this.drawDiagram();
+        //called in parallel mapPatData
+
+        events.on('dataLoaded', (evt, item)=> {
+            //console.log(item);
+            //this.drawDiagram(item, 'BMI');
+           // this.drawDiagram(item, 'AGE');
+           // this.drawDiagram(item, 'CCI');
+        })
+     
+        events.on('dataUpdated', (evt, item) => { 
+           console.log(item);
+           this.drawDiagram(item, 'BMI');
+           this.drawDiagram(item, 'AGE');
+           this.drawDiagram(item, 'CCI');
         });
 
     }
@@ -75,27 +103,31 @@ export class distributionDiagram {
     /**
      * Draw the diagram with the given data from getSimilarRows
      */
-    private drawDiagram() {
+    private drawDiagram(patData, type) {
         var self = this;
+        console.log(type);
+       //let data = patData.filter(element => +element['BMI']);
+
+        //console.log(data);
 
         this.$node.classed('hidden', false);
 
-        let maxValue = max(this.distributionData, function (d: number) {
-            return d
+        let maxValue = max(patData, function (d/*: number*/) {
+            return +d[type];
         });
 
-        let normalize = scaleLinear().domain([0, maxValue + 0.01]).range([0, 1]);
-        let data = this.distributionData.map((d: number) => normalize(d));
+       // let normalize = scaleLinear().domain([0, maxValue + 0.01]).range([0, 1]);
+        let dataCohort = patData.map((d: number) => +d[type]);
 
-        this.xScale.domain([0, 1/*maxValue*/]).nice();
+        this.xScale.domain([0, maxValue]).nice();
 
         let bins = histogram()
-            .domain([0, 1/*maxValue*/])
-            .thresholds(this.xScale.ticks(20))
+            .domain([0, maxValue])
+            .thresholds(this.xScale.ticks(25))
             //(this.distributionData);
-            (data);
+            (dataCohort);
 
-        let totalPatients = data.length;
+        let totalPatients = dataCohort.length;
         let histogramData = bins.map(function (d) {
             totalPatients -= d.length;
             return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length}
@@ -105,11 +137,17 @@ export class distributionDiagram {
             return d.length;
         })]);
 
-        let barGroups = this.group.selectAll(".bar")
+        let barGroups = this[type].select('.COHORT').selectAll(".bar")
             .data(histogramData);
 
-        barGroups.enter().append("g")
-            .attr("class", "bar")
+            barGroups.exit().remove();
+
+        let barEnter = barGroups.enter().append("g")
+            .attr("class", "bar");
+
+            barGroups = barEnter.merge(barGroups);
+
+            barGroups
             .attr("transform", (d) => {
                 return "translate(" + this.xScale(d.x0) + ",0)";
             })
@@ -121,52 +159,9 @@ export class distributionDiagram {
             .attr("width", this.xScale(bins[0].x1) - this.xScale(bins[0].x0) - 3)
             .attr("height", (d) => {
                 return this.yScale(d.length);
-            })
-            .on("mouseover", function () {
-                let currElement = this.parentNode;
-                while (currElement) {
-                    select(currElement).select('rect').classed('selectedRect', true);
-                    currElement = currElement.nextSibling;
-                }
-                let totalPatients = (select(this.parentNode).datum())['totalPatients'];
-                let t = transition('t').duration(500);
-                select(".tooltip")
-                    .html(`Total patients: ${totalPatients}`)
-                    .transition(t)
-                    .style("opacity", 1)
-                    .style("left", `${event.pageX + 10}px`)
-                    .style("top", `${event.pageY + 10}px`);
-
-            })
-            .on("mouseout", function () {
-                let currElement = this.parentNode;
-                while (currElement) {
-                    select(currElement).select('rect').classed('selectedRect', false);
-                    currElement = currElement.nextSibling;
-                }
-
-                let t = transition('t').duration(500);
-                select(".tooltip").transition(t)
-                    .style("opacity", 0);
-            })
-            .on('click', function () {
-                let totalPatients = (select(this.parentNode).datum())['totalPatients'];
-
-                select(this.parentNode.parentNode).selectAll('rect').classed('displayedRect', false);
-
-                let currElement = this.parentNode;
-                while (currElement) {
-                    select(currElement).select('rect').classed('displayedRect', true);
-                    currElement = currElement.nextSibling;
-                }
-
-                // received in queryBox
-                events.fire("number_of_similar_patients", [totalPatients]);
             });
-
-        let t = transition('t').duration(2000);
-
-        barGroups
+        
+            barGroups
             .attr("transform", (d) => {
                 return "translate(" + this.xScale(d.x0) + ",0)";
             })
@@ -178,10 +173,10 @@ export class distributionDiagram {
                 return select(this).attr("height");
             });
 
-        barGroups.enter().merge(barGroups)
+        barGroups
             .selectAll("rect")
             //.classed('displayedRect', false)
-            .transition(t)
+            //.transition(t)
             .attr("y", (d) => {
                 return this.distributionDimension.height - this.yScale(d.length);
             })
@@ -191,13 +186,12 @@ export class distributionDiagram {
             });
 
         // update the axis
-
         this.group.select(".axis--x")
-            .transition(t)
+            //.transition(t)
             .call(axisBottom(this.xScale));
 
         this.group.select(".axis--y")
-            .transition(t)
+           // .transition(t)
             .call(axisLeft(scaleLinear()
                 .range([this.distributionDimension.height, 0])
                 .domain([0, max(bins, function (d) {
@@ -206,7 +200,6 @@ export class distributionDiagram {
     }
 
 }
-
 
 export function create(parent: Element) {
     return new distributionDiagram(parent);
