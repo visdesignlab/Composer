@@ -85,8 +85,9 @@ export class parallel {
             });
 
             events.on('dataUpdated', (evt, item) =>{
-              console.log(item);
-              this.updateCounter(item);
+             // console.log(item);
+              let selected = item[0];
+              this.updateCounter(selected);
             }) 
     
         }
@@ -144,7 +145,7 @@ export class parallel {
         };
       });
 
-      let allData = this.selectedData;
+      this.allData = this.selectedData;
 
       let types = {
         "Number": {
@@ -263,7 +264,7 @@ export class parallel {
          selected.each((d)=> activeData.push(d));
         
         events.fire('brushes', activeData);
-        events.fire('dataUpdated', activeData);
+        events.fire('dataUpdated', [activeData, this.allData]);
       
         }
 
@@ -276,7 +277,7 @@ this.svg.append('g')
 .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotRejects');
 
 this.plotPatients(this.selectedData, this.contextData);
-events.fire('dataLoaded', allData);
+events.fire('dataLoaded', this.allData);
 
 this.SelectedCounter = this.svg.append('g')
 .attr('transform', 'translate(30,' + (this.plotDimension.height + 30) + ')')
@@ -300,9 +301,7 @@ private async plotPatients(data, rejectData){
     plotLines.attr('d', d => this.path(d));
   
     plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
-  //  plotLines.on('mouseover', (d)=> console.log(d));
 
-   // this.selectedData = data;
 
   }
 
@@ -312,11 +311,10 @@ let choice = d[0];
 let parent = d[1];
 
     let lines = select('#plotGroup').selectAll('path');
-    //console.log(lines.size());
+
 
     let filterGroup = lines.filter(d => d[parent] == choice);
 
-    // let reject = lines.filter(d => d[parent] == choice);
 
      let filteredData = this.selectedData.filter(d => d[parent] == choice);
      let rejectData = this.selectedData.filter(d => d[parent] !== choice);//.classed('hidden', true);
@@ -324,9 +322,8 @@ let parent = d[1];
     filterGroup.classed(parent, true);
 
     this.plotPatients(filteredData, rejectData);
-    //this.selectedData = filteredData;
 
-    events.fire('dataUpdated', filteredData);
+    events.fire('dataUpdated', [filteredData, this.allData]);
 
 }
 
