@@ -73,6 +73,7 @@ export class distributionDiagram {
             .attr("transform", "translate(0,0)");
         
         this.group.append('g').classed('COHORT', true);
+        this.group.append('g').classed('ALL', true);
 
         this.attachListener();
     }
@@ -93,9 +94,11 @@ export class distributionDiagram {
      
         events.on('dataUpdated', (evt, item) => { 
            console.log(item);
-           this.drawDiagram(item, 'BMI');
-           this.drawDiagram(item, 'AGE');
-           this.drawDiagram(item, 'CCI');
+           let selected = item[0];
+           let all = item[1];
+           this.drawDiagram(selected, all, 'BMI');
+           this.drawDiagram(selected, all, 'AGE');
+           this.drawDiagram(selected, all, 'CCI');
         });
 
     }
@@ -103,9 +106,10 @@ export class distributionDiagram {
     /**
      * Draw the diagram with the given data from getSimilarRows
      */
-    private drawDiagram(patData, type) {
+    private drawDiagram(selected, patData, type) {
         var self = this;
         console.log(type);
+        console.log(patData);
        //let data = patData.filter(element => +element['BMI']);
 
         //console.log(data);
@@ -117,7 +121,8 @@ export class distributionDiagram {
         });
 
        // let normalize = scaleLinear().domain([0, maxValue + 0.01]).range([0, 1]);
-        let dataCohort = patData.map((d: number) => +d[type]);
+        let dataCohort = selected.map((d: number) => +d[type]);
+        let dataAll = patData.map((d: number) => +d[type]);
 
         this.xScale.domain([0, maxValue]).nice();
 
@@ -127,16 +132,29 @@ export class distributionDiagram {
             //(this.distributionData);
             (dataCohort);
 
-        let totalPatients = dataCohort.length;
+        let binsALL = histogram()
+        .domain([0, maxValue])
+        .thresholds(this.xScale.ticks(25))
+        //(this.distributionData);
+        (dataAll);
+
+        let totalPatients = dataAll.length;
+
         let histogramData = bins.map(function (d) {
+            dataCohort.length -= d.length;
+            return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: dataCohort.length + d.length}
+        });
+
+        let histogramDataALL = binsALL.map(function (d) {
             totalPatients -= d.length;
             return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length}
         });
 
-        this.yScale.domain([0, max(bins, function (d) {
+        this.yScale.domain([0, max(binsALL, function (d) {
             return d.length;
         })]);
 
+        //needs to be cleaned up but bars for cohort////////////////////////////
         let barGroups = this[type].select('.COHORT').selectAll(".bar")
             .data(histogramData);
 
@@ -176,11 +194,60 @@ export class distributionDiagram {
         barGroups
             .selectAll("rect")
             //.classed('displayedRect', false)
-            //.transition(t)
+            .transition(9000)
             .attr("y", (d) => {
                 return this.distributionDimension.height - this.yScale(d.length);
             })
             .attr("width", this.xScale(bins[0].x1) - this.xScale(bins[0].x0) - 3)
+            .attr("height", (d) => {
+                return this.yScale(d.length);
+            });
+
+//////////////bar groups for all data////////////////////////////////
+            let barGroupsALL = this[type].select('.ALL').selectAll(".barALL")
+            .data(histogramDataALL);
+
+            barGroups.exit().remove();
+
+        let barEnterALL = barGroupsALL.enter().append("g")
+            .attr("class", "barALL");
+
+            barGroupsALL = barEnterALL.merge(barGroupsALL);
+
+            barGroupsALL
+            .attr("transform", (d) => {
+                return "translate(" + this.xScale(d.x0) + ",0)";
+            })
+            .append("rect")
+            .attr("x", 1)
+            .attr("y", (d) => {
+                return this.distributionDimension.height - this.yScale(d.length);
+            })
+            .attr("width", this.xScale(bins[0].x1) - this.xScale(bins[0].x0) - 3)
+            .attr("height", (d) => {
+                return this.yScale(d.length);
+            });
+        
+            barGroupsALL
+            .attr("transform", (d) => {
+                return "translate(" + this.xScale(d.x0) + ",0)";
+            })
+            .select("rect")
+            .attr("width", function () {
+                return select(this).attr("width");
+            })
+            .attr("height", function () {
+                return select(this).attr("height");
+            });
+
+        barGroupsALL
+            .selectAll("rect")
+            //.classed('displayedRect', false)
+            .transition(9000)
+            .attr("y", (d) => {
+                return this.distributionDimension.height - this.yScale(d.length);
+            })
+            .attr("width", this.xScale(binsALL[0].x1) - this.xScale(binsALL[0].x0) - 3)
             .attr("height", (d) => {
                 return this.yScale(d.length);
             });
@@ -194,7 +261,7 @@ export class distributionDiagram {
            // .transition(t)
             .call(axisLeft(scaleLinear()
                 .range([this.distributionDimension.height, 0])
-                .domain([0, max(bins, function (d) {
+                .domain([0, max(binsALL, function (d) {
                     return d.length;
                 })])));
     }
