@@ -1,84 +1,60 @@
 /**
- * Created by saharmehrpour on 4/3/17.
+ * Created by Jen on 11/4/17.
  */
 
 import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
+import * as events from 'phovea_core/src/event';
 //import {transition} from 'd3-transition';
 import {Constants} from './constants';
+import * as parallel from './parallel';
 
 export class SideBar {
 
   private $node;
 
-  private header = {
-    'Demo': ['PAT_BIRTHDATE', 'PAT_GENDER', 'PAT_ETHNICITY', 'D_ETHNICITY_DESC',
-      'PAT_RACE', 'D_RACE_DESC', 'PAT_MARITAL_STAT', 'PAT_DEATH_IND', 'BMI',
-      'HEIGHT_CM', 'WEIGHT_KG', 'ADM_DATE', 'DSCH_DATE', 'TOBACCO_USER',
-      'ALCOHOL_USER', 'ILLICIT_DRUG_USER', 'DEPRESSION']
-  };
-
+      private header = [
+        {'key': 'PAT_ETHNICITY', 'value': ['W', 'H' ]},
+        {'key': 'GENDER', 'value': ['M', 'F' ]},
+        {'key': 'RACE', 'value': ['C', 'B', 'O' ]},
+        {'key': 'MARITAL_STATUS', 'value': ['M', 'W', 'S', 'D', 'U' ]},
+        {'key': 'TOBACCO', 'value': ['Quit', 'Yes', 'NaN', 'Never' ]},
+        {'key': 'ALCOHOL', 'value': ['Yes', 'No', 'Not Asked', 'NaN' ]},
+        {'key': 'DRUG_USER', 'value': ['Yes', 'No', 'Not Asked', 'NaN' ]},
+        
+      ];
+      
   constructor(parent: Element) {
     this.$node = select(parent);
   }
 
   async init() {
 
-    let args_Demo = await ajax.getAPIJSON(`/data_api/getWeights/Demo`);
-    let args_CCI = await ajax.getAPIJSON(`/data_api/getWeights/CCI`);
-    const weights = Object.assign(args_Demo.weights,args_CCI.weights);
+    var form = this.$node.append("form").append('div').attr('padding-top', 250);
+    
+    let labels = form.selectAll("div")
+        .data(this.header)
+        .enter()
+        .append("div")
+        .attr('value', (d=>d.key));
 
-    this.$node.selectAll('.item').data(
-      entries(Constants.sideBar.Demo).concat(entries(Constants.sideBar.CCI)))
-      .enter()
-      .append('div')
-      .classed('item', true);
+        let headerLabel = labels.append('label')
+        .text(function(d) {return d.key;}).attr('value', (d=>d.key));
 
-    this.$node.selectAll('.item')
-      .html((d) => {
-        return `<input type='text' placeholder='Weight' size='8' id='weight_` + d.key
-          + `' value='` + weights[d.key] + `'>`
-          + `&nbsp;` + d.value;
-      });
-
-    this.$node.append('input')
-      .attr('type', 'button')
-      .attr('value', 'Update')
-      .on('click', () => this.updateWeights());
+        let listlabel = labels.selectAll('ul').data((d) => d.value).enter().append('ul').text(d => d);
+        
+        listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
+        listlabel.on('click', function(d){
+    
+          let parentValue = this.parentNode.attributes[0].value;
+         
+          events.fire('filter_data', [d, parentValue]);
+        } );
   }
 
-  async updateWeights() {
-
-    const tables = ['Demo', 'CCI'];
-    for(let t=0; t<tables.length; t++) {
-      let table = tables[t];
-
-      let tempWeights = '';
-      let array = entries(Constants.sideBar[table]);
-
-      for (let counter = 0; counter < array.length; counter++) {
-        const tempId = 'weight_' + array[counter].key;
-        const tempValue = (<HTMLInputElement>document.getElementById(tempId)).value;
-
-        if (isNaN(+tempValue)) {
-          console.log('error in ' + array[counter].key);
-          return;
-        }
-        tempWeights = tempWeights + (+tempValue.toString()) + `+`;
-      }
-
-      let URL = `/data_api/updateWeights/${table}/`
-        + tempWeights.substring(0, tempWeights.length - 1); // The last character is '+'
-      await ajax.getAPIJSON(URL);
-    }
-
-    console.log('Weights are updated.');
-
-  }
-
-}
+ }
 
 export function create(parent:Element) {
   return new SideBar(parent);

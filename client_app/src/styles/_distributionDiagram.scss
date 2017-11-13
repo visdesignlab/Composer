@@ -1,12 +1,17 @@
 .bar rect {
-  fill: #4e0b98;
+    fill: #352F43;
+    opacity: .3;
 }
 
+.barALL rect {
+    fill: #BCAAE7;
+    opacity: .3;
+}
 
 .displayedRect {
-  fill: #4e6498 !important;
+    fill: #4e6498 !important;
 }
 
 .selectedRect {
-  fill: darkred !important;
+    fill: darkred !important;
 }

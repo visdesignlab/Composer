@@ -140,13 +140,10 @@ export class similarityScoreDiagram {
 
             this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
             this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
-            //console.log(this.similarPatientsProInfo);
-           // console.log(item[2]);
-           // console.log(item[2]['pat_Orders']);
+       
             this.clearDiagram();
             this.drawDiagram();
             this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']))
-            //this.orderHierarchy(item[1]['Orders'][item[0]]);
 
         });
 
@@ -167,8 +164,7 @@ export class similarityScoreDiagram {
             //not recognized in the drawpatientrects();
             this.filteredOrders.medGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).medicationGroup;
             this.filteredOrders.proGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).procedureGroup;
-           // console.log(this.medGroup.length);
-           // console.log(this.proGroup.length);
+           
         });
 
     }

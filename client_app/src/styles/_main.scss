@@ -1,52 +1,103 @@
 #app {
-  /*width: 3200px;*/
+    /*width: 3200px;*/
 }
 
 #caleydoHeader {
-  width: 100%;
-  position:fixed;
-  z-index:100000;
+    width: 100%;
+    position: fixed;
+    z-index: 100000;
 }
 
 .tooltip {
-  position: absolute;
-  text-align: center;
-  padding: 5px;
-  font: 12px sans-serif;
-  background: #ddd;
-  border: 0;
-  border-radius: 8px;
-  pointer-events: none;
+    position: absolute;
+    text-align: center;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: #ddd;
+    border: 0;
+    border-radius: 8px;
+    pointer-events: none;
 }
 
 .main {
-  float: left;
-  padding-left: 10px;
-  width:80%;
-  margin-top: 50px;
-  
+    float: left;
+    padding-left: 10px;
+    width: 80%;
+    margin-top: 50px;
 }
 
 .sideBar {
-  float: left;
-  width: 20%;
-  padding: 10px;
-  
+    float: left;
+    width: 20%;
+    padding: 10px;
 }
 
 #sideBar {
-  float: left;
-  width: 20%;
-  padding: 20px;
-  margin-top: 50px;
+    float: left;
+    width: 20%;
+    padding: 20px;
+    margin-top: 50px;
 }
 
-.label{
-  line-height: 22px;
-  top: 38px;
-  transform: scale(0.75) translate(0px, -28px);
-  transform-origin: left top 0px;
-  pointer-events: none;
-  user-select: none;
-  color: rgba(0, 0, 0, 0.3)
+.label {
+    line-height: 22px;
+    top: 38px;
+    transform: scale(0.75) translate(0px, -28px);
+    transform-origin: left top 0px;
+    pointer-events: none;
+    user-select: none;
+    color: rgba(0, 0, 0, 0.3)
+}
+
+.axis line,
+.axis path {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1px;
+}
+
+.background path {
+    fill: none;
+    stroke: #ddd;
+    stroke-opacity: .5;
+}
+
+.foreground path {
+    fill: none;
+    stroke: steelblue;
+}
+
+.reject {
+    stroke: gainsboro;
+    stroke-opacity: .2;
+}
+
+.GENDER {
+    stroke: #873600;
+    stroke-opacity: .5;
+}
+
+.TOBACCO {
+    stroke: #1B4F72;
+    stroke-opacity: .5;
+}
+
+.ALCOHOL {
+    stroke: #633974;
+    stroke-opacity: .5;
+}
+
+.DRUG_USER {
+    stroke: #1D8348;
+    stroke-opacity: .3;
+}
+
+.MARITAL_STATUS {
+    stroke: #7D6608;
+    stroke-opacity: .3;
+}
+
+.RACE {
+    stroke: #7D6608;
+    stroke-opacity: .3;
 }

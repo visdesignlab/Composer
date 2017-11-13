@@ -1,4 +1,40 @@
 [{
+        "name": "demo_info_cleaned",
+        "path": "demo_with_CCI.csv",
+        "separator": ",",
+        "quotechar": "\"",
+        "id": "Demo_Info",
+        "size": [
+            6071,
+            20
+        ],
+        "type": "table",
+        "idtype": "INDEX",
+        "idcolumn": 0,
+        "columns": [
+            { "name": "PAT_ID", "value": { "type": "int" } },
+            { "name": "PAT_BIRTHDATE", "value": { "type": "string" } },
+            { "name": "PAT_GENDER", "value": { "type": "string" } },
+            { "name": "PAT_ETHNICITY", "value": { "type": "string" } },
+            { "name": "PAT_RACE", "value": { "type": "string" } },
+            { "name": "PAT_ZIP", "value": { "type": "string" } },
+            { "name": "PAT_MARITAL_STAT", "value": { "type": "string" } },
+            { "name": "PAT_DEATH_DATE", "value": { "type": "string" } },
+            { "name": "PAT_DEATH_IND", "value": { "type": "string" } },
+            { "name": "BMI", "value": { "type": "float" } },
+            { "name": "HEIGHT_CM", "value": { "type": "float" } },
+            { "name": "WEIGHT_KG", "value": { "type": "float" } },
+            { "name": "ATT_PROV_ID", "value": { "type": "float" } },
+            { "name": "ATT_PROV_FULLNAME", "value": { "type": "string" } },
+            { "name": "INS_PAY_CAT", "value": { "type": "string" } },
+            { "name": "INS_PAY_GRP", "value": { "type": "string" } },
+            { "name": "TOBACCO_USER", "value": { "type": "string" } },
+            { "name": "ALCOHOL_USER", "value": { "type": "string" } },
+            { "name": "ILLICIT_DRUG_USER", "value": { "type": "string" } },
+            { "name": "CCI", "value": { "type": "float" } }
+        ]
+    },
+    {
         "name": "icd_codes",
         "path": "data_ICD_cleaned.csv",
         "separator": ",",

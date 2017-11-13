@@ -275,9 +275,9 @@ export class patOrderBreakdown {
     console.log('Loading Data from the a Server');
     // listData() returns a list of all datasets loaded by the server
     // notice the await keyword - you'll see an explanation below
-    const allDatasets = await listData();
+  //  const allDatasets = await listData();
     //console.log('All loaded datasets:');
-    console.log("datasets "+allDatasets);
+   // console.log("datasets "+allDatasets);
      // we could use those dataset to filter them based on their description and pick the one(s) we're interested in
     // here we pick the first dataset and cast it to ITable - by default the datasets are returned as IDataType
     let tempTable: ITable;
@@ -295,63 +295,7 @@ export class patOrderBreakdown {
    public async basicTableUsage() {
     let table : ITable;
 
-    //this.table = <ITable> await getById('CPT_codes');
-    this.table = <ITable> await getById('Demo_selected');
-  
-
-    // Accessing the description of the dataset:
-    console.log('Table description:');
-    console.log(this.table.desc);
-
-    console.log('=============================');
-    console.log('FILTERING BASED ON DATA');
-    console.log('=============================');
-    console.log(this.table.col(3).valuetype.type);
-
-    console.log('=============================');
-    console.log('FILTERING BASED ON DATA');
-    console.log('=============================');
-    console.log('Extracting the Number of Studio Albums column:');
-    let patID: INumericalVector;
-    this.table.cols().forEach((vector: IAnyVector) => {
-      if (vector.desc.name === 'PAT_ID') {
-        patID = <INumericalVector>vector;
-      }
-    });
-    console.log(await patID.data());
-
-    if (patID == null) {
-      return;
-    }
-
-    const filteredID: INumericalVector = await patID.filter((d: number, i: number) => {
-      if (d > 4000) {
-        return true;
-      }
-      return false;
-    });
-    console.log('The data of the vector filtered by number of albums > 8');
-    console.log(await filteredID.data());
-
-    const ids = await filteredID.ids();
-
-    const tableView: ITable = await this.table.idView(ids);
-    console.log('The data of the table filtered by number of albums > 8');
-    console.log(await tableView.data());
-
-    console.log('-----------');
-    console.log('Using argFilter to get the indices of a filter operation:');
-    console.log('-----------');
-    const albumData = await patID.data();
-    const indices = argFilter(albumData, (d) => d > 8);
-    console.log('The data of the table filterd by number of albums > 8');
-    console.log(await this.table.data(indices));
-
-    console.log('-----------');
-    console.log('Using the filter operation of the range');
-    console.log('-----------');
-    // list creates an index range, and we apply this list to the array of data passed
-    console.log(list(indices).filter(await this.table.data()));
+    
   }
   }
    
