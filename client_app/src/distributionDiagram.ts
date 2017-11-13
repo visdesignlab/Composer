@@ -9,7 +9,7 @@ import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
 import {line, curveMonotoneX} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
-import {extent, min, max, ascending, histogram} from 'd3-array';
+import {extent, min, max, ascending, histogram, mean} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import { format } from 'd3-format';
@@ -75,6 +75,9 @@ export class distributionDiagram {
         this.group.append('g').classed('COHORT', true);
         this.group.append('g').classed('ALL', true);
 
+        this.group.append('g').classed('midLine', true);
+        this.group.append('g').classed('plotLabel', true);
+
         this.attachListener();
     }
 
@@ -124,8 +127,13 @@ export class distributionDiagram {
         let dataCohort = selected.map((d: number) => +d[type]);
         let dataAll = patData.map((d: number) => +d[type]);
 
+        console.log(mean(dataAll));
+        console.log(mean(dataCohort));
+
         this.xScale.domain([0, maxValue]).nice();
 
+        let xAxis = axisBottom(this.xScale);
+     
         let bins = histogram()
             .domain([0, maxValue])
             .thresholds(this.xScale.ticks(25))
@@ -168,8 +176,9 @@ export class distributionDiagram {
             barGroups
             .attr("transform", (d) => {
                 return "translate(" + this.xScale(d.x0) + ",0)";
-            })
-            .append("rect")
+            });
+            barEnter.append("rect");
+            barGroups.select('rect')
             .attr("x", 1)
             .attr("y", (d) => {
                 return this.distributionDimension.height - this.yScale(d.length);
@@ -178,22 +187,9 @@ export class distributionDiagram {
             .attr("height", (d) => {
                 return this.yScale(d.length);
             });
-        
-            barGroups
-            .attr("transform", (d) => {
-                return "translate(" + this.xScale(d.x0) + ",0)";
-            })
-            .select("rect")
-            .attr("width", function () {
-                return select(this).attr("width");
-            })
-            .attr("height", function () {
-                return select(this).attr("height");
-            });
 
         barGroups
-            .selectAll("rect")
-            //.classed('displayedRect', false)
+            .select("rect")
             .transition(9000)
             .attr("y", (d) => {
                 return this.distributionDimension.height - this.yScale(d.length);
@@ -207,7 +203,7 @@ export class distributionDiagram {
             let barGroupsALL = this[type].select('.ALL').selectAll(".barALL")
             .data(histogramDataALL);
 
-            barGroups.exit().remove();
+            barGroupsALL.exit().remove();
 
         let barEnterALL = barGroupsALL.enter().append("g")
             .attr("class", "barALL");
@@ -217,8 +213,9 @@ export class distributionDiagram {
             barGroupsALL
             .attr("transform", (d) => {
                 return "translate(" + this.xScale(d.x0) + ",0)";
-            })
-            .append("rect")
+            });
+            barEnterALL.append("rect");
+            barGroupsALL.select('rect')
             .attr("x", 1)
             .attr("y", (d) => {
                 return this.distributionDimension.height - this.yScale(d.length);
@@ -227,21 +224,9 @@ export class distributionDiagram {
             .attr("height", (d) => {
                 return this.yScale(d.length);
             });
-        
-            barGroupsALL
-            .attr("transform", (d) => {
-                return "translate(" + this.xScale(d.x0) + ",0)";
-            })
-            .select("rect")
-            .attr("width", function () {
-                return select(this).attr("width");
-            })
-            .attr("height", function () {
-                return select(this).attr("height");
-            });
 
         barGroupsALL
-            .selectAll("rect")
+            .select("rect")
             //.classed('displayedRect', false)
             .transition(9000)
             .attr("y", (d) => {
@@ -253,9 +238,9 @@ export class distributionDiagram {
             });
 
         // update the axis
-        this.group.select(".axis--x")
+        this.group.select(".axis--x")//.data(binsALL)
             //.transition(t)
-            .call(axisBottom(this.xScale));
+            .call(xAxis);
 
         this.group.select(".axis--y")
            // .transition(t)
@@ -264,6 +249,16 @@ export class distributionDiagram {
                 .domain([0, max(binsALL, function (d) {
                     return d.length;
                 })])));
+
+        let meanvalue = mean(dataAll);
+        let meanCohort = mean(dataCohort);
+        console.log(meanCohort);
+
+        let meanLine = this[type].select('.midLine').append('line')
+        .attr('x1', this.xScale(meanvalue)).attr('x2', this.xScale(meanvalue))
+        .attr('y1', 0).attr('y2', 200).attr('stroke-width', 1);
+
+        let plotLabel = this[type].select('.plotLabel').append('text').text(type).classed('Label', true);
     }
 
 }
