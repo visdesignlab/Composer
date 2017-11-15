@@ -29,6 +29,7 @@ export class distributionDiagram {
     private BMI;
     private AGE;
     private CCI;
+    private distibutionDivs;
 
 
     private distributionDimension = {height: 200, width: 300};
@@ -40,19 +41,41 @@ export class distributionDiagram {
             .classed('distributionDiv', true)
             .classed('hidden', true);
 
-        this.BMI = this.$node.append('svg').attr('id', 'BMI')
-            .attr('height', this.distributionDimension.height + 100)
+        this.BMI = this.$node.append('div').classed('distribution', true).attr('id', 'BMI').append('svg')
+            .attr('height', this.distributionDimension.height + 70)
             .attr('width', this.distributionDimension.width + 60);
 
-        this.AGE = this.$node.append('svg').attr('id', 'AGE')
-        .attr('height', this.distributionDimension.height + 100)
+        this.AGE = this.$node.append('div').classed('distribution', true).attr('id', 'AGE').append('svg')
+        .attr('height', this.distributionDimension.height + 70)
         .attr('width', this.distributionDimension.width + 60);
 
-        this.CCI = this.$node.append('svg').attr('id', 'CCI')
-        .attr('height', this.distributionDimension.height + 100)
+        this.CCI = this.$node.append('div').classed('distribution', true).attr('id', 'CCI').append('svg')
+        .attr('height', this.distributionDimension.height + 70)
         .attr('width', this.distributionDimension.width + 60);
 
         this.svg =  this.$node.selectAll('svg');
+
+        this.distibutionDivs = this.$node.selectAll('.distribution');
+
+//////////CHECKBOXES FOR HIDING THE COHORT OR TOTAL DISTRIBUTION BARS///////////////////////////////////////
+        let rectLabel = this.distibutionDivs.append('div').attr('transform', 'translate(150, 230)');
+        let checkAll = rectLabel.insert("input").attr('type', 'checkbox').attr('value', 'All').attr('checked', true);
+        checkAll.on('click', function(){
+            let target =  (this).parentNode.parentNode.querySelector('.ALL');
+            if(target.classList.contains('hidden')){
+                target.classList.remove('hidden');
+            }else{target.classList.add('hidden'); }
+        });
+        rectLabel.append('text').text('All').attr('color', '#BCAAE7');
+       
+        let checkCohort = rectLabel.insert("input").attr('type', 'checkbox').attr('checked', true).attr('value', 'Cohort').attr('transform', 'translate(40, 220)');;
+            checkCohort.on('click', function(d){
+                let target =  (this).parentNode.parentNode.querySelector('.COHORT');
+                if(target.classList.contains('hidden')){
+                    target.classList.remove('hidden');
+                }else{target.classList.add('hidden'); }
+        });
+        rectLabel.append('text').text('Cohort').attr('color', '#D0A016');
 
         this.xScale = scaleLinear()
             .rangeRound([0, this.distributionDimension.width]);
@@ -127,6 +150,11 @@ export class distributionDiagram {
         let dataCohort = selected.map((d: number) => +d[type]);
         let dataAll = patData.map((d: number) => +d[type]);
 
+        if (type == 'BMI'){
+            dataCohort = dataCohort.filter(d => d > 0);
+            dataAll = dataAll.filter(d => d > 0);
+        }
+
         console.log(mean(dataAll));
         console.log(mean(dataCohort));
 
@@ -143,22 +171,16 @@ export class distributionDiagram {
         let binsALL = histogram()
         .domain([0, maxValue])
         .thresholds(this.xScale.ticks(25))
-        //(this.distributionData);
         (dataAll);
 
-       
         let totalPatients = dataAll.length;
         let selectedPatients = dataCohort.length;
-
-       // console.log(dataAll);
-       // console.log(dataCohort);
 
         let histogramData = bins.map(function (d) {
             selectedPatients -= d.length;
             return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: selectedPatients + d.length, frequency: d.length/dataCohort.length}
         });
 
-        console.log(histogramData);
 
         let histogramDataALL = binsALL.map(function (d) {
             totalPatients -= d.length;
@@ -170,8 +192,6 @@ export class distributionDiagram {
         this.yScale.domain([0, max(histogramDataALL, function (d) {
             return d.frequency + .1;
         })]);
-
-        console.log(histogramDataALL);
 
         //needs to be cleaned up but bars for cohort////////////////////////////
         let barGroups = this[type].select('.COHORT').selectAll(".bar")
@@ -198,17 +218,6 @@ export class distributionDiagram {
             .attr("height", (d) => {
                 return this.yScale(d.frequency);
             });
-/*
-        barGroups
-            .select("rect")
-            .transition(9000)
-            .attr("y", (d) => {
-                return this.distributionDimension.height - this.yScale(d.frequency);
-            })
-            .attr("width", this.xScale(bins[0].x1) - this.xScale(bins[0].x0) - 3)
-            .attr("height", (d) => {
-                return this.yScale(d.frequency);
-            });*/
 
 //////////////bar groups for all data////////////////////////////////
             let barGroupsALL = this[type].select('.ALL').selectAll(".barALL")
@@ -238,19 +247,6 @@ export class distributionDiagram {
                 return this.yScale(d.frequency);
            });
 
-        
-/*
-        barGroupsALL
-            .select("rect")
-            //.classed('displayedRect', false)
-            .transition(9000)
-            .attr("y", (d) => {
-                return this.distributionDimension.height - this.yScale(d.frequency);
-            })
-            .attr("width", this.xScale(binsALL[0].x1) - this.xScale(binsALL[0].x0) - 3)
-            .attr("height", (d) => {
-                return this.yScale(d.frequency);
-            });*/
 
         // update the axis
         this.group.select(".axis--x")//.data(binsALL)
@@ -267,13 +263,10 @@ export class distributionDiagram {
 
         let meanvalue = mean(dataAll);
         let meanCohort = mean(dataCohort);
-
-        console.log(deviation(dataAll));
-        console.log(deviation(dataCohort));
         
         if(meanCohort > meanvalue){
             barGroups.classed('selected', true);
-            console.log(barGroups);
+            
         };
 
         let meanLine = this[type].select('.midLine').append('line')
@@ -284,11 +277,7 @@ export class distributionDiagram {
         let plotLabel = this[type].select('.plotLabel').append('text').text(type).classed('Label', true)
         .attr('transform', 'translate(150, 230)');
 
-        let rectLabel = this[type].select('.plotLabel').append('g');
-        rectLabel.append('rect').attr('width', 10).attr('height', 10).attr('fill', '#BCAAE7').attr('transform', 'translate(0, 220)');
-        rectLabel.append('text').text('All').attr('transform', 'translate(10, 230)');
-        rectLabel.append('rect').attr('width', 10).attr('height', 10).attr('fill', '#D0A016').attr('transform', 'translate(40, 220)');;
-        rectLabel.append('text').text('Cohort').attr('transform', 'translate(50, 230)');
+       
     }
 
 }
