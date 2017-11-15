@@ -231,10 +231,11 @@ export class parallel {
 
     let brushed = function() {
       let lines = select('#plotGroup').selectAll('path');
-
+       console.log(brushSelection(this));
           let actives = [];
           dimensionGroup.selectAll(".brush")
             .filter(function(d) {
+             
               return brushSelection(this);
             })
             .each(function(d) {
