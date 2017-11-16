@@ -10,6 +10,9 @@ import * as events from 'phovea_core/src/event';
 //import {transition} from 'd3-transition';
 import {Constants} from './constants';
 import * as parallel from './parallel';
+//import React from 'react';
+//import Collapsible from 'react-collapsible';
+
 
 export class SideBar {
 
@@ -37,18 +40,43 @@ export class SideBar {
     let labels = form.selectAll("div")
         .data(this.header)
         .enter()
-        .append("div")
+        .append("div");
+
+      
+
+    let ul = labels.append('ul')
         .attr('value', (d=>d.key));
 
-        let headerLabel = labels.append('label')
+        let headerLabel = ul.append('label')
         .text(function(d) {return d.key;}).attr('value', (d=>d.key));
 
-        let listlabel = labels.selectAll('ul').data((d) => d.value).enter().append('ul').text(d => d);
+        let listlabel = ul.selectAll('li').data((d) => d.value).enter().append('li').text(d => d);
+
+        ul.selectAll('li').classed('hidden', true);
+
+      headerLabel.on('click', function(d){
         
-        listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
-        listlabel.on('click', function(d){
+         let children = (this.parentNode).querySelectorAll('li');
+         children.forEach(element => {
+           if(element.classList.contains('hidden')){
+            element.classList.remove('hidden');
+           }else{
+            element.classList.add('hidden');
+           }
+           
+         });
+        });
+
+       // console.log(this.$node.querySelectorAll('li'));
     
+        listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
+    
+        
+        listlabel.on('click', function(d){
+
           let parentValue = this.parentNode.attributes[0].value;
+         // console.log(d);
+          //console.log(parentValue);
          
           events.fire('filter_data', [d, parentValue]);
         } );

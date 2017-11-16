@@ -30,6 +30,7 @@ export class distributionDiagram {
     private AGE;
     private CCI;
     private distibutionDivs;
+    private midLineCohort;
 
 
     private distributionDimension = {height: 200, width: 300};
@@ -76,7 +77,8 @@ export class distributionDiagram {
                 }else{target.classList.add('hidden'); }
         });
         rectLabel.append('text').text('Cohort').attr('color', '#D0A016');
-
+        
+///////SETTING SCALES//////////////////////////////
         this.xScale = scaleLinear()
             .rangeRound([0, this.distributionDimension.width]);
 
@@ -99,6 +101,9 @@ export class distributionDiagram {
         this.group.append('g').classed('ALL', true);
 
         this.group.append('g').classed('midLine', true);
+        this.group.append('g').classed('midLineCohort', true);
+        selectAll('.midLineCohort').append('text');
+        selectAll('.midLineCohort').append('line');
         this.group.append('g').classed('plotLabel', true);
 
         this.attachListener();
@@ -271,8 +276,16 @@ export class distributionDiagram {
 
         let meanLine = this[type].select('.midLine').append('line')
         .attr('x1', this.xScale(meanvalue)).attr('x2', this.xScale(meanvalue))
-        .attr('y1', 0).attr('y2', 200).attr('stroke-width', 1);
-        this[type].select('.midLine').append('text').text('total population mean:  ' + meanvalue).attr('x', this.xScale(meanvalue));
+        .attr('y1', 0).attr('y2', 200).attr('stroke-width', .5);
+        this[type].select('.midLine').append('text').text('total population mean:  ' + meanvalue)
+        .attr('x', this.xScale(meanvalue));
+
+        let meanLineCohort = this[type].select('.midLineCohort').select('line')
+        .attr('x1', this.xScale(meanCohort)).attr('x2', this.xScale(meanCohort))
+        .attr('y1', 20).attr('y2', 200).attr('stroke-width', .5).attr('stroke', 'red');
+
+        this[type].select('.midLineCohort').select('text').text('Cohort mean:  ' + meanCohort)
+        .attr('x', this.xScale(meanCohort)).attr('y', 20);
 
         let plotLabel = this[type].select('.plotLabel').append('text').text(type).classed('Label', true)
         .attr('transform', 'translate(150, 230)');

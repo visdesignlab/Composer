@@ -46,6 +46,7 @@ export class parallel {
 
   selectedData;
   contextData;
+  sidebarFiltered;
   
 
   table: ITable;
@@ -68,13 +69,15 @@ export class parallel {
     this.attachListener();
     
     this.plotLines = select('#plotGroup').selectAll('path');
+    this.backgroundLines = select('#plotGroup').selectAll('path');
     
   }
 
   private attachListener() {
     
-            // item: pat_id, number of similar patients, DATA
-            events.on('filter_data', (evt, item) => { // called in queryBox
+            // item: [d, parentValue]
+            events.on('filter_data', (evt, item) => { // called in sidebar
+
               this.updatePlot(this.plotLines, item);
 
             });
@@ -235,7 +238,6 @@ export class parallel {
           let actives = [];
           dimensionGroup.selectAll(".brush")
             .filter(function(d) {
-             
               return brushSelection(this);
             })
             .each(function(d) {
@@ -265,7 +267,7 @@ export class parallel {
          selected.each((d)=> activeData.push(d));
         
         events.fire('brushes', activeData);
-        events.fire('dataUpdated', [activeData, this.allData]);
+       events.fire('dataUpdated', [activeData, this.allData]);
       
         }
 
@@ -288,12 +290,10 @@ this.SelectedCounter = this.svg.append('g')
 }
 
 private async plotPatients(data, rejectData){
-  
-   // console.log(rejectData);
    
    let plotLines = select('#plotGroup')
     .selectAll('path').data(data);
-  
+
     plotLines.exit().remove();
     
     let linesEnter = plotLines.enter().append('path');
@@ -302,35 +302,47 @@ private async plotPatients(data, rejectData){
     plotLines.attr('d', d => this.path(d));
   
     plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
+/*
+    let plotRejects = select('#plotRejects')
+    .selectAll('path').data(rejectData);
 
+    plotRejects.exit().remove();
+    
+    let rejectEnter = plotRejects.enter().append('path');
+    plotRejects = rejectEnter.merge(plotRejects);
+  
+    plotRejects.attr('d', d => this.path(d));
+  
+    plotRejects.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .1).attr("stroke-opacity", 0.1);
+*/
 
   }
 
-private updatePlot(selected, d) {
+private updatePlot(selected, d) {//picks up the filters from sidebar
 
 let choice = d[0];
 let parent = d[1];
 
     let lines = select('#plotGroup').selectAll('path');
 
-
     let filterGroup = lines.filter(d => d[parent] == choice);
 
-
-     let filteredData = this.selectedData.filter(d => d[parent] == choice);
+   
+     this.sidebarFiltered = this.selectedData.filter(d => d[parent] == choice);
      let rejectData = this.selectedData.filter(d => d[parent] !== choice);//.classed('hidden', true);
+ 
+     filterGroup.classed(parent, true);
 
-    filterGroup.classed(parent, true);
+    this.plotPatients(this.sidebarFiltered, rejectData);
 
-    this.plotPatients(filteredData, rejectData);
-
-    events.fire('dataUpdated', [filteredData, this.allData]);
+    events.fire('dataUpdated', [this.sidebarFiltered, this.allData]);
 
 }
 
 private updateCounter(data){
   this.selectedData = data;
   this.SelectedCounter.text('Selected Patients:   ' + data.length);
+  events.fire('selected_updated', data);
 }
 
 
