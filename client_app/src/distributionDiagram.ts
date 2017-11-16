@@ -160,22 +160,19 @@ export class distributionDiagram {
             dataAll = dataAll.filter(d => d > 0);
         }
 
-        console.log(mean(dataAll));
-        console.log(mean(dataCohort));
-
-        this.xScale.domain([0, maxValue]).nice();
-
-        let xAxis = axisBottom(this.xScale);
+        let x = this.xScale.domain([0, maxValue]).nice();
+       
+        let xAxis = axisBottom(x);
+        console.log("x scale for" + type + ":  " + xAxis);
      
         let bins = histogram()
-            .domain([0, maxValue])
-            .thresholds(this.xScale.ticks(25))
-            //(this.distributionData);
+            .domain(x.domain())
+            .thresholds(x.ticks(25))
             (dataCohort);
 
         let binsALL = histogram()
-        .domain([0, maxValue])
-        .thresholds(this.xScale.ticks(25))
+        .domain(x.domain())
+        .thresholds(x.ticks(25))
         (dataAll);
 
         let totalPatients = dataAll.length;
@@ -254,7 +251,7 @@ export class distributionDiagram {
 
 
         // update the axis
-        this.group.select(".axis--x")//.data(binsALL)
+        this[type].select(".axis--x")//.data(binsALL)
             //.transition(t)
             .call(xAxis);
 
