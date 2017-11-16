@@ -131,6 +131,9 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
+        events.on('selected_updated', (evt, item) => {
+            console.log(item);
+        });
 
         // item: pat_id, number of similar patients, DATA
         events.on('update_similar', (evt, item) => { // called in queryBox
@@ -160,6 +163,7 @@ export class similarityScoreDiagram {
             this.clearDiagram();
             this.drawDiagram();
             this.addOrderSquares(item[1]['Orders'][item[0]]);
+
             //this splits the order hierarchy into 2 arrays of medicaiton and procedures for the patient but it is
             //not recognized in the drawpatientrects();
             this.filteredOrders.medGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).medicationGroup;
