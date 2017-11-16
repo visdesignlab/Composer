@@ -10,13 +10,11 @@ import * as events from 'phovea_core/src/event';
 //import {transition} from 'd3-transition';
 import {Constants} from './constants';
 import * as parallel from './parallel';
-//import React from 'react';
-//import Collapsible from 'react-collapsible';
-
 
 export class SideBar {
 
   private $node;
+  private filters;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'value': ['W', 'H' ]},
@@ -35,14 +33,15 @@ export class SideBar {
 
   async init() {
 
-    var form = this.$node.append("form").append('div').attr('padding-top', 250);
+    this.filters = [];
+    let that = this;
+
+    let form = this.$node.append("form").append('div').attr('padding-top', 250);
     
     let labels = form.selectAll("div")
         .data(this.header)
         .enter()
         .append("div");
-
-      
 
     let ul = labels.append('ul')
         .attr('value', (d=>d.key));
@@ -67,19 +66,25 @@ export class SideBar {
          });
         });
 
-       // console.log(this.$node.querySelectorAll('li'));
-    
         listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
     
-        
         listlabel.on('click', function(d){
 
+          let choice = d;
+
           let parentValue = this.parentNode.attributes[0].value;
-         // console.log(d);
-          //console.log(parentValue);
+          that.filters.push([d, parentValue]);
+
+          let lines = select('#plotGroup').selectAll('path');
+          let filterGroup = lines.filter(d => d[parentValue] == choice);
          
-          events.fire('filter_data', [d, parentValue]);
+          filterGroup.classed(parentValue, true);
+          
         } );
+
+        form.insert('input').attr('type', 'button').attr('value', 'filter').on('click', function(d){
+          events.fire('filter_data', that.filters);//sent to parallel
+         });
   }
 
  }

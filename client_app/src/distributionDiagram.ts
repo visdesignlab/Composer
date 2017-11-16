@@ -124,7 +124,6 @@ export class distributionDiagram {
         })
      
         events.on('dataUpdated', (evt, item) => { 
-           console.log(item);
            let selected = item[0];
            let all = item[1];
            this.drawDiagram(selected, all, 'BMI');
@@ -141,9 +140,6 @@ export class distributionDiagram {
         var self = this;
         console.log(type);
         console.log(patData);
-       //let data = patData.filter(element => +element['BMI']);
-
-        //console.log(data);
 
         this.$node.classed('hidden', false);
 
@@ -151,7 +147,6 @@ export class distributionDiagram {
             return +d[type];
         });
 
-       // let normalize = scaleLinear().domain([0, maxValue + 0.01]).range([0, 1]);
         let dataCohort = selected.map((d: number) => +d[type]);
         let dataAll = patData.map((d: number) => +d[type]);
 
@@ -163,8 +158,7 @@ export class distributionDiagram {
         let x = this.xScale.domain([0, maxValue]).nice();
        
         let xAxis = axisBottom(x);
-        console.log("x scale for" + type + ":  " + xAxis);
-     
+ 
         let bins = histogram()
             .domain(x.domain())
             .thresholds(x.ticks(25))

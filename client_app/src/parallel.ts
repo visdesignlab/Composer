@@ -44,9 +44,9 @@ export class parallel {
   private dimension;
   private path;
 
-  selectedData;
+  selectedData;//used with active data for brushing on plot
   contextData;
-  sidebarFiltered;
+  sidebarFiltered;//used plot to divide into selected and context
   
 
   table: ITable;
@@ -77,14 +77,14 @@ export class parallel {
     
             // item: [d, parentValue]
             events.on('filter_data', (evt, item) => { // called in sidebar
-
-              this.updatePlot(this.plotLines, item);
+          
+              this.updatePlot(item);
 
             });
 
             events.on('brushes', (evt, item) => {
              // console.log(item);
-              this.plotPatients(item, null);
+              this.plotPatients(item);
             });
 
             events.on('dataUpdated', (evt, item) =>{
@@ -109,6 +109,15 @@ export class parallel {
 
     let table : ITable;
     let that = this;
+
+    
+this.svg.append('g')
+.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
+.attr('id', 'plotGroup');
+
+this.svg.append('g')
+.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
+.attr('id', 'plotRejects');
 
     //this.table = <ITable> await getById('CPT_codes');
   this.table = <ITable> await getById('Demo_Info');
@@ -273,13 +282,7 @@ export class parallel {
 
 this.brush.on('end', brushed);
 
-this.svg.append('g')
-.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotGroup');
-
-this.svg.append('g')
-.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotRejects');
-
-this.plotPatients(this.selectedData, this.contextData);
+this.plotPatients(this.selectedData);
 events.fire('dataLoaded', this.allData);
 
 this.SelectedCounter = this.svg.append('g')
@@ -289,7 +292,7 @@ this.SelectedCounter = this.svg.append('g')
 
 }
 
-private async plotPatients(data, rejectData){
+private async plotPatients(data){
    
    let plotLines = select('#plotGroup')
     .selectAll('path').data(data);
@@ -313,29 +316,27 @@ private async plotPatients(data, rejectData){
   
     plotRejects.attr('d', d => this.path(d));
   
-    plotRejects.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .1).attr("stroke-opacity", 0.1);
+    plotRejects.attr('fill', 'none').attr('stroke', 'red').attr('stroke-width', .1).attr("stroke-opacity", 0.1);
 */
 
   }
 
-private updatePlot(selected, d) {//picks up the filters from sidebar
+private updatePlot(d) {//picks up the filters from sidebar
 
-let choice = d[0];
-let parent = d[1];
 
-    let lines = select('#plotGroup').selectAll('path');
+ let filter = this.allData;
 
-    let filterGroup = lines.filter(d => d[parent] == choice);
+  d.forEach( d=> {
+    let choice = d[0];
+    let parent = d[1];
+    filter = filter.filter(d => d[parent] == choice);
+  });
+    // let rejectData = this.selectedData.filter(d => d[parent] !== choice);//.classed('hidden', true);
+    this.sidebarFiltered = filter;
 
-   
-     this.sidebarFiltered = this.selectedData.filter(d => d[parent] == choice);
-     let rejectData = this.selectedData.filter(d => d[parent] !== choice);//.classed('hidden', true);
+    this.plotPatients(this.sidebarFiltered);
  
-     filterGroup.classed(parent, true);
-
-    this.plotPatients(this.sidebarFiltered, rejectData);
-
-    events.fire('dataUpdated', [this.sidebarFiltered, this.allData]);
+  events.fire('dataUpdated', [this.sidebarFiltered, this.allData]);
 
 }
 
