@@ -131,9 +131,10 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
+        /*
         events.on('selected_updated', (evt, item) => {
             console.log(item);
-        });
+        });*/
 
         // item: pat_id, number of similar patients, DATA
         events.on('update_similar', (evt, item) => { // called in queryBox
