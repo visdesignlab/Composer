@@ -138,8 +138,8 @@ export class distributionDiagram {
      */
     private drawDiagram(selected, patData, type) {
         var self = this;
-        console.log(type);
-        console.log(patData);
+        //console.log(type);
+       // console.log(patData);
 
         this.$node.classed('hidden', false);
 
