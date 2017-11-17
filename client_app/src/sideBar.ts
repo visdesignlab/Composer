@@ -79,9 +79,9 @@ export class SideBar {
           let filterGroup = lines.filter(d => d[parentValue] == choice);
          
           filterGroup.classed(parentValue, true);
-          
+          console.log(that.filters);
         } );
-
+       
         form.insert('input').attr('type', 'button').attr('value', 'filter').on('click', function(d){
           events.fire('filter_data', that.filters);//sent to parallel
          });
