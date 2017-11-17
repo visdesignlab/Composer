@@ -1,5 +1,5 @@
 .bar rect {
-    fill: #352F43;
+    fill: #D0A016;
     opacity: .3;
 }
 
@@ -14,4 +14,9 @@
 
 .selectedRect {
     fill: darkred !important;
+}
+
+.distribution {
+    width: 360;
+    display: inline-block;
 }

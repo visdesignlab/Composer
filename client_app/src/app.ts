@@ -96,8 +96,7 @@ export class App {
 
             //this.$node.select('.orderBreakdownDiv').classed('hidden', false);
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
-           
-
+          
             console.log('added similarity score diagram');
 
         });
@@ -117,9 +116,9 @@ export class App {
 
 
     // PROMIS diagrams
-    const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
-    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
-    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
+   // const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
+   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
     //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
 
 

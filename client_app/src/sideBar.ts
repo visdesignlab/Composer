@@ -14,6 +14,7 @@ import * as parallel from './parallel';
 export class SideBar {
 
   private $node;
+  private filters;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'value': ['W', 'H' ]},
@@ -32,26 +33,67 @@ export class SideBar {
 
   async init() {
 
-    var form = this.$node.append("form").append('div').attr('padding-top', 250);
+    this.filters = [];
+    let that = this;
+
+    let form = this.$node.append("form").append('div').attr('padding-top', 250);
     
     let labels = form.selectAll("div")
         .data(this.header)
         .enter()
-        .append("div")
+        .append("div");
+
+    let ul = labels.append('ul')
         .attr('value', (d=>d.key));
 
-        let headerLabel = labels.append('label')
+        let headerLabel = ul.append('label')
         .text(function(d) {return d.key;}).attr('value', (d=>d.key));
 
-        let listlabel = labels.selectAll('ul').data((d) => d.value).enter().append('ul').text(d => d);
+        let listlabel = ul.selectAll('li').data((d) => d.value).enter().append('li').text(d => d);
+        ul.selectAll('li').attr('value', (d=>d));
+        ul.selectAll('li').classed('hidden', true);
+
+      headerLabel.on('click', function(d){
         
+         let children = (this.parentNode).querySelectorAll('li');
+         children.forEach(element => {
+           if(element.classList.contains('hidden')){
+            element.classList.remove('hidden');
+           }else{
+            element.classList.add('hidden');
+           }
+           
+         });
+        });
+
         listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
-        listlabel.on('click', function(d){
     
+        listlabel.on('click', function(d){
+
+          let choice = d;
+
           let parentValue = this.parentNode.attributes[0].value;
          
-          events.fire('filter_data', [d, parentValue]);
+
+          let lines = select('#plotGroup').selectAll('path');
+          let filterGroup = lines.filter(d => d[parentValue] == choice);
+         
+          filterGroup.classed(parentValue, true);
+     
         } );
+       
+        form.insert('input').attr('type', 'button').attr('value', 'filter').on('click', function(d){
+          
+         let input = form.selectAll('li').nodes();
+         let filterInput = input.filter(d=> d.lastChild['checked']);
+       
+         filterInput.forEach(d=> {
+          that.filters.push([d.innerText, d.parentNode.attributes[0].value]);
+          });
+         
+          events.fire('filter_data', that.filters);//sent to parallel
+          that.filters = [];
+        });
   }
 
  }
