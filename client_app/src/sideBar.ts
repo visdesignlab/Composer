@@ -50,7 +50,7 @@ export class SideBar {
         .text(function(d) {return d.key;}).attr('value', (d=>d.key));
 
         let listlabel = ul.selectAll('li').data((d) => d.value).enter().append('li').text(d => d);
-
+        ul.selectAll('li').attr('value', (d=>d));
         ul.selectAll('li').classed('hidden', true);
 
       headerLabel.on('click', function(d){
@@ -73,18 +73,27 @@ export class SideBar {
           let choice = d;
 
           let parentValue = this.parentNode.attributes[0].value;
-          that.filters.push([d, parentValue]);
+         
 
           let lines = select('#plotGroup').selectAll('path');
           let filterGroup = lines.filter(d => d[parentValue] == choice);
          
           filterGroup.classed(parentValue, true);
-          console.log(that.filters);
+     
         } );
        
         form.insert('input').attr('type', 'button').attr('value', 'filter').on('click', function(d){
+          
+         let input = form.selectAll('li').nodes();
+         let filterInput = input.filter(d=> d.lastChild['checked']);
+       
+         filterInput.forEach(d=> {
+          that.filters.push([d.innerText, d.parentNode.attributes[0].value]);
+          });
+         
           events.fire('filter_data', that.filters);//sent to parallel
-         });
+          that.filters = [];
+        });
   }
 
  }
