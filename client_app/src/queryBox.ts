@@ -124,6 +124,7 @@ export class QueryBox {
                 this.similarArgs = args;
 
                 events.fire('update_similar', [item[1], item[2], args]); // caught by svgTable and scoreDiagram and statHistogram
+                console.log('testing  ' + item);
             });
         });
 
@@ -132,6 +133,10 @@ export class QueryBox {
             this.updateSimilar();
 
         });
+/*
+        events.on('selected_updated', (evt, item)=>{
+            events.fire('update_similar', [item, item.length, null]);
+        });*/
     }
 
 

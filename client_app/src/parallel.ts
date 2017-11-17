@@ -44,8 +44,9 @@ export class parallel {
   private dimension;
   private path;
 
-  selectedData;
+  selectedData;//used with active data for brushing on plot
   contextData;
+  sidebarFiltered;//used plot to divide into selected and context
   
 
   table: ITable;
@@ -68,26 +69,29 @@ export class parallel {
     this.attachListener();
     
     this.plotLines = select('#plotGroup').selectAll('path');
+    this.backgroundLines = select('#plotGroup').selectAll('path');
     
   }
 
   private attachListener() {
     
-            // item: pat_id, number of similar patients, DATA
-            events.on('filter_data', (evt, item) => { // called in queryBox
-              this.updatePlot(this.plotLines, item);
+            // item: [d, parentValue]
+            events.on('filter_data', (evt, item) => { // called in sidebar
+          
+              this.updatePlot(item);
 
             });
 
-            events.on('brushes', (evt, item) => {
-             // console.log(item);
-              this.plotPatients(item, null);
+            events.on('brush_event', (evt, item) => {
+           
+             //brush event used to redraw plot
+              this.plotPatients(item[0], item[1]);
+              events.fire('dataUpdated', [item[0], this.allData]);
             });
 
             events.on('dataUpdated', (evt, item) =>{
-             // console.log(item);
-              let selected = item[0];
-              this.updateCounter(selected);
+           
+              this.updateCounter(item[0]);
             }) 
     
         }
@@ -107,22 +111,33 @@ export class parallel {
     let table : ITable;
     let that = this;
 
+    
+    this.svg.append('g').attr('id', 'MotherPlotter');
+    
+    select('#MotherPlotter').append('g')
+    .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
+    .attr('id', 'plotRejects');
+
+    select('#MotherPlotter').append('g')
+    .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
+    .attr('id', 'plotGroup');
+
     //this.table = <ITable> await getById('CPT_codes');
-  this.table = <ITable> await getById('Demo_Info');
-  console.log(await this.table.desc);
+    this.table = <ITable> await getById('Demo_Info');
+    console.log(await this.table.desc);
 
-     let patID = (await this.table.colData('PAT_ID')).map(d => +d);
-     let GENDER = (await this.table.colData('PAT_GENDER')).map(d => d);
-     let MARITAL_STATUS = (await this.table.colData('PAT_MARITAL_STAT')).map(d => d);
-     let TOBACCO = (await this.table.colData('TOBACCO_USER')).map(d => d);
-     let ALCOHOL = (await this.table.colData('ALCOHOL_USER')).map(d => d);
-     let DRUG_USER = (await this.table.colData('ILLICIT_DRUG_USER')).map(d => d);
-     let RACE = (await this.table.colData('PAT_RACE')).map(d => d);
-     let BMI = (await this.table.colData('BMI')).map(d => +d);
-     let patDOB = (await this.table.colData('PAT_BIRTHDATE')).map(d => new Date(String(d)));
-     let CCI = (await this.table.colData('CCI')).map(d => +d);
+    let patID = (await this.table.colData('PAT_ID')).map(d => +d);
+    let GENDER = (await this.table.colData('PAT_GENDER')).map(d => d);
+    let MARITAL_STATUS = (await this.table.colData('PAT_MARITAL_STAT')).map(d => d);
+    let TOBACCO = (await this.table.colData('TOBACCO_USER')).map(d => d);
+    let ALCOHOL = (await this.table.colData('ALCOHOL_USER')).map(d => d);
+    let DRUG_USER = (await this.table.colData('ILLICIT_DRUG_USER')).map(d => d);
+    let RACE = (await this.table.colData('PAT_RACE')).map(d => d);
+    let BMI = (await this.table.colData('BMI')).map(d => +d);
+    let patDOB = (await this.table.colData('PAT_BIRTHDATE')).map(d => new Date(String(d)));
+    let CCI = (await this.table.colData('CCI')).map(d => +d);
 
-  let patAge = [];
+    let patAge = [];
 
     patDOB.forEach((d) => { 
         let diff = Date.now() - d.getTime();
@@ -130,7 +145,7 @@ export class parallel {
        
       });
   
-      this.selectedData = patID.map((id, i) => {
+      this.allData = patID.map((id, i) => {
         return {
           ID: id,
           GENDER: GENDER[i],
@@ -144,8 +159,6 @@ export class parallel {
           CCI: CCI[i]
         };
       });
-
-      this.allData = this.selectedData;
 
       let types = {
         "Number": {
@@ -219,7 +232,7 @@ export class parallel {
    .each(function(d, i) { d3.select(this).call(axis.scale(d.scale)); })
    .append("text")
    .style("text-anchor", "middle")
-   .attr("y", -9)
+   .attr("y", 0)
    .text(function(d) { return d.value; });
 
    this.brush = brushY()
@@ -230,29 +243,25 @@ export class parallel {
    .call(this.brush);
 
     let brushed = function() {
-      let lines = select('#plotGroup').selectAll('path');
+      let lines = select('#MotherPlotter').selectAll('path');
 
           let actives = [];
+
           dimensionGroup.selectAll(".brush")
             .filter(function(d) {
               return brushSelection(this);
             })
             .each(function(d) {
+            
               actives.push({
                 dimension: d,
                 extent: brushSelection(this)
-               
               });
             });
-          
-           let activeData = [];
-           let rejectData;
-      
+        
           let selected = lines.filter(function(d) {
             if (actives.every(function(active) {
-
-               var dim = active.dimension;
-            
+               let dim = active.dimension;
                 // test if point is within extents for each active brush
                 return dim.type.within(d[dim.value], active.extent, dim);
               })) 
@@ -261,22 +270,33 @@ export class parallel {
             }
           });
 
-         selected.each((d)=> activeData.push(d));
+          let context = lines.filter(function(d) {
+            if (actives.every(function(active) {
+               let dim = active.dimension;
+                // test if point is within extents for each active brush
+                return !dim.type.within(d[dim.value], active.extent, dim);
+              })) 
+              {
+              return true;
+            }
+          });
         
-        events.fire('brushes', activeData);
-        events.fire('dataUpdated', [activeData, this.allData]);
+        let activeData = [];
+        let rejectData = [];
+          
+       // context.classed('context', true);
+        selected.each((d)=> activeData.push(d));
+        context.each((d)=> rejectData.push(d));
+        
+        events.fire('brush_event', [activeData, rejectData]);
+       ////used to fire data updated here?? should this stay?
+       //events.fire('dataUpdated', [activeData, this.allData]);
       
         }
 
 this.brush.on('end', brushed);
 
-this.svg.append('g')
-.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotGroup');
-
-this.svg.append('g')
-.attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')').attr('id', 'plotRejects');
-
-this.plotPatients(this.selectedData, this.contextData);
+this.plotPatients(this.allData, null);
 events.fire('dataLoaded', this.allData);
 
 this.SelectedCounter = this.svg.append('g')
@@ -287,12 +307,10 @@ this.SelectedCounter = this.svg.append('g')
 }
 
 private async plotPatients(data, rejectData){
-  
-   // console.log(rejectData);
    
    let plotLines = select('#plotGroup')
     .selectAll('path').data(data);
-  
+
     plotLines.exit().remove();
     
     let linesEnter = plotLines.enter().append('path');
@@ -301,35 +319,48 @@ private async plotPatients(data, rejectData){
     plotLines.attr('d', d => this.path(d));
   
     plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
+if(rejectData !== null){
 
+  let plotRejects = select('#plotRejects')
+  .selectAll('path').data(rejectData);
 
+  plotRejects.exit().remove();
+  
+  let rejectEnter = plotRejects.enter().append('path');
+  plotRejects = rejectEnter.merge(plotRejects);
+
+  plotRejects.attr('d', d => this.path(d));
+
+  plotRejects.attr('fill', 'none').attr('stroke', '#DCDCDC').attr('stroke-width', .1).attr("stroke-opacity", 0.1);
+
+}
+   
   }
 
-private updatePlot(selected, d) {
+private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfiltered data
 
-let choice = d[0];
-let parent = d[1];
+ let filter = this.allData;
+ let rejectData;
 
-    let lines = select('#plotGroup').selectAll('path');
+  d.forEach( d=> {
+    let choice = d[0];
+    let parent = d[1];
+    filter = filter.filter(d => d[parent] == choice);
+    rejectData = this.allData.filter(d => d[parent] !== choice);
+  });
+  
+    this.sidebarFiltered = filter;
 
-
-    let filterGroup = lines.filter(d => d[parent] == choice);
-
-
-     let filteredData = this.selectedData.filter(d => d[parent] == choice);
-     let rejectData = this.selectedData.filter(d => d[parent] !== choice);//.classed('hidden', true);
-
-    filterGroup.classed(parent, true);
-
-    this.plotPatients(filteredData, rejectData);
-
-    events.fire('dataUpdated', [filteredData, this.allData]);
+    this.plotPatients(this.sidebarFiltered, null);
+ 
+  events.fire('dataUpdated', [this.sidebarFiltered, this.allData]);
 
 }
 
 private updateCounter(data){
-  this.selectedData = data;
+  //this.selectedData = data;
   this.SelectedCounter.text('Selected Patients:   ' + data.length);
+ // events.fire('selected_updated', data);
 }
 
 
