@@ -123,6 +123,7 @@ export class SideBar {
          // events.fire('filter_data', that.filters);//sent to parallel
          events.fire('filter_data', filterList);
           that.filters = [];
+          
           filterList = [];
           
         });
