@@ -117,10 +117,10 @@ export class App {
 
 
     // PROMIS diagrams
-   // const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
-   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
-   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
-    //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
+   const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
+   similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+   similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
+   similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
 
 
     this.setBusy(false);
