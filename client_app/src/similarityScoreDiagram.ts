@@ -16,6 +16,13 @@ import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
+import {ITable, asTable} from 'phovea_core/src/table';
+import {IAnyVector, INumericalVector} from 'phovea_core/src/vector';
+import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
+import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
+import {asVector} from 'phovea_core/src/vector/Vector';
+import {argFilter} from 'phovea_core/src/';
+
 
 export const filteredOrders = this.filteredOrders;
 
@@ -48,7 +55,10 @@ export class similarityScoreDiagram {
     sliderWidth = 10;
     similarBar = {width: 4, height: 10};
 
+    table: ITable;
+
     constructor(parent: Element, diagram) {
+
 
         this.diagram = diagram;
         this.$node = select(parent)
@@ -126,6 +136,70 @@ export class similarityScoreDiagram {
         this.attachListener();
 
     }
+//uses Phovea to access PRO data and draw table
+    private async getPromisScore(data) {
+       
+       let ids = [];
+
+        data.forEach(element => {
+           ids.push(element.ID);
+       });
+
+       this.table = <ITable> await getById('PRO');
+      
+//testing fitlering through phovea. no luck
+/*
+        let extents = extent(ids);
+
+       // const testVector = asVector([ids]);
+       let idRange = range(extents[0], extents[1]);
+      // console.log(idRange);
+
+        this.table = <ITable> await getById('PRO');
+       // console.log(await this.table.desc);
+       let idVector = <INumericalVector> this.table.col(0);
+      // let idV = asVector(['1'], ids);
+        console.log(idVector);*/
+/*
+      const patObjects = await this.table.objects();
+
+     let filteredPatients = patObjects.filter(//function(item, index, array){
+       // return item.PAT_ID == 20253918;
+       // return item.PAT_ID == ids.indexOf();
+       obj => ids.indexOf(obj.PAT_ID) !== -1
+);
+
+let mapped = filteredPatients.map((id, i) => {
+    return {
+      key: id.PAT_ID,
+      value: [id]
+    };
+  });
+
+  console.log(mapped);*/
+
+  let filteredPatScore = {};
+  const patObjects = await this.table.objects();
+  patObjects.forEach(item => {
+    if (ids.indexOf(item.PAT_ID) !== -1) {
+      if (filteredPatScore[item.PAT_ID] === undefined) {
+        filteredPatScore[item.PAT_ID] = [];
+      }
+      filteredPatScore[item.PAT_ID].push(item);
+    }
+  });
+  let mapped = entries(filteredPatScore);
+  
+  console.log(mapped);
+
+
+this.similarPatientsProInfo = mapped;
+//console.log(this.similarPatientsProInfo);
+
+this.clearDiagram();
+this.drawDiagram();
+
+    };
 
     /**
      * Attach listeners
@@ -144,10 +218,11 @@ export class similarityScoreDiagram {
 
             this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
             this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+            console.log(this.similarPatientsProInfo);
        
             this.clearDiagram();
             this.drawDiagram();
-            this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']))
+            this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']));
 
         });
 
@@ -157,6 +232,8 @@ export class similarityScoreDiagram {
             this.svg.select('.slider')  // reset slider
                 .call(this.brush)
                 .call(this.brush.move, this.scoreScale.range());
+
+          //  console.log("what is happening  "+item);
 
             this.targetPatientProInfo = item[1]['PRO'][item[0]];
             this.similarPatientsProInfo = [];
@@ -172,6 +249,15 @@ export class similarityScoreDiagram {
            
         });
 
+        events.on('dataUpdated', (evt, item) => {  // called in query box
+            
+               // console.log("sent to similarity " + item[0].length);   
+               // console.log(this.similarPatientsProInfo); 
+                this.getPromisScore(item[0]);   
+              
+                       
+                    });
+
     }
 
     /**
@@ -179,20 +265,28 @@ export class similarityScoreDiagram {
      * @param args
      */
     private drawDiagram() {
+        
 
         // ----- add diff days to the data
 
         let maxDiff = 0;
 
-        let minPatDate = this.findMinDate(this.targetPatientProInfo);
-        this.targetPatientProInfo.forEach((d) => {
-            d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
-            maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-        });
-        this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
+  
 
+            let minPatDate = this.findMinDate(this.targetPatientProInfo);
+            this.targetPatientProInfo.forEach((d) => {
+                d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
+                maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+            });
+            this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
+    
 
+   
+
+       
+     
         this.similarPatientsProInfo.forEach((g) => {
+           
             let minDate = this.findMinDate(g.value);
             g.value.forEach((d) => {
                 try {
@@ -274,6 +368,7 @@ export class similarityScoreDiagram {
 
 
     }
+    
 
     /**
      * Utility method
