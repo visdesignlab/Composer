@@ -48,7 +48,6 @@ export class parallel {
   selectedData;//used with active data for brushing on plot
   contextData;
   sidebarFiltered;//used plot to divide into selected and context
-  
 
   table: ITable;
 
@@ -109,7 +108,7 @@ export class parallel {
 
   public async mapPatientData() {
 
-    let table : ITable;
+   // let table : ITable;
     let that = this;
 
     
