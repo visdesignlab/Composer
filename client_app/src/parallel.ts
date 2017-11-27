@@ -43,11 +43,11 @@ export class parallel {
   private backgroundLines;
   private dimension;
   private path;
+  private actives;
 
   selectedData;//used with active data for brushing on plot
   contextData;
   sidebarFiltered;//used plot to divide into selected and context
-  
 
   table: ITable;
 
@@ -108,7 +108,7 @@ export class parallel {
 
   public async mapPatientData() {
 
-    let table : ITable;
+   // let table : ITable;
     let that = this;
 
     
@@ -245,7 +245,7 @@ export class parallel {
     let brushed = function() {
       let lines = select('#MotherPlotter').selectAll('path');
 
-          let actives = [];
+         let actives = [];
 
           dimensionGroup.selectAll(".brush")
             .filter(function(d) {
@@ -291,6 +291,7 @@ export class parallel {
         events.fire('brush_event', [activeData, rejectData]);
        ////used to fire data updated here?? should this stay?
        //events.fire('dataUpdated', [activeData, this.allData]);
+       actives = [];
       
         }
 
@@ -341,12 +342,30 @@ private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfi
 
  let filter = this.allData;
  let rejectData;
+ let totalnumbers;
+
+// console.log(d);
 
   d.forEach( d=> {
-    let choice = d[0];
-    let parent = d[1];
-    filter = filter.filter(d => d[parent] == choice);
-    rejectData = this.allData.filter(d => d[parent] !== choice);
+    
+    let parent = d.attributeName;
+    let choice = d.checkedOptions;
+   // console.log(choice.length);
+    if (choice.length == 1){
+       filter = filter.filter(d => d[parent] == choice);
+    }else if(choice.length == 2){
+       filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
+       console.log(filter);
+    }else if(choice.length == 2){
+      filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
+      console.log(filter);
+   }else if(choice.length == 3){
+      filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
+      console.log(filter);
+
+ }
+   
+   // rejectData = this.allData.filter(d => d[parent] !== choice);
   });
   
     this.sidebarFiltered = filter;
@@ -358,9 +377,9 @@ private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfi
 }
 
 private updateCounter(data){
-  //this.selectedData = data;
+
   this.SelectedCounter.text('Selected Patients:   ' + data.length);
- // events.fire('selected_updated', data);
+
 }
 
 

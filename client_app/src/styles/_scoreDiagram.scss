@@ -1,99 +1,103 @@
 .allDiagramDiv {
-  clear: left;
+    clear: left;
 }
 
 //container div for the line graph?
 .diagramDiv {
-  float: left;
-  padding-right: 100px;
-  //added max-height to div to move boxs closer together
-  //min-height: 530px;
+    float: left;
+    padding-right: 100px;
+    //added max-height to div to move boxs closer together
+    //min-height: 530px;
 }
 
 .scoreLine {
-  fill: none;
-  stroke: darkblue;
+    fill: none;
+    stroke: darkblue;
 }
 
 .scoreCircle {
-  fill: darkred;
-  stroke: none;
+    fill: darkred;
+    stroke: none;
 }
 
 .patLine {
-  fill: none;
-  stroke: #FF5733;
-  stroke-width: 2px;
+    fill: none;
+    stroke: #FF5733;
+    stroke-width: 2px;
 }
 
 .medLine {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 2px;
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
 }
 
 .proLine {
-  fill: none;
-  stroke: #21618C;
-  stroke-width: 1px; //changed the stoke of the similar lines to add more emphasis on the selected patient
+    fill: none;
+    stroke: #21618C;
+    stroke-width: .5px; //changed the stoke of the similar lines to add more emphasis on the selected patient
+    stroke-opacity: 0.5;
 }
 
 .grid line {
-  stroke: #979797;
-  stroke-opacity: 0.5;//adjusted the stroke opacity to the horizontal grid lines for more subtlety 
+    stroke: #979797;
+    stroke-opacity: 0.5; //adjusted the stroke opacity to the horizontal grid lines for more subtlety 
 }
+
 
 /* For slider */
 
 .ticks {
-  font: 10px sans-serif;
+    font: 10px sans-serif;
 }
 
 .track,
 .track-inset,
 .track-overlay {
-  stroke-linecap: round;
+    stroke-linecap: round;
 }
 
 .track {
-  stroke: #000;
-  stroke-opacity: 0.3;
-  stroke-width: 10px;
+    stroke: #000;
+    stroke-opacity: 0.3;
+    stroke-width: 10px;
 }
 
 .track-inset {
-  stroke: #ddd;
-  stroke-width: 8px;
+    stroke: #ddd;
+    stroke-width: 8px;
 }
 
 .track-overlay {
-  pointer-events: stroke;
-  stroke-width: 50px;
-  stroke: transparent;
-  cursor: crosshair;
+    pointer-events: stroke;
+    stroke-width: 50px;
+    stroke: transparent;
+    cursor: crosshair;
 }
 
 .handle {
-  fill: #fff;
-  stroke: #000;
-  stroke-opacity: 0.5;
-  stroke-width: 1.25px;
+    fill: #fff;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    stroke-width: 1.25px;
 }
 
 .patOrder .PROCEDURE {
-  fill: #8d8d8d;
-  stroke: #7b7b7b;
+    fill: #8d8d8d;
+    stroke: #7b7b7b;
 }
 
 .patOrder .MEDICATION {
-  fill: #ddd;
-  stroke: #7b7b7b;
+    fill: #ddd;
+    stroke: #7b7b7b;
 }
 
 .selectedLine {
-  stroke: #800000;
-  stroke-dasharray: 5,5;
+    stroke: #800000;
+    stroke-dasharray: 5, 5;
 }
+
+
 /*
 .selectedOrder {
   fill: darkred !important;
@@ -105,66 +109,62 @@
 }*/
 
 .similarRect .PROCEDURE {
-  //fill: #087b03;
-  fill: #FF5733;
-  opacity: 0.5;
+    //fill: #087b03;
+    fill: #FF5733;
+    opacity: 0.5;
 }
 
 .similarRect .MEDICATION {
-  fill: #4a6ffb;
-  opacity: 0.5;
+    fill: #4a6ffb;
+    opacity: 0.5;
 }
 
 .PROCEDURE.selectedOrder,
 .MEDICATION.selectedOrder {
- // fill: darkred;// !important;
-  opacity: .6;
+    // fill: darkred;// !important;
+    opacity: .6;
 }
+
 .PROCEDURE.unselectedOrder,
 .MEDICATION.unselectedOrder {
-  opacity: 0.2;
-  fill: grey;// !important;
+    opacity: 0.2;
+    fill: grey; // !important;
 }
 
 .patRect .PROCEDURE {
-  //fill: #087b03;
-  fill: #0da201;
-  opacity: 0.5;
+    //fill: #087b03;
+    fill: #0da201;
+    opacity: 0.5;
 }
 
 .patRect .MEDICATION {
-  fill: #c37e45;
-  opacity: 0.5;
+    fill: #c37e45;
+    opacity: 0.5;
 }
 
-
 .patRect.PROCEDURE.COMPLETED {
-  fill: red;
-  opacity: 0.5;
+    fill: red;
+    opacity: 0.5;
 }
 
 .patRect.PROCEDURE.ORDERED {
-   fill: orange;
-  opacity: 0.5;
+    fill: orange;
+    opacity: 0.5;
 }
 
- .MEDICATION.ORDERED,  
- .MEDICATION.SENT
- {
-  fill: #4a6ffb;
-  opacity: 0.5;
+.MEDICATION.ORDERED,
+.MEDICATION.SENT {
+    fill: #4a6ffb;
+    opacity: 0.5;
 }
 
 .MEDICATION.COMPLETED {
-  fill: green;
-  opacity: 0.5;
+    fill: green;
+    opacity: 0.5;
 }
-
 
 .MEDICATION.DISCONTINUED,
-.MEDICATION.SUSPEND
- {
-  fill: purple;
-  opacity: 0.5;
+.MEDICATION.SUSPEND {
+    fill: purple;
+    opacity: 0.5;
 }
-
