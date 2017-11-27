@@ -342,6 +342,7 @@ private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfi
 
  let filter = this.allData;
  let rejectData;
+ let totalnumbers;
 
 // console.log(d);
 
@@ -359,8 +360,9 @@ private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfi
       filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
       console.log(filter);
    }else if(choice.length == 3){
-    filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
-    console.log(filter);
+      filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
+      console.log(filter);
+
  }
    
    // rejectData = this.allData.filter(d => d[parent] !== choice);

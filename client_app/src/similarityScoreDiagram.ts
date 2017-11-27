@@ -249,10 +249,9 @@ this.drawDiagram();
            
         });
 
-        events.on('dataUpdated', (evt, item) => {  // called in query box
+        events.on('dataUpdated', (evt, item) => {  // called in sidebar
             
-               // console.log("sent to similarity " + item[0].length);   
-               // console.log(this.similarPatientsProInfo); 
+               
                 this.getPromisScore(item[0]);   
               
                        

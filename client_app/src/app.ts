@@ -79,12 +79,14 @@ export class App {
      // distributionDiagram
     distributionDiagram.create(main.node());
 
-    //rect
-    rectExploration.create(main.node());
-
+   
     // query box
     queryBox.create(main.node());
 
+     //rect
+     rectExploration.create(main.node());
+     this.$node.select('.rectDiv').classed('hidden', true);
+ 
       //order hierarchy
     patOrderBreakdown.create(main.node());
     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
@@ -96,7 +98,9 @@ export class App {
             const similarPatientsProInfo = [];
 
             this.$node.select('.orderBreakdownDiv').classed('hidden', false);
+            this.$node.select('.main').select('.rectDiv').classed('hidden', false);
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
+
           
             console.log('added similarity score diagram');
 
@@ -111,6 +115,7 @@ export class App {
            // patOrderBreakdown.create(main.node());
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', false);
             this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+            this.$node.select('.main').select('.rectDiv').classed('hidden', true);
             console.log('remove pat hierarchy');
 
         });
