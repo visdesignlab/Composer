@@ -125,8 +125,8 @@ export class patOrderBreakdown {
       this.similarPatientsProInfo = [];
 
       this.setOrderScale();
-     this.loadDataFromServer();
-     this.basicTableUsage();
+      this.loadDataFromServer();
+      this.basicTableUsage();
      // this.drawPatOrderRects(this.targetPatientOrders);
      const allDatasets = listData();
      //console.log('All loaded datasets:');
