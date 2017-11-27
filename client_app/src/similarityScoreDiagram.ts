@@ -37,6 +37,8 @@ export class similarityScoreDiagram {
 
     private targetPatientProInfo;
     private similarPatientsProInfo;
+    private targetOrderInfo;
+    private similarOrderInfo;
     private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
     private parseTime = dataCalc.parseTime;
     private setOrderScale = dataCalc.setOrderScale;
@@ -55,7 +57,7 @@ export class similarityScoreDiagram {
     sliderWidth = 10;
     similarBar = {width: 4, height: 10};
 
-    table: ITable;
+   // table: ITable;
 
     constructor(parent: Element, diagram) {
 
@@ -71,12 +73,12 @@ export class similarityScoreDiagram {
 
         // scales
         this.timeScale = scaleLinear()
-            .range([0, this.promisDimension.width - 2 * this.margin.x])
+            .range([0, this.promisDimension.width - 1.2 * this.margin.x])
             .clamp(true);
 
         this.scoreScale = scaleLinear()
-            .domain([100, 0])
-            .range([0, this.promisDimension.height - 3 * this.margin.y]);
+            .domain([80, 10])
+            .range([0, this.promisDimension.height - 3 * this.margin.y]).clamp(true);
 
         // axis
         this.svg.append('g')
@@ -145,7 +147,7 @@ export class similarityScoreDiagram {
            ids.push(element.ID);
        });
 
-       this.table = <ITable> await getById('PRO');
+       let table = <ITable> await getById('PRO');
       
 //testing fitlering through phovea. no luck
 /*
@@ -179,7 +181,7 @@ let mapped = filteredPatients.map((id, i) => {
   console.log(mapped);*/
 
   let filteredPatScore = {};
-  const patObjects = await this.table.objects();
+  const patObjects = await table.objects();
   patObjects.forEach(item => {
     if (ids.indexOf(item.PAT_ID) !== -1) {
       if (filteredPatScore[item.PAT_ID] === undefined) {
@@ -198,17 +200,52 @@ this.similarPatientsProInfo = mapped;
 
 this.clearDiagram();
 this.drawDiagram();
+//this.addSimilarOrderPoints(this.targetPatientProInfo);
 
     };
+
+    //uses Phovea to access PRO data and draw table
+    private async getOrders(data) {
+        
+        let ids = [];
+ 
+         data.forEach(element => {
+            ids.push(element.ID);
+        });
+ 
+        let table = <ITable> await getById('Orders');
+
+ 
+        let filteredPatOrders = {};
+        const patObjects = await table.objects();
+        // console.log("filtering orders    " + patObjects);
+         patObjects.forEach(item => {
+             if (ids.indexOf(item.PAT_ID) !== -1) {
+              if (filteredPatOrders[item.PAT_ID] === undefined) {
+         filteredPatOrders[item.PAT_ID] = [];
+       }
+         filteredPatOrders[item.PAT_ID].push(item);
+        }
+         });
+    let mapped = entries(filteredPatOrders);
+   
+    console.log("filtered order" + mapped.length);
+    mapped.forEach(d=> console.log(d));
+ 
+ 
+ //this.similarPatientsOrderInfo = mapped;
+ //console.log(this.similarPatientsProInfo);
+ 
+ this.svg.select('#pat_orders').selectAll('line,g').remove();
+ this.svg.select('#similar_orders').selectAll('g').remove();
+ this.addSimilarOrderPoints(this.targetOrderInfo, mapped);
+ 
+     };
 
     /**
      * Attach listeners
      */
     private attachListener() {
-        /*
-        events.on('selected_updated', (evt, item) => {
-            console.log(item);
-        });*/
 
         // item: pat_id, number of similar patients, DATA
         events.on('update_similar', (evt, item) => { // called in queryBox
@@ -218,12 +255,13 @@ this.drawDiagram();
 
             this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
             this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
-            console.log(this.similarPatientsProInfo);
-       
+            this.targetOrderInfo = item[2]['pat_Orders'][item[0]].slice();
+            this.similarOrderInfo = entries(item[2]['similar_Orders']);
+            
             this.clearDiagram();
             this.drawDiagram();
             this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']));
-
+           
         });
 
         // item: pat_id, DATA
@@ -251,9 +289,8 @@ this.drawDiagram();
 
         events.on('dataUpdated', (evt, item) => {  // called in sidebar
             
-               
                 this.getPromisScore(item[0]);   
-              
+                this.getOrders(item[0]);
                        
                     });
 
@@ -265,12 +302,9 @@ this.drawDiagram();
      */
     private drawDiagram() {
         
-
         // ----- add diff days to the data
 
         let maxDiff = 0;
-
-  
 
             let minPatDate = this.findMinDate(this.targetPatientProInfo);
             this.targetPatientProInfo.forEach((d) => {
@@ -280,10 +314,6 @@ this.drawDiagram();
             this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
     
 
-   
-
-       
-     
         this.similarPatientsProInfo.forEach((g) => {
            
             let minDate = this.findMinDate(g.value);
@@ -298,17 +328,16 @@ this.drawDiagram();
             })
         });
 
-
-        const patData = this.targetPatientProInfo.filter((d) => {
-            return d['FORM'] == this.diagram
-        });
-
         let similarData = this.similarPatientsProInfo.map((d) => {
             let res = d.value.filter((g) => {
                 return g['FORM'] == this.diagram
             });
             res.sort((a, b) => ascending(a.diff, b.diff));
             return res;
+        });
+
+        const patData = this.targetPatientProInfo.filter((d) => {
+            return d['FORM'] == this.diagram
         });
 
         // -----  set domains and axis
@@ -333,21 +362,6 @@ this.drawDiagram();
 
         // ------- draw
 
-        const patScoreGroup = this.svg.select('#pat_score');
-        const patLine = patScoreGroup
-            .append('g')
-            .attr('transform', () => {
-                return `translate(${this.margin.x},${this.margin.y})`;
-            })
-            .selectAll('.patLine')
-            .data([patData])
-            .enter()
-            .append('path')
-            .attr('class', 'patLine')
-            .attr('d', (d) => lineFunc(d))
-            .on('click', (d) => console.log(d));
-
-
         const medScoreGroup = this.svg.select('#similar_score');
         medScoreGroup.selectAll('.med_group')
             .data(similarData)
@@ -365,7 +379,20 @@ this.drawDiagram();
             })
             .on('click', (d) => console.log(d));
 
-
+            const patScoreGroup = this.svg.select('#pat_score');
+            const patLine = patScoreGroup
+                .append('g')
+                .attr('transform', () => {
+                    return `translate(${this.margin.x},${this.margin.y})`;
+                })
+                .selectAll('.patLine')
+                .data([patData])
+                .enter()
+                .append('path')
+                .attr('class', 'patLine')
+                .attr('d', (d) => lineFunc(d))
+                .on('click', (d) => console.log(d));
+    
     }
     
 
@@ -406,7 +433,7 @@ this.drawDiagram();
      * @param ordersInfo
      */
     private addOrderSquares(ordersInfo) {
-
+        //determine the min date from the target patient
         let minDate = this.findMinDate(this.targetPatientProInfo);
 
         ordersInfo.forEach((d) => {
@@ -501,16 +528,14 @@ this.drawDiagram();
 
         this.svg
             .attr('height', this.promisDimension.height - 50 + this.timeScale(25) * maxLength);
-
-
     }
-
 
     /**
      *
      * @param ordersInfo
      */
     private addSimilarOrderPoints(ordersInfo, similarOrdersInfo) {
+
 
         // -------  target patient
 
@@ -590,11 +615,17 @@ this.drawDiagram();
 
         similarOrdersInfo.forEach((g) => {
 
+            console.log(g);
+
             let currPatient = this.similarPatientsProInfo.filter((d) => {
                 return d.key == g.key
             })[0];
 
-            let minDate = this.findMinDate(currPatient.value);
+            if(currPatient.value != null){
+                let minDate = this.findMinDate(currPatient.value);
+            }
+    
+          // let minDate = this.findMinDate(similarOrdersInfo.value);
             g.value.forEach((d) => {
                 try {
                     d.diff = Math.ceil((this.parseTime(d['ORDER_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
