@@ -34,6 +34,7 @@ export class SideBar {
   async init() {
 
     this.filters = [];
+    let parents = [];
     let that = this;
 
     let form = this.$node.append("form").append('div').attr('padding-top', 250);
@@ -73,8 +74,9 @@ export class SideBar {
           let choice = d;
 
           let parentValue = this.parentNode.attributes[0].value;
-         
-
+          let parental = this.parentNode.classList.add('parent');
+          parents.push(parental);
+          
           let lines = select('#plotGroup').selectAll('path');
           let filterGroup = lines.filter(d => d[parentValue] == choice);
          
@@ -90,9 +92,40 @@ export class SideBar {
          filterInput.forEach(d=> {
           that.filters.push([d.innerText, d.parentNode.attributes[0].value]);
           });
-         
-          events.fire('filter_data', that.filters);//sent to parallel
+ 
+    let parentFilter = form.selectAll('ul.parent');//.nodes().filter(d => d.classList.value == 'parent');
+   // console.log(parentFilter);
+
+    let filterList = [];
+
+    parentFilter.each(function (element) {
+       
+        let filter = {
+        
+        attributeName:(this).attributes[0].value,
+        checkedOptions: []
+      
+        };
+
+        let children = select(this).selectAll('li');
+        children
+        .each(function (option) {
+      
+         if (select(this).select(':last-child').property('checked')){
+            filter.checkedOptions.push(option);
+            };
+          });
+        filterList.push(filter);
+      });
+
+      console.log(filterList);
+
+         // events.fire('filter_data', that.filters);//sent to parallel
+         events.fire('filter_data', filterList);
           that.filters = [];
+          
+          filterList = [];
+          
         });
   }
 

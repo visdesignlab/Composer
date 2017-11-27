@@ -158,7 +158,9 @@ export class QueryBox {
 
                 this.setBusy(false);
                 this.similarArgs = args;
-                console.log(this.similarArgs.ids);
+               // console.log(this.similarArgs.ids);
+                console.log('value  '+ value);
+                console.log('args  '+ args);
                
 
                 // caught by svgTable and scoreDiagram and statHistogram

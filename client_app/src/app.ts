@@ -78,12 +78,14 @@ export class App {
      // distributionDiagram
     distributionDiagram.create(main.node());
 
-    //rect
-    rectExploration.create(main.node());
-
+   
     // query box
     queryBox.create(main.node());
 
+     //rect
+     rectExploration.create(main.node());
+     this.$node.select('.rectDiv').classed('hidden', true);
+ 
       //order hierarchy
     //patOrderBreakdown.create(main.node());
     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
@@ -94,8 +96,10 @@ export class App {
             const targetPatientProInfo = item[1]['PRO'][item[0]];
             const similarPatientsProInfo = [];
 
-            //this.$node.select('.orderBreakdownDiv').classed('hidden', false);
+            this.$node.select('.orderBreakdownDiv').classed('hidden', false);
+            this.$node.select('.main').select('.rectDiv').classed('hidden', false);
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
+
           
             console.log('added similarity score diagram');
 
@@ -109,17 +113,18 @@ export class App {
            // this.$node.remove(patOrderBreakdown);
            // patOrderBreakdown.create(main.node());
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', false);
-            //this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+            this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+            this.$node.select('.main').select('.rectDiv').classed('hidden', true);
             console.log('remove pat hierarchy');
 
         });
 
 
     // PROMIS diagrams
-   // const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
-   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
-   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
-    //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
+   const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
+   similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+   //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
+   //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
 
 
     this.setBusy(false);
