@@ -31,7 +31,9 @@ export class SideBar {
       
   constructor(parent: Element) {
     this.$node = select(parent);
-    this.popRectScale = scaleLinear().range([0,100]);
+    this.popRectScale = scaleLinear().range([0,150]);
+
+    this.attachListener();
   }
 
   private attachListener () {
@@ -40,9 +42,9 @@ export class SideBar {
          let allCount = item[0];
          let popCount = item[1];
          let parentValue = item[2];
-         let choiceValue = item[3];
+        // let choiceValue = item[3];
          this.popRectScale.domain([0, allCount]);
-         let selected = select('#' +parentValue).selectAll('li[value='+choiceValue+']');//.querySelector('li[value='+choiceValue+']'); //.filter(d=> d.value = choiceValue);
+         let selected = select('#' +parentValue);//.selectAll('li[value='+choiceValue+']');//.querySelector('li[value='+choiceValue+']'); //.filter(d=> d.value = choiceValue);
          console.log(selected);
          selected.select('text').text(popCount)
          .attr('transform', 'translate('+ this.popRectScale(popCount) +', 10)');
@@ -76,8 +78,9 @@ export class SideBar {
     let ul = labels.append('ul')
         .attr('value', (d=>d.key));
 
-        let popRects = labels.append('svg').attr('width', 150).attr('height', 20).attr('id', d=>d.key);
-        popRects.append('rect').attr('width', 5).attr('height', 20).attr('fill', 'blue');
+        let popRects = labels.append('svg').attr('width', 150).attr('height', 16).attr('id', d=>d.key);
+        popRects.append('rect').attr('width', 0).attr('height', 16).attr('fill', '#AEB6BF');
+        popRects.append('text').attr('fill', '#AEB6BF');
 
         let headerLabel = ul.append('label')
         .text(function(d) {return d.key;}).attr('value', (d=>d.key));
