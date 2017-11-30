@@ -101,7 +101,7 @@ export class parallel {
            
               let subFilter = this.allData.filter(d => d[parent] == choice);
              
-              events.fire('filter_counted', [this.allData.length, subFilter.length]);
+              events.fire('filter_counted', [this.allData.length, subFilter.length, parent]);
 
             })
     
