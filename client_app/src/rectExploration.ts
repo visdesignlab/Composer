@@ -68,11 +68,11 @@ export class rectExploration {
 
     this.$node = select(parent)
         .append('div')
-        .classed('rectDiv', true);
+        .classed('rectDiv', true).attr('height', 700);
     
     this.svg = this.$node.append('svg')
         .attr('width', this.rectBoxDimension.width)
-        .attr('height', this.rectBoxDimension.height*2)
+        .attr('height', this.rectBoxDimension.height*1.5)
     
     this.timeScale = scaleLinear()
         .range([0, this.rectBoxDimension.width])

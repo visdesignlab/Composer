@@ -58,6 +58,7 @@ export class patOrderBreakdown {
 
  rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
+  similarBar = {width: 8, height: 30 };
   margin = {top: 20, right: 10, bottom: 10, left: 10};
   contextDimension = {width: this.rectBoxDimension.width, height:55};
 
@@ -68,12 +69,16 @@ export class patOrderBreakdown {
 
     this.$node = select(parent)
         .append('div')
-        .classed('orderBreakdownDiv', true);
+        .classed('orderBreakdownDiv', true)
+        .attr('transform', `translate(-50,0)`);
     
     this.svg = this.$node.append('svg')
         .attr('class', 'rectSVG')
         .attr('width', this.rectBoxDimension.width)
-        .attr('height', this.rectBoxDimension.height*4)
+        .attr('height', this.rectBoxDimension.height*4);
+
+        this.svg.append('g')
+        .attr('id', 'similar_order');
     
     this.timeScale = scaleLinear()
         .range([0, this.rectBoxDimension.width])
@@ -81,16 +86,10 @@ export class patOrderBreakdown {
 
     //append patient order svg group
       //append patient order svg group
-   this.svg.append('g')
-      .attr('id', 'pat_rect_line')
-       .attr('transform', `translate(${this.margin.left},${this.margin.top})`); 
-  /*
-   let context = this.svg.append('g')
-            .attr('class', 'context')
-            .attr('width', this.contextDimension.width)
-            .attr('height', this.contextDimension.height)
-            .attr('transform', `translate(${this.margin.left},${this.rectBoxDimension.height + this.margin.top})`);
-*/
+ //  this.svg.append('g')
+    //  .attr('id', 'sim_rect_line')
+    //   .attr('transform', `translate(${this.margin.left},${this.margin.top})`);   
+
     
   this.attachListener();
 
@@ -101,6 +100,12 @@ export class patOrderBreakdown {
    */
   
   private attachListener() {
+    //called in similarityScoreDiagram
+    events.on('orders_updated', (evt, item) => {
+        console.log('works!!!');
+        console.log(item);
+        this.addSimilarOrderPoints(this.targetPatientProInfo, item[0], item[1], item[2]);
+    });
 
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
@@ -115,7 +120,7 @@ export class patOrderBreakdown {
 
       this.drawPatOrderRects(this.targetPatientOrders);
       this.drawPatOrderRects(filteredorders.medicationGroup);
-     // this.drawPatOrderRects(filteredorders.procedureGroup);
+     
     
     });
 
@@ -125,12 +130,7 @@ export class patOrderBreakdown {
       this.similarPatientsProInfo = [];
 
       this.setOrderScale();
-      this.loadDataFromServer();
-      this.basicTableUsage();
-     // this.drawPatOrderRects(this.targetPatientOrders);
-     const allDatasets = listData();
-     //console.log('All loaded datasets:');
-     console.log(allDatasets);
+ 
     });
 
 
@@ -144,110 +144,129 @@ export class patOrderBreakdown {
           }
   }
   
-    /**
-     * add small squares for orders of one (target) patient
+
+     /**
+     *
      * @param ordersInfo
      */
-    
-    private addOrderSquares(ordersInfo) {
+    private addSimilarOrderPoints(ordersInfo, similarOrdersInfo, targetPro, simPro) {
+        
+                // -------  target patient
+        
+                let minDate = this.findMinDate(targetPro);
+        
+                ordersInfo.forEach((d) => {
+                    let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
+                    d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                });
+        
+                const self = this;
 
-        let minDate = this.findMinDate(this.targetPatientProInfo);
-
-        ordersInfo.forEach((d) => {
-            let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
-            d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
-        });
-
-        const self = this;
-
-        let nestedData = nest()
-            .key(function (d) {
-                return (Math.floor(d['diff'] / 60) * 100).toString()
-            })
-            .entries(ordersInfo);
-
-        nestedData.forEach((d) => {
-            d.values = d.values.sort((a, b) => ascending(a.diff, b.diff));
-            // rollup was not successful
-            d['sumUp'] = nest().key((g) => g['diff']).entries(d.values); // TODO visualize collapsible squares
-        });
-
-        //console.log(nestedData);
-
-        this.svg.select('#pat_orders').selectAll('g').remove();
-
-
-        this.svg.select('#pat_orders')
-            .append('g')
-            .attr('transform', () => {
-                return `translate(${this.margin.left},0)`; // If there is a label for the x-axis change 0
-            })
-            .selectAll('.patOrder')
-            .data(nestedData)
-            .enter()
-            .append('g')
-            .attr('transform', (d) => `translate(0,${this.rectBoxDimension.height - 50})`)
-            .classed('patOrder', true)
-            .selectAll('rect')
-            .data((d) => d.values)
-            .enter()
-            .append('rect')
-            .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
-             .attr('class', this.getClassAssignment('ORDER_STATUS'))
-            //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
-            .attr('x', (g) => this.timeScale(g.diff))
-            .attr('y', (g, i) => i * this.timeScale(25))
-            .attr('width', this.timeScale(20))
-            .attr('height', this.timeScale(20))
-            .on('click', function (d) {
-
-                if (!select(this).classed('selectedOrder')) {
-
-                    select(this).classed('selectedOrder', true);
-
-                    select(this.parentNode.parentNode.parentNode)
-                        .append('line')
-                        .classed('selectedLine', true)
-                        .attr('id', `orderLine_${d['VISIT_NO']}`)
-                        .attr('x1', self.timeScale(d['diff']) + self.margin.left)
-                        .attr('x2', self.timeScale(d['diff']) + self.margin.left)
-                        .attr('y1', self.scoreScale(100) + self.margin.left)
-                        .attr('y2', self.scoreScale(0) + self.margin.left)
-                        .on('click', () => console.log(d));
-
-                    console.log(d);
-                }
-                else {
-                    select(this).classed('selectedOrder', false);
-                    select(`#orderLine_${d['VISIT_NO']}`).remove();
-                }
-            })
-            .on("mouseover", (d) => {
-                let t = transition('t').duration(500);
-                select(".tooltip")
-                    .html(() => {
-                        return this.renderOrdersTooltip(d);
+                // ----- add diff days to the data
+        
+                similarOrdersInfo.forEach((g) => {
+        
+        
+                    let currPatient = simPro.filter((d) => {
+                        return d.key == g.key
+                    })[0];
+        
+                    if(currPatient.value != null){
+                        let minDate = this.findMinDate(currPatient.value);
+                    }
+            
+                  // let minDate = this.findMinDate(similarOrdersInfo.value);
+                    g.value.forEach((d) => {
+                        try {
+                            d.diff = Math.ceil((this.parseTime(d['ORDER_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                        }
+                        catch (TypeError) {
+                            console.log('error');
+                            d.diff = -1;
+                        }
                     })
-                    .transition(t)
-                    .style("opacity", 1)
-                    .style("left", `${event.pageX + 10}px`)
-                    .style("top", `${event.pageY + 10}px`);
-            })
-            .on("mouseout", () => {
-                let t = transition('t').duration(500);
-                select(".tooltip").transition(t)
-                    .style("opacity", 0);
-            });
+                });
+        
+               let similarOrderGroup = this.svg.select('#similar_order')
+                    .append('g')
+                    .attr('transform', () => {
+                        return `translate(${this.margin.left},0)`; // If there is a label for the x-axis change 0
+                    })
+                    .selectAll('.similarRectOrder')
+                    .data(similarOrdersInfo)
+                    .enter()
+                    .append('g').attr('class', d=> d.key);
 
-        let maxLength = max(nestedData, (d) => {
-            return d.values.length;
-        });
+                    similarOrderGroup
+                    .append('text').text(d=> d.key)
+                    .attr('transform', `translate(0,10)`);
 
-        this.svg
-            .attr('height', this.rectBoxDimension.height - 50 + this.timeScale(25) * maxLength);
-
-
-    }
+                    similarOrderGroup
+                    .attr('transform', (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
+                  
+                    similarOrderGroup.append('g')
+                    .classed('similarRectOrder', true)
+                    .attr('transform', `translate(60,0)`)
+                    .selectAll('rect')
+                    .data((d) => d.value)
+                    .enter()
+                    .append('rect')
+                    //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+                    .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+                    .attr('class', this.getClassAssignment('ORDER_STATUS'))
+                    .attr('x', (g) => this.timeScale(g.diff))
+                    .attr('y', 0)
+                    .attr('width', this.similarBar.width)
+                    .attr('height', this.similarBar.height)
+                    .on('click', function (d) {
+        
+                        if (!select(this).classed('selectedOrder')) {
+        
+                            select(this).classed('selectedOrder', true);
+        
+                            select(this.parentNode.parentNode.parentNode)
+                                .append('line')
+                                .classed('selectedLine', true)
+                                .attr('id', `orderLine_${d['VISIT_NO']}`)
+                                .attr('x1', self.timeScale(d['diff']) + self.margin.right)
+                                .attr('x2', self.timeScale(d['diff']) + self.margin.right)
+                                .attr('y1', self.scoreScale(100) + self.margin.top)
+                                .attr('y2', self.scoreScale(0) + self.margin.top)
+                                .on('click', () => console.log(d));
+        
+                           // console.log(d);
+                        }
+                        else {
+                            select(this).classed('selectedOrder', false);
+                            select(`#orderLine_${d['VISIT_NO']}`).remove();
+                        }
+                    })
+                    .on("mouseover", (d) => {
+                        let t = transition('t').duration(500);
+                        select(".tooltip")
+                            .html(() => {
+                                return this.renderOrdersTooltip(d);
+                            })
+                            .transition(t)
+                            .style("opacity", 1)
+                            .style("left", `${event.pageX + 10}px`)
+                            .style("top", `${event.pageY + 10}px`);
+                    })
+                    .on("mouseout", () => {
+                        let t = transition('t').duration(500);
+                        select(".tooltip").transition(t)
+                            .style("opacity", 0);
+                    });
+                    
+                      this.svg.select('#similar_orders').selectAll('.similarRect')
+                            .append('text')
+                            .text(similarOrdersInfo.pat_id);
+        
+                // fix height of the svg
+                this.svg
+                    .attr('height', this.rectBoxDimension.height - 50 + (this.similarBar.height + 5) * similarOrdersInfo.length);
+        
+            }
 
 
 
@@ -269,34 +288,7 @@ export class patOrderBreakdown {
     return text;
   }
 
-   public async loadDataFromServer() {
-     
-   
-    console.log('Loading Data from the a Server');
-    // listData() returns a list of all datasets loaded by the server
-    // notice the await keyword - you'll see an explanation below
-  //  const allDatasets = await listData();
-    //console.log('All loaded datasets:');
-   // console.log("datasets "+allDatasets);
-     // we could use those dataset to filter them based on their description and pick the one(s) we're interested in
-    // here we pick the first dataset and cast it to ITable - by default the datasets are returned as IDataType
-    let tempTable: ITable;
-    let orderArray = [];
-    // retrieving a dataset by name. Note that only the first dataset will be returned.
-    //tempTable = <ITable> await getById('Orders');
-    //tempTable = <ITable> await getById('ICD_codes');
-  //  let tempVector = await tempTable.cols()[5].data();
-    //console.log("tempvector?? "+tempVector);
-    //console.log(tempTable.dim);
-    //console.log(this.currentlySelectedName);
 
-   }
-
-   public async basicTableUsage() {
-    let table : ITable;
-
-    
-  }
   }
    
 

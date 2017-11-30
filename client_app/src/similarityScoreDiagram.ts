@@ -71,6 +71,8 @@ export class similarityScoreDiagram {
             .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
 
+        let scoreGroup = this.svg.append('g').classed('scoreGroup', true);
+
         // scales
         this.timeScale = scaleLinear()
             .range([0, this.promisDimension.width - 1.2 * this.margin.x])
@@ -81,18 +83,18 @@ export class similarityScoreDiagram {
             .range([0, this.promisDimension.height - 3 * this.margin.y]).clamp(true);
 
         // axis
-        this.svg.append('g')
+        scoreGroup.append('g')
             .attr('class', 'xAxis')
             .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
       
-        this.svg.append('g')
+            scoreGroup.append('g')
             .attr('class', 'yAxis')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`)
             .call(axisLeft(this.scoreScale));
 
         // -----
 
-        let slider = this.svg.append('g')
+        let slider = scoreGroup.append('g')
             .attr('class', 'slider')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth + 2)},${this.margin.y})`);
 
@@ -110,12 +112,12 @@ export class similarityScoreDiagram {
 
         // -----
 
-        this.svg.append('text')
+        scoreGroup.append('text')
             .text(`${this.diagram}`)
             .attr('text-anchor', 'middle')
             .attr('transform', `translate(${this.margin.x / 4},${this.promisDimension.height * 0.5}) rotate(-90)`);
 
-        this.svg.append('g')
+            scoreGroup.append('g')
             .attr('class', 'grid')
             .attr('transform', `translate(${this.margin.x},${this.margin.y})`)
             .call(axisLeft(this.scoreScale)
@@ -123,16 +125,16 @@ export class similarityScoreDiagram {
             )
             .selectAll('text').remove();
 
-        this.svg.append('g')
+            scoreGroup.append('g')
             .attr('id', 'pat_score');
 
-        this.svg.append('g')
+            scoreGroup.append('g')
             .attr('id', 'similar_score');
 
-        this.svg.append('g')
+            this.svg.append('g')
             .attr('id', 'pat_orders');
 
-        this.svg.append('g')
+            this.svg.append('g')
             .attr('id', 'similar_orders');
 
         this.attachListener();
@@ -229,16 +231,17 @@ this.drawDiagram();
          });
     let mapped = entries(filteredPatOrders);
    
-    console.log("filtered order" + mapped.length);
-    mapped.forEach(d=> console.log(d));
+   // console.log("filtered order" + mapped.length);
+   // mapped.forEach(d=> console.log(d));
  
  
- //this.similarPatientsOrderInfo = mapped;
+ this.similarOrderInfo = mapped;
  //console.log(this.similarPatientsProInfo);
  
  this.svg.select('#pat_orders').selectAll('line,g').remove();
  this.svg.select('#similar_orders').selectAll('g').remove();
- this.addSimilarOrderPoints(this.targetOrderInfo, mapped);
+// this.addSimilarOrderPoints(this.targetOrderInfo, mapped);
+ events.fire('orders_updated',[this.similarOrderInfo, this.targetPatientProInfo, this.similarPatientsProInfo]);
  
      };
 
@@ -246,6 +249,10 @@ this.drawDiagram();
      * Attach listeners
      */
     private attachListener() {
+
+        events.on('show_orders',(evt, item)=> {
+           // select('.scoreGroup').remove();
+        });
 
         // item: pat_id, number of similar patients, DATA
         events.on('update_similar', (evt, item) => { // called in queryBox
@@ -615,8 +622,6 @@ this.drawDiagram();
 
         similarOrdersInfo.forEach((g) => {
 
-            console.log(g);
-
             let currPatient = this.similarPatientsProInfo.filter((d) => {
                 return d.key == g.key
             })[0];
@@ -672,8 +677,6 @@ this.drawDiagram();
                         .attr('y1', self.scoreScale(100) + self.margin.y)
                         .attr('y2', self.scoreScale(0) + self.margin.y)
                         .on('click', () => console.log(d));
-
-                    console.log(d);
                 }
                 else {
                     select(this).classed('selectedOrder', false);
