@@ -31,6 +31,8 @@ export class SideBar {
     this.$node = select(parent);
   }
 
+  private attachListener () {}
+
   async init() {
 
     this.filters = [];
@@ -81,6 +83,7 @@ export class SideBar {
           let filterGroup = lines.filter(d => d[parentValue] == choice);
          
           filterGroup.classed(parentValue, true);
+          events.fire('checked', [parentValue, choice]);
      
         } );
        
@@ -94,7 +97,6 @@ export class SideBar {
           });
  
     let parentFilter = form.selectAll('ul.parent');//.nodes().filter(d => d.classList.value == 'parent');
-   // console.log(parentFilter);
 
     let filterList = [];
 
@@ -118,7 +120,7 @@ export class SideBar {
         filterList.push(filter);
       });
 
-      console.log(filterList);
+      //console.log(filterList);
 
          // events.fire('filter_data', that.filters);//sent to parallel
          events.fire('filter_data', filterList);
