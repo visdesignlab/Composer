@@ -92,7 +92,18 @@ export class parallel {
             events.on('dataUpdated', (evt, item) =>{
            
               this.updateCounter(item[0]);
-            }) 
+            });
+
+            events.on('checked', (evt, item)=> {
+              console.log(item);
+              let parent = item[0];
+              let choice = item[1];
+           
+              let subFilter = this.allData.filter(d => d[parent] == choice);
+             
+              events.fire('filter_counted', [this.allData.length, subFilter.length]);
+
+            })
     
         }
   
@@ -344,8 +355,6 @@ private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfi
  let rejectData;
  let totalnumbers;
 
-// console.log(d);
-
   d.forEach( d=> {
     
     let parent = d.attributeName;
@@ -372,7 +381,7 @@ private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfi
 
     this.plotPatients(this.sidebarFiltered, null);
  
-  events.fire('dataUpdated', [this.sidebarFiltered, this.allData]);
+    events.fire('dataUpdated', [this.sidebarFiltered, this.allData]);
 
 }
 
