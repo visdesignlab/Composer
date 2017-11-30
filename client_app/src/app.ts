@@ -99,10 +99,19 @@ export class App {
 
             this.$node.select('.orderBreakdownDiv').classed('hidden', false);
             this.$node.select('.main').select('.rectDiv').classed('hidden', false);
-            this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
+            this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', true);
 
           
             console.log('added similarity score diagram');
+
+        });
+
+        events.on('show_orders', () => {
+
+            console.log('works!');
+            this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
+            this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
+            this.$node.select('.main').select('.rectDiv').classed('hidden', false);
 
         });
         
@@ -113,7 +122,7 @@ export class App {
               //order hierarchy
            // this.$node.remove(patOrderBreakdown);
            // patOrderBreakdown.create(main.node());
-            this.$node.select('.main').select('.allDiagramDiv').classed('hidden', false);
+            this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', false);
             this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
             this.$node.select('.main').select('.rectDiv').classed('hidden', true);
             console.log('remove pat hierarchy');

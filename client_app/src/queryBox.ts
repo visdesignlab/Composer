@@ -83,6 +83,12 @@ export class QueryBox {
             .attr('id', 'text_pat_id')
             .attr('value', '20559329');
 
+            form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Orders')
+            .on('click', () => events.fire('show_orders'));
+
+
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'All Info')
