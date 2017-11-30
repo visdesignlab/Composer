@@ -10,11 +10,13 @@ import * as events from 'phovea_core/src/event';
 //import {transition} from 'd3-transition';
 import {Constants} from './constants';
 import * as parallel from './parallel';
+import {scaleLinear,scaleTime,scaleOrdinal, scaleBand} from 'd3-scale';
 
 export class SideBar {
 
   private $node;
   private filters;
+  private popRectScale;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'value': ['W', 'H' ]},
@@ -29,9 +31,28 @@ export class SideBar {
       
   constructor(parent: Element) {
     this.$node = select(parent);
+    this.popRectScale = scaleLinear().range([0,100]);
   }
 
-  private attachListener () {}
+  private attachListener () {
+    
+       events.on('filter_counted', (evt, item) => {
+         let allCount = item[0];
+         let popCount = item[1];
+         let parentValue = item[2];
+         let choiceValue = item[3];
+         this.popRectScale.domain([0, allCount]);
+         let selected = select('#' +parentValue).selectAll('li[value='+choiceValue+']');//.querySelector('li[value='+choiceValue+']'); //.filter(d=> d.value = choiceValue);
+         console.log(selected);
+         selected.select('text').text(popCount)
+         .attr('transform', 'translate('+ this.popRectScale(popCount) +', 10)');
+         selected.select('rect').transition() // Wait one second. Then brown, and remove.
+         .attr('width', this.popRectScale(popCount));
+        // selected.node.append('svg');
+         //let select = selected.querySelector('li[value="M"]');
+        // console.log(select);
+       });
+      }
 
   async init() {
 
@@ -42,17 +63,34 @@ export class SideBar {
     let form = this.$node.append("form").append('div').attr('padding-top', 250);
     
     let labels = form.selectAll("div")
-        .data(this.header)
+        .data(this.header);
+
+    let labelsEnter = labels
         .enter()
         .append("div");
+
+    labels.exit().remove();
+
+    labels = labelsEnter.merge(labels);
 
     let ul = labels.append('ul')
         .attr('value', (d=>d.key));
 
+        let popRects = labels.append('svg').attr('width', 150).attr('height', 20).attr('id', d=>d.key);
+        popRects.append('rect').attr('width', 5).attr('height', 20).attr('fill', 'blue');
+
         let headerLabel = ul.append('label')
         .text(function(d) {return d.key;}).attr('value', (d=>d.key));
 
-        let listlabel = ul.selectAll('li').data((d) => d.value).enter().append('li').text(d => d);
+        let listlabel = ul.selectAll('li').data((d) => d.value)
+        
+        let listlabelEnter = listlabel.enter().append('li');
+
+        listlabel.exit().remove();
+
+        listlabel = listlabelEnter.merge(listlabel);
+        
+        listlabel.text(d => d);
         ul.selectAll('li').attr('value', (d=>d));
         ul.selectAll('li').classed('hidden', true);
 
@@ -70,6 +108,20 @@ export class SideBar {
         });
 
         listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
+
+        let liHover = ul.selectAll('li');
+        
+        liHover.on('mouseover', function(d){
+          let parentValue = this.parentNode.attributes[0].value;
+          console.log(this);
+        //  select(this).select('svg').select('text').classed('hidden', false);
+          events.fire('checked', [parentValue, d])
+        });
+        liHover.on('mouseout', function(d){
+          select(this).select('svg').select('rect').attr('width', 0);
+          select(this).select('svg').select('text').text(' ');
+          console.log('leaving');
+        });
     
         listlabel.on('click', function(d){
 
@@ -120,15 +172,15 @@ export class SideBar {
         filterList.push(filter);
       });
 
-      //console.log(filterList);
-
-         // events.fire('filter_data', that.filters);//sent to parallel
+      
          events.fire('filter_data', filterList);
           that.filters = [];
           
           filterList = [];
           
         });
+
+      //let popRect = ul.selectAll('li').append('svg').attr('width', 100).attr('height', 20);
   }
 
  }
