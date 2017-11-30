@@ -110,7 +110,7 @@ export class SideBar {
          
           filterGroup.classed(parentValue, true);
           
-         // events.fire('checked', [parentValue, choice]);
+         events.fire('checked', [parentValue, choice]);
      
         } );
 
