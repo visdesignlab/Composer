@@ -95,13 +95,13 @@ export class parallel {
             });
 
             events.on('checked', (evt, item)=> {
-              console.log(item);
+             // console.log(item);
               let parent = item[0];
               let choice = item[1];
            
               let subFilter = this.allData.filter(d => d[parent] == choice);
              
-              events.fire('filter_counted', [this.allData.length, subFilter.length]);
+              events.fire('filter_counted', [this.allData.length, subFilter.length, parent, choice]);
 
             })
     
