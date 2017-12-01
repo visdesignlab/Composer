@@ -50,7 +50,6 @@ export class App {
     //await pl.runDemo();
     //await pl.showInfo();
 
-
     // loading header
     this.$node.select('h3').remove();
 
@@ -62,12 +61,10 @@ export class App {
 
 
     //this.$node.append('div').attr('id','sideBar');
-
   //  ReactDOM.render(
     //  React.createElement(SideBarComponent),
    //   document.getElementById('sideBar')
   //  );
-
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
 
@@ -92,7 +89,6 @@ export class App {
 
      // item: pat_id, DATA
         events.on('update_all_info', (evt, item) => {  // called in query box
-
             const targetPatientProInfo = item[1]['PRO'][item[0]];
             const similarPatientsProInfo = [];
 
@@ -117,7 +113,6 @@ export class App {
           // item: pat_id, DATA
         events.on('update_hierarchy', () => {  // called in query box
 
-
               //order hierarchy
            // this.$node.remove(patOrderBreakdown);
            // patOrderBreakdown.create(main.node());
@@ -134,7 +129,6 @@ export class App {
    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
    //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
    //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
-
 
     this.setBusy(false);
 
