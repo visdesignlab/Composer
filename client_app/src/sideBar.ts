@@ -116,17 +116,17 @@ export class SideBar {
         
         liHover.on('mouseover', function(d){
           let parentValue = this.parentNode.attributes[0].value;
-          console.log(this);
+         // console.log(this);
         //  select(this).select('svg').select('text').classed('hidden', false);
           events.fire('checked', [parentValue, d])
         });
         liHover.on('mouseout', function(d){
-          console.log(select(this.parentNode.parentNode).select('rect'));
+         // console.log(select(this.parentNode.parentNode).select('rect'));
           select(this.parentNode.parentNode).select('rect').attr('width', 0);
           select(this.parentNode.parentNode).select('text').text(' ');
         //  select(this).parentNode.parentNode).select('svg').select('rect').attr('width', 0);
         //  select(this).select('svg').select('text').text(' ');
-          console.log('leaving');
+        //  console.log('leaving');
         });
     
         listlabel.on('click', function(d){
