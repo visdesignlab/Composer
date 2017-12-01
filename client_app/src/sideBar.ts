@@ -121,8 +121,11 @@ export class SideBar {
           events.fire('checked', [parentValue, d])
         });
         liHover.on('mouseout', function(d){
-          select(this).select('svg').select('rect').attr('width', 0);
-          select(this).select('svg').select('text').text(' ');
+          console.log(select(this.parentNode.parentNode).select('rect'));
+          select(this.parentNode.parentNode).select('rect').attr('width', 0);
+          select(this.parentNode.parentNode).select('text').text(' ');
+        //  select(this).parentNode.parentNode).select('svg').select('rect').attr('width', 0);
+        //  select(this).select('svg').select('text').text(' ');
           console.log('leaving');
         });
     
