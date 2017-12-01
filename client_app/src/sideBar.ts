@@ -42,17 +42,15 @@ export class SideBar {
          let allCount = item[0];
          let popCount = item[1];
          let parentValue = item[2];
-        // let choiceValue = item[3];
+     
          this.popRectScale.domain([0, allCount]);
          let selected = select('#' +parentValue);//.selectAll('li[value='+choiceValue+']');//.querySelector('li[value='+choiceValue+']'); //.filter(d=> d.value = choiceValue);
-         console.log(selected);
+      //   console.log(selected);
          selected.select('text').text(popCount)
          .attr('transform', 'translate('+ this.popRectScale(popCount) +', 10)');
          selected.select('rect').transition() // Wait one second. Then brown, and remove.
          .attr('width', this.popRectScale(popCount));
-        // selected.node.append('svg');
-         //let select = selected.querySelector('li[value="M"]');
-        // console.log(select);
+    
        });
       }
 
@@ -116,17 +114,15 @@ export class SideBar {
         
         liHover.on('mouseover', function(d){
           let parentValue = this.parentNode.attributes[0].value;
-         // console.log(this);
-        //  select(this).select('svg').select('text').classed('hidden', false);
+    
           events.fire('checked', [parentValue, d])
         });
         liHover.on('mouseout', function(d){
-         // console.log(select(this.parentNode.parentNode).select('rect'));
+     
           select(this.parentNode.parentNode).select('rect').attr('width', 0);
           select(this.parentNode.parentNode).select('text').text(' ');
-        //  select(this).parentNode.parentNode).select('svg').select('rect').attr('width', 0);
-        //  select(this).select('svg').select('text').text(' ');
-        //  console.log('leaving');
+       
+          console.log('leaving');
         });
     
         listlabel.on('click', function(d){
@@ -155,7 +151,6 @@ export class SideBar {
           });
  
     let parentFilter = form.selectAll('ul.parent');//.nodes().filter(d => d.classList.value == 'parent');
-
     let filterList = [];
 
     parentFilter.each(function (element) {
@@ -194,4 +189,3 @@ export class SideBar {
 export function create(parent:Element) {
   return new SideBar(parent);
 }
-
