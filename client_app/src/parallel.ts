@@ -95,7 +95,7 @@ export class parallel {
             });
 
             events.on('checked', (evt, item)=> {
-              console.log(item);
+             // console.log(item);
               let parent = item[0];
               let choice = item[1];
            
