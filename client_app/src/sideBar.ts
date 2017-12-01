@@ -113,7 +113,7 @@ export class SideBar {
          events.fire('checked', [parentValue, choice]);
      
         } );
-
+/*
         let liHover = ul.selectAll('li');
         
         liHover.on('mouseover', function(d){
@@ -132,7 +132,7 @@ export class SideBar {
         .attr('width', 100).attr('height', 20);
         liRect.append('rect').attr('width', 0).attr('height', 20).attr('fill',' #F39C12');
         let liRectText = liRect.append('text');
-       
+       */
         form.insert('input').attr('type', 'button').attr('value', 'filter').on('click', function(d){
           
          let input = form.selectAll('li').nodes();
