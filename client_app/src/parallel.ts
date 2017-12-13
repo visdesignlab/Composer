@@ -77,7 +77,7 @@ export class parallel {
     
             // item: [d, parentValue]
             events.on('filter_data', (evt, item) => { // called in sidebar
-          
+              console.log(item);
               this.updatePlot(item);
 
             });
@@ -89,18 +89,18 @@ export class parallel {
               events.fire('dataUpdated', [item[0], this.allData]);
             });
 
-            events.on('dataUpdated', (evt, item) =>{
-           
+            events.on('dataUpdated', (evt, item) =>{//called on brush event and updatePlot in parallel
               this.updateCounter(item[0]);
             });
 
-            events.on('checked', (evt, item)=> {
-             // console.log(item);
+            events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
+            
               let parent = item[0];
               let choice = item[1];
            
               let subFilter = this.allData.filter(d => d[parent] == choice);
-             
+
+             //gos right back to sidebar for the hover count
               events.fire('filter_counted', [this.allData.length, subFilter.length, parent]);
 
             })
@@ -133,9 +133,7 @@ export class parallel {
     .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
     .attr('id', 'plotGroup');
 
-    //this.table = <ITable> await getById('CPT_codes');
-    this.table = <ITable> await getById('Demo_Info');
-    console.log(await this.table.desc);
+    this.table = <ITable> await getById('Demo_Revise');
 
     let patID = (await this.table.colData('PAT_ID')).map(d => +d);
     let GENDER = (await this.table.colData('PAT_GENDER')).map(d => d);
@@ -147,6 +145,7 @@ export class parallel {
     let BMI = (await this.table.colData('BMI')).map(d => +d);
     let patDOB = (await this.table.colData('PAT_BIRTHDATE')).map(d => new Date(String(d)));
     let CCI = (await this.table.colData('CCI')).map(d => +d);
+    let DM_CODE = (await this.table.colData('DM_CODE')).map(d => +d);
 
     let patAge = [];
 
@@ -167,7 +166,8 @@ export class parallel {
           ALCOHOL: ALCOHOL[i],
           DRUG_USER: DRUG_USER[i],
           RACE : RACE[i],
-          CCI: CCI[i]
+          CCI: CCI[i],
+          DM_CODE: DM_CODE[i]
         };
       });
 
@@ -255,14 +255,13 @@ export class parallel {
 
     let brushed = function() {
       let lines = select('#MotherPlotter').selectAll('path');
+      let actives = [];
 
-         let actives = [];
-
-          dimensionGroup.selectAll(".brush")
-            .filter(function(d) {
+      dimensionGroup.selectAll(".brush")
+        .filter(function(d) {
               return brushSelection(this);
             })
-            .each(function(d) {
+        .each(function(d) {
             
               actives.push({
                 dimension: d,
@@ -270,7 +269,7 @@ export class parallel {
               });
             });
         
-          let selected = lines.filter(function(d) {
+      let selected = lines.filter(function(d) {
             if (actives.every(function(active) {
                let dim = active.dimension;
                 // test if point is within extents for each active brush
@@ -281,7 +280,7 @@ export class parallel {
             }
           });
 
-          let context = lines.filter(function(d) {
+        let context = lines.filter(function(d) {
             if (actives.every(function(active) {
                let dim = active.dimension;
                 // test if point is within extents for each active brush
@@ -295,16 +294,13 @@ export class parallel {
         let activeData = [];
         let rejectData = [];
           
-       // context.classed('context', true);
         selected.each((d)=> activeData.push(d));
         context.each((d)=> rejectData.push(d));
         
         events.fire('brush_event', [activeData, rejectData]);
-       ////used to fire data updated here?? should this stay?
-       //events.fire('dataUpdated', [activeData, this.allData]);
-       actives = [];
       
-        }
+        actives = [];
+      }
 
 this.brush.on('end', brushed);
 
@@ -331,6 +327,7 @@ private async plotPatients(data, rejectData){
     plotLines.attr('d', d => this.path(d));
   
     plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
+
 if(rejectData !== null){
 
   let plotRejects = select('#plotRejects')
@@ -360,27 +357,30 @@ private updatePlot(d) {//picks up the filters from sidebar and creates sidebarfi
     let parent = d.attributeName;
     let choice = d.checkedOptions;
    // console.log(choice.length);
-    if (choice.length == 1){
-       filter = filter.filter(d => d[parent] == choice);
-    }else if(choice.length == 2){
-       filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
-       console.log(filter);
-    }else if(choice.length == 2){
-      filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
-      console.log(filter);
-   }else if(choice.length == 3){
-      filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
-      console.log(filter);
 
+   if (parent == 'DM_CODE'){
+  
+    filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
+   }else{
+    if (choice.length == 1){
+      filter = filter.filter(d => d[parent] == choice);
+   }else if(choice.length == 2){
+      filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
+      console.log(filter);
+   }else if(choice.length == 2){
+     filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
+     console.log(filter);
+  }else if(choice.length == 3){
+     filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
+     console.log(filter);
+   }
  }
    
    // rejectData = this.allData.filter(d => d[parent] !== choice);
   });
   
     this.sidebarFiltered = filter;
-
     this.plotPatients(this.sidebarFiltered, null);
- 
     events.fire('dataUpdated', [this.sidebarFiltered, this.allData]);
 
 }
