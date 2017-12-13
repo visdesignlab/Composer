@@ -26,6 +26,7 @@ export class SideBar {
         {'key': 'TOBACCO', 'value': ['Quit', 'Yes', 'NaN', 'Never' ]},
         {'key': 'ALCOHOL', 'value': ['Yes', 'No', 'Not Asked', 'NaN' ]},
         {'key': 'DRUG_USER', 'value': ['Yes', 'No', 'Not Asked', 'NaN' ]},
+        {'key': 'DM_CODE', 'value': [250.0, 0 ]},
         
       ];
       
@@ -38,17 +39,17 @@ export class SideBar {
 
   private attachListener () {
     
-       events.on('filter_counted', (evt, item) => {
+       events.on('filter_counted', (evt, item) => {//this get the count from the group
+
          let allCount = item[0];
          let popCount = item[1];
          let parentValue = item[2];
      
          this.popRectScale.domain([0, allCount]);
-         let selected = select('#' +parentValue);//.selectAll('li[value='+choiceValue+']');//.querySelector('li[value='+choiceValue+']'); //.filter(d=> d.value = choiceValue);
-      //   console.log(selected);
+         let selected = select('#' +parentValue);
          selected.select('text').text(popCount)
          .attr('transform', 'translate('+ this.popRectScale(popCount) +', 10)');
-         selected.select('rect').transition() // Wait one second. Then brown, and remove.
+         selected.select('rect').transition() 
          .attr('width', this.popRectScale(popCount));
     
        });
@@ -60,9 +61,9 @@ export class SideBar {
     let parents = [];
     let that = this;
 
-    let form = this.$node.append("form").append('div').attr('padding-top', 250);
+    let form = this.$node.append('form').append('div').attr('padding-top', 250);
     
-    let labels = form.selectAll("div")
+    let labels = form.selectAll('div')
         .data(this.header);
 
     let labelsEnter = labels
@@ -115,14 +116,14 @@ export class SideBar {
         liHover.on('mouseover', function(d){
           let parentValue = this.parentNode.attributes[0].value;
     
-          events.fire('checked', [parentValue, d])
+          events.fire('checkbox_hover', [parentValue, d])
         });
         liHover.on('mouseout', function(d){
      
           select(this.parentNode.parentNode).select('rect').attr('width', 0);
           select(this.parentNode.parentNode).select('text').text(' ');
        
-          console.log('leaving');
+          //console.log('leaving');
         });
     
         listlabel.on('click', function(d){
@@ -131,13 +132,16 @@ export class SideBar {
 
           let parentValue = this.parentNode.attributes[0].value;
           let parental = this.parentNode.classList.add('parent');
+
           parents.push(parental);
-          
+
           let lines = select('#plotGroup').selectAll('path');
           let filterGroup = lines.filter(d => d[parentValue] == choice);
          
           filterGroup.classed(parentValue, true);
-          events.fire('checked', [parentValue, choice]);
+     
+          //events.fire('checked', [parentValue, choice]); you dont need this it already does this on hover
+
      
         } );
        
@@ -150,38 +154,34 @@ export class SideBar {
           that.filters.push([d.innerText, d.parentNode.attributes[0].value]);
           });
  
-    let parentFilter = form.selectAll('ul.parent');//.nodes().filter(d => d.classList.value == 'parent');
-    let filterList = [];
+         let parentFilter = form.selectAll('ul.parent');
+         let filterList = [];
 
-    parentFilter.each(function (element) {
+        parentFilter.each(function (element) {
        
-        let filter = {
+          let filter = {
         
-        attributeName:(this).attributes[0].value,
-        checkedOptions: []
+          attributeName:(this).attributes[0].value,
+          checkedOptions: []
       
-        };
+          };
 
-        let children = select(this).selectAll('li');
-        children
-        .each(function (option) {
+          let children = select(this).selectAll('li');
+          children
+          .each(function (option) {
       
-         if (select(this).select(':last-child').property('checked')){
+            if (select(this).select(':last-child').property('checked')){
             filter.checkedOptions.push(option);
-            };
+              };
           });
         filterList.push(filter);
-      });
+        });
 
-      
          events.fire('filter_data', filterList);
           that.filters = [];
-          
           filterList = [];
           
         });
-
-      //let popRect = ul.selectAll('li').append('svg').attr('width', 100).attr('height', 20);
   }
 
  }

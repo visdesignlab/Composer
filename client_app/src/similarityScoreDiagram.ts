@@ -57,11 +57,15 @@ export class similarityScoreDiagram {
     sliderWidth = 10;
     similarBar = {width: 4, height: 10};
 
-   // table: ITable;
+    table: ITable;
+    orderTable : ITable;
+
+    patObjects;
 
     constructor(parent: Element, diagram) {
 
-
+        this.loadData();
+        
         this.diagram = diagram;
         this.$node = select(parent)
             .append('div')
@@ -140,6 +144,18 @@ export class similarityScoreDiagram {
         this.attachListener();
 
     }
+
+    private async loadData(){
+        
+       this.table = <ITable> await getById('PRO');
+       this.patObjects = await this.table.objects();
+
+       this.orderTable = <ITable> await getById('Orders');
+
+       const allDatasets = await listData();
+       console.log('All loaded datasets:');
+       console.log(allDatasets);
+    }
 //uses Phovea to access PRO data and draw table
     private async getPromisScore(data) {
        
@@ -149,7 +165,7 @@ export class similarityScoreDiagram {
            ids.push(element.ID);
        });
 
-       let table = <ITable> await getById('PRO');
+      // let table = <ITable> await getById('PRO');
       
 //testing fitlering through phovea. no luck
 /*
@@ -183,8 +199,12 @@ let mapped = filteredPatients.map((id, i) => {
   console.log(mapped);*/
 
   let filteredPatScore = {};
-  const patObjects = await table.objects();
-  patObjects.forEach(item => {
+ // const patObjects = await this.table.objects();
+
+  console.log("the table of patObjects"+ this.patObjects.length);
+  console.log('then goes through each itm and checks to see if the filterd patient score id matches the object');
+
+  this.patObjects.forEach(item => {
     if (ids.indexOf(item.PAT_ID) !== -1) {
       if (filteredPatScore[item.PAT_ID] === undefined) {
         filteredPatScore[item.PAT_ID] = [];
@@ -194,7 +214,8 @@ let mapped = filteredPatients.map((id, i) => {
   });
   let mapped = entries(filteredPatScore);
   
-  console.log(mapped);
+  console.log("here is the mapped patient scores finally filtered   "+ mapped.length);
+  console.log('finally it sets the similarpatientsproinfo as mapped')
 
 
 this.similarPatientsProInfo = mapped;
@@ -215,11 +236,11 @@ this.drawDiagram();
             ids.push(element.ID);
         });
  
-        let table = <ITable> await getById('Orders');
+       // let table = <ITable> await getById('Orders');
 
  
         let filteredPatOrders = {};
-        const patObjects = await table.objects();
+        const patObjects = await this.orderTable.objects();
         // console.log("filtering orders    " + patObjects);
          patObjects.forEach(item => {
              if (ids.indexOf(item.PAT_ID) !== -1) {
@@ -294,7 +315,7 @@ this.drawDiagram();
            
         });
 
-        events.on('dataUpdated', (evt, item) => {  // called in sidebar
+        events.on('dataUpdated', (evt, item) => {  // called in parrallel on brush and 
             
                 this.getPromisScore(item[0]);   
                 this.getOrders(item[0]);
