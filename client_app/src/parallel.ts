@@ -27,6 +27,7 @@ import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
 import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
+import * as dataObject from './dataObject';
 
 export class parallel {
 
@@ -45,9 +46,9 @@ export class parallel {
   private path;
   private actives;
 
-  selectedData;//used with active data for brushing on plot
-  contextData;
-  sidebarFiltered;//used plot to divide into selected and context
+  private selectedData;//used with active data for brushing on plot
+  private contextData;
+  private sidebarFiltered;//used plot to divide into selected and context
 
   table: ITable;
 
@@ -132,7 +133,7 @@ export class parallel {
     select('#MotherPlotter').append('g')
     .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
     .attr('id', 'plotGroup');
-
+    
     this.table = <ITable> await getById('Demo_Revise');
 
     let patID = (await this.table.colData('PAT_ID')).map(d => +d);

@@ -6,7 +6,6 @@ import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll} from 'd3-selection';
 import * as events from 'phovea_core/src/event';
 
-
 export class QueryBox {
 
     private $node;
