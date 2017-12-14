@@ -14,6 +14,7 @@ import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
 import * as patOrderBreakdown from './patOrderBreakdown';
 import * as parallel from './parallel';
+import * as dataObject from './dataObject';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -53,7 +54,7 @@ export class App {
 
     // loading header
     this.$node.select('h3').remove();
-
+    
 
     // create side bar
     const sideBarDiv = this.$node.append('div').classed('sideBar', true);
@@ -87,6 +88,8 @@ export class App {
       //order hierarchy
     patOrderBreakdown.create(main.node());
     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
+
+    const data = dataObject.create();
 
      // item: pat_id, DATA
         events.on('update_all_info', (evt, item) => {  // called in query box

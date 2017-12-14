@@ -16,6 +16,7 @@ import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
+import * as dataObject from './dataObject'
 import {ITable, asTable} from 'phovea_core/src/table';
 import {IAnyVector, INumericalVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
@@ -44,6 +45,8 @@ export class similarityScoreDiagram {
     private setOrderScale = dataCalc.setOrderScale;
     private getClassAssignment = dataCalc.getClassAssignment;
     private orderHierarchy = dataCalc.orderHierarchy;
+    patProObjects;
+    patOrderTable;
 
    filteredOrders = {
        medGroup : [],
@@ -57,15 +60,11 @@ export class similarityScoreDiagram {
     sliderWidth = 10;
     similarBar = {width: 4, height: 10};
 
-    table: ITable;
+    proTable: ITable;
     orderTable : ITable;
-
-    patObjects;
 
     constructor(parent: Element, diagram) {
 
-        this.loadData();
-        
         this.diagram = diagram;
         this.$node = select(parent)
             .append('div')
@@ -145,17 +144,6 @@ export class similarityScoreDiagram {
 
     }
 
-    private async loadData(){
-        
-       this.table = <ITable> await getById('PRO');
-       this.patObjects = await this.table.objects();
-
-       this.orderTable = <ITable> await getById('Orders');
-
-       const allDatasets = await listData();
-       console.log('All loaded datasets:');
-       console.log(allDatasets);
-    }
 //uses Phovea to access PRO data and draw table
     private async getPromisScore(data) {
        
@@ -165,65 +153,23 @@ export class similarityScoreDiagram {
            ids.push(element.ID);
        });
 
-      // let table = <ITable> await getById('PRO');
-      
-//testing fitlering through phovea. no luck
-/*
-        let extents = extent(ids);
+     let filteredPatScore = {};
 
-       // const testVector = asVector([ids]);
-       let idRange = range(extents[0], extents[1]);
-      // console.log(idRange);
-
-        this.table = <ITable> await getById('PRO');
-       // console.log(await this.table.desc);
-       let idVector = <INumericalVector> this.table.col(0);
-      // let idV = asVector(['1'], ids);
-        console.log(idVector);*/
-/*
-      const patObjects = await this.table.objects();
-
-     let filteredPatients = patObjects.filter(//function(item, index, array){
-       // return item.PAT_ID == 20253918;
-       // return item.PAT_ID == ids.indexOf();
-       obj => ids.indexOf(obj.PAT_ID) !== -1
-);
-
-let mapped = filteredPatients.map((id, i) => {
-    return {
-      key: id.PAT_ID,
-      value: [id]
-    };
-  });
-
-  console.log(mapped);*/
-
-  let filteredPatScore = {};
- // const patObjects = await this.table.objects();
-
-  console.log("the table of patObjects"+ this.patObjects.length);
-  console.log('then goes through each itm and checks to see if the filterd patient score id matches the object');
-
-  this.patObjects.forEach(item => {
-    if (ids.indexOf(item.PAT_ID) !== -1) {
+     this.patProObjects.forEach(item => {
+     if (ids.indexOf(item.PAT_ID) !== -1) {
       if (filteredPatScore[item.PAT_ID] === undefined) {
         filteredPatScore[item.PAT_ID] = [];
       }
       filteredPatScore[item.PAT_ID].push(item);
     }
   });
-  let mapped = entries(filteredPatScore);
+     let mapped = entries(filteredPatScore);
   
-  console.log("here is the mapped patient scores finally filtered   "+ mapped.length);
-  console.log('finally it sets the similarpatientsproinfo as mapped')
+     this.similarPatientsProInfo = mapped;
 
+     this.clearDiagram();
+     this.drawDiagram();
 
-this.similarPatientsProInfo = mapped;
-//console.log(this.similarPatientsProInfo);
-
-this.clearDiagram();
-this.drawDiagram();
-//this.addSimilarOrderPoints(this.targetPatientProInfo);
 
     };
 
@@ -236,13 +182,11 @@ this.drawDiagram();
             ids.push(element.ID);
         });
  
-       // let table = <ITable> await getById('Orders');
 
- 
         let filteredPatOrders = {};
-        const patObjects = await this.orderTable.objects();
-        // console.log("filtering orders    " + patObjects);
-         patObjects.forEach(item => {
+        const patOrders = await this.patOrderTable.objects();
+       
+         patOrders.forEach(item => {
              if (ids.indexOf(item.PAT_ID) !== -1) {
               if (filteredPatOrders[item.PAT_ID] === undefined) {
          filteredPatOrders[item.PAT_ID] = [];
@@ -252,16 +196,12 @@ this.drawDiagram();
          });
     let mapped = entries(filteredPatOrders);
    
-   // console.log("filtered order" + mapped.length);
-   // mapped.forEach(d=> console.log(d));
- 
- 
+
  this.similarOrderInfo = mapped;
- //console.log(this.similarPatientsProInfo);
- 
+
  this.svg.select('#pat_orders').selectAll('line,g').remove();
  this.svg.select('#similar_orders').selectAll('g').remove();
-// this.addSimilarOrderPoints(this.targetOrderInfo, mapped);
+
  events.fire('orders_updated',[this.similarOrderInfo, this.targetPatientProInfo, this.similarPatientsProInfo]);
  
      };
@@ -270,6 +210,12 @@ this.drawDiagram();
      * Attach listeners
      */
     private attachListener() {
+
+        events.on('dataloaded', (evt, item)=>{
+            
+            this.patProObjects = item[0];
+            this.patOrderTable = item[1];
+        });
 
         events.on('show_orders',(evt, item)=> {
            // select('.scoreGroup').remove();
@@ -483,8 +429,6 @@ this.drawDiagram();
             d['sumUp'] = nest().key((g) => g['diff']).entries(d.values); // TODO visualize collapsible squares
         });
 
-       // console.log(nestedData);
-
         this.svg.select('#pat_orders').selectAll('g').remove();
 
 
@@ -505,7 +449,7 @@ this.drawDiagram();
             .append('rect')
             .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
              .attr('class', this.getClassAssignment('ORDER_STATUS'))
-            //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
+           
             .attr('x', (g) => this.timeScale(g.diff))
             .attr('y', (g, i) => i * this.timeScale(25))
             .attr('width', this.timeScale(20))
@@ -563,8 +507,6 @@ this.drawDiagram();
      * @param ordersInfo
      */
     private addSimilarOrderPoints(ordersInfo, similarOrdersInfo) {
-
-
         // -------  target patient
 
         let minDate = this.findMinDate(this.targetPatientProInfo);
