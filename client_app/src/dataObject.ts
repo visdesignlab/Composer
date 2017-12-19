@@ -33,28 +33,28 @@ export class dataObject implements Subject {
     demoTable : ITable;
     orderTable : ITable;
     proTable :ITable;
+
     patProObjects;
     patOrderObjects;
 
     constructor() {
         console.log('is this thing on');
-        this.loadData();
-       
-
+        this.loadData('PROMIS_Scores', this.proTable, this.patProObjects);//.then(console.log(this.proTable));
+        this.loadData('Orders', this.orderTable, this.patOrderObjects);
     }
 
     public registerObserver(o : Observer) {};
     public removeObserver(o : Observer) {};
     public notifyObserver() {};
 
-    public async loadData(){
-        
-       this.proTable = <ITable> await getById('PRO');
-       this.patProObjects = await this.proTable.objects();
+    public async loadData(id: string, table : ITable, object : any){
+    
+       table = <ITable> await getById(id);//load the tables or orders and PROMIS scores on init of app
+      // this.orderTable = <ITable> await getById('Orders');
+       object = await table.objects();//gets the table information for PROMIS scores as objets
 
-       this.orderTable = <ITable> await getById('Orders');
-
-       events.fire('dataloaded', [this.patProObjects, this.orderTable]);
+      events.fire(id, [object, table]);//sends the object array to sidebar? for filtering against cohort
+      console.log(id);
     }
 
   }

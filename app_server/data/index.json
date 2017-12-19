@@ -709,7 +709,7 @@
         "name": "PRO",
         "path": "PRO_index.csv",
         "separator": ",",
-        "id": "PRO",
+        "id": "PROMIS_Scores",
         "size": [
             51548,
             7

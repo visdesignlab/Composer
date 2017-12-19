@@ -54,6 +54,8 @@ export class parallel {
 
   constructor(parent: Element) {
 
+    //console.log(data)
+
     this.$node = select(parent)
         .append('div')
         .classed('parallelDiv', true);
@@ -114,9 +116,10 @@ export class parallel {
        * @param URL
        * @returns {Promise<any>}
        */
+         /**
       private async getData(URL) {
         return await ajax.getAPIJSON(URL);
-      }
+      }*/
 
   public async mapPatientData() {
 
@@ -134,7 +137,7 @@ export class parallel {
     .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
     .attr('id', 'plotGroup');
     
-    this.table = <ITable> await getById('Demo_Revise');
+    this.table = <ITable> await getById('Demo_Revise');//all of the data is still 
 
     let patID = (await this.table.colData('PAT_ID')).map(d => +d);
     let GENDER = (await this.table.colData('PAT_GENDER')).map(d => d);
@@ -306,7 +309,6 @@ export class parallel {
 this.brush.on('end', brushed);
 
 this.plotPatients(this.allData, null);
-events.fire('dataLoaded', this.allData);
 
 this.SelectedCounter = this.svg.append('g')
 .attr('transform', 'translate(30,' + (this.plotDimension.height + 30) + ')')

@@ -236,6 +236,7 @@ export class dataCalc {
       let orderRectEnter = orderRect.enter()
       .append('g')
       .classed('orderRect', true);
+      
       orderRect = orderRectEnter.merge(orderRect);
 
       let rects = orderRect.selectAll('rect')
@@ -289,23 +290,3 @@ export class dataCalc {
           return element.attr('class');
         }
   }
-/*
-  export async function loadDataFromServer() {
-
-    console.log('Loading Data from the a Server');
-    // listData() returns a list of all datasets loaded by the server
-    // notice the await keyword - you'll see an explanation below
-    const allDatasets = await listData();
-    //console.log('All loaded datasets:');
-    console.log(allDatasets);
-     // we could use those dataset to filter them based on their description and pick the one(s) we're interested in
-    // here we pick the first dataset and cast it to ITable - by default the datasets are returned as IDataType
-    let tempTable: ITable;
-    let orderArray = [];
-    // retrieving a dataset by name. Note that only the first dataset will be returned.
-    tempTable = <ITable> await getById('Orders');
-   
-    let tempVector = await tempTable.cols()[5].data();
-    console.log(tempVector);
-
-  }*/
