@@ -114,15 +114,6 @@ export class distributionDiagram {
      */
     private attachListener() {
 
-        //called in parallel mapPatData
-
-        events.on('dataLoaded', (evt, item)=> {
-            //console.log(item);
-            //this.drawDiagram(item, 'BMI');
-           // this.drawDiagram(item, 'AGE');
-           // this.drawDiagram(item, 'CCI');
-        })
-     
         events.on('dataUpdated', (evt, item) => { 
            let selected = item[0];
            let all = item[1];

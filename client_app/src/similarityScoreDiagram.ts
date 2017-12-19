@@ -154,7 +154,7 @@ export class similarityScoreDiagram {
        });
 
      let filteredPatScore = {};
-
+    console.log(this.patProObjects);
      this.patProObjects.forEach(item => {
      if (ids.indexOf(item.PAT_ID) !== -1) {
       if (filteredPatScore[item.PAT_ID] === undefined) {
@@ -211,11 +211,22 @@ export class similarityScoreDiagram {
      */
     private attachListener() {
 
-        events.on('dataloaded', (evt, item)=>{
+        events.on('PROMIS_Scores', (evt, item)=> {
+            console.log(item);
+            this.patProObjects = item[0];
+            
+        });
+
+        events.on('Orders', (evt, item)=> {
+            console.log(item)
+            this.patOrderTable = item[1];
+        });
+
+      /*  events.on('dataloaded', (evt, item)=>{
             
             this.patProObjects = item[0];
             this.patOrderTable = item[1];
-        });
+        });*/
 
         events.on('show_orders',(evt, item)=> {
            // select('.scoreGroup').remove();
@@ -246,8 +257,8 @@ export class similarityScoreDiagram {
                 .call(this.brush.move, this.scoreScale.range());
 
           //  console.log("what is happening  "+item);
-
-            this.targetPatientProInfo = item[1]['PRO'][item[0]];
+           this.targetPatientProInfo = item[1]['PROMIS_Scores'][item[0]];
+           // this.targetPatientProInfo = item[1]['PRO'][item[0]];
             this.similarPatientsProInfo = [];
 
             this.clearDiagram();

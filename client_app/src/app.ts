@@ -69,7 +69,7 @@ export class App {
   //  );
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
-
+    const data = dataObject.create();
 
     //parallel coord plot 
     parallel.create(main.node());
@@ -89,7 +89,7 @@ export class App {
     patOrderBreakdown.create(main.node());
     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
 
-    const data = dataObject.create();
+   
 
      // item: pat_id, DATA
         events.on('update_all_info', (evt, item) => {  // called in query box

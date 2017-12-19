@@ -56,11 +56,12 @@ export class patOrderBreakdown {
   private drawPatOrderRects = dataCalc.drawPatOrderRects;
   private orderHierarchy = dataCalc.orderHierarchy;
 
- rectBoxDimension = {width: 1100, height: 90 };
+  rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
   similarBar = {width: 8, height: 30 };
   margin = {top: 20, right: 10, bottom: 10, left: 10};
   contextDimension = {width: this.rectBoxDimension.width, height:55};
+  patOrderGroup;
 
   table: ITable;
   table2: ITable;
@@ -89,7 +90,11 @@ export class patOrderBreakdown {
  //  this.svg.append('g')
     //  .attr('id', 'sim_rect_line')
     //   .attr('transform', `translate(${this.margin.left},${this.margin.top})`);   
-
+    this.patOrderGroup = this.svg.select('#similar_order')
+    .append('g')
+    .attr('transform', () => {
+        return `translate(${this.margin.left},0)`; // If there is a label for the x-axis change 0
+    });
     
   this.attachListener();
 
@@ -126,7 +131,7 @@ export class patOrderBreakdown {
 
     // item: pat_id, DATA
     events.on('update_all_info', (evt, item) => {  // called in query box
-      this.targetPatientProInfo = item[1]['PRO'][item[0]];
+      this.targetPatientProInfo = item[1]['PROMIS_Scores'][item[0]];
       this.similarPatientsProInfo = [];
 
       this.setOrderScale();
@@ -187,28 +192,29 @@ export class patOrderBreakdown {
                     })
                 });
         
-               let similarOrderGroup = this.svg.select('#similar_order')
-                    .append('g')
-                    .attr('transform', () => {
-                        return `translate(${this.margin.left},0)`; // If there is a label for the x-axis change 0
-                    })
-                    .selectAll('.similarRectOrder')
-                    .data(similarOrdersInfo)
-                    .enter()
-                    .append('g').attr('class', d=> d.key);
+              
+                let patGroups = this.patOrderGroup
+                    .selectAll('.patgroups')
+                    .data(similarOrdersInfo);
 
-                    similarOrderGroup
+                    patGroups.exit().remove();
+
+                let similarOrderGroupEnter = patGroups
+                    .enter()
+                    .append('g').attr('class', 'patgroups')//.attr('class', d=> d.key);
+
+                let patGroupText = similarOrderGroupEnter
                     .append('text').text(d=> d.key)
                     .attr('transform', `translate(0,10)`);
 
-                    similarOrderGroup
+                   similarOrderGroupEnter
                     .attr('transform', (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
                   
-                    similarOrderGroup.append('g')
+                 let rects =  similarOrderGroupEnter.append('g')
                     .classed('similarRectOrder', true)
                     .attr('transform', `translate(60,0)`)
                     .selectAll('rect')
-                    .data((d) => d.value)
+                    .data(d=> d.value)
                     .enter()
                     .append('rect')
                     //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
@@ -257,6 +263,8 @@ export class patOrderBreakdown {
                         select(".tooltip").transition(t)
                             .style("opacity", 0);
                     });
+
+                    patGroups = similarOrderGroupEnter.merge(patGroups);
                     
                       this.svg.select('#similar_orders').selectAll('.similarRect')
                             .append('text')
