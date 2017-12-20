@@ -4,7 +4,7 @@
 
 import * as ajax from 'phovea_core/src/ajax';
 import {BaseType, select, selectAll, event} from 'd3-selection';
-import {nest, values, keys, map, entries} from 'd3-collection'
+import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
 import {line, curveMonotoneX} from 'd3-shape';
@@ -170,41 +170,7 @@ export class similarityScoreDiagram {
      this.clearDiagram();
      this.drawDiagram();
 
-
     };
-
-    //uses Phovea to access PRO data and draw table
-    private async getOrders(data) {
-        
-        let ids = [];
- 
-         data.forEach(element => {
-            ids.push(element.ID);
-        });
- 
-
-        let filteredPatOrders = {};
-        const patOrders = await this.patOrderTable.objects();
-       
-         patOrders.forEach(item => {
-             if (ids.indexOf(item.PAT_ID) !== -1) {
-              if (filteredPatOrders[item.PAT_ID] === undefined) {
-         filteredPatOrders[item.PAT_ID] = [];
-       }
-         filteredPatOrders[item.PAT_ID].push(item);
-        }
-         });
-    let mapped = entries(filteredPatOrders);
-   
-
- this.similarOrderInfo = mapped;
-
- this.svg.select('#pat_orders').selectAll('line,g').remove();
- this.svg.select('#similar_orders').selectAll('g').remove();
-
- events.fire('orders_updated',[this.similarOrderInfo, this.targetPatientProInfo, this.similarPatientsProInfo]);
- 
-     };
 
     /**
      * Attach listeners
@@ -215,21 +181,6 @@ export class similarityScoreDiagram {
             console.log(item);
             this.patProObjects = item[0];
             
-        });
-
-        events.on('Orders', (evt, item)=> {
-            console.log(item)
-            this.patOrderTable = item[1];
-        });
-
-      /*  events.on('dataloaded', (evt, item)=>{
-            
-            this.patProObjects = item[0];
-            this.patOrderTable = item[1];
-        });*/
-
-        events.on('show_orders',(evt, item)=> {
-           // select('.scoreGroup').remove();
         });
 
         // item: pat_id, number of similar patients, DATA
@@ -275,7 +226,7 @@ export class similarityScoreDiagram {
         events.on('dataUpdated', (evt, item) => {  // called in parrallel on brush and 
             
                 this.getPromisScore(item[0]);   
-                this.getOrders(item[0]);
+                //this.getOrders(item[0]);
                        
                     });
 

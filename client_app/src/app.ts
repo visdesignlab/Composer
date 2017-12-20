@@ -55,12 +55,10 @@ export class App {
     // loading header
     this.$node.select('h3').remove();
     
-
     // create side bar
     const sideBarDiv = this.$node.append('div').classed('sideBar', true);
     const side = sideBar.create(sideBarDiv.node());
     await side.init();
-
 
     //this.$node.append('div').attr('id','sideBar');
   //  ReactDOM.render(
@@ -72,7 +70,7 @@ export class App {
     const data = dataObject.create();
 
     //parallel coord plot 
-    parallel.create(main.node());
+    parallel.create(main.node(), data);
 
      // distributionDiagram
     distributionDiagram.create(main.node());
@@ -89,8 +87,6 @@ export class App {
     patOrderBreakdown.create(main.node());
     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
 
-   
-
      // item: pat_id, DATA
         events.on('update_all_info', (evt, item) => {  // called in query box
             const targetPatientProInfo = item[1]['PRO'][item[0]];
@@ -100,7 +96,6 @@ export class App {
             this.$node.select('.main').select('.rectDiv').classed('hidden', false);
             this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', true);
 
-          
             console.log('added similarity score diagram');
 
         });
@@ -137,7 +132,7 @@ export class App {
     this.setBusy(false);
 
     events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
-    //events.fire('update_all_info', ['PAT_ID', '5330196']);
+   
   }
 
   /**
