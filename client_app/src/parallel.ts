@@ -49,12 +49,13 @@ export class parallel {
   private selectedData;//used with active data for brushing on plot
   private contextData;
   private sidebarFiltered;//used plot to divide into selected and context
-
+  //private data : dataObject;
+  private demoTable;
+  private demoObject
+  
   table: ITable;
 
-  constructor(parent: Element) {
-
-    //console.log(data)
+  constructor(parent: Element, object) {
 
     this.$node = select(parent)
         .append('div')
@@ -68,15 +69,24 @@ export class parallel {
     this.yscale = scaleLinear().range([0, this.plotDimension.height]);
     this.xscale = scaleLinear().range([0, this.plotDimension.width]);
 
-    this.mapPatientData();
     this.attachListener();
     
     this.plotLines = select('#plotGroup').selectAll('path');
     this.backgroundLines = select('#plotGroup').selectAll('path');
+
+   // this.mapPatientData();
     
   }
 
   private attachListener() {
+
+           events.on('Demo_Revise', (evt, item)=> {
+     // console.log(this.demoTable);
+           console.log(item);
+           this.table = item[1];
+           this.mapPatientData();
+        
+           });
     
             // item: [d, parentValue]
             events.on('filter_data', (evt, item) => { // called in sidebar
@@ -86,7 +96,6 @@ export class parallel {
             });
 
             events.on('brush_event', (evt, item) => {
-           
              //brush event used to redraw plot
               this.plotPatients(item[0], item[1]);
               events.fire('dataUpdated', [item[0], this.allData]);
@@ -137,7 +146,7 @@ export class parallel {
     .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
     .attr('id', 'plotGroup');
     
-    this.table = <ITable> await getById('Demo_Revise');//all of the data is still 
+   // this.table = <ITable> await getById('Demo_Revise');//all of the data is still 
 
     let patID = (await this.table.colData('PAT_ID')).map(d => +d);
     let GENDER = (await this.table.colData('PAT_GENDER')).map(d => d);
@@ -399,7 +408,7 @@ private updateCounter(data){
 
    
 
-export function create(parent:Element) {
-  return new parallel(parent);
+export function create(parent:Element, dataObject) {
+  return new parallel(parent, dataObject);
 }
 

@@ -109,8 +109,17 @@ export class patOrderBreakdown {
     events.on('orders_updated', (evt, item) => {
         console.log('works!!!');
         console.log(item);
-        this.addSimilarOrderPoints(this.targetPatientProInfo, item[0], item[1], item[2]);
+        console.log(this.targetPatientProInfo);
+
+
+        this.addSimilarOrderPoints(item[0], item[1], item[2]);
     });
+
+    events.on('Orders', (evt, item) => {
+        console.log(item);
+        
+       // this.addSimilarOrderPoints(this.targetPatientProInfo, item[0], this.targetPatientProInfo, item[0]);
+    })
 
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
@@ -154,11 +163,11 @@ export class patOrderBreakdown {
      *
      * @param ordersInfo
      */
-    private addSimilarOrderPoints(ordersInfo, similarOrdersInfo, targetPro, simPro) {
+    private addSimilarOrderPoints(ordersInfo, similarOrdersInfo, simPro) {
         
                 // -------  target patient
         
-                let minDate = this.findMinDate(targetPro);
+                let minDate = this.findMinDate(ordersInfo);
         
                 ordersInfo.forEach((d) => {
                     let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
