@@ -87,6 +87,10 @@ export class QueryBox {
             .attr('value', 'Orders')
             .on('click', () => events.fire('show_orders'));
 
+            form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'CPT Codes')
+            .on('click', () => events.fire('show_cpt'));
 
         form.append('input')
             .attr('type', 'button')

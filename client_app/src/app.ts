@@ -85,14 +85,16 @@ export class App {
     patOrderBreakdown.create(main.node());
     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
 
+    const cpt = main.append('Div').classed('cptDiv', true);
+    cptBreak.create(cpt.node());
+    this.$node.select('cptDiv').classed('hidden', true);
+
       // PROMIS diagrams
     const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
     similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
      //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
      //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
 
-    const cpt = main.append('Div').classed('cptDiv', true);
-     cptBreak.create(cpt.node());
 
     this.setBusy(false);
 
@@ -117,8 +119,19 @@ export class App {
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
             this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
             this.$node.select('.main').select('.rectDiv').classed('hidden', false);
+            this.$node.select('.main').select('.cptDiv').classed('hidden', true);
 
         });
+
+        events.on('show_cpt', () => {
+          
+                     // console.log('works!');
+                      this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
+                      this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+                      this.$node.select('.main').select('.cptDiv').classed('hidden', false);
+                      this.$node.select('.main').select('.rectDiv').classed('hidden', false);
+          
+                  });
         
           // item: pat_id, DATA
         events.on('update_hierarchy', () => {  // called in query box

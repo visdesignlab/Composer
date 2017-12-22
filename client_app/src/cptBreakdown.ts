@@ -124,13 +124,7 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
  
        this.setOrderScale();
        this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
-       
-      // let filteredorders = this.orderHierarchy(this.targetPatientOrders);
- 
-      // this.drawPatOrderRects(this.targetPatientOrders);
-      // this.drawPatOrderRects(filteredorders.medicationGroup);
       
-     
      });
    
 
@@ -258,8 +252,8 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
                   .enter()
                   .append('rect')
                   //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
-                  //.attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
-                 // .attr('class', this.getClassAssignment('ORDER_STATUS'))
+                  .attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+                  .attr('class', this.getClassAssignment('ORDER_STATUS'))
                   .attr('x', (g) => this.timeScale(g.diff))
                   .attr('y', 0)
                   .attr('width', this.similarBar.width)
