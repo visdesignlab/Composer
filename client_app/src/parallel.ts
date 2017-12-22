@@ -81,9 +81,7 @@ export class parallel {
   private attachListener() {
 
            events.on('Demo_Revise', (evt, item)=> {
-     // console.log(this.demoTable);
-           console.log(item);
-           this.table = item[1];
+           this.table = item;
            this.mapPatientData();
         
            });
