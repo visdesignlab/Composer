@@ -203,6 +203,10 @@ export class similarityScoreDiagram {
 
                     });
 
+        events.on('filtered_CPT', (evt, item)=> {
+            this.addSimilarOrderPoints(this.targetOrderInfo, item);
+        });
+
     }
 
     /**
@@ -215,17 +219,17 @@ export class similarityScoreDiagram {
 
         let maxDiff = 0;
 
-            let minPatDate = this.findMinDate(this.targetPatientProInfo);
-            this.targetPatientProInfo.forEach((d) => {
+        let minPatDate = this.findMinDate(this.targetPatientProInfo);
+        this.targetPatientProInfo.forEach((d) => {
                 d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
                 maxDiff = d.diff > maxDiff ? d.diff : maxDiff
             });
-            this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
+        this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
     
 
         this.similarPatientsProInfo.forEach((g) => {
            
-            let minDate = this.findMinDate(g.value);
+        let minDate = this.findMinDate(g.value);
             g.value.forEach((d) => {
                 try {
                     d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -342,6 +346,7 @@ export class similarityScoreDiagram {
      * @param ordersInfo
      */
     private addOrderSquares(ordersInfo) {
+
         //determine the min date from the target patient
         let minDate = this.findMinDate(this.targetPatientProInfo);
 
@@ -524,8 +529,8 @@ export class similarityScoreDiagram {
                 return d.key == g.key
             })[0];
 
-            if(currPatient.value != null){
-                let minDate = this.findMinDate(currPatient.value);
+            if(g.value != null){
+                let minDate = this.findMinDate(g.value);
             }
     
           // let minDate = this.findMinDate(similarOrdersInfo.value);
