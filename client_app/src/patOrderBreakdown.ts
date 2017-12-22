@@ -162,13 +162,16 @@ export class patOrderBreakdown {
      *
      * @param ordersInfo
      */
-    private addSimilarOrderPoints(ordersInfo, similarOrdersInfo, simPro) {
+    private addSimilarOrderPoints(patordersInfo, similarOrdersInfo, simPro) {
         
-                // -------  target patient
+              //similar patient PROMIS score records
+               // console.log(simPro); 
+               //similar patient order records
+                console.log(patordersInfo);
         
-                let minDate = this.findMinDate(ordersInfo);
+                let minDate = this.findMinDate(patordersInfo);
         
-                ordersInfo.forEach((d) => {
+                patordersInfo.forEach((d) => {
                     let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
                     d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
                 });
@@ -178,17 +181,22 @@ export class patOrderBreakdown {
                 // ----- add diff days to the data
         
                 similarOrdersInfo.forEach((g) => {
+
+                    //this used to filter 
         
-        
-                    let currPatient = simPro.filter((d) => {
-                        return d.key == g.key
-                    })[0];
-        
-                    if(currPatient.value != null){
-                        let minDate = this.findMinDate(currPatient.value);
+                //   let currPatient = simPro.filter((d) => {
+                    //   return d.key == g.key
+                 //  })[0];
+
+                  // console.log(currPatient);
+    /*
+                    if(currentPatient.value != null){
+                        let minDate = this.findMinDate(currentPatient.value);
+                    }*/
+                    if(g.value != null){
+                        let minDate = this.findMinDate(g.value);
                     }
-            
-                  // let minDate = this.findMinDate(similarOrdersInfo.value);
+                  
                     g.value.forEach((d) => {
                         try {
                             d.diff = Math.ceil((this.parseTime(d['ORDER_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
