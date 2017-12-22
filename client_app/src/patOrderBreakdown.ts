@@ -123,7 +123,6 @@ export class patOrderBreakdown {
 
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
-
        this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
        this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
 
@@ -211,7 +210,6 @@ export class patOrderBreakdown {
                 let similarOrderGroupEnter = patGroups
                     .enter()
                     .append('g').attr('class', 'patgroups')//.attr('class', d=> d.key);
-
                 let patGroupText = similarOrderGroupEnter
                     .append('text').text(d=> d.key)
                     .attr('transform', `translate(0,10)`);
@@ -312,4 +310,3 @@ export class patOrderBreakdown {
 export function create(parent:Element) {
   return new patOrderBreakdown(parent);
 }
-

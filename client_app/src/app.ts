@@ -15,6 +15,7 @@ import * as distributionDiagram from './distributionDiagram';
 import * as patOrderBreakdown from './patOrderBreakdown';
 import * as parallel from './parallel';
 import * as dataObject from './dataObject';
+import * as cptBreak from './cptBreakdown';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -29,7 +30,10 @@ export class App {
   private $node;
 
   constructor(parent: Element) {
+  
     this.$node = select(parent);
+
+    
   }
 
   /**
@@ -47,13 +51,10 @@ export class App {
    */
   private async build() {
 
-    //const pl = printLogs.create('Demo');
-    //await pl.runLogs();
-    //await pl.runDemo();
-    //await pl.showInfo();
-
     // loading header
     this.$node.select('h3').remove();
+
+    const data = dataObject.create();//dataobject with all the info
     
     // create side bar
     const sideBarDiv = this.$node.append('div').classed('sideBar', true);
@@ -65,20 +66,17 @@ export class App {
     //  React.createElement(SideBarComponent),
    //   document.getElementById('sideBar')
   //  );
+
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
-    const data = dataObject.create();
 
     //parallel coord plot 
     parallel.create(main.node(), data);
 
      // distributionDiagram
     distributionDiagram.create(main.node());
-
-   
     // query box
     queryBox.create(main.node());
-
      //rect
      rectExploration.create(main.node());
      this.$node.select('.rectDiv').classed('hidden', true);
@@ -86,6 +84,19 @@ export class App {
       //order hierarchy
     patOrderBreakdown.create(main.node());
     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
+
+      // PROMIS diagrams
+    const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
+    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+     //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
+     //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
+
+    const cpt = main.append('Div').classed('cptDiv', true);
+     cptBreak.create(cpt.node());
+
+    this.setBusy(false);
+
+    events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
 
      // item: pat_id, DATA
         events.on('update_all_info', (evt, item) => {  // called in query box
@@ -96,13 +107,13 @@ export class App {
             this.$node.select('.main').select('.rectDiv').classed('hidden', false);
             this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', true);
 
-            console.log('added similarity score diagram');
+         //   console.log('added similarity score diagram');
 
         });
 
         events.on('show_orders', () => {
 
-            console.log('works!');
+           // console.log('works!');
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
             this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
             this.$node.select('.main').select('.rectDiv').classed('hidden', false);
@@ -112,26 +123,13 @@ export class App {
           // item: pat_id, DATA
         events.on('update_hierarchy', () => {  // called in query box
 
-              //order hierarchy
-           // this.$node.remove(patOrderBreakdown);
-           // patOrderBreakdown.create(main.node());
             this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', false);
             this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
             this.$node.select('.main').select('.rectDiv').classed('hidden', true);
-            console.log('remove pat hierarchy');
+           // console.log('remove pat hierarchy');
 
         });
-
-
-    // PROMIS diagrams
-   const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
-   similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
-   //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
-   //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
-
-    this.setBusy(false);
-
-    events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
+      
    
   }
 

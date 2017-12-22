@@ -144,33 +144,6 @@ export class similarityScoreDiagram {
 
     }
 
-//uses Phovea to access PRO data and draw table
-    private async getPromisScore(data) {
-       
-       let ids = [];
-
-        data.forEach(element => {
-           ids.push(element.ID);
-       });
-
-     let filteredPatScore = {};
-    console.log(this.patProObjects);
-     this.patProObjects.forEach(item => {
-     if (ids.indexOf(item.PAT_ID) !== -1) {
-      if (filteredPatScore[item.PAT_ID] === undefined) {
-        filteredPatScore[item.PAT_ID] = [];
-      }
-      filteredPatScore[item.PAT_ID].push(item);
-    }
-  });
-     let mapped = entries(filteredPatScore);
-  
-     this.similarPatientsProInfo = mapped;
-
-     this.clearDiagram();
-     this.drawDiagram();
-
-    };
 
     /**
      * Attach listeners
@@ -178,7 +151,7 @@ export class similarityScoreDiagram {
     private attachListener() {
 
         events.on('PROMIS_Scores', (evt, item)=> {
-            console.log(item);
+           // console.log(item);
             this.patProObjects = item[0];
             
         });
@@ -207,27 +180,27 @@ export class similarityScoreDiagram {
                 .call(this.brush)
                 .call(this.brush.move, this.scoreScale.range());
 
-          //  console.log("what is happening  "+item);
-           this.targetPatientProInfo = item[1]['PROMIS_Scores'][item[0]];
-           // this.targetPatientProInfo = item[1]['PRO'][item[0]];
+            this.targetPatientProInfo = item[1]['PROMIS_Scores'][item[0]];
             this.similarPatientsProInfo = [];
 
             this.clearDiagram();
             this.drawDiagram();
             this.addOrderSquares(item[1]['Orders'][item[0]]);
 
-            //this splits the order hierarchy into 2 arrays of medicaiton and procedures for the patient but it is
+            //this splits the order hierarchy into 2 arrays of medicaiton and 
+            //procedures for the patient but it is
             //not recognized in the drawpatientrects();
             this.filteredOrders.medGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).medicationGroup;
             this.filteredOrders.proGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).procedureGroup;
            
         });
 
-        events.on('dataUpdated', (evt, item) => {  // called in parrallel on brush and 
+        events.on('gotPromisScore', (evt, item) => {  // called in parrallel on brush and 
             
-                this.getPromisScore(item[0]);   
-                //this.getOrders(item[0]);
-                       
+                this.similarPatientsProInfo = item;  
+                this.clearDiagram();
+                this.drawDiagram();
+
                     });
 
     }
