@@ -107,22 +107,23 @@ export class patOrderBreakdown {
   private attachListener() {
     //called in similarityScoreDiagram
     events.on('orders_updated', (evt, item) => {
-        console.log('works!!!');
-        console.log(item);
-        console.log(this.targetPatientProInfo);
+       // console.log('works!!!');
+      //  console.log(item);
+       // console.log(this.targetPatientProInfo);
 
 
         this.addSimilarOrderPoints(item[0], item[1], item[2]);
     });
 
     events.on('Orders', (evt, item) => {
-        console.log(item);
+       // console.log(item);
         
        // this.addSimilarOrderPoints(this.targetPatientProInfo, item[0], this.targetPatientProInfo, item[0]);
     })
 
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
+
        this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
        this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
 
@@ -139,6 +140,7 @@ export class patOrderBreakdown {
 
     // item: pat_id, DATA
     events.on('update_all_info', (evt, item) => {  // called in query box
+
       this.targetPatientProInfo = item[1]['PROMIS_Scores'][item[0]];
       this.similarPatientsProInfo = [];
 
@@ -167,7 +169,7 @@ export class patOrderBreakdown {
               //similar patient PROMIS score records
                // console.log(simPro); 
                //similar patient order records
-                console.log(patordersInfo);
+               // console.log(patordersInfo);
         
                 let minDate = this.findMinDate(patordersInfo);
         
