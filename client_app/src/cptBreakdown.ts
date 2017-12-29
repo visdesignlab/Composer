@@ -84,7 +84,6 @@ this.timeScale = scaleLinear()
 //  .attr('id', 'sim_rect_line')
 //   .attr('transform', `translate(${this.margin.left},${this.margin.top})`);   
 this.patOrderGroup = this.svg.select('#similar_cpt')
-.append('g')
 .attr('transform', () => {
     return `translate(${this.margin.left},0)`; // If there is a label for the x-axis change 0
 });
@@ -222,7 +221,7 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
 
                       try {
                           d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                          console.log(d.diff);
+                         // console.log(d.diff);
                         }
                       catch (TypeError) {
                           console.log('error');
@@ -267,8 +266,10 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
                       filteredOrders.push(filter);
                            
                 });
-                console.log(filteredOrders);
-                console.log(similarOrdersInfo);
+              //  console.log(filteredOrders);
+              //  console.log(similarOrdersInfo);
+
+              events.fire('cpt_filtered', filteredOrders);
             
               let patGroups = this.patOrderGroup
                   .selectAll('.patgroups')
@@ -287,21 +288,27 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
                  similarOrderGroupEnter
                   .attr('transform', (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
                 
-               let rects =  similarOrderGroupEnter.append('g')
-                  .classed('similarRectCPT', true)
-                  .attr('transform', `translate(60,0)`)
-                  .selectAll('rect')
-                  .data((d, i)=> d)
-                //  .data(d=> d.value)
+                  let patGroupRecs = similarOrderGroupEnter.append('g')
+                  .attr('transform', 'translate(60, 0)');
+
+               let rectGroup =  patGroupRecs
+                  .selectAll('.similarRectCPT')
+                  .data(d => d)     
                   .enter()
-                  .append('rect')
-                  //.attr('class', (d) => `${d['ORDER_CATALOG_TYPE']}`)
-                  .attr('class', this.getClassAssignment('time'))
-                 // .attr('class', this.getClassAssignment('CPT_2'))
-                  .attr('x', (g) => this.timeScale(g.diff))
-                  .attr('y', 0)
-                  .attr('width', this.similarBar.width)
-                  .attr('height', this.similarBar.height)
+                  .append('g')
+                  .classed('similarRectCPT', true)
+                 // .attr('transform', translate)
+                  .attr('transform', (d) => `translate(`+ this.timeScale(d.diff) +`,0)`);
+
+                
+                let rects = rectGroup.selectAll('rect')
+                    .data(d => d.value[0])
+                    .enter()
+                    .append('rect')
+                    .attr('class', d => d)
+                    .attr('y', 0)
+                    .attr('width', this.similarBar.width)
+                    .attr('height', this.similarBar.height)
                  
                  .on("mouseover", (d) => {
                       let t = transition('t').duration(500);
@@ -319,6 +326,68 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
                       select(".tooltip").transition(t)
                           .style("opacity", 0);
                   });
+               
+
+                  let rectFilter = selectAll('.similarRectCPT').selectAll('rect');
+                 // console.log(rectFilter);
+                 // rectFilter.each(d => console.log(d));
+                  rects.each((d)=> {
+                      if(d > 99201 && d < 99499){
+                        console.log('eval: ' + d); 
+                       // d.classed('test', true);
+                        //evaluation.push(d.parent);
+                       
+                      }/*
+                      if((d > 100 && d < 1999) || (d > 99100 && d < 99140)){
+                        console.log('anesthesia:    ' + d);
+                        anesthesia.push(d.parent);
+                    }
+                      if(d > 10021 && d < 69990){
+                          console.log('surgery: ' + d);
+                          surgery.push(d.parent);
+                    }
+                      if(d > 70010 && d < 79999){
+                          console.log('radiology:   ' + d);
+                          radiology.push(d.parent);
+                    }*/
+                     // if (d == )
+                  });
+             
+                 // let surgery = rects.selectAll('.99100');
+               //   let surgery = selectAll('.similarRectCPT').selectAll('rect').filter( d=> d == 99100);
+                 // let evaluation = [];
+                  let evaluationFilter = rects.filter(function(d) {
+                    return d > 99201 && d < 99499;
+                   });
+
+                   let anesthesia = rects.filter(function(d) {
+                    (d > 100 && d < 1999) || (d > 99100 && d < 99140)
+                   }); // 00100 – 01999; 99100 – 99140.
+                  
+                   let surgery = rects.filter(function(d) {
+                    return d > 10021 && d < 69990
+                   });   // 10021 – 69990.
+
+                   let radiology = rects.filter(function(d) {
+                    return d > 70010 && d < 79999;
+                   }); // 70010 – 79999.
+
+                   let evalRects = evaluationFilter.nodes();
+                   evalRects.forEach(rect => rect.classList.add('evaluation'));
+                  // console.log(evalRects);
+
+                   let surgeryRects = surgery.nodes();
+                   surgeryRects.forEach(rect => rect.classList.add('surgery'));
+                  // console.log(surgeryRects);
+                
+                   
+                   let anesthesiaRects = anesthesia.nodes();
+                   anesthesiaRects.forEach(rect => rect.classList.add('anesthesia'));
+                  // console.log(evalRects);
+
+                   let radiologyRects = radiology.nodes();
+                   radiologyRects.forEach(rect => rect.classList.add('radiology'));
+                   //console.log(surgeryRects);
 
                   patGroups = similarOrderGroupEnter.merge(patGroups);
                   
@@ -335,10 +404,8 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
           //tooltip
   private renderOrdersTooltip(tooltip_data) {
         let text
-        text = tooltip_data['time'];
-        tooltip_data.value.forEach((d, i) => {
-            console.log(d[i]);
-        });
+        text = tooltip_data;
+        
         /*
     if(tooltip_data['CPT_1'] !== 0){text = "<strong style='color:darkslateblue'>" + tooltip_data['CPT_1'] + "</strong></br>";}
         if(tooltip_data['CPT_2'] !== 0){text += "<span>" + tooltip_data['CPT_2'] + "</span></br>"; }

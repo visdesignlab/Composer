@@ -56,6 +56,10 @@ export class rectExploration {
   private drawPatOrderRects = dataCalc.drawPatOrderRects;
   private orderType = dataCalc.orderType;
 
+  private filteredCPT;
+
+  private queryBool;
+
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
   margin = {top: 20, right: 10, bottom: 10, left: 10};
@@ -169,6 +173,19 @@ export class rectExploration {
       this.orderType('MEDICATION');
     });
 
+    events.on('show_cpt', (evt)=> {
+      this.queryBool = 'cpt';
+    });
+
+    events.on('show_orders', (evt)=> {
+      this.queryBool = 'order';
+    });
+
+    events.on('cpt_filtered', (evt, item)=>{
+      console.log(item);
+      this.filteredCPT = item;
+    })
+
 
   }
 
@@ -185,22 +202,44 @@ export class rectExploration {
     
       console.log(value);
 
-      let dataset = 'selected';
-      let targetOrder = value;
-      const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
-      this.setBusy(true);
-      this.getData(url).then((args) => {
-
-        events.fire('find_orders', [args]);
-        this.setBusy(false);
-        console.log(args);
-      
-        events.fire('query_order', value);
-        this.drawPatOrderRects(this.targetPatientOrders);
-       // this.loadDataFromServer();
+      if (this.queryBool == "order"){
+        console.log('order');
+        console.log(value);
+        let dataset = 'selected';
+        let targetOrder = value;
+        const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
+        this.setBusy(true);
+        this.getData(url).then((args) => {
+  
+          events.fire('find_orders', [args]);
+          this.setBusy(false);
+          console.log(args);
         
-      });
+          events.fire('query_order', value);
+          this.drawPatOrderRects(this.targetPatientOrders);
+         // this.loadDataFromServer();
+          
+        });
+
+      }
+
+      if (this.queryBool == "cpt"){
+
+          console.log('order');
+          let dataset = 'selected';
+          let targetOrder = value;
+          
+         console.log(this.filteredCPT);
+
+         let rects = selectAll('.similarRectCPT').selectAll('rect');
+   
+         console.log(rects);
+             
+          events.fire('query_order', value);
+          
+    
   }
+}
  
   
   private drawMiniRects() {
