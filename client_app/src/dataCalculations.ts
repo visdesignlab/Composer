@@ -278,7 +278,6 @@ export class dataCalc {
        this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale))
 
-
   }
 
   export function getClassAssignment (attString) {
@@ -289,4 +288,6 @@ export class dataCalc {
           element.classed (d[attString], true);
           return element.attr('class');
         }
+
+        
   }
