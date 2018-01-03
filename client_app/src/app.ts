@@ -87,7 +87,7 @@ export class App {
 
     const cpt = main.append('Div').classed('cptDiv', true);
     cptBreak.create(cpt.node());
-    this.$node.select('cptDiv').classed('hidden', true);
+    this.$node.select('.cptDiv').classed('hidden', true);
 
       // PROMIS diagrams
     const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
