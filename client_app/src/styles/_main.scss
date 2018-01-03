@@ -130,3 +130,29 @@
     fill: cadetblue;
     opacity: .5;
 }
+
+.physical_therapy {
+    fill: yellow;
+    opacity: .5;
+}
+
+.injection {
+    fill: green;
+    opacity: .5;
+}
+
+.medicine {
+    fill: brown;
+    opacity: .5;
+}
+
+.unselectedOrder {
+    opacity: 0.2;
+    fill: grey;
+    //!important;
+}
+
+.selectedOrder {
+    opacity: 0.8;
+    fill: red;
+}
