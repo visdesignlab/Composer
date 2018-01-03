@@ -126,7 +126,7 @@ export class rectExploration {
           .attr('transform', () => `translate(0,${this.contextDimension.height- 30})`)
           .call(axisBottom(this.timeScaleMini));
         }
-        this.drawPatOrderRects(this.targetPatientOrders);
+        this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
         this.drawMiniRects();
       });
     
@@ -155,11 +155,31 @@ export class rectExploration {
 
       this.setOrderScale();
       this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
-      this.drawPatOrderRects(this.targetPatientOrders);
+      this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
       this.drawMiniRects();
-
-
     });
+
+    events.on('gotTargetPromisScore', (evt, item) => {
+
+          this.targetPatientProInfo = item;
+          this.setOrderScale();
+    });
+
+    events.on('target_orders_updated', (evt, item) => { // called in queryBox
+      
+            this.targetPatientProInfo = item[0];
+             //this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+            this.targetPatientOrders = item[1];
+
+            this.setOrderScale();
+            selectAll('.orderRectMini').remove();
+            
+            this.drawPatOrderRects(item[1], item[0]);
+            this.drawMiniRects();
+          });
+      
+
+
 
     // item: pat_id, DATA
     events.on('update_all_info', (evt, item) => {  // called in query box
@@ -168,7 +188,7 @@ export class rectExploration {
 
       this.setOrderScale();
  
-      this.drawPatOrderRects(this.targetPatientOrders);
+      this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
       this.drawMiniRects();
       this.orderType('MEDICATION');
     });
@@ -216,7 +236,7 @@ export class rectExploration {
           console.log(args);
         
           events.fire('query_order', value);
-          this.drawPatOrderRects(this.targetPatientOrders);
+          this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
          // this.loadDataFromServer();
           
         });
@@ -249,7 +269,6 @@ export class rectExploration {
 
   }
 }
- 
   
   private drawMiniRects() {
 
@@ -416,31 +435,11 @@ private updateRectPro() {
 
 private assignCurrentName (d) {
           
-          //this.svg.selectAll('rects').classed('selectedOrder', false);
-          //this.svg.selectAll('rects').classed('unselectedOrder', false);
-
-        
-          /*
-          if (this.currentlySelectedName === undefined) {
-            this.currentlySelectedName = d.PRIMARY_MNEMONIC;
-           console.log(this.currentlySelectedName);
-           this.orderLabel = this.currentlySelectedName;//adds the order name to the label
-        
-           this.findOrders();
-           
-          } else {
-            this.currentlySelectedName = undefined;
-            this.orderLabel = "Select An Order";
-            this.selectedTargetPatOrderCount = "  ";
-             this.selectedSimilarOrderCount = "   ";
-             d3.selectAll('.orderLabel').remove();
-            //this.drawOrderLabel();
-          }*/
           if (this.currentlySelectedName != undefined){
             this.currentlySelectedName = undefined;
           }
 
-          this.drawPatOrderRects(this.targetPatientOrders);
+          this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
           /*
           this.selectedTargetPatOrderCount = this.svg.selectAll('.selectedOrder').size();
            this.selectedSimilarOrderCount = d3.selectAll('#similar_orders').selectAll('.selectedOrder').size()/3;

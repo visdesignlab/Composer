@@ -84,6 +84,11 @@ export class QueryBox {
 
         form.append('input')
             .attr('type', 'button')
+            .attr('value', 'Update Target Patient')
+            .on('click', () => events.fire('update_target'));
+
+        form.append('input')
+            .attr('type', 'button')
             .attr('value', 'All Info')
             .on('click', () => this.updateAllInfo());
 
@@ -101,6 +106,11 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'CPT Codes')
             .on('click', () => events.fire('show_cpt'));
+
+        form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'PROMIS Scores')
+            .on('click', () => events.fire('show_PROMIS'));
 /*
         form.append('label')
             .attr('for', 'text_num_similar')
@@ -131,9 +141,9 @@ export class QueryBox {
 
                 this.setBusy(false);
                 this.similarArgs = args;
-
+               // console.log(args);
                 events.fire('update_similar', [item[1], item[2], args]); // caught by svgTable and scoreDiagram and statHistogram
-                console.log('testing  ' + item);
+               // console.log('testing  ' + item);
             });
         });
 
@@ -168,8 +178,8 @@ export class QueryBox {
                 this.setBusy(false);
                 this.similarArgs = args;
                // console.log(this.similarArgs.ids);
-                console.log('value  '+ value);
-                console.log('args  '+ args);
+              //  console.log('value  '+ value);
+               // console.log('args  '+ args);
                
 
                 // caught by svgTable and scoreDiagram and statHistogram

@@ -151,7 +151,7 @@ export class similarityScoreDiagram {
     private attachListener() {
 
         events.on('PROMIS_Scores', (evt, item)=> {
-           // console.log(item);
+          
             this.patProObjects = item[0];
             
         });
@@ -203,6 +203,14 @@ export class similarityScoreDiagram {
 
                     });
 
+         events.on('gotTargetPromisScore', (evt, item)=> {
+            
+                this.targetPatientProInfo = item;
+                this.clearDiagram();
+                this.drawDiagram();
+                        
+        });
+
         events.on('filtered_CPT', (evt, item)=> {
             this.addSimilarOrderPoints(this.targetOrderInfo, item);
         });
@@ -216,7 +224,7 @@ export class similarityScoreDiagram {
     private drawDiagram() {
         
         // ----- add diff days to the data
-
+   
         let maxDiff = 0;
 
         let minPatDate = this.findMinDate(this.targetPatientProInfo);
@@ -410,7 +418,7 @@ export class similarityScoreDiagram {
                         .attr('y2', self.scoreScale(0) + self.margin.y)
                         .on('click', () => console.log(d));
 
-                    console.log(d);
+                
                 }
                 else {
                     select(this).classed('selectedOrder', false);
@@ -496,7 +504,7 @@ export class similarityScoreDiagram {
                         .attr('y2', self.scoreScale(0) + self.margin.y)
                         .on('click', () => console.log(d));
 
-                    console.log(d);
+                   
                 }
                 else {
                     select(this).classed('selectedOrder', false);

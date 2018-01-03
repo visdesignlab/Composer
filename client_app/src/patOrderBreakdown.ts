@@ -111,7 +111,6 @@ export class patOrderBreakdown {
       //  console.log(item);
        // console.log(this.targetPatientProInfo);
 
-
         this.addSimilarOrderPoints(item[0], item[1], item[2]);
     });
 
@@ -132,8 +131,10 @@ export class patOrderBreakdown {
       
       let filteredorders = this.orderHierarchy(this.targetPatientOrders);
 
-      this.drawPatOrderRects(this.targetPatientOrders);
-      this.drawPatOrderRects(filteredorders.medicationGroup);
+     // this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
+     // this.drawPatOrderRects(filteredorders.medicationGroup, this.targetPatientProInfo);
+
+     // this.addSimilarOrderPoints(item[0], item[1], item[2]);
      
     
     });
@@ -146,6 +147,12 @@ export class patOrderBreakdown {
 
       this.setOrderScale();
  
+    });
+
+    events.on('gotTargetPromisScore', (evt, item)=> {
+
+        this.targetPatientProInfo = item;
+
     });
 
 
