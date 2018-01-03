@@ -233,17 +233,20 @@ export class rectExploration {
 
          let rects = selectAll('.similarRectCPT').selectAll('rect');
    
-         console.log(rects);
+        // console.log(rects);
              
-          events.fire('query_order', value);
+         events.fire('query_order', value);
+        let selectedRects = rects.nodes();
+        let selected =  <any>( <any>selectedRects );
+        selected.forEach(node=> {
+        node.classList.remove('selectedOrder', 'unselectedOrder');
+          if(node.classList.contains(value)){
+           // if(node.classList.contains('unselectedOrder'))
+            node.classList.add('selectedOrder');
+          }else{node.classList.add('unselectedOrder');}
+        });
+        
 
-         //let selected = rects.nodes().forEach(rect=> console.log(select(rect));
-
-         rects
-          .classed('selectedOrder', d =>  d.toString() == value)
-          .classed('unselectedOrder', d => value !== undefined && d !== value);
-          
-    
   }
 }
  
