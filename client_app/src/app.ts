@@ -132,6 +132,13 @@ export class App {
                       this.$node.select('.main').select('.rectDiv').classed('hidden', false);
           
                   });
+
+        events.on('show_PROMIS', ()=> {
+          this.$node.select('.main').select('.allDiagramDiv').classed('hidden', false);
+          this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+          this.$node.select('.main').select('.cptDiv').classed('hidden', true);
+          this.$node.select('.main').select('.rectDiv').classed('hidden', true);
+        });
         
           // item: pat_id, DATA
         events.on('update_hierarchy', () => {  // called in query box

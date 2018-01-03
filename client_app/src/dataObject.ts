@@ -39,6 +39,7 @@ export class dataObject implements Subject {
     similarPatientsProInfo; //used in order squares
     similarOrderInfo;
 
+    targetProObjects;
     patProObjects;
     patOrderObjects;
     patDemoObjects;
@@ -93,18 +94,27 @@ export class dataObject implements Subject {
 
         events.on('dataUpdated', (evt, item) => {
             this.selectedPatientId(item[0]);
+            //console.log('dataUpdated ' + item);
            // this.getPromisScore(this.selectedPatIds); 
            // this.getOrders(this.selectedPatIds);
          });
 
         events.on('update_similar', (evt, item) => { 
             this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
-        
+       
+           // console.log('update_similar '+this.targetPatientProInfo);
+         });
+
+         events.on('update_target', () => { //this is picked up from target patient search in query box
+            const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
+            this.getTargetPromisScore(value);
+            this.getTargetOrders(value);
+
          });
 
     }
 
-    //uses Phovea to access PROMIS data and draw table
+    //uses Phovea to access PROMIS data and draw table for cohort
     private async getPromisScore(selectedPatIds) {
         /*
         let ids = [];
@@ -129,6 +139,22 @@ export class dataObject implements Subject {
  
      };
 
+      //uses Phovea to access PROMIS data and draw table for cohort
+    private async getTargetPromisScore(targetPatId) {
+ 
+        let filteredPatScore = [];
+       // console.log(this.patProObjects + 'found in promis score');
+        this.patProObjects.forEach(item => {
+        if (targetPatId.indexOf(item.PAT_ID) !== -1) {
+        filteredPatScore.push(item);
+     }
+   }); 
+       
+       this.targetPatientProInfo = filteredPatScore;
+       events.fire('gotTargetPromisScore', this.targetPatientProInfo);
+ 
+     };
+
      public selectedPatientId(data){//this adds all of the filtered patients to an array
 
         let ids = [];
@@ -137,7 +163,7 @@ export class dataObject implements Subject {
                    ids.push(element.ID);
                });
 
-        console.log("selected group ids     "+ids);
+       // console.log("selected group ids     "+ids);
         this.selectedPatIds = ids;
 
         events.fire('selected_pat_array', this.selectedPatIds);
@@ -147,7 +173,7 @@ export class dataObject implements Subject {
 
      }
  
-     //uses Phovea to access PRO data and draw table
+     //uses Phovea to access PRO data and draw table for similar cohort
      private async getOrders(selectedPatIds) {
         /*
         let ids = [];
@@ -173,6 +199,24 @@ export class dataObject implements Subject {
 
  //events.fire('orders_updated',[this.patOrderObjects, this.targetPatientProInfo, this.similarPatientProInfo]);
         events.fire('orders_updated',[this.targetPatientProInfo, this.similarOrderInfo, this.similarPatientsProInfo]);
+ 
+     };
+
+       //uses Phovea to access PRO data and draw table for target patient
+    private async getTargetOrders(targetPatId) {
+   
+
+        let filteredPatOrders = [];
+        // console.log(this.patProObjects + 'found in promis score');
+         this.patProObjects.forEach(item => {
+         if (targetPatId.indexOf(item.PAT_ID) !== -1) {
+        
+         filteredPatOrders.push(item);
+      }
+    }); 
+
+ //events.fire('orders_updated',[this.patOrderObjects, this.targetPatientProInfo, this.similarPatientProInfo]);
+        events.fire('target_orders_updated',[this.targetPatientProInfo, filteredPatOrders, this.similarPatientsProInfo]);
  
      };
 

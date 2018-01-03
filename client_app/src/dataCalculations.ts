@@ -28,7 +28,7 @@ export class dataCalc {
      private getTargetPatient () {
      // item: pat_id, number of similar patients, DATA
 
-    events.on('update_similar', (evt, item) => { // called in queryBox
+       events.on('update_similar', (evt, item) => { // called in queryBox
 
       // this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
      //  this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
@@ -39,8 +39,6 @@ export class dataCalc {
     // item: pat_id, DATA
     events.on('update_all_info', (evt, item) => {  // called in query box
     
-     //  this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
-      // this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
        this.filteredOrders = item[1]['Orders'][item[0]];
     
   });
@@ -73,7 +71,7 @@ export class dataCalc {
      */
     export function orderHierarchy(ordersInfo) {
 
-      //  let minDate = this.findMinDate(this.targetPatientProInfo);
+    
       let filteredOrders = {
              procedureGroup : [],
              medicationGroup : [],
@@ -94,16 +92,7 @@ export class dataCalc {
        // console.log("number of procedures" + filteredOrders.procedureGroup.length);
        // console.log("number of medications" + filteredOrders.medicationGroup.length);
         return filteredOrders;
-        /*
-         this.svg.select('#pat_orders')
-         .append('text')
-         .text('Procedure Orders for patient:   ' + procedureGroup.length)
-         .attr('transform', 'translate(450, 100)');
-          this.svg.select('#pat_orders')
-         .append('text')
-         .text('Procedure Orders for patient:   ' + medicationGroup.length)
-         .attr('transform', 'translate(450, 120)');
-        */
+
     }
 
 
@@ -130,17 +119,17 @@ export class dataCalc {
 //get med and pro groups for target patient
         export function orderType(type) {
           
-       const value = type;
+         let value = type;
     
-      console.log(value);
+      //console.log(value);
 
-      let dataset = 'selected';
+        let dataset = 'selected';
    
-      let targetOrder = value;
-      const url = `/data_api/filteredOrderType/${dataset}/${targetOrder}`;
-     // const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
-      this.setBusy(true);
-      this.getData(url).then((args) => {
+        let targetOrder = value;
+        const url = `/data_api/filteredOrderType/${dataset}/${targetOrder}`;
+        // const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
+         this.setBusy(true);
+         this.getData(url).then((args) => {
 
         events.fire('find_order_type', [args]);
         this.setBusy(false);
@@ -160,7 +149,7 @@ export class dataCalc {
   export function setOrderScale() {
     // find the max difference between the first patient visit and the last visit. This determines the domain scale of the graph.
     // ----- add diff days to the data
-
+    console.log("set scale: "+this.targetPatientProInfo);
     let maxDiff = 0;
 
     let minPatDate = this.findMinDate(this.targetPatientProInfo);
@@ -181,8 +170,6 @@ export class dataCalc {
          this.timeScaleMini.domain([-1,maxDiff]);
     }
    
-    
-
     events.on('brushed', (newMin, newMax) => {  // from brushed in rect exploration
     
    //------- set domain after brush event
@@ -206,11 +193,13 @@ export class dataCalc {
    * @param ordersInfo
    */
 
-  export function drawPatOrderRects(ordersInfo) {
+  export function drawPatOrderRects(ordersInfo, proInfo) {
 
-     ordersInfo = this.targetPatientOrders;
+     this.targetPatientOrders = ordersInfo;
+     console.log(this.targetPatientOrders);
+    // ordersInfo = this.targetPatientOrders;
      // let ordersInfo = this.targetPatientProInfo; why is this not determining the date??
-      let minDate = this.findMinDate(this.targetPatientProInfo);
+      let minDate = this.findMinDate(ordersInfo);
   
          ordersInfo.forEach((d) => {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
@@ -227,12 +216,13 @@ export class dataCalc {
 
 
       let orderRect = this.svg.select('#pat_rect_line')
-      // let orderRect = this.svg.append('g').attr('class', 'pat_rect_line ')
-    // .attr('transform', (d, i) => 'translate(0, ' + (i * 100) + ')')
-
+  
      
       .selectAll('.orderRect')
       .data([ordersInfo]);
+
+      orderRect.exit().remove();
+
       let orderRectEnter = orderRect.enter()
       .append('g')
       .classed('orderRect', true);
@@ -241,6 +231,9 @@ export class dataCalc {
 
       let rects = orderRect.selectAll('rect')
       .data((d) => d);
+
+      rects.exit().remove();
+
       let rectsEnter = rects.enter()
       .append('rect');
       rects = rectsEnter.merge(rects);
