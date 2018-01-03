@@ -236,6 +236,12 @@ export class rectExploration {
          console.log(rects);
              
           events.fire('query_order', value);
+
+         //let selected = rects.nodes().forEach(rect=> console.log(select(rect));
+
+         rects
+          .classed('selectedOrder', d =>  d.toString() == value)
+          .classed('unselectedOrder', d => value !== undefined && d !== value);
           
     
   }
