@@ -82,16 +82,6 @@ export class QueryBox {
             .attr('id', 'text_pat_id')
             .attr('value', '20559329');
 
-            form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Orders')
-            .on('click', () => events.fire('show_orders'));
-
-            form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'CPT Codes')
-            .on('click', () => events.fire('show_cpt'));
-
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'All Info')
@@ -102,6 +92,16 @@ export class QueryBox {
             .attr('value', 'similar')
             .on('click', () => this.updateSimilar());
 
+        form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Orders')
+            .on('click', () => events.fire('show_orders'));
+
+        form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'CPT Codes')
+            .on('click', () => events.fire('show_cpt'));
+/*
         form.append('label')
             .attr('for', 'text_num_similar')
             .text('Number of similar patients');
@@ -111,7 +111,7 @@ export class QueryBox {
             .attr('placeholder', 'Number of similar patients')
             .attr('id', 'text_num_similar')
             .attr('value', '10');
-
+*/
         this.attachListener();
     }
 
