@@ -42,7 +42,7 @@ export class cptBreakdown {
   private orderHierarchy = dataCalc.orderHierarchy;
   private patOrderGroup;
   targetPatientOrders;
-  targetPatientProInfo
+  targetProInfo
   similarPatientsProInfo;
 
 
@@ -113,12 +113,12 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
 
     events.on('filtered_CPT', (evt, item) => {
       
-      this.addSimilarOrderPoints(this.targetPatientProInfo, item);
+      this.addSimilarOrderPoints(this.targetProInfo, item);
     });
 
       // item: pat_id, number of similar patients, DATA
       events.on('update_similar', (evt, item) => { // called in queryBox
-        this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
+        this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
         this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
  
        this.setOrderScale();

@@ -86,7 +86,7 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'Update Target Patient')
             .on('click', () => events.fire('update_target'));
-
+/*
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'All Info')
@@ -96,7 +96,7 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'similar')
             .on('click', () => this.updateSimilar());
-
+*/
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'Orders')

@@ -11,22 +11,19 @@ import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom,axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
-import {Constants} from './constants';
+//import {Constants} from './constants';
 import * as dataCalc from './dataCalculations';
 import {transition} from 'd3-transition';
 import {brush, brushY, brushX} from 'd3-brush';
-import * as similarityScore  from './similarityScoreDiagram';
+//import * as similarityScore  from './similarityScoreDiagram';
 import * as d3 from 'd3';
 import {ITable, asTable} from 'phovea_core/src/table';
 import {IAnyVector} from 'phovea_core/src/vector';
-import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
-//import * as csvUrl from 'file-loader!../data/number_one_artists.csv';
-import {tsv} from 'd3-request';
-import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
-import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
-import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
-import {asVector} from 'phovea_core/src/vector/Vector';
-import {argFilter} from 'phovea_core/src/';
+//import {list as getFirstByName, get as getById} from 'phovea_core/src/data';
+
+//import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
+//import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
+//import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 
 export class patOrderBreakdown {
 
@@ -34,26 +31,21 @@ export class patOrderBreakdown {
   private timeScale;
   private scoreScale;
   private timeScaleMini;
-  private patientInfo;
-  private svg;
-  private targetPatientProInfo;
-  private brush;
-  private targetPatientOrders;
-  private currentlySelectedName;
-  private similarData;
-  private allData;
-  private selectedOrder;
-  private orderLabel;
-  private selectedTargetPatOrderCount;
-  private selectedSimilarOrderCount;
 
-  private similarPatientsProInfo;
+  private svg;
+  private targetProInfo;
+  private brush;
+  private targetOrders;
+  private currentlySelectedName;
+
+  private selectedOrder;
+  private cohortProInfo;
  
   private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
   private parseTime = dataCalc.parseTime;
   private setOrderScale = dataCalc.setOrderScale;
   private getClassAssignment = dataCalc.getClassAssignment;
-  private drawPatOrderRects = dataCalc.drawPatOrderRects;
+  
   private orderHierarchy = dataCalc.orderHierarchy;
 
   rectBoxDimension = {width: 1100, height: 90 };
@@ -63,9 +55,6 @@ export class patOrderBreakdown {
   contextDimension = {width: this.rectBoxDimension.width, height:55};
   patOrderGroup;
 
-  table: ITable;
-  table2: ITable;
-    
   constructor(parent: Element) {
 
     this.$node = select(parent)
@@ -85,11 +74,6 @@ export class patOrderBreakdown {
         .range([0, this.rectBoxDimension.width])
         .clamp(true);
 
-    //append patient order svg group
-      //append patient order svg group
- //  this.svg.append('g')
-    //  .attr('id', 'sim_rect_line')
-    //   .attr('transform', `translate(${this.margin.left},${this.margin.top})`);   
     this.patOrderGroup = this.svg.select('#similar_order')
     .append('g')
     .attr('transform', () => {
@@ -107,60 +91,42 @@ export class patOrderBreakdown {
   private attachListener() {
     //called in similarityScoreDiagram
     events.on('orders_updated', (evt, item) => {
-       // console.log('works!!!');
-      //  console.log(item);
-       // console.log(this.targetPatientProInfo);
 
         this.addSimilarOrderPoints(item[0], item[1], item[2]);
     });
 
     events.on('Orders', (evt, item) => {
-       // console.log(item);
-        
-       // this.addSimilarOrderPoints(this.targetPatientProInfo, item[0], this.targetPatientProInfo, item[0]);
+      
     })
 
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
 
-       this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
-       this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+       this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
+       this.cohortProInfo = entries(item[2]['similar_PRO']);
 
       this.setOrderScale();
-      this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
+      this.targetOrders = item[2]['pat_Orders'][item[0]].slice();
       
-      let filteredorders = this.orderHierarchy(this.targetPatientOrders);
-
-     // this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
-     // this.drawPatOrderRects(filteredorders.medicationGroup, this.targetPatientProInfo);
-
-     // this.addSimilarOrderPoints(item[0], item[1], item[2]);
+      let filteredorders = this.orderHierarchy(this.targetOrders);
      
     
     });
 
-    // item: pat_id, DATA
-    events.on('update_all_info', (evt, item) => {  // called in query box
-
-      this.targetPatientProInfo = item[1]['PROMIS_Scores'][item[0]];
-      this.similarPatientsProInfo = [];
-
-      this.setOrderScale();
- 
-    });
-
-    events.on('gotTargetPromisScore', (evt, item)=> {
-
-        this.targetPatientProInfo = item;
-
-    });
-
+  
+events.on('target_updated', (evt, item) => {
+    console.log(item);
+    this.targetOrders = item[0];
+    this.targetProInfo = item[1];
+    this.setOrderScale();
+   // this.drawPatOrderRects(item[0], item[1]);
+   // this.drawMiniRects();
+});
 
   }
 
   private assignCurrentName (d) {
           
-         
           if (this.currentlySelectedName != undefined){
             this.currentlySelectedName = undefined;
           }

@@ -17,15 +17,15 @@ import {transition} from 'd3-transition';
 import {brush, brushY, brushX} from 'd3-brush';
 import * as similarityScore  from './similarityScoreDiagram';
 import * as d3 from 'd3';
-import {ITable, asTable} from 'phovea_core/src/table';
-import {IAnyVector} from 'phovea_core/src/vector';
+//import {ITable, asTable} from 'phovea_core/src/table';
+//import {IAnyVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
 //import * as csvUrl from 'file-loader!../data/number_one_artists.csv';
 import {tsv} from 'd3-request';
-import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
-import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
-import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
-import {asVector} from 'phovea_core/src/vector/Vector';
+//import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
+//import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
+//import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
+//import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 
 
@@ -34,20 +34,22 @@ export class rectExploration {
   private $node;
   private timeScale;
   private timeScaleMini;
-  private patientInfo;
+ 
   private svg;
-  private targetPatientProInfo;
+
+  private targetProInfo;
+  private targetOrders;
+
   private brush;
-  private targetPatientOrders;
+ 
   private currentlySelectedName;
-  private similarData;
-  private allData;
+ 
   private selectedOrder;
   private orderLabel;
   private selectedTargetPatOrderCount;
   private selectedSimilarOrderCount;
 
-  private similarPatientsProInfo;
+  private cohortProInfo;
  
   private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
   private parseTime = dataCalc.parseTime;
@@ -65,9 +67,6 @@ export class rectExploration {
   margin = {top: 20, right: 10, bottom: 10, left: 10};
   contextDimension = {width: this.rectBoxDimension.width, height:55};
 
-  table: ITable;
-  table2: ITable;
-    
   constructor(parent: Element) {
 
     this.$node = select(parent)
@@ -126,7 +125,7 @@ export class rectExploration {
           .attr('transform', () => `translate(0,${this.contextDimension.height- 30})`)
           .call(axisBottom(this.timeScaleMini));
         }
-        this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
+        this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
         this.drawMiniRects();
       });
     
@@ -150,47 +149,28 @@ export class rectExploration {
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
 
-       this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
-       this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+       this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
+       this.cohortProInfo = entries(item[2]['similar_PRO']);
 
-      this.setOrderScale();
-      this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
-      this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
-      this.drawMiniRects();
+       this.setOrderScale();
+       this.targetOrders = item[2]['pat_Orders'][item[0]].slice();
+       this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
+       this.drawMiniRects();
     });
-
+/*
     events.on('gotTargetPromisScore', (evt, item) => {
 
-          this.targetPatientProInfo = item;
+          this.targetProInfo = item;
           this.setOrderScale();
-    });
+    });*/
 
-    events.on('target_orders_updated', (evt, item) => { // called in queryBox
-      
-            this.targetPatientProInfo = item[0];
-             //this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
-            this.targetPatientOrders = item[1];
-
-            this.setOrderScale();
-            selectAll('.orderRectMini').remove();
-            
-            this.drawPatOrderRects(item[1], item[0]);
-            this.drawMiniRects();
-          });
-      
-
-
-
-    // item: pat_id, DATA
-    events.on('update_all_info', (evt, item) => {  // called in query box
-      this.targetPatientProInfo = item[1]['PRO'][item[0]];
-      this.similarPatientsProInfo = [];
-
-      this.setOrderScale();
- 
-      this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
-      this.drawMiniRects();
-      this.orderType('MEDICATION');
+    events.on('target_updated', (evt, item) => {
+        console.log(item);
+        this.targetOrders = item[0];
+        this.targetProInfo = item[1];
+        this.setOrderScale();
+        this.drawPatOrderRects(item[0], item[1]);
+        this.drawMiniRects();
     });
 
     events.on('show_cpt', (evt)=> {
@@ -236,7 +216,7 @@ export class rectExploration {
           console.log(args);
         
           events.fire('query_order', value);
-          this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
+          this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
          // this.loadDataFromServer();
           
         });
@@ -272,9 +252,9 @@ export class rectExploration {
   
   private drawMiniRects() {
 
-      let ordersInfo2 = this.targetPatientOrders;
-      let minDate = this.findMinDate(this.targetPatientProInfo);
-   
+      let ordersInfo2 = this.targetOrders;
+      let minDate = this.findMinDate(this.targetProInfo);
+     // console.log('from draw mini  :'+ this.targetProInfo);
       ordersInfo2.forEach((d) => {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
         d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -439,7 +419,7 @@ private assignCurrentName (d) {
             this.currentlySelectedName = undefined;
           }
 
-          this.drawPatOrderRects(this.targetPatientOrders, this.targetPatientProInfo);
+          this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
           /*
           this.selectedTargetPatOrderCount = this.svg.selectAll('.selectedOrder').size();
            this.selectedSimilarOrderCount = d3.selectAll('#similar_orders').selectAll('.selectedOrder').size()/3;

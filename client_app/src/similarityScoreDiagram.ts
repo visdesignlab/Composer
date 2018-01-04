@@ -36,17 +36,15 @@ export class similarityScoreDiagram {
     private svg;
     private brush;
 
-    private targetPatientProInfo;
-    private similarPatientsProInfo;
+    private targetProInfo;
+    private cohortProInfo;
     private targetOrderInfo;
-    private similarOrderInfo;
+    private cohortOrderInfo;
     private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
     private parseTime = dataCalc.parseTime;
     private setOrderScale = dataCalc.setOrderScale;
     private getClassAssignment = dataCalc.getClassAssignment;
     private orderHierarchy = dataCalc.orderHierarchy;
-    patProObjects;
-    patOrderTable;
 
    filteredOrders = {
        medGroup : [],
@@ -150,26 +148,21 @@ export class similarityScoreDiagram {
      */
     private attachListener() {
 
-        events.on('PROMIS_Scores', (evt, item)=> {
-          
-            this.patProObjects = item[0];
-            
-        });
-
         // item: pat_id, number of similar patients, DATA
         events.on('update_similar', (evt, item) => { // called in queryBox
+
             this.svg.select('.slider')  // reset slider
                 .call(this.brush)
                 .call(this.brush.move, this.scoreScale.range());
 
-            this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
-            this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+            this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
+            this.cohortProInfo = entries(item[2]['similar_PRO']);
             this.targetOrderInfo = item[2]['pat_Orders'][item[0]].slice();
-            this.similarOrderInfo = entries(item[2]['similar_Orders']);
+            this.cohortOrderInfo = entries(item[2]['similar_Orders']);
             
             this.clearDiagram();
             this.drawDiagram();
-            this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']));
+           // this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']));
            
         });
 
@@ -180,12 +173,12 @@ export class similarityScoreDiagram {
                 .call(this.brush)
                 .call(this.brush.move, this.scoreScale.range());
 
-            this.targetPatientProInfo = item[1]['PROMIS_Scores'][item[0]];
-            this.similarPatientsProInfo = [];
+            this.targetProInfo = item[1]['PROMIS_Scores'][item[0]];
+            this.cohortProInfo = [];
 
             this.clearDiagram();
             this.drawDiagram();
-            this.addOrderSquares(item[1]['Orders'][item[0]]);
+           // this.addOrderSquares(item[1]['Orders'][item[0]]);
 
             //this splits the order hierarchy into 2 arrays of medicaiton and 
             //procedures for the patient but it is
@@ -195,9 +188,18 @@ export class similarityScoreDiagram {
            
         });
 
+        events.on('target_updated', (evt, item) => {
+      
+            this.targetProInfo = item[1];
+            this.setOrderScale();
+            this.clearDiagram();
+            this.drawDiagram();
+       
+        });
+
         events.on('gotPromisScore', (evt, item) => {  // called in parrallel on brush and 
-            
-                this.similarPatientsProInfo = item;  
+                console.log(item);
+                this.cohortProInfo = item;  
                 this.clearDiagram();
                 this.drawDiagram();
 
@@ -205,7 +207,7 @@ export class similarityScoreDiagram {
 
          events.on('gotTargetPromisScore', (evt, item)=> {
             
-                this.targetPatientProInfo = item;
+                this.targetProInfo = item;
                 this.clearDiagram();
                 this.drawDiagram();
                         
@@ -227,15 +229,15 @@ export class similarityScoreDiagram {
    
         let maxDiff = 0;
 
-        let minPatDate = this.findMinDate(this.targetPatientProInfo);
-        this.targetPatientProInfo.forEach((d) => {
+        let minPatDate = this.findMinDate(this.targetProInfo);
+        this.targetProInfo.forEach((d) => {
                 d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
                 maxDiff = d.diff > maxDiff ? d.diff : maxDiff
             });
-        this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
+        this.targetProInfo.sort((a, b) => ascending(a.diff, b.diff));
     
 
-        this.similarPatientsProInfo.forEach((g) => {
+        this.cohortProInfo.forEach((g) => {
            
         let minDate = this.findMinDate(g.value);
             g.value.forEach((d) => {
@@ -249,7 +251,7 @@ export class similarityScoreDiagram {
             })
         });
 
-        let similarData = this.similarPatientsProInfo.map((d) => {
+        let similarData = this.cohortProInfo.map((d) => {
             let res = d.value.filter((g) => {
                 return g['FORM'] == this.diagram
             });
@@ -257,7 +259,7 @@ export class similarityScoreDiagram {
             return res;
         });
 
-        const patData = this.targetPatientProInfo.filter((d) => {
+        const patData = this.targetProInfo.filter((d) => {
             return d['FORM'] == this.diagram
         });
 
@@ -356,7 +358,7 @@ export class similarityScoreDiagram {
     private addOrderSquares(ordersInfo) {
 
         //determine the min date from the target patient
-        let minDate = this.findMinDate(this.targetPatientProInfo);
+        let minDate = this.findMinDate(this.targetProInfo);
 
         ordersInfo.forEach((d) => {
             let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
@@ -457,7 +459,7 @@ export class similarityScoreDiagram {
     private addSimilarOrderPoints(ordersInfo, similarOrdersInfo) {
         // -------  target patient
 
-        let minDate = this.findMinDate(this.targetPatientProInfo);
+        let minDate = this.findMinDate(this.targetProInfo);
 
         ordersInfo.forEach((d) => {
             let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
@@ -533,7 +535,7 @@ export class similarityScoreDiagram {
 
         similarOrdersInfo.forEach((g) => {
 
-            let currPatient = this.similarPatientsProInfo.filter((d) => {
+            let currPatient = this.cohortProInfo.filter((d) => {
                 return d.key == g.key
             })[0];
 
