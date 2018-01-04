@@ -30,8 +30,6 @@ export class dataCalc {
 
        events.on('update_similar', (evt, item) => { // called in queryBox
 
-      // this.targetPatientProInfo = item[2]['pat_PRO'][item[0]].slice();
-     //  this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
        this.filteredOrders = item[1]['Orders'][item[0]];
 
     });
@@ -136,8 +134,7 @@ export class dataCalc {
         console.log(args);
       
         events.fire('query_order_type', value);
-        //this.drawPatOrderRects(this.targetPatientOrders);
-       // this.loadDataFromServer();
+
         
       });
   }
@@ -147,19 +144,22 @@ export class dataCalc {
    * @param args
    */
   export function setOrderScale() {
-    // find the max difference between the first patient visit and the last visit. This determines the domain scale of the graph.
+
+     // console.log(this.targetProInfo);
+    // find the max difference between the first patient visit and the last visit. 
+    //This determines the domain scale of the graph.
     // ----- add diff days to the data
-    console.log("set scale: "+this.targetPatientProInfo);
+
     let maxDiff = 0;
 
-    let minPatDate = this.findMinDate(this.targetPatientProInfo);
-    this.targetPatientProInfo.forEach((d) => {
+    let minPatDate = this.findMinDate(this.targetProInfo);
+    this.targetProInfo.forEach((d) => {
       d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
       maxDiff = d.diff > maxDiff ? d.diff : maxDiff
     });
-    this.targetPatientProInfo.sort((a, b) => ascending(a.diff, b.diff));
+    this.targetProInfo.sort((a, b) => ascending(a.diff, b.diff));
 
-    const patData = this.targetPatientProInfo.filter((d) => {
+    const patData = this.targetProInfo.filter((d) => {
       return d['FORM'] == this.svg//changed to svg because I dont have a diagram
     });
 
@@ -173,7 +173,7 @@ export class dataCalc {
     events.on('brushed', (newMin, newMax) => {  // from brushed in rect exploration
     
    //------- set domain after brush event
-    console.log(newMax[1]);
+   // console.log(newMax[1]);
     if (this.brush.move != null) {
       this.timeScale.domain([newMax[0], newMax[1]])
     }
@@ -185,6 +185,7 @@ export class dataCalc {
     
     this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale));
+     // console.log("set order scale:  "+maxDiff);
   }
 
 
@@ -193,13 +194,9 @@ export class dataCalc {
    * @param ordersInfo
    */
 
-  export function drawPatOrderRects(ordersInfo, proInfo) {
+  export function drawPatOrderRects(ordersInfo, targetProInfo) {
 
-     this.targetPatientOrders = ordersInfo;
-     console.log(this.targetPatientOrders);
-    // ordersInfo = this.targetPatientOrders;
-     // let ordersInfo = this.targetPatientProInfo; why is this not determining the date??
-      let minDate = this.findMinDate(ordersInfo);
+      let minDate = this.findMinDate(targetProInfo);
   
          ordersInfo.forEach((d) => {
         let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
