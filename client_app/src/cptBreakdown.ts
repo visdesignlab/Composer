@@ -154,6 +154,7 @@ constructor(parent: Element) {
 
     let filteredPatOrders = {};
    // const patOrders = await this.orderTable.objects();
+   console.log(cptObject);
    
      cptObject.forEach(item => {
          if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
@@ -176,6 +177,7 @@ constructor(parent: Element) {
     private addSimilarOrderPoints(patProInfo, similarOrdersInfo) {
 
      // console.log("patpro"+ patProInfo);
+     console.log("sim orders"+similarOrdersInfo);
       
               // -------  target patient
               let minDate = this.findMinDate(patProInfo);
@@ -236,28 +238,18 @@ constructor(parent: Element) {
                             diff : blob.diff
                             };
                         });
-/* attempted array of codes separate
-                        let filter = g.value.map(function(blob) {
-                            let temp = [];
-                            temp.push(blob.array);  
-                            return {
-                                key: blob.PAT_ID,
-                                values : temp,
-                                };
-                            });
-                        */
-                      //console.log(filter);
+
                       filteredOrders.push(filter);
                            
                 });
-              //  console.log(filteredOrders);
-              //  console.log(similarOrdersInfo);
+            
 
               events.fire('cpt_filtered', filteredOrders);
+              this.filteredCPT = filteredOrders;
             
               let patGroups = this.patOrderGroup
                   .selectAll('.patgroups')
-                  .data(filteredOrders);
+                  .data(this.filteredCPT);
                   //.data(similarOrdersInfo);
 
                   patGroups.exit().remove();
@@ -387,6 +379,7 @@ constructor(parent: Element) {
                 let biopsy = rects.filter((d)=> {
                     return d == 'G0364'; 
                 });
+
                 let biopsyRects = biopsy.nodes();
                 biopsyRects.forEach(rect => rect.classList.add('biopsy'));
 
@@ -529,14 +522,7 @@ constructor(parent: Element) {
         /*
     if(tooltip_data['CPT_1'] !== 0){text = "<strong style='color:darkslateblue'>" + tooltip_data['CPT_1'] + "</strong></br>";}
         if(tooltip_data['CPT_2'] !== 0){text += "<span>" + tooltip_data['CPT_2'] + "</span></br>"; }
-        if(tooltip_data['CPT_3'] !== 0){ text += "<span>" + tooltip_data['CPT_3'] + "</span></br>";}
-        if(tooltip_data['CPT_4'] !== 0){ text += "<span>" + tooltip_data['CPT_4'] + "</span></br>";}
-        if(tooltip_data['CPT_5'] !== 0){text += "<span>" + tooltip_data['CPT_5'] + "</span></br>";}
-        if(tooltip_data['CPT_6'] !== 0){ text = "<strong style='color:darkslateblue'>" + tooltip_data['CPT_6'] + "</strong></br>";}
-        if(tooltip_data['CPT_7'] !== 0){text += "<span>" + tooltip_data['CPT_7'] + "</span></br>";}
-        if(tooltip_data['CPT_8'] !== 0){ text += "<span>" + tooltip_data['CPT_8'] + "</span></br>";}
-        if(tooltip_data['CPT_9'] !== 0){text += "<span>" + tooltip_data['CPT_9'] + "</span></br>";}
-        if(tooltip_data['CPT_10'] !== 0){text += "<span>" + tooltip_data['CPT_10'] + "</span></br>";}*/
+      */
         return text;
       }
 

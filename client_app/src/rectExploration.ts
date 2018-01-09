@@ -27,6 +27,7 @@ import {tsv} from 'd3-request';
 //import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 //import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
+import { fillWithNone } from 'phovea_core/src/idtype/IIDType';
 
 
 export class rectExploration {
@@ -61,6 +62,7 @@ export class rectExploration {
   private filteredCPT;
 
   private queryBool;
+  queryDataArray;
 
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
@@ -159,7 +161,7 @@ export class rectExploration {
     });
 
     events.on('target_updated', (evt, item) => {
-        console.log(item);
+        
         this.targetOrders = item[0];
         this.targetProInfo = item[1];
         this.setOrderScale();
@@ -187,6 +189,8 @@ export class rectExploration {
      * firing event to update the vis for info of a patient
      */
     private queryOrder() {
+
+      let withQuery = [];
           
       if (this.currentlySelectedName != undefined ){
         this.currentlySelectedName = undefined;
@@ -194,7 +198,7 @@ export class rectExploration {
 
       const value = (<HTMLInputElement>document.getElementById('order_search')).value;
     
-      console.log(value);
+      //console.log(value);
 
       if (this.queryBool == "order"){
         console.log('order');
@@ -207,7 +211,7 @@ export class rectExploration {
   
           events.fire('find_orders', [args]);
           this.setBusy(false);
-          console.log(args);
+         // console.log(args);
         
           events.fire('query_order', value);
           this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
@@ -230,18 +234,44 @@ export class rectExploration {
         // console.log(rects);
              
          events.fire('query_order', value);
+
          let selectedRects = rects.nodes();
          let selected =  <any>( <any>selectedRects );
+         let parentElem;
          selected.forEach(node=> {
-         node.classList.remove('selectedOrder', 'unselectedOrder');
+          node.classList.remove('selectedOrder', 'unselectedOrder');
           if(node.classList.contains(value)){
-           // if(node.classList.contains('unselectedOrder'))
+         
             node.classList.add('selectedOrder');
-          }else{node.classList.add('unselectedOrder');}
-        });
-        
+            let parent = node.parentNode.parentNode.parentNode;
 
+          if(parentElem != parent){
+             withQuery.push(parent.__data__);
+             parentElem = parent;
+      
+          };
+
+          }else{node.classList.add('unselectedOrder');}
+          });
+
+       
   }
+
+  //console.log(withQuery);
+  let mapped = entries(withQuery);
+  console.log(mapped);
+  this.queryDataArray = mapped;
+
+  let form = this.$node.select('form')
+            .append('input')
+            .attr('type', 'button')
+            .attr('value', 'filter cohort by selected')
+            .on('click', () => {
+              events.fire('filtered_CPT', this.queryDataArray);
+              selectAll('.selectedOrder').classed('selectedOrder', false);
+              selectAll('.unselectedOrder').classed('unselectedOrder', false);
+            });
+
 }
   
   private drawMiniRects() {
@@ -283,6 +313,7 @@ export class rectExploration {
               .attr('width', '20')
               .attr('height', '20')
               .attr('class', 'med-swatch ORDERED');
+              
       this.svg.select('.colorLabels')
                 .append('rect')
               .attr('width', '20')
@@ -322,7 +353,7 @@ export class rectExploration {
               .attr('value', 'Pro')
                .attr('x', 175)
               .attr('id', 'pro-check')
-              .on('click', () => this.updateRectPro());
+              //.on('click', () => this.updateRectPro());
 
       this.$node.select('.checkbox-pro')
             .append('text')
@@ -336,7 +367,7 @@ export class rectExploration {
               .attr('checked', true)
               .attr('value', 'med')
               .attr('id', 'med-check')
-              .on('click', () => this.updateRectMed())
+              //.on('click', () => this.updateRectMed())
 
              this.$node.select('.checkbox-med')
             .append('text')
@@ -387,7 +418,7 @@ export class rectExploration {
   }
   
 
- 
+ /*
 private updateRectMed() {
       
       //var rect = this.$node.getElementsByClassName('.MEDICATION');
@@ -407,7 +438,7 @@ private updateRectPro() {
       else selectAll(".PROCEDURE").classed('hidden', false);
 }
 
-
+*/
 
 private assignCurrentName (d) {
           
@@ -416,8 +447,6 @@ private assignCurrentName (d) {
           }
 
           this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
-
-      
 
 }
 

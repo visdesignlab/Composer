@@ -129,17 +129,8 @@ export class QueryBox {
         form.append('label')
             .attr('id', 'pat_or_event')
             .text(this.startBool);
-/*
-        form.append('label')
-            .attr('for', 'text_num_similar')
-            .text('Number of similar patients');
 
-        form.append('input')
-            .attr('type', 'text')
-            .attr('placeholder', 'Number of similar patients')
-            .attr('id', 'text_num_similar')
-            .attr('value', '10');
-*/
+
         this.attachListener();
     }
 
