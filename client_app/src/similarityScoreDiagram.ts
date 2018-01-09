@@ -198,7 +198,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('gotPromisScore', (evt, item) => {  // called in parrallel on brush and 
-                console.log(item);
+                
                 this.cohortProInfo = item;  
                 this.clearDiagram();
                 this.drawDiagram();

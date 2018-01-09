@@ -89,7 +89,8 @@ export class patOrderBreakdown {
    */
   
   private attachListener() {
-    //called in similarityScoreDiagram
+
+    //called in dataObject after cohort filtered (filter specified in sidebar)
     events.on('orders_updated', (evt, item) => {
 
         this.addSimilarOrderPoints(item[0], item[1], item[2]);
@@ -115,7 +116,7 @@ export class patOrderBreakdown {
 
   
 events.on('target_updated', (evt, item) => {
-    console.log(item);
+    //console.log(item);
     this.targetOrders = item[0];
     this.targetProInfo = item[1];
     this.setOrderScale();
@@ -139,17 +140,13 @@ events.on('target_updated', (evt, item) => {
      */
     private addSimilarOrderPoints(patordersInfo, similarOrdersInfo, simPro) {
         
-              //similar patient PROMIS score records
-               // console.log(simPro); 
-               //similar patient order records
-               // console.log(patordersInfo);
-        
                 let minDate = this.findMinDate(patordersInfo);
         
                 patordersInfo.forEach((d) => {
                     let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
                     d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
                 });
+
         
                 const self = this;
 
@@ -157,19 +154,11 @@ events.on('target_updated', (evt, item) => {
         
                 similarOrdersInfo.forEach((g) => {
 
-                    //this used to filter 
-        
-                //   let currPatient = simPro.filter((d) => {
-                    //   return d.key == g.key
-                 //  })[0];
-
-                  // console.log(currPatient);
-    /*
-                    if(currentPatient.value != null){
-                        let minDate = this.findMinDate(currentPatient.value);
-                    }*/
+         
                     if(g.value != null){
-                        let minDate = this.findMinDate(g.value);
+                        let minDate2 = this.findMinDate(g.value);
+                   
+                        g.min = minDate2;
                     }
                   
                     g.value.forEach((d) => {
@@ -181,6 +170,8 @@ events.on('target_updated', (evt, item) => {
                             d.diff = -1;
                         }
                     })
+
+                   // console.log(g.min);
                 });
         
               
@@ -221,16 +212,7 @@ events.on('target_updated', (evt, item) => {
                             select(this).classed('selectedOrder', true);
         
                             select(this.parentNode.parentNode.parentNode)
-                                //.append('line')
-                               // .classed('selectedLine', true)
-                               // .attr('id', `orderLine_${d['VISIT_NO']}`)
-                               // .attr('x1', self.timeScale(d['diff']) + self.margin.right)
-                               // .attr('x2', self.timeScale(d['diff']) + self.margin.right)
-                              //  .attr('y1', self.scoreScale(100) + self.margin.top)
-                               // .attr('y2', self.scoreScale(0) + self.margin.top)
-                                .on('click', () => console.log(d));
-        
-                           // console.log(d);
+                
                         }
                         else {
                             select(this).classed('selectedOrder', false);
