@@ -14,6 +14,7 @@ import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
+import * as d3 from 'd3';
 
 interface Subject {
 
@@ -54,13 +55,16 @@ export class dataObject implements Subject {
 
     selectedPatIds;//array of ids for defined patients 
 
+    startDate;
+
     constructor() {
-        console.log('is this thing on');
+       // console.log('is this thing on');
 
         this.loadData('Demo_Revise');
         this.loadData('PROMIS_Scores');//.then(console.log(this.proTable));
         this.loadData('Orders');
         this.loadData('CPT_codes');
+
         this.attachListener();
     }
 
@@ -69,6 +73,15 @@ export class dataObject implements Subject {
     public notifyObserver() {};
 
     private attachListener(){
+
+        let startDateSelection = d3.select('#start_date').select('text');
+
+        events.on('start_date_updated', (evt, item)=> {
+            console.log('updated');
+            this.startDate = item;
+            startDateSelection.text(this.startDate);
+            console.log(startDateSelection);
+        });
 
         events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
             this.proTable = item;
@@ -109,9 +122,7 @@ export class dataObject implements Subject {
         events.on('dataUpdated', (evt, item) => {
 
             this.selectedPatientId(item[0]);
-            //console.log('dataUpdated ' + item);
-           // this.getPromisScore(this.selectedPatIds); 
-           // this.getOrders(this.selectedPatIds);
+
          });
 
         events.on('update_similar', (evt, item) => { 

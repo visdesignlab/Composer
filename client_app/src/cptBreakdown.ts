@@ -17,15 +17,7 @@ import {transition} from 'd3-transition';
 import {brush, brushY, brushX} from 'd3-brush';
 import * as similarityScore  from './similarityScoreDiagram';
 import * as d3 from 'd3';
-import {ITable, asTable} from 'phovea_core/src/table';
-import {IAnyVector} from 'phovea_core/src/vector';
-import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
-//import * as csvUrl from 'file-loader!../data/number_one_artists.csv';
 import {tsv} from 'd3-request';
-import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
-import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
-import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
-import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 
 export class cptBreakdown {
@@ -43,7 +35,7 @@ export class cptBreakdown {
   private patOrderGroup;
   targetPatientOrders;
   targetProInfo
-  similarPatientsProInfo;
+  //similarPatientsProInfo;
 
 
   rectBoxDimension = {width: 1100, height: 90 };
@@ -55,18 +47,15 @@ export class cptBreakdown {
   selectedPatientArray;
   cptObject;
   filteredCPT;
-
-  table: ITable;
-  table2: ITable;
     
-  constructor(parent: Element) {
+constructor(parent: Element) {
 
     this.$node = select(parent)
     .append('div')
     .classed('cptBreakdownDiv', true)
     .attr('transform', `translate(-50,0)`);
 
-this.svg = this.$node.append('svg')
+    this.svg = this.$node.append('svg')
     .attr('class', 'cptSVG')
     .attr('width', this.rectBoxDimension.width)
     .attr('height', this.rectBoxDimension.height*4);
@@ -74,24 +63,19 @@ this.svg = this.$node.append('svg')
     this.svg.append('g')
     .attr('id', 'similar_cpt');
 
-this.timeScale = scaleLinear()
+    this.timeScale = scaleLinear()
     .range([0, this.rectBoxDimension.width])
     .clamp(true);
 
-//append patient order svg group
-  //append patient order svg group
-//  this.svg.append('g')
-//  .attr('id', 'sim_rect_line')
-//   .attr('transform', `translate(${this.margin.left},${this.margin.top})`);   
-this.patOrderGroup = this.svg.select('#similar_cpt')
-.attr('transform', () => {
+    this.patOrderGroup = this.svg.select('#similar_cpt')
+    .attr('transform', () => {
     return `translate(${this.margin.left},0)`; // If there is a label for the x-axis change 0
-});
+    });
 
 
     this.attachListener();
   
-      }
+}
 
   /**
    * Attach listeners
@@ -118,15 +102,15 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
 
       // item: pat_id, number of similar patients, DATA
       events.on('update_similar', (evt, item) => { // called in queryBox
+
         this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
-        this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
+       // this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
  
-       this.setOrderScale();
-       this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
+        this.setOrderScale();
+        this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
       
      });
    
-
   }
 
   
@@ -324,6 +308,12 @@ this.patOrderGroup = this.svg.select('#similar_cpt')
                       let t = transition('t').duration(500);
                       select(".tooltip").transition(t)
                           .style("opacity", 0);
+                  })
+                  .on('click', function (d) {
+                    console.log(d);
+                    let parentData = select(this.parentNode).data;
+                   console.log(parentData);
+                    
                   });
 
                 /*

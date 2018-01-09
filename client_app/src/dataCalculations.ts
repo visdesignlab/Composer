@@ -16,9 +16,8 @@ import * as d3 from 'd3';
 
 export class dataCalc {
 
-
+    startDate;
     private filteredOrders;
-  
 
     constructor(parent: Element) {
 
@@ -60,7 +59,9 @@ export class dataCalc {
             if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
                 minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
         }
+       
         return minDate
+        
     }
 
     /**
@@ -153,6 +154,12 @@ export class dataCalc {
     let maxDiff = 0;
 
     let minPatDate = this.findMinDate(this.targetProInfo);
+    console.log("min date   :"+ minPatDate);
+    this.startDate = "patient";
+    events.fire('start_date_patient', minPatDate);
+
+    //minPatDate is the first date of the target patient PROMIS records
+
     this.targetProInfo.forEach((d) => {
       d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
       maxDiff = d.diff > maxDiff ? d.diff : maxDiff
@@ -169,6 +176,7 @@ export class dataCalc {
     if (this.timeScaleMini != null){
          this.timeScaleMini.domain([-1,maxDiff]);
     }
+    //console.log(this.timeScale);
    
     events.on('brushed', (newMin, newMax) => {  // from brushed in rect exploration
     
@@ -213,8 +221,6 @@ export class dataCalc {
 
 
       let orderRect = this.svg.select('#pat_rect_line')
-  
-     
       .selectAll('.orderRect')
       .data([ordersInfo]);
 
@@ -242,7 +248,11 @@ export class dataCalc {
       .attr('height', this.orderBar.height)
      
       //this is the mousclick event that greys rects
-      .on('click', this.assignCurrentName.bind(this))//end the mousclick event that shows the graph
+      .on('click', (d)=> {
+          this.assignCurrentName.bind(this);
+          console.log(d.ORDER_DTM);
+          events.fire('date clicked', d.ORDER_DTM);
+        })//end the mousclick event that shows the graph
       .on("mouseover", (d) => {
         let t = transition('t').duration(500);
         select(".tooltip")

@@ -77,6 +77,9 @@ export class App {
     distributionDiagram.create(main.node());
     // query box
     queryBox.create(main.node());
+
+    //start time count
+    main.append('div').attr('id', 'start_date').append('text');
      //rect
      rectExploration.create(main.node());
      this.$node.select('.rectDiv').classed('hidden', true);
@@ -100,6 +103,7 @@ export class App {
     events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
 
      // item: pat_id, DATA
+     /*
         events.on('update_all_info', (evt, item) => {  // called in query box
             const targetPatientProInfo = item[1]['PRO'][item[0]];
             const similarPatientsProInfo = [];
@@ -110,7 +114,7 @@ export class App {
 
          //   console.log('added similarity score diagram');
 
-        });
+        });*/
 
         events.on('show_orders', () => {
 

@@ -157,12 +157,6 @@ export class rectExploration {
        this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
        this.drawMiniRects();
     });
-/*
-    events.on('gotTargetPromisScore', (evt, item) => {
-
-          this.targetProInfo = item;
-          this.setOrderScale();
-    });*/
 
     events.on('target_updated', (evt, item) => {
         console.log(item);
@@ -198,7 +192,7 @@ export class rectExploration {
         this.currentlySelectedName = undefined;
       }
 
-    const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+      const value = (<HTMLInputElement>document.getElementById('order_search')).value;
     
       console.log(value);
 
@@ -225,7 +219,7 @@ export class rectExploration {
 
       if (this.queryBool == "cpt"){
 
-          console.log('order');
+          console.log('cpt');
           let dataset = 'selected';
           let targetOrder = value;
           
@@ -236,10 +230,10 @@ export class rectExploration {
         // console.log(rects);
              
          events.fire('query_order', value);
-        let selectedRects = rects.nodes();
-        let selected =  <any>( <any>selectedRects );
-        selected.forEach(node=> {
-        node.classList.remove('selectedOrder', 'unselectedOrder');
+         let selectedRects = rects.nodes();
+         let selected =  <any>( <any>selectedRects );
+         selected.forEach(node=> {
+         node.classList.remove('selectedOrder', 'unselectedOrder');
           if(node.classList.contains(value)){
            // if(node.classList.contains('unselectedOrder'))
             node.classList.add('selectedOrder');
@@ -352,22 +346,24 @@ export class rectExploration {
   }
 
       //this is where your order search starts
-private drawQueryBox (){
-  let form = this.$node.append('form');
+  private drawQueryBox (){
 
-        form.append('input')
+    let form = this.$node.append('form');
+
+    form.append('input')
             .attr('type', 'text')
             .attr('placeholder', 'Search Order Name')
             .attr('id', 'order_search')
             .attr('value');
 
-        form.append('input')
+    form.append('input')
             .attr('type', 'button')
             .attr('value', 'order search')
             .on('click', () => this.queryOrder());
 }
        
   private drawOrderLabel() {
+
     d3.selectAll('.orderLabel').remove();
     
     d3.select('.rectDiv ')
@@ -376,14 +372,14 @@ private drawQueryBox (){
         .append('text')
         .text(this.orderLabel);
           
-        d3.select('.rectDiv')
-           .append('div')
+    d3.select('.rectDiv')
+        .append('div')
         .classed('orderLabel', true)
         .append('text')
         .text('Order Frequency for Target Patient: ' + this.selectedTargetPatOrderCount);
 
-        d3.select('.orderLabel')
-           .append('div')
+    d3.select('.orderLabel')
+        .append('div')
         .classed('orderLabel', true)
         .append('text')
         .text('Orders found in Similar Patients: ' + this.selectedSimilarOrderCount);
@@ -420,18 +416,7 @@ private assignCurrentName (d) {
           }
 
           this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
-          /*
-          this.selectedTargetPatOrderCount = this.svg.selectAll('.selectedOrder').size();
-           this.selectedSimilarOrderCount = d3.selectAll('#similar_orders').selectAll('.selectedOrder').size()/3;
-           this.drawOrderLabel();//draws the label with the order count for patient and similar patients
-          let selectedGroupTargetPat = this.svg.selectAll('.selectedOrder');
-          let selectedGroupSimilar = d3.selectAll('#similar_orders').selectAll('.selectedOrder');
-         
-         //  console.log(selectedGroupTargetPat.size());//logs the number of orders in the selected order for target patient
-          // console.log(selectedGroupSimilar.size()/3);//logs the number of orders in the selected order of similar patients
-          
-           this.loadDataFromServer();
-    */
+
       
 
 }
