@@ -11,6 +11,8 @@ export class QueryBox {
     private $node;
     private similarArgs;
     private dataset;
+    startDay;
+    startBool;
 
     constructor(parent: Element) {
 
@@ -86,6 +88,7 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'Update Target Patient')
             .on('click', () => events.fire('update_target'));
+
 /*
         form.append('input')
             .attr('type', 'button')
@@ -111,6 +114,21 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'PROMIS Scores')
             .on('click', () => events.fire('show_PROMIS'));
+
+        form.append('label')
+            .attr('for', 'start_date')
+            .attr('id', 'start_date_label')
+           .text(this.startDay);
+            
+        form.append('input')
+            .attr('type', 'button')
+            .attr('id', 'start_date')
+            .attr('value', 'Update Start Day')
+            .on('click', () => events.fire('update_start_event'));
+
+        form.append('label')
+            .attr('id', 'pat_or_event')
+            .text(this.startBool);
 /*
         form.append('label')
             .attr('for', 'text_num_similar')
@@ -145,6 +163,30 @@ export class QueryBox {
                 events.fire('update_similar', [item[1], item[2], args]); // caught by svgTable and scoreDiagram and statHistogram
                // console.log('testing  ' + item);
             });
+        });
+
+        events.on('update_start_event', (evt, item)=>  {
+            
+            console.log('button press');
+            let startLabel = select('#start_date_label').style('color', 'black');
+            this.startBool = '0 date determined by event';
+            let startLabelBool = select('#pat_or_event').text(this.startBool);
+         
+        });
+
+        events.on('date clicked', (evt, item)=>  {
+
+            this.startDay = item;
+            let startLabel = select('#start_date_label').text(item).style('color', 'red');
+            console.log(this.startDay);
+
+        });
+
+        events.on('start_date_patient', (evt, item)=> {
+            this.startBool = '0 date determined by patient';
+            this.startDay = item;
+            let startLabel = select('#start_date_label').text(item);//.style('color', 'red');
+            let startLabelBool = select('#pat_or_event').text(this.startBool);
         });
 
         events.on('number_of_similar_patients', (evt, item) => {  // called in distribution diagram

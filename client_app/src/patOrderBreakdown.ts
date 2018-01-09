@@ -17,8 +17,8 @@ import {transition} from 'd3-transition';
 import {brush, brushY, brushX} from 'd3-brush';
 //import * as similarityScore  from './similarityScoreDiagram';
 import * as d3 from 'd3';
-import {ITable, asTable} from 'phovea_core/src/table';
-import {IAnyVector} from 'phovea_core/src/vector';
+//import {ITable, asTable} from 'phovea_core/src/table';
+//import {IAnyVector} from 'phovea_core/src/vector';
 //import {list as getFirstByName, get as getById} from 'phovea_core/src/data';
 
 //import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
@@ -215,19 +215,19 @@ events.on('target_updated', (evt, item) => {
                     .attr('width', this.similarBar.width)
                     .attr('height', this.similarBar.height)
                     .on('click', function (d) {
-        
+                        console.log(d);
                         if (!select(this).classed('selectedOrder')) {
         
                             select(this).classed('selectedOrder', true);
         
                             select(this.parentNode.parentNode.parentNode)
-                                .append('line')
-                                .classed('selectedLine', true)
-                                .attr('id', `orderLine_${d['VISIT_NO']}`)
-                                .attr('x1', self.timeScale(d['diff']) + self.margin.right)
-                                .attr('x2', self.timeScale(d['diff']) + self.margin.right)
-                                .attr('y1', self.scoreScale(100) + self.margin.top)
-                                .attr('y2', self.scoreScale(0) + self.margin.top)
+                                //.append('line')
+                               // .classed('selectedLine', true)
+                               // .attr('id', `orderLine_${d['VISIT_NO']}`)
+                               // .attr('x1', self.timeScale(d['diff']) + self.margin.right)
+                               // .attr('x2', self.timeScale(d['diff']) + self.margin.right)
+                              //  .attr('y1', self.scoreScale(100) + self.margin.top)
+                               // .attr('y2', self.scoreScale(0) + self.margin.top)
                                 .on('click', () => console.log(d));
         
                            // console.log(d);
