@@ -240,6 +240,7 @@ export class rectExploration {
          let parentElem;
          selected.forEach(node=> {
           node.classList.remove('selectedOrder', 'unselectedOrder');
+
           if(node.classList.contains(value)){
          
             node.classList.add('selectedOrder');
@@ -257,20 +258,12 @@ export class rectExploration {
        
   }
 
-  //console.log(withQuery);
-  let mapped = entries(withQuery);
-  console.log(mapped);
-  this.queryDataArray = mapped;
+ // console.log(withQuery);
+ // let mapped = entries(withQuery);
+ // console.log(mapped);
+  this.queryDataArray = withQuery;
+  
 
-  let form = this.$node.select('form')
-            .append('input')
-            .attr('type', 'button')
-            .attr('value', 'filter cohort by selected')
-            .on('click', () => {
-              events.fire('filtered_CPT', this.queryDataArray);
-              selectAll('.selectedOrder').classed('selectedOrder', false);
-              selectAll('.unselectedOrder').classed('unselectedOrder', false);
-            });
 
 }
   
@@ -391,6 +384,15 @@ export class rectExploration {
             .attr('type', 'button')
             .attr('value', 'order search')
             .on('click', () => this.queryOrder());
+
+    form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'filter cohort by selected')
+            .on('click', () => {
+              events.fire('filtered_CPT_by_order', this.queryDataArray);
+              selectAll('.selectedOrder').classed('selectedOrder', false);
+              selectAll('.unselectedOrder').classed('unselectedOrder', false);
+            });
 }
        
   private drawOrderLabel() {
@@ -468,13 +470,6 @@ private assignCurrentName (d) {
     text += "<span>" + tooltip_data['ORDER_DTM'] + "</span></br>";
     return text;
   }
-
-/*
- const url = `/data_api/getSimilarRows/${value}/${n}/${this.dataset}`;
-            this.setBusy(true);
-            this.getData(url).then((args) => {
-                this.setBusy(false);
-                this.similarArgs = args;*/
 
   /**
    * Show or hide the application loading indicator
