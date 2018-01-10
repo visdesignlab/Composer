@@ -219,7 +219,6 @@ export class dataCalc {
          // console.log(event);
       });
 
-
       let orderRect = this.svg.select('#pat_rect_line')
       .selectAll('.orderRect')
       .data([ordersInfo]);
@@ -267,7 +266,7 @@ export class dataCalc {
       .on("mouseout", () => {
         let t = transition('t').duration(500);
         select(".tooltip").transition(t)
-          .style("opacity", 0);
+        .style("opacity", 0);
       });
       
       
