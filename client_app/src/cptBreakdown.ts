@@ -174,7 +174,7 @@ constructor(parent: Element) {
      });
     let mapped = entries(filteredPatOrders);
 
-    console.log("mapped in cpt  "+mapped);
+    //console.log("mapped in cpt  "+mapped);
 
     events.fire('filtered_CPT', mapped);
 
@@ -253,7 +253,6 @@ constructor(parent: Element) {
                            
                 });
             
-
               events.fire('cpt_filtered', filteredOrders);
               this.filteredCPT = filteredOrders;
               this.drawOrders(filteredOrders);
@@ -306,7 +305,6 @@ constructor(parent: Element) {
         rectGroup.exit().remove();
 
         rectGroup.classed('visitDays', true)
-        // .attr('transform', translate)
          .attr('transform', (d) => `translate(`+ this.timeScale(d.diff) +`,0)`);
 
         let rects = rectGroup.selectAll('rect')
@@ -384,7 +382,7 @@ constructor(parent: Element) {
 
         //Evaluation and Management: 99201 – 99499
         let evaluationFilter = rects.filter((d)=>  {
-            return d > 99200 && d < 99500; 
+            return (d > 99200 && d < 99500) || d == 96150 || d == 96118;
         });
         //class assigned to each rect with code in this range
         let evalRects = evaluationFilter.nodes();
@@ -411,7 +409,7 @@ constructor(parent: Element) {
 
         // Radiology: 70010 – 79999.
         let radiology = rects.filter((d)=>  {
-            return d > 70010 && d < 79999;
+            return (d > 70010 && d < 79999) || d == 93970;
         }); 
         //class assigned to each rect with code in this range
         let radiologyRects = radiology.nodes();
@@ -431,7 +429,7 @@ constructor(parent: Element) {
         biopsyRects.forEach(rect => rect.classList.add('biopsy'));
 
         let chiropractor = rects.filter((d)=>  {
-            return d  == 97140;
+            return d  == 97140 || d == 97012;
         });
         let chiropractorRects = chiropractor.nodes();
         chiropractorRects.forEach(rect => rect.classList.add('chiropractor'));
@@ -462,7 +460,7 @@ constructor(parent: Element) {
 
         //gynechology 
         let gyn = rects.filter((d)=> {
-            return d == 'Q0091';
+            return d == 'Q0091' || d == 93325;
         });
         let gynRects = gyn.nodes();
         gynRects.forEach(rect => rect.classList.add('gynecologic'));
@@ -514,21 +512,22 @@ constructor(parent: Element) {
 
 
         let injection = rects.filter((d)=>  {
-        return d == 96365 || d == 96450 || d == 96372 || d == 96375;
+        return d == 96365 || d == 96450 || d == 96372 || d == 96375 || d == 96374;
         });
         let injectionRects = injection.nodes();
         injectionRects.forEach(rect => rect.classList.add('injection'));
 
 
         let vaccine = rects.filter((d)=> {
-            return d == 'G0008' || d == 'G0009';
+            return d == 'G0008' || d == 'G0009' || d == 90688 || (d > 90475 && d < 90750) || (d > 90470 && d < 90475);
         });
         let vaccineRects = vaccine.nodes();
         vaccineRects.forEach(rect => rect.classList.add('vaccine'));
 
 
         let opthalmic = rects.filter((d)=> {
-            return d == 92002 || d == 92136 || d == 92134 || d == 92004 || d == 92012 || d == 92014 || d == 92015;
+            return d == 92002 || d == 92136 || d == 92134 || d == 92004 || d == 92012 || d == 92014 || d == 92015
+            || d == 99173;
         });
         let opthalmicRects = opthalmic.nodes();
         opthalmicRects.forEach(rect => rect.classList.add('opthalmology'));
@@ -539,6 +538,12 @@ constructor(parent: Element) {
         });
         let oncologyRects = oncology.nodes();
         oncologyRects.forEach(rect => rect.classList.add('oncology'));
+
+        let other = rects.filter((d) => {
+            return d == '4248F';
+        });
+        let otherRects = other.nodes();
+        otherRects.forEach(rect => rect.classList.add('other'));
 
 
         //31579, 92520 - 92526
@@ -551,7 +556,7 @@ constructor(parent: Element) {
 
           // fix height of the svg
           this.svg
-             .attr('height', this.rectBoxDimension.height - 50 + (this.similarBar.height + 5) * filteredCPT.length);
+             .attr('height', this.rectBoxDimension.height + ((this.similarBar.height + 5) * filteredCPT.length));
 
         }
 
