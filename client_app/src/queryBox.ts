@@ -99,12 +99,12 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'similar')
             .on('click', () => this.updateSimilar());
-*/
+
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'Orders')
             .on('click', () => events.fire('show_orders'));
-
+*/
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'CPT Codes')

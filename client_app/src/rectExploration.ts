@@ -229,7 +229,7 @@ export class rectExploration {
           
          console.log(this.filteredCPT);
 
-         let rects = selectAll('.similarRectCPT').selectAll('rect');
+         let rects = selectAll('.visitDays').selectAll('rect');
    
         // console.log(rects);
              
