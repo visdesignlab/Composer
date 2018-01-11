@@ -111,39 +111,84 @@
     stroke-opacity: .1;
 }
 
-.surgery {
-    fill: red;
-    opacity: .5;
-}
-
-.evaluation {
-    fill: blue;
-    opacity: .5;
-}
-
-.radiology {
-    fill: plum;
-    opacity: .5;
-}
-
 .anesthesia {
     fill: cadetblue;
-    opacity: .5;
+    opacity: .3;
 }
 
-.physical_therapy {
-    fill: yellow;
-    opacity: .5;
+.chiropractor {
+    fill: orange;
+    opacity: .3;
+}
+
+.biopsy {
+    fill: orange;
+    opacity: .3;
+}
+
+.ecg_ekg,
+.emg,
+.evaluation,
+.electrical_stimulation,
+.echocardiography {
+    fill: #1B4F72;
+    opacity: .3;
+}
+
+.gynecologic {
+    fill: pink;
+    opacity: .3;
 }
 
 .injection {
     fill: green;
-    opacity: .5;
+    opacity: .3;
 }
 
-.medicine {
+.medicine,
+.mammography {
     fill: brown;
-    opacity: .5;
+    opacity: .3;
+}
+
+.nerve_conduction {
+    fill: blueviolet;
+    opacity: .3;
+}
+
+.oncology {
+    fill: greenyellow;
+    opacity: .3;
+}
+
+.opthalmology,
+.other {
+    fill: green;
+    opacity: .3;
+}
+
+.physical_therapy,
+.pulmonary,
+.postoperative_visit,
+.pathology_lab {
+    fill: yellow;
+    opacity: .3;
+}
+
+.radiology {
+    fill: plum;
+    opacity: .3;
+}
+
+.surgery,
+.SLP {
+    fill: red;
+    opacity: .3;
+}
+
+.vaccine {
+    fill: violet;
+    opacity: .3;
 }
 
 .unselectedOrder {
