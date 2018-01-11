@@ -62,7 +62,7 @@ export class dataObject implements Subject {
 
         this.loadData('Demo_Revise');
         this.loadData('PROMIS_Scores');//.then(console.log(this.proTable));
-        this.loadData('Orders');
+       // this.loadData('Orders');
         this.loadData('CPT_codes');
 
         this.attachListener();
@@ -90,8 +90,8 @@ export class dataObject implements Subject {
         });
                  
         events.on('Orders', (evt, item)=> {
-            this.orderTable = item;
-            this.getDataObjects('order_object', this.orderTable);
+            //this.orderTable = item;
+           // this.getDataObjects('order_object', this.orderTable);
         });
 
         events.on('CPT_codes', (evt, item)=> {
@@ -100,7 +100,7 @@ export class dataObject implements Subject {
         });
 
         events.on('order_object', (evt, item)=> {
-            this.patOrderObjects = item;
+            //this.patOrderObjects = item;
         });
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
@@ -222,7 +222,7 @@ export class dataObject implements Subject {
         events.fire('selected_pat_array', this.selectedPatIds);
 
         this.getPromisScore(this.selectedPatIds);
-        this.getOrders(this.selectedPatIds);
+       // this.getOrders(this.selectedPatIds);
 
      }
  

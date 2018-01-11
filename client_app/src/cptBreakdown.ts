@@ -52,9 +52,11 @@ export class cptBreakdown {
 constructor(parent: Element) {
 
     this.$node = select(parent)
-    .append('div')
-    .classed('cptBreakdownDiv', true)
-    .attr('transform', `translate(-50,0)`);
+   // .append('div')
+   // .classed('cptBreakdownDiv', true)
+   // .attr('transform', `translate(-50,0)`)
+    .attr('width', this.rectBoxDimension.width)
+    .attr('height', this.rectBoxDimension.height*4);;
 
     this.svg = this.$node.append('svg')
     .attr('class', 'cptSVG')
@@ -102,6 +104,7 @@ constructor(parent: Element) {
     });
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
+        selectAll('.patCPTRecord').remove();
         this.drawOrders(item);
     });
 
@@ -262,39 +265,63 @@ constructor(parent: Element) {
             console.log(filteredCPT)
 
             let patGroups = this.patOrderGroup
-            .selectAll('.patgroups')
+            .selectAll('.patCPTRecord')
             .data(filteredCPT);
             //.data(similarOrdersInfo);
 
+        let patGroupEnter = patGroups
+            .enter()
+            //.append('g').attr('class', d=>d[0].key)//.attr('class', d=> d.key);
+            .append('g').attr('class', 'patCPTRecord')
+
+           // patGroupEnter
+           // .attr('transform', 
+          //  (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
+
+            patGroups = patGroupEnter.merge(patGroups);
             patGroups.exit().remove();
 
-        let similarOrderGroupEnter = patGroups
-            .enter()
-            .append('g').attr('class', 'patgroups')//.attr('class', d=> d.key);
-        let patGroupText = similarOrderGroupEnter
+            patGroups
+            .attr('transform', 
+            (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
+
+        let patGroupText = patGroupEnter
             .append('text').text(d=>d[0].key)
             .attr('transform', `translate(0,10)`);
 
-           similarOrderGroupEnter
-            .attr('transform', (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
-          
-            let patGroupRecs = similarOrderGroupEnter.append('g')
+        let patInnerGroup = patGroupEnter.append('g')
+            .classed('patInnerGroup', true)
             .attr('transform', 'translate(60, 0)');
 
-         let rectGroup =  patGroupRecs
-            .selectAll('.similarRectCPT')
+         let rectGroup = patGroups.select('.patInnerGroup')
+            .selectAll('.visitDays')
             .data(d => d)     
+
+        let rectGroupEnter = rectGroup
             .enter()
             .append('g')
-            .classed('similarRectCPT', true)
-           // .attr('transform', translate)
-            .attr('transform', (d) => `translate(`+ this.timeScale(d.diff) +`,0)`);
 
-          let rects = rectGroup.selectAll('rect')
-              .data(d => d.value[0])
+        rectGroup = rectGroupEnter.merge(rectGroup);
+
+        rectGroup.exit().remove();
+
+        rectGroup.classed('visitDays', true)
+        // .attr('transform', translate)
+         .attr('transform', (d) => `translate(`+ this.timeScale(d.diff) +`,0)`);
+
+        let rects = rectGroup.selectAll('rect')
+              .data(d => d.value[0]);
+
+        let rectsEnter = rects
               .enter()
               .append('rect')
-              .attr('class', d => d)
+              .attr('class', d => d);
+        
+        rects = rectsEnter.merge(rects);
+
+        rects.exit().remove();
+
+        rects
               .attr('y', 0)
               .attr('width', this.similarBar.width)
               .attr('height', this.similarBar.height)
@@ -322,7 +349,13 @@ constructor(parent: Element) {
               
             });
 
-          /*
+        
+
+         // this.svg.select('#similar_orders').selectAll('.similarRect')
+            //  .append('text')
+             // .text(filteredCPT.pat_id);
+        
+               /*
           Major categories for  CPT defined below and classes assigned:
           CPT Category 1: Evaluation and Management: 99201 – 99499
                           Anesthesia: 00100 – 01999; 99100 – 99140
@@ -333,194 +366,188 @@ constructor(parent: Element) {
           */
           //Pathology and Laboratory: 80047 – 89398
           let pathologyLab = rects.filter(function(d){
-              return d > 80046 && d < 89399;
-          });
-          //pathology lab class assigned to each rect with code in this range
-          let pathLabRects = pathologyLab.nodes();
-          pathLabRects.forEach(rect => rect.classList.add('pathology_lab'));
+            return d > 80046 && d < 89399;
+        });
+        //pathology lab class assigned to each rect with code in this range
+        let pathLabRects = pathologyLab.nodes();
+        pathLabRects.forEach(rect => rect.classList.add('pathology_lab'));
 
 
-          //Medicine: 90281 – 99199; 99500 – 99607
-          let medicine = rects.filter((d)=>  {
-              return d > 90280 && d < 99200 || d > 99499 && d < 99608; 
-          });
-          //class assigned to each rect with code in this range
-          let medRects = pathologyLab.nodes();
-          medRects.forEach(rect => rect.classList.add('medicine'));
+        //Medicine: 90281 – 99199; 99500 – 99607
+        let medicine = rects.filter((d)=>  {
+            return d > 90280 && d < 99200 || d > 99499 && d < 99608; 
+        });
+        //class assigned to each rect with code in this range
+        let medRects = pathologyLab.nodes();
+        medRects.forEach(rect => rect.classList.add('medicine'));
 
 
-          //Evaluation and Management: 99201 – 99499
-          let evaluationFilter = rects.filter((d)=>  {
-              return d > 99200 && d < 99500; 
-          });
-          //class assigned to each rect with code in this range
-          let evalRects = evaluationFilter.nodes();
-          evalRects.forEach(rect => rect.classList.add('evaluation'));
+        //Evaluation and Management: 99201 – 99499
+        let evaluationFilter = rects.filter((d)=>  {
+            return d > 99200 && d < 99500; 
+        });
+        //class assigned to each rect with code in this range
+        let evalRects = evaluationFilter.nodes();
+        evalRects.forEach(rect => rect.classList.add('evaluation'));
 
 
-          // Anesthesia: 00100 – 01999; 99100 – 99140.
-          let anesthesia = rects.filter((d)=>  {
-              return (d > 99 && d < 2000) || (d > 99099 && d < 99141);
-          }); 
-          //class assigned to each rect with code in this range
-          let anesthesiaRects = anesthesia.nodes();
-          anesthesiaRects.forEach(rect => {rect.classList.add('anesthesia')});
+        // Anesthesia: 00100 – 01999; 99100 – 99140.
+        let anesthesia = rects.filter((d)=>  {
+            return (d > 99 && d < 2000) || (d > 99099 && d < 99141);
+        }); 
+        //class assigned to each rect with code in this range
+        let anesthesiaRects = anesthesia.nodes();
+        anesthesiaRects.forEach(rect => {rect.classList.add('anesthesia')});
 
-          
-          // Surgery: 10021 – 69990.
-          let surgery = rects.filter((d)=>  {
-              return d > 10020 && d < 69991
-          });   
-          //class assigned to each rect with code in this range
-          let surgeryRects = surgery.nodes();
-          surgeryRects.forEach(rect => rect.classList.add('surgery'));
-
-
-          // Radiology: 70010 – 79999.
-          let radiology = rects.filter((d)=>  {
-              return d > 70010 && d < 79999;
-          }); 
-          //class assigned to each rect with code in this range
-          let radiologyRects = radiology.nodes();
-          radiologyRects.forEach(rect => rect.classList.add('radiology'));
-
-           /*
-          Secondary categories for CPT defined below and classes assigned:
-          CPT group 2: Nerve Conduction
-                       Physical Therapy
-                       Injections
-          */
-          let biopsy = rects.filter((d)=> {
-              return d == 'G0364'; 
-          });
-
-          let biopsyRects = biopsy.nodes();
-          biopsyRects.forEach(rect => rect.classList.add('biopsy'));
-
-          let chiropractor = rects.filter((d)=>  {
-              return d  == 97140;
-          });
-          let chiropractorRects = chiropractor.nodes();
-          chiropractorRects.forEach(rect => rect.classList.add('chiropractor'));
-
-          let ecg_ekg = rects.filter((d)=> {
-              return d > 92999 && d < 93011;
-          });
-          let ecgRects = ecg_ekg.nodes();
-          ecgRects.forEach(rect => rect.classList.add('ecg_ekg'));
+        
+        // Surgery: 10021 – 69990.
+        let surgery = rects.filter((d)=>  {
+            return d > 10020 && d < 69991
+        });   
+        //class assigned to each rect with code in this range
+        let surgeryRects = surgery.nodes();
+        surgeryRects.forEach(rect => rect.classList.add('surgery'));
 
 
-          //95860-95872, 95885-95887
-          let emg = rects.filter((d)=> {
-              return (d > 95859 && d < 95873) || (d > 95884 && d < 95888);
-          });
-          let emgRects = emg.nodes();
-          emgRects.forEach(rect => rect.classList.add('emg'));
+        // Radiology: 70010 – 79999.
+        let radiology = rects.filter((d)=>  {
+            return d > 70010 && d < 79999;
+        }); 
+        //class assigned to each rect with code in this range
+        let radiologyRects = radiology.nodes();
+        radiologyRects.forEach(rect => rect.classList.add('radiology'));
+
+         /*
+        Secondary categories for CPT defined below and classes assigned:
+        CPT group 2: Nerve Conduction
+                     Physical Therapy
+                     Injections
+        */
+        let biopsy = rects.filter((d)=> {
+            return d == 'G0364'; 
+        });
+
+        let biopsyRects = biopsy.nodes();
+        biopsyRects.forEach(rect => rect.classList.add('biopsy'));
+
+        let chiropractor = rects.filter((d)=>  {
+            return d  == 97140;
+        });
+        let chiropractorRects = chiropractor.nodes();
+        chiropractorRects.forEach(rect => rect.classList.add('chiropractor'));
+
+        let ecg_ekg = rects.filter((d)=> {
+            return d > 92999 && d < 93011;
+        });
+        let ecgRects = ecg_ekg.nodes();
+        ecgRects.forEach(rect => rect.classList.add('ecg_ekg'));
 
 
-           //93350 - 93351, 93303 - 93308, 93312- 93317, 93320 - 93321, 93325
-           let echocardiography = rects.filter((d)=> {
-              return (d > 93349 && d < 93352) || (d > 93302 && d < 93309) || (d > 93311 && d < 93318) || 
-                      d == 93320 || d == 93321 || d == 93325;
-          });
-          let echocardiographyRects = echocardiography.nodes();
-          echocardiographyRects.forEach(rect => rect.classList.add('echocardiography'));
+        //95860-95872, 95885-95887
+        let emg = rects.filter((d)=> {
+            return (d > 95859 && d < 95873) || (d > 95884 && d < 95888);
+        });
+        let emgRects = emg.nodes();
+        emgRects.forEach(rect => rect.classList.add('emg'));
 
 
-          //gynechology 
-          let gyn = rects.filter((d)=> {
-              return d == 'Q0091';
-          });
-          let gynRects = gyn.nodes();
-          gynRects.forEach(rect => rect.classList.add('gynecologic'));
+         //93350 - 93351, 93303 - 93308, 93312- 93317, 93320 - 93321, 93325
+         let echocardiography = rects.filter((d)=> {
+            return (d > 93349 && d < 93352) || (d > 93302 && d < 93309) || (d > 93311 && d < 93318) || 
+                    d == 93320 || d == 93321 || d == 93325;
+        });
+        let echocardiographyRects = echocardiography.nodes();
+        echocardiographyRects.forEach(rect => rect.classList.add('echocardiography'));
 
 
-          let electricalStimulation = rects.filter((d)=> {
-              return d == 'G0283' || d == 97110;
-          });
-          let elStimRects = electricalStimulation.nodes();
-          elStimRects.forEach(rect => rect.classList.add('electrical_stimulation'));
+        //gynechology 
+        let gyn = rects.filter((d)=> {
+            return d == 'Q0091';
+        });
+        let gynRects = gyn.nodes();
+        gynRects.forEach(rect => rect.classList.add('gynecologic'));
 
 
-          let mammography = rects.filter((d)=>  {
-              return d  == "G0204" || d == "G0202" || d == "G0206";
-          });
-          let mammographyRects = mammography.nodes();
-          mammographyRects.forEach(rect => rect.classList.add('mammography'));
+        let electricalStimulation = rects.filter((d)=> {
+            return d == 'G0283' || d == 97110;
+        });
+        let elStimRects = electricalStimulation.nodes();
+        elStimRects.forEach(rect => rect.classList.add('electrical_stimulation'));
 
 
-          let nerveConduction = rects.filter((d)=> {
-              return d == 95908 || d == 95909;
-          });
-          let nerveRects = nerveConduction.nodes();
-          nerveRects.forEach(rect => rect.classList.add('nerve_conduction'));
+        let mammography = rects.filter((d)=>  {
+            return d  == "G0204" || d == "G0202" || d == "G0206";
+        });
+        let mammographyRects = mammography.nodes();
+        mammographyRects.forEach(rect => rect.classList.add('mammography'));
 
 
-          let pulmonary = rects.filter((d)=> {
-              return d == 94060 || d == 94010 || d == 94640 || d == 94620 || d == 94729 || d == 94761;
-          });
-          let pulmonaryRects = pulmonary.nodes();
-          pulmonaryRects.forEach(rect => rect.classList.add('pulmonary'));
+        let nerveConduction = rects.filter((d)=> {
+            return d == 95908 || d == 95909;
+        });
+        let nerveRects = nerveConduction.nodes();
+        nerveRects.forEach(rect => rect.classList.add('nerve_conduction'));
 
 
-          let postopVisit = rects.filter((d)=> {
-              return d == 99024;
-          });
-          let postopVisitRects = postopVisit.nodes();
-          postopVisitRects.forEach(rect => rect.classList.add('postoperative_visit'));
-
-          
-          //97001-97004 are the old codes
-          //97161- 97168 are the new codes
-          let physicalTherapy = rects.filter((d)=>  {
-              return d  == 97110 || (d > 97000 && d < 97005) || (d > 97160 && d < 97169) || d == 97112 
-                  || d == 97010 || d == 97530 || d =="G8979" || d == "G8978";
-          });
-          let physicalTherapyRects = physicalTherapy.nodes();
-          physicalTherapyRects.forEach(rect => rect.classList.add('physical_therapy'));
+        let pulmonary = rects.filter((d)=> {
+            return d == 94060 || d == 94010 || d == 94640 || d == 94620 || d == 94729 || d == 94761;
+        });
+        let pulmonaryRects = pulmonary.nodes();
+        pulmonaryRects.forEach(rect => rect.classList.add('pulmonary'));
 
 
-          let injection = rects.filter((d)=>  {
-          return d == 96365 || d == 96450 || d == 96372 || d == 96375;
-          });
-          let injectionRects = injection.nodes();
-          injectionRects.forEach(rect => rect.classList.add('injection'));
+        let postopVisit = rects.filter((d)=> {
+            return d == 99024;
+        });
+        let postopVisitRects = postopVisit.nodes();
+        postopVisitRects.forEach(rect => rect.classList.add('postoperative_visit'));
+
+        
+        //97001-97004 are the old codes
+        //97161- 97168 are the new codes
+        let physicalTherapy = rects.filter((d)=>  {
+            return d  == 97110 || (d > 97000 && d < 97005) || (d > 97160 && d < 97169) || d == 97112 
+                || d == 97010 || d == 97530 || d =="G8979" || d == "G8978";
+        });
+        let physicalTherapyRects = physicalTherapy.nodes();
+        physicalTherapyRects.forEach(rect => rect.classList.add('physical_therapy'));
 
 
-          let vaccine = rects.filter((d)=> {
-              return d == 'G0008' || d == 'G0009';
-          });
-          let vaccineRects = vaccine.nodes();
-          vaccineRects.forEach(rect => rect.classList.add('vaccine'));
+        let injection = rects.filter((d)=>  {
+        return d == 96365 || d == 96450 || d == 96372 || d == 96375;
+        });
+        let injectionRects = injection.nodes();
+        injectionRects.forEach(rect => rect.classList.add('injection'));
 
 
-          let opthalmic = rects.filter((d)=> {
-              return d == 92002 || d == 92136 || d == 92134 || d == 92004 || d == 92012 || d == 92014 || d == 92015;
-          });
-          let opthalmicRects = opthalmic.nodes();
-          opthalmicRects.forEach(rect => rect.classList.add('opthalmology'));
+        let vaccine = rects.filter((d)=> {
+            return d == 'G0008' || d == 'G0009';
+        });
+        let vaccineRects = vaccine.nodes();
+        vaccineRects.forEach(rect => rect.classList.add('vaccine'));
 
 
-          let oncology = rects.filter((d)=> {
-              return d == 96413 || d == 96411 || d == 96417 || d == 96415;
-          });
-          let oncologyRects = oncology.nodes();
-          oncologyRects.forEach(rect => rect.classList.add('oncology'));
+        let opthalmic = rects.filter((d)=> {
+            return d == 92002 || d == 92136 || d == 92134 || d == 92004 || d == 92012 || d == 92014 || d == 92015;
+        });
+        let opthalmicRects = opthalmic.nodes();
+        opthalmicRects.forEach(rect => rect.classList.add('opthalmology'));
 
 
-          //31579, 92520 - 92526
-          let slp = rects.filter((d)=> {
-              return d == 31579 || (d > 92519 && d < 92527) || (d > 92507 && d < 92508) || d == 92511
-                  || d == 92597 || d == 92605 || d == 92618 || d == "G8999" || d == "G9186" || d == "G89158";
-          });
-          let slpRects = slp.nodes();
-          slpRects.forEach(rect => rect.classList.add('SLP'));
-          
-          patGroups = similarOrderGroupEnter.merge(patGroups);
+        let oncology = rects.filter((d)=> {
+            return d == 96413 || d == 96411 || d == 96417 || d == 96415;
+        });
+        let oncologyRects = oncology.nodes();
+        oncologyRects.forEach(rect => rect.classList.add('oncology'));
 
-          this.svg.select('#similar_orders').selectAll('.similarRect')
-              .append('text')
-              .text(filteredCPT.pat_id);
+
+        //31579, 92520 - 92526
+        let slp = rects.filter((d)=> {
+            return d == 31579 || (d > 92519 && d < 92527) || (d > 92507 && d < 92508) || d == 92511
+                || d == 92597 || d == 92605 || d == 92618 || d == "G8999" || d == "G9186" || d == "G89158";
+        });
+        let slpRects = slp.nodes();
+        slpRects.forEach(rect => rect.classList.add('SLP'));
 
           // fix height of the svg
           this.svg
