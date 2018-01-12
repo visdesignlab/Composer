@@ -40,6 +40,7 @@ export class rectExploration {
 
   private targetProInfo;
   private targetOrders;
+  private targetCPT;
 
   private brush;
  
@@ -57,6 +58,8 @@ export class rectExploration {
   private setOrderScale = dataCalc.setOrderScale;
   private getClassAssignment = dataCalc.getClassAssignment;
   private drawPatOrderRects = dataCalc.drawPatOrderRects;
+  private reformatCPT = dataCalc.reformatCPT;
+  private drawOrders = dataCalc.drawOrders;
   private orderType = dataCalc.orderType;
 
   private filteredCPT;
@@ -64,10 +67,16 @@ export class rectExploration {
   private queryBool;
   queryDataArray;
 
+ // rectBoxDimension = {width: 1100, height: 90 };
+ // orderBar = {width: 10, height: 60 };
+ // margin = {top: 20, right: 10, bottom: 10, left: 10};
+ // contextDimension = {width: this.rectBoxDimension.width, height:55};
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
+  similarBar = {width: 8, height: 30 };
   margin = {top: 20, right: 10, bottom: 10, left: 10};
   contextDimension = {width: this.rectBoxDimension.width, height:55};
+  private patOrderGroup;
 
   constructor(parent: Element) {
 
@@ -95,8 +104,9 @@ export class rectExploration {
 
     //append patient order svg group
    this.svg.append('g')
-      .attr('id', 'pat_rect_line')
+      .attr('id', 'pat_cpt')
        .attr('transform', `translate(${this.margin.left},${this.margin.top})`); 
+  //this.patOrderGroup = this.svg.select('#similar_cpt')
 
    let context = this.svg.append('g')
             .attr('class', 'context')
@@ -128,6 +138,7 @@ export class rectExploration {
           .call(axisBottom(this.timeScaleMini));
         }
         this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
+       // this.reformatCPT(this.targetCPT)
         this.drawMiniRects();
       });
     
@@ -162,11 +173,16 @@ export class rectExploration {
 
     events.on('target_updated', (evt, item) => {
         
-        this.targetOrders = item[0];
+       // this.targetOrders = item[0];
+        console.log(item);
+
+        this.targetCPT = item[0];
         this.targetProInfo = item[1];
+     
         this.setOrderScale();
-        this.drawPatOrderRects(item[0], item[1]);
-        this.drawMiniRects();
+       // this.drawPatOrderRects(item[0], item[1]);
+        this.reformatCPT(this.targetProInfo, this.targetCPT);
+       // this.drawMiniRects();
     });
 
     events.on('show_cpt', (evt)=> {
@@ -184,6 +200,17 @@ export class rectExploration {
 
 
   }
+
+ private findMinDateCPT(pat) {
+   
+           let minDate = new Date();
+           for (let index = 0; index < pat.length; index++) {
+               if (!pat[index]['PROC_DTM']) continue;
+               if (this.parseTime(pat[index]['PROC_DTM'], null) < minDate)
+                   minDate = this.parseTime(pat[index]['PROC_DTM'], null)
+           }
+           return minDate
+       }
 
     /**
      * firing event to update the vis for info of a patient
