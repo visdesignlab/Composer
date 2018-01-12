@@ -40,7 +40,7 @@ export class dataCalc {
     
   });
 
-    console.log('orders have changed');
+   
     return this.filteredOrders;
   
 }
@@ -80,16 +80,15 @@ export class dataCalc {
             
             if (d['ORDER_CATALOG_TYPE'] == 'PROCEDURE') {
                 filteredOrders.procedureGroup.push(d);
-                //console.log('pro added');
+               
             }else if(d['ORDER_CATALOG_TYPE'] == 'MEDICATION'){
                 filteredOrders.medicationGroup.push(d);
-                //console.log(d['PRIMARY_MNEMONIC']);
+               
             }else { console.log('type not found');  }
            
         });
         
-       // console.log("number of procedures" + filteredOrders.procedureGroup.length);
-       // console.log("number of medications" + filteredOrders.medicationGroup.length);
+       
         return filteredOrders;
 
     }
@@ -120,8 +119,6 @@ export class dataCalc {
           
          let value = type;
     
-      //console.log(value);
-
         let dataset = 'selected';
    
         let targetOrder = value;
@@ -132,7 +129,7 @@ export class dataCalc {
 
         events.fire('find_order_type', [args]);
         this.setBusy(false);
-        console.log(args);
+        //console.log(args);
       
         events.fire('query_order_type', value);
 
@@ -146,7 +143,7 @@ export class dataCalc {
    */
   export function setOrderScale() {
 
-     // console.log(this.targetProInfo);
+ 
     // find the max difference between the first patient visit and the last visit. 
     //This determines the domain scale of the graph.
     // ----- add diff days to the data
@@ -154,7 +151,7 @@ export class dataCalc {
     let maxDiff = 0;
 
     let minPatDate = this.findMinDate(this.targetProInfo);
-    console.log("min date   :"+ minPatDate);
+ 
     this.startDate = "patient";
     events.fire('start_date_patient', minPatDate);
 
@@ -176,12 +173,12 @@ export class dataCalc {
     if (this.timeScaleMini != null){
          this.timeScaleMini.domain([-1,maxDiff]);
     }
-    //console.log(this.timeScale);
+
    
     events.on('brushed', (newMin, newMax) => {  // from brushed in rect exploration
     
    //------- set domain after brush event
-   // console.log(newMax[1]);
+
     if (this.brush.move != null) {
       this.timeScale.domain([newMax[0], newMax[1]])
     }
@@ -193,7 +190,7 @@ export class dataCalc {
     
     this.svg.select('.xAxis')
       .call(axisBottom(this.timeScale));
-     // console.log("set order scale:  "+maxDiff);
+
   }
 
 
@@ -219,7 +216,7 @@ export class dataCalc {
 
       events.on ('query_order', event => {
           this.currentlySelectedName = event.args[0];
-         // console.log(event);
+       
       });
 
       let orderRect = this.svg.select('#pat_rect_line')
@@ -281,10 +278,9 @@ export class dataCalc {
       .call(axisBottom(this.timeScale))
 
   }
-
+  
+//make this more generic
   export function reformatCPT(patProInfo, similarOrdersInfo) {
-
-    console.log(similarOrdersInfo);
 
     let minDate = this.findMinDate(patProInfo);
               
@@ -296,7 +292,7 @@ export class dataCalc {
     const self = this;
 
 // ----- add diff days to the data
-// console.log() similarOrdersInfo.values();
+
     let filteredOrders = [];
     similarOrdersInfo.forEach((g) => {
 
@@ -305,7 +301,6 @@ export class dataCalc {
     if(g.value != null){
     let minDate = this.findMinDateCPT(g.value);
     }
-// let minDate = this.findMinDate(similarOrdersInfo.value);
     g.value.forEach((d) => {
 
     d.array = []; 
@@ -313,7 +308,7 @@ export class dataCalc {
 
     try {
         d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-       // console.log(d.diff);
+     
       }
     catch (TypeError) {
         console.log('error');
@@ -359,7 +354,6 @@ this.drawMiniRects(this.targetProInfo, filteredOrders);
 //Draw the CPT rects for the patients. This takes the filtered CPT that has been formatted
 export function drawOrders (filteredCPT) {
 
-    console.log(filteredCPT)
 
     let patGroups = this.svg.select('#pat_cpt')
     .selectAll('.patCPTRecord')

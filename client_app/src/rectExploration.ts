@@ -186,7 +186,7 @@ export class rectExploration {
     });
 
     events.on('cpt_filtered', (evt, item)=>{
-      console.log(item);
+    
       this.filteredCPT = item;
     })
 
@@ -217,11 +217,10 @@ export class rectExploration {
 
       const value = (<HTMLInputElement>document.getElementById('order_search')).value;
     
-      //console.log(value);
+    
 
       if (this.queryBool == "order"){
-        console.log('order');
-        console.log(value);
+       
         let dataset = 'selected';
         let targetOrder = value;
         const url = `/data_api/filteredOrdersByMonth/${dataset}/${targetOrder}`;
@@ -230,7 +229,7 @@ export class rectExploration {
   
           events.fire('find_orders', [args]);
           this.setBusy(false);
-         // console.log(args);
+         
         
           events.fire('query_order', value);
           this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
@@ -242,16 +241,12 @@ export class rectExploration {
 
       if (this.queryBool == "cpt"){
 
-          console.log('cpt');
+      
           let dataset = 'selected';
           let targetOrder = value;
           
-         console.log(this.filteredCPT);
-
          let rects = selectAll('.visitDays').selectAll('rect');
    
-        // console.log(rects);
-             
          events.fire('query_order', value);
 
          let selectedRects = rects.nodes();
@@ -277,9 +272,6 @@ export class rectExploration {
        
   }
 
- // console.log(withQuery);
- // let mapped = entries(withQuery);
- // console.log(mapped);
   this.queryDataArray = withQuery;
   
 }

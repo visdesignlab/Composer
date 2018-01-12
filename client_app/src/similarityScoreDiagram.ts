@@ -546,7 +546,7 @@ export class similarityScoreDiagram {
           // let minDate = this.findMinDate(similarOrdersInfo.value);
             g.value.forEach((d) => {
                 try {
-                    d.diff = Math.ceil((this.parseTime(d['ORDER_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                    d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
                 }
                 catch (TypeError) {
                     console.log('error');
