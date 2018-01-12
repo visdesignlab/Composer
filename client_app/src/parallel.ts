@@ -133,7 +133,6 @@ export class parallel {
    // let table : ITable;
     let that = this;
 
-    
     this.svg.append('g').attr('id', 'MotherPlotter');
     
     select('#MotherPlotter').append('g')
@@ -146,6 +145,7 @@ export class parallel {
     
    // this.table = <ITable> await getById('Demo_Revise');//all of the data is still 
 
+    // I THINK THIS IS WHAT IS KILLING THE APP
     let patID = (await this.table.colData('PAT_ID')).map(d => +d);
     let GENDER = (await this.table.colData('PAT_GENDER')).map(d => d);
     let MARITAL_STATUS = (await this.table.colData('PAT_MARITAL_STAT')).map(d => d);
@@ -181,6 +181,8 @@ export class parallel {
           DM_CODE: DM_CODE[i]
         };
       });
+
+//maybe move types to data object?
 
       let types = {
         "Number": {
@@ -324,7 +326,7 @@ this.SelectedCounter = this.svg.append('g')
 
 }
 
-private async plotPatients(data, rejectData){
+private plotPatients(data, rejectData){
    
    let plotLines = select('#plotGroup')
     .selectAll('path').data(data);
@@ -338,19 +340,19 @@ private async plotPatients(data, rejectData){
   
     plotLines.attr('fill', 'none').attr('stroke', 'black').attr('stroke-width', .3).attr("stroke-opacity", 0.2);
 
-if(rejectData !== null){
+    if(rejectData !== null){
 
-  let plotRejects = select('#plotRejects')
-  .selectAll('path').data(rejectData);
+     let plotRejects = select('#plotRejects')
+    .selectAll('path').data(rejectData);
 
-  plotRejects.exit().remove();
+   plotRejects.exit().remove();
   
-  let rejectEnter = plotRejects.enter().append('path');
-  plotRejects = rejectEnter.merge(plotRejects);
+    let rejectEnter = plotRejects.enter().append('path');
+    plotRejects = rejectEnter.merge(plotRejects);
 
-  plotRejects.attr('d', d => this.path(d));
+    plotRejects.attr('d', d => this.path(d));
 
-  plotRejects.attr('fill', 'none').attr('stroke', '#DCDCDC').attr('stroke-width', .1).attr("stroke-opacity", 0.1);
+   plotRejects.attr('fill', 'none').attr('stroke', '#DCDCDC').attr('stroke-width', .1).attr("stroke-opacity", 0.1);
 
 }
    

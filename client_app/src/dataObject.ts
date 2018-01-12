@@ -57,13 +57,17 @@ export class dataObject implements Subject {
 
     selectedPatIds;//array of ids for defined patients 
 
+    filterRequirements;//this is sent from sidebar
+
     startDate;
 
     constructor() {
-       // console.log('is this thing on');
+        /* 
+        // GET THE GIVEN TABLE BY TABLE ID AS ARG
+        */
 
         this.loadData('Demo_Revise');
-        this.loadData('PROMIS_Scores');//.then(console.log(this.proTable));
+        this.loadData('PROMIS_Scores');
        // this.loadData('Orders');
         this.loadData('CPT_codes');
         this.loadData('ICD_codes');
@@ -80,68 +84,85 @@ export class dataObject implements Subject {
         let startDateSelection = d3.select('#start_date').select('text');
 
         events.on('start_date_updated', (evt, item)=> {
-            //console.log('updated');
+         
             this.startDate = item;
             startDateSelection.text(this.startDate);
-            //console.log(startDateSelection);
+        });
+
+        /* 
+        // THESE GET THE OBJECTS FROM GIVEN TABLE 
+        */
+
+        events.on('Demo_Revise', (evt, item) => {
+            this.demoTable = item;
+            console.log('demo table loaded');
+            this.mapPatientData();
+            this.getDataObjects('demo_object', this.demoTable);
         });
 
         events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
             this.proTable = item;
-           // console.log(item);
+            console.log('pro table loaded');
             this.getDataObjects('pro_object', this.proTable);
         });
                  
         events.on('Orders', (evt, item)=> {
+            console.log('order table loaded');
             //this.orderTable = item;
            // this.getDataObjects('order_object', this.orderTable);
         });
 
         events.on('CPT_codes', (evt, item)=> {
             this.cptTable = item;
+            console.log('cpt table loaded');
             this.getDataObjects('cpt_object', this.cptTable);
         });
 
         events.on('ICD_codes', (evt, item)=> {
-
             this.icdTable = item;
+            console.log('icd table loaded');
+           // this.getDataObjects('icd_object', this.cptTable);
             
-        })
+        });
+
+        /* 
+        // THESE SET VARIABLES TO OBJECTS AND SEND OBJECTS TO VIEWS
+        */
+        //THESE ARE TAKING AN ETERNITY. NEED TO USE RANGES TO FILTER TABLES
+        events.on('demo_object', (evt, item)=> {
+            this.cohortDemoObjects = item;
+            console.log('demo objects loaded');
+        });
 
         events.on('order_object', (evt, item)=> {
             //this.patOrderObjects = item;
         });
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
+
             this.cohortProObjects = item;
+            console.log('promis objects loaded');
         });
 
         events.on('cpt_object', (evt, item)=> {
+
             this.cohortCptObjects = item;
+            console.log('cpt objects loaded');
+            events.fire('update_target');
            // this.getOrders(this.patCptObjects);
         });
 
-        events.on('cpt_object', (evt, item)=> {
+        events.on('icd_object', (evt, item)=> {
+
             this.cohortCptObjects = item;
-            events.fire('update_target');
+            console.log('icd objects loaded');
+            //events.fire('update_target');
+           // this.getOrders(this.patCptObjects);
         });
 
-
-        events.on('dataUpdated', (evt, item) => {
-
-            this.selectedPatientId(item[0]);
-
-         });
-
-        events.on('update_similar', (evt, item) => { 
-
-            this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
-
-           // const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-            //this.getTargetCPT(value, this.cohortCptObjects);
-       
-         });
-
+        /* 
+        // WHEN THE DATA CHANGES REASSIGN TARGET AND COHORT
+        */
          events.on('update_target', () => { //this is picked up from target patient search in query box
 
             const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
@@ -149,14 +170,57 @@ export class dataObject implements Subject {
        
          });
 
-    }
+          // item: [d, parentValue]
+          events.on('filter_data', (evt, item) => { // called in sidebar
 
+            console.log(item);
+            this.updateDemo(item, this.cohortDemoObjects);
+
+          });
+
+    }
+//pulled from parallel coord
+    private updateDemo(sidebarFilter, demoObjects) {//picks up the filters from sidebar and creates sidebarfiltered data
+
+        let filter = demoObjects;
+    
+         sidebarFilter.forEach( d=> {
+           
+           let parent = d.attributeName;
+           let choice = d.checkedOptions;
+       
+          if (parent == 'DM_CODE'){
+         
+           filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
+          }else{
+           if (choice.length == 1){
+             filter = filter.filter(d => d[parent] == choice);
+          }else if(choice.length == 2){
+             filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
+             console.log(filter);
+          }else if(choice.length == 2){
+            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
+            console.log(filter);
+         }else if(choice.length == 3){
+            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
+            console.log(filter);
+          }
+        }
+          
+         });
+         
+           //this.sidebarFiltered = filter;
+           //this.plotPatients(this.sidebarFiltered, null);
+           events.fire('demo_filtered', [filter, this.cohortDemoObjects]);
+       
+       }
+    
     //uses Phovea to access PROMIS data and draw table for cohort
-    private async getPromisScore(selectedPatIds) {
+    private async getPromisScores(selectedPatIds, proObjects) {
 
         let filteredPatScore = {};
      
-        this.cohortProObjects.forEach(item => {
+        proObjects.forEach(item => {
         if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
         if (filteredPatScore[item.PAT_ID] === undefined) {
          filteredPatScore[item.PAT_ID] = [];
@@ -166,14 +230,13 @@ export class dataObject implements Subject {
         });
        let mapped = entries(filteredPatScore);
        this.cohortProInfo = mapped;
-       events.fire('gotPromisScore', this.cohortProInfo);
+       events.fire('gotPromisScore', mapped);
  
      };
 
        //gets CPT objects for target patient and maps them to draw
     private async getTargetCPT(patID, cptObject) {
 
-  
         let filteredPatScore = [];
   
         this.cohortProObjects.forEach(item => {
@@ -195,12 +258,67 @@ export class dataObject implements Subject {
         });
         let mapped = entries(filteredPatOrders);
  
-     //console.log("mapped in cpt  "+mapped);
- 
     // events.fire('filtered_CPT', mapped);
      events.fire('target_updated', [mapped, filteredPatScore]);
  
     };
+
+    public async mapPatientData() {
+
+        // let table : ITable;
+         let that = this;
+     /*
+         this.svg.append('g').attr('id', 'MotherPlotter');
+         
+         select('#MotherPlotter').append('g')
+         .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
+         .attr('id', 'plotRejects');
+     
+         select('#MotherPlotter').append('g')
+         .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
+         .attr('id', 'plotGroup');
+         */
+        // this.table = <ITable> await getById('Demo_Revise');//all of the data is still 
+     
+         // I THINK THIS IS WHAT IS KILLING THE APP
+         let patID = (await this.demoTable.colData('PAT_ID')).map(d => +d);
+         let GENDER = (await this.demoTable.colData('PAT_GENDER')).map(d => d);
+         let MARITAL_STATUS = (await this.demoTable.colData('PAT_MARITAL_STAT')).map(d => d);
+         let TOBACCO = (await this.demoTable.colData('TOBACCO_USER')).map(d => d);
+         let ALCOHOL = (await this.demoTable.colData('ALCOHOL_USER')).map(d => d);
+         let DRUG_USER = (await this.demoTable.colData('ILLICIT_DRUG_USER')).map(d => d);
+         let RACE = (await this.demoTable.colData('PAT_RACE')).map(d => d);
+         let BMI = (await this.demoTable.colData('BMI')).map(d => +d);
+         let patDOB = (await this.demoTable.colData('PAT_BIRTHDATE')).map(d => new Date(String(d)));
+         let CCI = (await this.demoTable.colData('CCI')).map(d => +d);
+         let DM_CODE = (await this.demoTable.colData('DM_CODE')).map(d => +d);
+     
+         let patAge = [];
+     
+         patDOB.forEach((d) => { 
+             let diff = Date.now() - d.getTime();
+             patAge.push(diff / (1000 * 60 * 60 * 24 * 365.25));
+            
+           });
+       
+           this.cohortDemoObjects = patID.map((id, i) => {
+             return {
+               ID: id,
+               GENDER: GENDER[i],
+               AGE: patAge[i],
+               BMI: BMI[i],
+               MARITAL_STATUS: MARITAL_STATUS[i],
+               TOBACCO: TOBACCO[i],
+               ALCOHOL: ALCOHOL[i],
+               DRUG_USER: DRUG_USER[i],
+               RACE : RACE[i],
+               CCI: CCI[i],
+               DM_CODE: DM_CODE[i]
+             };
+           });
+     
+   
+        }
 /*
      private async updateTargetPatient(patID) {
 
@@ -249,7 +367,7 @@ export class dataObject implements Subject {
  
      };*/
 
-    public selectedPatientId(data){//this adds all of the filtered patients to an array
+    public selectedPatientId(data){//this adds all of the filtered patient ids to an array
 
         let ids = [];
         
@@ -262,7 +380,7 @@ export class dataObject implements Subject {
 
         events.fire('selected_pat_array', this.selectedPatIds);
 
-        this.getPromisScore(this.selectedPatIds);
+        this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
        // this.getOrders(this.selectedPatIds);
 
      }
@@ -308,15 +426,15 @@ export class dataObject implements Subject {
  
      };*/
 
-    public async loadData(id: string){
+    public async loadData(id: string){ //loads the tables from Phovea
     
-       let table = <ITable> await getById(id);//load the tables or orders and PROMIS scores on init of app
+       let table = <ITable> await getById(id);
       
-       events.fire(id, table);//sends the object array to sidebar? for filtering against cohort
+       events.fire(id, table);//sends the id string to the getDataObjects
    
     }
 
-    public async getDataObjects(id: string, table: ITable){
+    public async getDataObjects(id: string, table: ITable){ 
 
         let object = await table.objects();
         events.fire(id, object);

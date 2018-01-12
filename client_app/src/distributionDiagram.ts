@@ -1,5 +1,5 @@
 /**
- * Created by saharmehrpour on 7/16/17.
+ * Total Overhaul, Jen 1/12/17
  */
 
 import * as ajax from 'phovea_core/src/ajax';
@@ -13,7 +13,6 @@ import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array'
 import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import { format } from 'd3-format';
-//import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
 
@@ -40,7 +39,7 @@ export class distributionDiagram {
         this.$node = select(parent)
             .append('div')
             .classed('distributionDiv', true)
-            .classed('hidden', true);
+           // .classed('hidden', true);
 
         this.BMI = this.$node.append('div').classed('distribution', true).attr('id', 'BMI').append('svg')
             .attr('height', this.distributionDimension.height + 70)
@@ -114,7 +113,9 @@ export class distributionDiagram {
      */
     private attachListener() {
 
-        events.on('dataUpdated', (evt, item) => { 
+        events.on('demo_filtered', (evt, item) => { 
+
+            console.log('updated');
            let selected = item[0];
            let all = item[1];
            this.drawDiagram(selected, all, 'BMI');

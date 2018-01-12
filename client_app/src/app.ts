@@ -9,17 +9,13 @@ import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
-//import * as statHistogram from './statHistogram';
 import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
 //import * as patOrderBreakdown from './patOrderBreakdown';
 import * as parallel from './parallel';
 import * as dataObject from './dataObject';
 import * as cptBreak from './cptBreakdown';
-
-//import React from 'react';
-//import ReactDOM from 'react-dom';
-//import SideBarComponent from './ReactComponents/SideBarComponent';
+import * as populationStat from './populationStat';
 
 
 /**
@@ -61,37 +57,45 @@ export class App {
     const side = sideBar.create(sideBarDiv.node());
     await side.init();
 
-    //this.$node.append('div').attr('id','sideBar');
-  //  ReactDOM.render(
-    //  React.createElement(SideBarComponent),
-   //   document.getElementById('sideBar')
-  //  );
-
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
 
-    //parallel coord plot 
-    parallel.create(main.node(), data);
+    //test button to create parallel when I want to
+    main.append('input')
+        .attr('type', 'button')
+        .attr('value', 'Parallel Coordinate')
+        .on('click', () => events.fire('parrallel'));
+
+    const parallelView = main.append('div').classed('parallel_view', true);
+    const populationView = main.append('div').classed('population_view', true);
+
+    // population distributions, initial visualization for all of the data
+    populationStat.create(populationView.node());
 
      // distributionDiagram
-    distributionDiagram.create(main.node());
+   // distributionDiagram.create(main.node());
     // query box
     queryBox.create(main.node());
 
     //start time count
-    main.append('div').attr('id', 'start_date').append('text');
-     //rect
-     rectExploration.create(main.node());
-     this.$node.select('.rectDiv').classed('hidden', true);
+    //main.append('div').attr('id', 'start_date').append('text');
  
+    /* hid the rectEx, order, CPT views to separate
+
+    //rect exploration draws target patient cpt orders
+    //user can query cpt orders 
+
+    rectExploration.create(main.node());
+    this.$node.select('.rectDiv').classed('hidden', true);
+    
       //order hierarchy
-      //hid the order div to focus on CPT
-  //  patOrderBreakdown.create(main.node());
-  // this.$node.select('.orderBreakdownDiv').classed('hidden', true);
+    patOrderBreakdown.create(main.node());
+     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
 
     const cpt = main.append('Div').classed('cptDiv', true);
     cptBreak.create(cpt.node());
     this.$node.select('.cptDiv').classed('hidden', true);
+    */
 
       // PROMIS diagrams
     const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
@@ -101,33 +105,27 @@ export class App {
      
     this.setBusy(false);
 
+    //this update_temp_similar is from testing at beginning of project. 
     events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
 
-     // item: pat_id, DATA
-     /*
-        events.on('update_all_info', (evt, item) => {  // called in query box
-            const targetPatientProInfo = item[1]['PRO'][item[0]];
-            const similarPatientsProInfo = [];
+    events.on('parallel', () => {
 
-            this.$node.select('.orderBreakdownDiv').classed('hidden', false);
-            this.$node.select('.main').select('.rectDiv').classed('hidden', false);
-            this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', true);
+    //parallel coord plot 
+    parallel.create(parallelView.node(), data);
 
-         //   console.log('added similarity score diagram');
+    });
 
-        });*/
-
-        events.on('show_orders', () => {
+    events.on('show_orders', () => {
 
            // console.log('works!');
-            this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
+            //this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
            // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
             this.$node.select('.main').select('.rectDiv').classed('hidden', false);
             this.$node.select('.main').select('.cptDiv').classed('hidden', true);
 
         });
 
-        events.on('show_cpt', () => {
+    events.on('show_cpt', () => {
           
                      // console.log('works!');
                       this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
