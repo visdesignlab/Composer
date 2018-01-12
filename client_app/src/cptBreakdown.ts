@@ -187,7 +187,8 @@ constructor(parent: Element) {
     private addSimilarOrderPoints(patProInfo, similarOrdersInfo) {
 
      // console.log("patpro"+ patProInfo);
-     console.log("sim orders"+similarOrdersInfo);
+     console.log("sim orders    "+similarOrdersInfo);
+     console.log("patProInfo    "+patProInfo);
       
               // -------  target patient
               let minDate = this.findMinDate(patProInfo);
@@ -556,7 +557,7 @@ constructor(parent: Element) {
 
           // fix height of the svg
           this.svg
-             .attr('height', this.rectBoxDimension.height + ((this.similarBar.height + 5) * filteredCPT.length));
+             .attr('height', this.rectBoxDimension.height + 50 + ((this.similarBar.height + 5) * filteredCPT.length));
 
         }
 
