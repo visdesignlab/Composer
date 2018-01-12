@@ -157,12 +157,8 @@ constructor(parent: Element) {
    //uses Phovea to access PRO data and draw table
    private async getCPT(selectedPatIds, cptObject) {
 
-   // console.log(cptObject);
-   // console.log(this.selectedPatientArray);
-
     let filteredPatOrders = {};
    // const patOrders = await this.orderTable.objects();
-   console.log(cptObject);
    
      cptObject.forEach(item => {
          if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
@@ -174,8 +170,6 @@ constructor(parent: Element) {
      });
     let mapped = entries(filteredPatOrders);
 
-    //console.log("mapped in cpt  "+mapped);
-
     events.fire('filtered_CPT', mapped);
 
  };
@@ -186,11 +180,8 @@ constructor(parent: Element) {
      */
     private addSimilarOrderPoints(patProInfo, similarOrdersInfo) {
 
-     // console.log("patpro"+ patProInfo);
-     console.log("sim orders    "+similarOrdersInfo);
-     console.log("patProInfo    "+patProInfo);
-      
               // -------  target patient
+
               let minDate = this.findMinDate(patProInfo);
               
                       similarOrdersInfo.forEach((d) => {
@@ -201,7 +192,7 @@ constructor(parent: Element) {
               const self = this;
 
               // ----- add diff days to the data
-            // console.log() similarOrdersInfo.values();
+         
               let filteredOrders = [];
               similarOrdersInfo.forEach((g) => {
 
@@ -218,7 +209,7 @@ constructor(parent: Element) {
 
                       try {
                           d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                         // console.log(d.diff);
+                        
                         }
                       catch (TypeError) {
                           console.log('error');
@@ -234,7 +225,7 @@ constructor(parent: Element) {
                       if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5'])    };
                       if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6'])    };
                       if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7'])    };
-                      //console.log(g.array);
+                    
                       d.diff = d.diff;
 
                      });
@@ -261,8 +252,6 @@ constructor(parent: Element) {
           }
 
         private drawOrders (filteredCPT) {
-
-            console.log(filteredCPT)
 
             let patGroups = this.patOrderGroup
             .selectAll('.patCPTRecord')

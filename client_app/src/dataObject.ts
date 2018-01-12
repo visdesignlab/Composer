@@ -103,6 +103,7 @@ export class dataObject implements Subject {
         });
 
         events.on('ICD_codes', (evt, item)=> {
+
             this.icdTable = item;
             
         })
@@ -113,7 +114,6 @@ export class dataObject implements Subject {
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
             this.cohortProObjects = item;
-            //console.log(item);
         });
 
         events.on('cpt_object', (evt, item)=> {
@@ -124,7 +124,6 @@ export class dataObject implements Subject {
         events.on('cpt_object', (evt, item)=> {
             this.cohortCptObjects = item;
             events.fire('update_target');
-           // this.getOrders(this.patCptObjects);
         });
 
 
@@ -141,7 +140,6 @@ export class dataObject implements Subject {
            // const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
             //this.getTargetCPT(value, this.cohortCptObjects);
        
-           // console.log('update_similar '+this.targetPatientProInfo);
          });
 
          events.on('update_target', () => { //this is picked up from target patient search in query box
