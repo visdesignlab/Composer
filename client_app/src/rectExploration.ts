@@ -139,12 +139,12 @@ export class rectExploration {
         }
         this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
        // this.reformatCPT(this.targetCPT)
-        this.drawMiniRects();
+        this.drawMiniRects(this.targetProInfo, this.targetCPT);
       });
     
     context.append('g')
     .attr('class', 'brush')
-      .call(this.brush)
+    .call(this.brush)
     
     
   this.attachListener();
@@ -162,27 +162,23 @@ export class rectExploration {
     // item: pat_id, number of similar patients, DATA
     events.on('update_similar', (evt, item) => { // called in queryBox
 
-       this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
-       this.cohortProInfo = entries(item[2]['similar_PRO']);
+      // this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
+      // this.cohortProInfo = entries(item[2]['similar_PRO']);
 
-       this.setOrderScale();
-       this.targetOrders = item[2]['pat_Orders'][item[0]].slice();
-       this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
-       this.drawMiniRects();
+      // this.setOrderScale();
+      // this.targetOrders = item[2]['pat_Orders'][item[0]].slice();
+      // this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
+       //this.drawMiniRects(this.targetProInfo, this.targetCPT);
     });
 
     events.on('target_updated', (evt, item) => {
         
-       // this.targetOrders = item[0];
-        console.log(item);
-
         this.targetCPT = item[0];
         this.targetProInfo = item[1];
      
         this.setOrderScale();
        // this.drawPatOrderRects(item[0], item[1]);
         this.reformatCPT(this.targetProInfo, this.targetCPT);
-       // this.drawMiniRects();
     });
 
     events.on('show_cpt', (evt)=> {
@@ -290,23 +286,26 @@ export class rectExploration {
  // console.log(mapped);
   this.queryDataArray = withQuery;
   
-
-
 }
   
-  private drawMiniRects() {
+  private drawMiniRects(promis, orders) {
 
-      let ordersInfo2 = this.targetOrders;
-      let minDate = this.findMinDate(this.targetProInfo);
-     // console.log('from draw mini  :'+ this.targetProInfo);
-      ordersInfo2.forEach((d) => {
-        let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
+      let test = 'CPT';
+
+      let minDate;
+
+      if (test == 'CPT') minDate = this.findMinDateCPT(promis);
+        
+      if(test == 'Order') minDate = this.findMinDate(promis);
+
+      orders.forEach((d) => {
+        let time = this.parseTime(d['PROC_DTM'], minDate).getTime();//changed this to cpt date but should be flexible
         d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
       }); 
 
      this.svg.select('.context')
      .selectAll('.orderRectMini')
-      .data([ordersInfo2])
+      .data(orders)
       .enter()
       .append('g')
       .classed('orderRectMini', true)

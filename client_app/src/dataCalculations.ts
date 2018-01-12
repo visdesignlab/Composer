@@ -351,7 +351,9 @@ export class dataCalc {
 
 events.fire('cpt_filtered', filteredOrders);
 this.filteredCPT = filteredOrders;
+select('#pat_cpt').selectAll('.patCPTRecord').remove();
 this.drawOrders(filteredOrders);
+this.drawMiniRects(this.targetProInfo, filteredOrders);
 
  }
 //Draw the CPT rects for the patients. This takes the filtered CPT that has been formatted
@@ -375,14 +377,14 @@ let patGroupEnter = patGroups
 
     patGroups = patGroupEnter.merge(patGroups);
     patGroups.exit().remove();
-
+/*
     patGroups
     .attr('transform', 
-    (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.orderBar.height + 5)})`);
-
+    (d, i) => `translate(0,${(i + 1) * (this.orderBar.height + 5)})`);
+*/
 let patInnerGroup = patGroupEnter.append('g')
     .classed('patInnerGroup', true)
-    .attr('transform', 'translate(60, 0)');
+   // .attr('transform', 'translate(60, 0)');
 
  let rectGroup = patGroups.select('.patInnerGroup')
     .selectAll('.visitDays')

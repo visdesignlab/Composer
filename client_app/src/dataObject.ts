@@ -36,6 +36,7 @@ export class dataObject implements Subject {
     orderTable : ITable;
     proTable : ITable;
     cptTable : ITable;
+    icdTable : ITable
 
     //assigned target patient info
     targetPatId;//string id for target patient
@@ -52,6 +53,7 @@ export class dataObject implements Subject {
     patOrderObjects;//orders as objects for all patient data
     cohortDemoObjects;//demographic info as objects for defined cohort
     cohortCptObjects;//CPT as objects for defined cohort
+    cohortIcdObjects;//ICD objects for cohort
 
     selectedPatIds;//array of ids for defined patients 
 
@@ -64,6 +66,7 @@ export class dataObject implements Subject {
         this.loadData('PROMIS_Scores');//.then(console.log(this.proTable));
        // this.loadData('Orders');
         this.loadData('CPT_codes');
+        this.loadData('ICD_codes');
 
         this.attachListener();
     }
@@ -99,6 +102,11 @@ export class dataObject implements Subject {
             this.getDataObjects('cpt_object', this.cptTable);
         });
 
+        events.on('ICD_codes', (evt, item)=> {
+            this.icdTable = item;
+            
+        })
+
         events.on('order_object', (evt, item)=> {
             //this.patOrderObjects = item;
         });
@@ -115,6 +123,7 @@ export class dataObject implements Subject {
 
         events.on('cpt_object', (evt, item)=> {
             this.cohortCptObjects = item;
+            events.fire('update_target');
            // this.getOrders(this.patCptObjects);
         });
 
@@ -128,6 +137,9 @@ export class dataObject implements Subject {
         events.on('update_similar', (evt, item) => { 
 
             this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
+
+           // const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
+            //this.getTargetCPT(value, this.cohortCptObjects);
        
            // console.log('update_similar '+this.targetPatientProInfo);
          });
@@ -135,8 +147,7 @@ export class dataObject implements Subject {
          events.on('update_target', () => { //this is picked up from target patient search in query box
 
             const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-            
-            this.getTargetCPT(value, this.cohortProObjects);
+            this.getTargetCPT(value, this.cohortCptObjects);
        
          });
 
@@ -146,15 +157,15 @@ export class dataObject implements Subject {
     private async getPromisScore(selectedPatIds) {
 
         let filteredPatScore = {};
-       // console.log(this.patProObjects + 'found in promis score');
+     
         this.cohortProObjects.forEach(item => {
         if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
         if (filteredPatScore[item.PAT_ID] === undefined) {
          filteredPatScore[item.PAT_ID] = [];
-       }
+        }
        filteredPatScore[item.PAT_ID].push(item);
-     }
-   });
+        }
+        });
        let mapped = entries(filteredPatScore);
        this.cohortProInfo = mapped;
        events.fire('gotPromisScore', this.cohortProInfo);
@@ -162,38 +173,36 @@ export class dataObject implements Subject {
      };
 
        //gets CPT objects for target patient and maps them to draw
-   private async getTargetCPT(patID, cptObject) {
+    private async getTargetCPT(patID, cptObject) {
 
-    // console.log(cptObject);
-    // console.log(this.selectedPatientArray);
-    let filteredPatScore = [];
-    // console.log(this.patProObjects + 'found in promis score');
-     this.cohortProObjects.forEach(item => {
-     if (patID.indexOf(item.PAT_ID) !== -1) {
-     filteredPatScore.push(item);
-     }
-     }); 
+  
+        let filteredPatScore = [];
+  
+        this.cohortProObjects.forEach(item => {
+            if (patID.indexOf(item.PAT_ID) !== -1) {
+            filteredPatScore.push(item);
+        }
+        }); 
  
-     let filteredPatOrders = {};
-    // const patOrders = await this.orderTable.objects();
-    console.log(cptObject);
-    
-      cptObject.forEach(item => {
+        let filteredPatOrders = {};
+        // const patOrders = await this.orderTable.objects();
+   
+        cptObject.forEach(item => {
           if (patID.indexOf(item.PAT_ID) !== -1) {
            if (filteredPatOrders[item.PAT_ID] === undefined) {
-      filteredPatOrders[item.PAT_ID] = [];
-    }
-      filteredPatOrders[item.PAT_ID].push(item);
-     }
-      });
-     let mapped = entries(filteredPatOrders);
+         filteredPatOrders[item.PAT_ID] = [];
+        }
+        filteredPatOrders[item.PAT_ID].push(item);
+        }
+        });
+        let mapped = entries(filteredPatOrders);
  
      //console.log("mapped in cpt  "+mapped);
  
     // events.fire('filtered_CPT', mapped);
      events.fire('target_updated', [mapped, filteredPatScore]);
  
-  };
+    };
 /*
      private async updateTargetPatient(patID) {
 
@@ -201,7 +210,7 @@ export class dataObject implements Subject {
          
 
           let filteredPatScore = [];
-          // console.log(this.patProObjects + 'found in promis score');
+          
            this.cohortProObjects.forEach(item => {
            if (patID.indexOf(item.PAT_ID) !== -1) {
            filteredPatScore.push(item);
@@ -218,14 +227,12 @@ export class dataObject implements Subject {
             filteredPatOrders.push(item);
          }
        }); 
-            console.log("target patient " + filteredPatOrders);
-            console.log(filteredPatScore);
            events.fire('target_updated', [filteredPatOrders, filteredPatScore]);
      };*/
 
       //uses Phovea to access PROMIS data and draw table for cohort
       /*
-    private async getTargetPromisScore(targetPatId) {
+     private async getTargetPromisScore(targetPatId) {
  
         let filteredPatScore = [];
        // console.log(this.patProObjects + 'found in promis score');
@@ -244,7 +251,7 @@ export class dataObject implements Subject {
  
      };*/
 
-     public selectedPatientId(data){//this adds all of the filtered patients to an array
+    public selectedPatientId(data){//this adds all of the filtered patients to an array
 
         let ids = [];
         
@@ -252,7 +259,7 @@ export class dataObject implements Subject {
                    ids.push(element.ID);
                });
 
-       // console.log("selected group ids     "+ids);
+      
         this.selectedPatIds = ids;
 
         events.fire('selected_pat_array', this.selectedPatIds);
@@ -263,7 +270,7 @@ export class dataObject implements Subject {
      }
  
      //uses Phovea to access PRO data and draw table for similar cohort
-     private async getOrders(selectedPatIds) {
+    private async getOrders(selectedPatIds) {
   
         let filteredPatOrders = {};
         //const patOrders = await this.orderTable.objects();
@@ -272,7 +279,7 @@ export class dataObject implements Subject {
              if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
               if (filteredPatOrders[item.PAT_ID] === undefined) {
          filteredPatOrders[item.PAT_ID] = [];
-       }
+        }
          filteredPatOrders[item.PAT_ID].push(item);
         }
          });
@@ -306,8 +313,7 @@ export class dataObject implements Subject {
     public async loadData(id: string){
     
        let table = <ITable> await getById(id);//load the tables or orders and PROMIS scores on init of app
-       //this.orderTable = <ITable> await getById('Orders');
-      // object = await table.objects();//gets the table information for PROMIS scores as objets
+      
        events.fire(id, table);//sends the object array to sidebar? for filtering against cohort
    
     }
