@@ -11,21 +11,17 @@ import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom,axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
-import {Constants} from './constants';
+
 import * as dataCalc from './dataCalculations';
 import {transition} from 'd3-transition';
 import {brush, brushY, brushX} from 'd3-brush';
 import * as similarityScore  from './similarityScoreDiagram';
 import * as d3 from 'd3';
-//import {ITable, asTable} from 'phovea_core/src/table';
-//import {IAnyVector} from 'phovea_core/src/vector';
+
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
-//import * as csvUrl from 'file-loader!../data/number_one_artists.csv';
+
 import {tsv} from 'd3-request';
-//import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
-//import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
-//import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
-//import {asVector} from 'phovea_core/src/vector/Vector';
+
 import {argFilter} from 'phovea_core/src/';
 import { fillWithNone } from 'phovea_core/src/idtype/IIDType';
 

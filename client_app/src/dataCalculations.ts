@@ -9,7 +9,7 @@ import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
-import {Constants} from './constants';
+//import {Constants} from './constants';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {transition} from 'd3-transition';
 import * as d3 from 'd3';

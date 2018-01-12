@@ -3,23 +3,23 @@
  */
 
 import {select} from 'd3-selection';
-import * as printLogs from './printLogs';
-import * as svgTable from './svgTable';
+//import * as printLogs from './printLogs';
+//import * as svgTable from './svgTable';
 import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
-import * as statHistogram from './statHistogram';
+//import * as statHistogram from './statHistogram';
 import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
-import * as patOrderBreakdown from './patOrderBreakdown';
+//import * as patOrderBreakdown from './patOrderBreakdown';
 import * as parallel from './parallel';
 import * as dataObject from './dataObject';
 import * as cptBreak from './cptBreakdown';
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import SideBarComponent from './ReactComponents/SideBarComponent';
+//import React from 'react';
+//import ReactDOM from 'react-dom';
+//import SideBarComponent from './ReactComponents/SideBarComponent';
 
 
 /**
@@ -85,8 +85,9 @@ export class App {
      this.$node.select('.rectDiv').classed('hidden', true);
  
       //order hierarchy
-    patOrderBreakdown.create(main.node());
-    this.$node.select('.orderBreakdownDiv').classed('hidden', true);
+      //hid the order div to focus on CPT
+  //  patOrderBreakdown.create(main.node());
+  // this.$node.select('.orderBreakdownDiv').classed('hidden', true);
 
     const cpt = main.append('Div').classed('cptDiv', true);
     cptBreak.create(cpt.node());
@@ -120,7 +121,7 @@ export class App {
 
            // console.log('works!');
             this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
-            this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
+           // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
             this.$node.select('.main').select('.rectDiv').classed('hidden', false);
             this.$node.select('.main').select('.cptDiv').classed('hidden', true);
 
@@ -130,7 +131,7 @@ export class App {
           
                      // console.log('works!');
                       this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
-                      this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+                     // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
                       this.$node.select('.main').select('.cptDiv').classed('hidden', false);
                       this.$node.select('.main').select('.rectDiv').classed('hidden', false);
           
@@ -138,7 +139,7 @@ export class App {
 
         events.on('show_PROMIS', ()=> {
           this.$node.select('.main').select('.allDiagramDiv').classed('hidden', false);
-          this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+          //this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
           this.$node.select('.main').select('.cptDiv').classed('hidden', true);
           this.$node.select('.main').select('.rectDiv').classed('hidden', true);
         });
@@ -147,7 +148,7 @@ export class App {
         events.on('update_hierarchy', () => {  // called in query box
 
             this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', false);
-            this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+           // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
             this.$node.select('.main').select('.rectDiv').classed('hidden', true);
            // console.log('remove pat hierarchy');
 
