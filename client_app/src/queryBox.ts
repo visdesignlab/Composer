@@ -25,7 +25,7 @@ export class QueryBox {
         let self = this;
 
         let form = this.$node.append('form');
-
+/*
         form.append('label')
             .attr('for', 'dataset_selection')
             .text('Dataset: ');
@@ -60,7 +60,7 @@ export class QueryBox {
 
         form.append('label')
             .html('All');
-
+*/
         form.append('br');
 
         // // these events are only handled in tables

@@ -53,7 +53,7 @@ export class rectExploration {
   private parseTime = dataCalc.parseTime;
   private setOrderScale = dataCalc.setOrderScale;
   private getClassAssignment = dataCalc.getClassAssignment;
-  private drawPatOrderRects = dataCalc.drawPatOrderRects;
+  //private drawPatOrderRects = dataCalc.drawPatOrderRects;
   private reformatCPT = dataCalc.reformatCPT;
   private drawOrders = dataCalc.drawOrders;
   private orderType = dataCalc.orderType;
@@ -63,10 +63,6 @@ export class rectExploration {
   private queryBool;
   queryDataArray;
 
- // rectBoxDimension = {width: 1100, height: 90 };
- // orderBar = {width: 10, height: 60 };
- // margin = {top: 20, right: 10, bottom: 10, left: 10};
- // contextDimension = {width: this.rectBoxDimension.width, height:55};
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
   similarBar = {width: 8, height: 30 };
@@ -192,6 +188,84 @@ export class rectExploration {
 
 
   }
+
+ private drawPatOrderRects(ordersInfo, targetProInfo) {
+
+     let timeType = 'PROC_DTM';
+
+     let minDate = this.findMinDate(targetProInfo);
+ 
+        ordersInfo.forEach((d) => {
+       let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
+       d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+     });
+
+     const self = this;
+
+     events.on ('query_order', event => {
+         this.currentlySelectedName = event.args[0];
+      
+     });
+
+     let orderRect = this.svg.select('#pat_rect_line')
+     .selectAll('.orderRect')
+     .data([ordersInfo]);
+
+     orderRect.exit().remove();
+
+     let orderRectEnter = orderRect.enter()
+     .append('g')
+     .classed('orderRect', true);
+     
+     orderRect = orderRectEnter.merge(orderRect);
+
+     let rects = orderRect.selectAll('rect')
+     .data((d) => d);
+
+     rects.exit().remove();
+
+     let rectsEnter = rects.enter()
+     .append('rect');
+     rects = rectsEnter.merge(rects);
+     rects.attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
+     .attr('class', this.getClassAssignment('ORDER_STATUS'))
+     .attr('x', (g) => this.timeScale(g.diff))
+     .attr('y', 0)
+     .attr('width', this.orderBar.width)
+     .attr('height', this.orderBar.height)
+    
+     //this is the mousclick event that greys rects
+     .on('click', (d)=> {
+         this.assignCurrentName.bind(this);
+         console.log(d.ORDER_DTM);
+         events.fire('date clicked', d.ORDER_DTM);
+       })//end the mousclick event that shows the graph
+     .on("mouseover", (d) => {
+       let t = transition('t').duration(500);
+       select(".tooltip")
+         .html(() => {
+           return this.renderOrdersTooltip(d);
+         })
+         .transition(t)
+         .style("opacity", 1)
+         .style("left", `${event.pageX + 10}px`)
+         .style("top", `${event.pageY + 10}px`);
+     })
+     .on("mouseout", () => {
+       let t = transition('t').duration(500);
+       select(".tooltip").transition(t)
+       .style("opacity", 0);
+     });
+     
+     
+     d3.selectAll('.MEDICATION, .PROCEDURE')
+     .classed('selectedOrder', d =>  d.PRIMARY_MNEMONIC == this.currentlySelectedName)
+     .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.PRIMARY_MNEMONIC !== this.currentlySelectedName);
+     
+      this.svg.select('.xAxis')
+     .call(axisBottom(this.timeScale))
+
+ }
 
  private findMinDateCPT(pat) {
    
