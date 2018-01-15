@@ -15,22 +15,10 @@ import {argFilter} from 'phovea_core/src/';
 import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
+import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 
-interface Subject {
 
-registerObserver(o : Observer);
-removeObserver(o : Observer);
-notifyObserver();
-
-}
-
-interface Observer {
-
-update(table : any);
-
-}
-
-export class dataObject implements Subject {
+export class dataObject {
     //tables for all patient data
     demoTable : ITable;
     orderTable : ITable;
@@ -46,18 +34,25 @@ export class dataObject implements Subject {
     targetOrderObjects;
 
     //defined cohort info
+    cohortIdArray;
     cohortProInfo; //used in order squares
     cohortOrderInfo; //defined cohort 
 
     cohortProObjects;//Promis scores as objects for cohort
     patOrderObjects;//orders as objects for all patient data
-    cohortDemoObjects;//demographic info as objects for defined cohort
+    populationDemographics;//demo for whole population
+    filteredCohortDemo;//demographic info as objects for defined cohort
     cohortCptObjects;//CPT as objects for defined cohort
     cohortIcdObjects;//ICD objects for cohort
 
     selectedPatIds;//array of ids for defined patients 
 
-    filterRequirements;//this is sent from sidebar
+    //attempting to set up structure to hold filters
+    filterRequirements = {
+                          'demo': null, //this is sent from sidebar
+                          'icd': null,
+                          'cpt': null
+                         };
 
     startDate;
 
@@ -75,10 +70,6 @@ export class dataObject implements Subject {
         this.attachListener();
     }
 
-    public registerObserver(o : Observer) {};
-    public removeObserver(o : Observer) {};
-    public notifyObserver() {};
-
     private attachListener(){
 
         let startDateSelection = d3.select('#start_date').select('text');
@@ -95,14 +86,16 @@ export class dataObject implements Subject {
 
         events.on('Demo_Revise', (evt, item) => {
             this.demoTable = item;
-            console.log('demo table loaded');
-            this.mapPatientData();
-            this.getDataObjects('demo_object', this.demoTable);
+            //console.log('demo table loaded');
+            this.mapDemoData().then(value => {
+                events.fire('population demo loaded', value);
+            });
+           // this.getDataObjects('demo_object', this.demoTable);
         });
 
         events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
             this.proTable = item;
-            console.log('pro table loaded');
+            //console.log('pro table loaded');
             this.getDataObjects('pro_object', this.proTable);
         });
                  
@@ -120,7 +113,7 @@ export class dataObject implements Subject {
 
         events.on('ICD_codes', (evt, item)=> {
             this.icdTable = item;
-            console.log('icd table loaded');
+            //console.log('icd table loaded');
            // this.getDataObjects('icd_object', this.cptTable);
             
         });
@@ -130,8 +123,8 @@ export class dataObject implements Subject {
         */
         //THESE ARE TAKING AN ETERNITY. NEED TO USE RANGES TO FILTER TABLES
         events.on('demo_object', (evt, item)=> {
-            this.cohortDemoObjects = item;
-            console.log('demo objects loaded');
+           // this.populationDemographics = item;
+            //console.log('demo objects loaded');
         });
 
         events.on('order_object', (evt, item)=> {
@@ -141,23 +134,21 @@ export class dataObject implements Subject {
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
 
             this.cohortProObjects = item;
-            console.log('promis objects loaded');
+            //console.log('promis objects loaded');
         });
 
         events.on('cpt_object', (evt, item)=> {
 
             this.cohortCptObjects = item;
-            console.log('cpt objects loaded');
+           // console.log('cpt objects loaded');
             events.fire('update_target');
            // this.getOrders(this.patCptObjects);
         });
 
         events.on('icd_object', (evt, item)=> {
 
-            this.cohortCptObjects = item;
-            console.log('icd objects loaded');
-            //events.fire('update_target');
-           // this.getOrders(this.patCptObjects);
+            this.cohortIcdObjects = item;
+       
         });
 
         /* 
@@ -166,25 +157,37 @@ export class dataObject implements Subject {
          events.on('update_target', () => { //this is picked up from target patient search in query box
 
             const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-            this.getTargetCPT(value, this.cohortCptObjects);
+            this.updateTarget(value, this.cohortCptObjects);
        
          });
 
           // item: [d, parentValue]
           events.on('filter_data', (evt, item) => { // called in sidebar
 
-            console.log(item);
-            this.updateDemo(item, this.cohortDemoObjects);
+            this.filterRequirements.demo = item;
+            //console.log(this.filterRequirements);
+            this.updateDemo(item, this.populationDemographics);
 
           });
+
+          events.on('selected_pat_array', (evt, item)=> {
+     
+            this.cohortIdArray = item;
+            this.getCPT(this.cohortIdArray, this.cohortCptObjects);
+        });
+
+    }
+
+    private updateFiltered (filters, population){
+
 
     }
 //pulled from parallel coord
     private updateDemo(sidebarFilter, demoObjects) {//picks up the filters from sidebar and creates sidebarfiltered data
-
-        let filter = demoObjects;
+        //this works with the value returned by the mapped patient demo
+          let filter = demoObjects;
     
-         sidebarFilter.forEach( d=> {
+          sidebarFilter.forEach( d=> {
            
            let parent = d.attributeName;
            let choice = d.checkedOptions;
@@ -208,11 +211,11 @@ export class dataObject implements Subject {
         }
           
          });
-         
-           //this.sidebarFiltered = filter;
-           //this.plotPatients(this.sidebarFiltered, null);
-           events.fire('demo_filtered', [filter, this.cohortDemoObjects]);
-       
+
+           this.filteredCohortDemo = filter;
+
+           events.fire('demo_filtered', [filter, this.populationDemographics]);
+            
        }
     
     //uses Phovea to access PROMIS data and draw table for cohort
@@ -234,53 +237,52 @@ export class dataObject implements Subject {
  
      };
 
-       //gets CPT objects for target patient and maps them to draw
-    private async getTargetCPT(patID, cptObject) {
+     //uses Phovea to access PRO data and draw table
+   private async getCPT(selectedPatIds, cptObject) {
 
-        let filteredPatScore = [];
+    let filteredPatOrders = {};
+   // const patOrders = await this.orderTable.objects();
+   
+     cptObject.forEach(item => {
+         if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
+          if (filteredPatOrders[item.PAT_ID] === undefined) {
+     filteredPatOrders[item.PAT_ID] = [];
+   }
+     filteredPatOrders[item.PAT_ID].push(item);
+    }
+     });
+     let mapped = entries(filteredPatOrders);
+
+    events.fire('filtered_CPT', mapped);
+
+    return mapped;
+
+ };
+
+       //gets CPT objects for target patient and maps them to draw
+    private async updateTarget(patID, cptObject) {
+
+        let filteredPatScore = [];//gets PROMIS Scores for target patient
   
         this.cohortProObjects.forEach(item => {
             if (patID.indexOf(item.PAT_ID) !== -1) {
             filteredPatScore.push(item);
         }
         }); 
- 
-        let filteredPatOrders = {};
-        // const patOrders = await this.orderTable.objects();
-   
-        cptObject.forEach(item => {
-          if (patID.indexOf(item.PAT_ID) !== -1) {
-           if (filteredPatOrders[item.PAT_ID] === undefined) {
-         filteredPatOrders[item.PAT_ID] = [];
-        }
-        filteredPatOrders[item.PAT_ID].push(item);
-        }
-        });
-        let mapped = entries(filteredPatOrders);
- 
-    // events.fire('filtered_CPT', mapped);
-     events.fire('target_updated', [mapped, filteredPatScore]);
- 
+
+        this.getCPT(patID, cptObject).then(value => {//gets CPT for target patient
+
+            events.fire('target_updated', [value, filteredPatScore]);
+
+          });
+          
     };
 
-    public async mapPatientData() {
+    public async mapDemoData() {
 
-        // let table : ITable;
          let that = this;
-     /*
-         this.svg.append('g').attr('id', 'MotherPlotter');
-         
-         select('#MotherPlotter').append('g')
-         .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
-         .attr('id', 'plotRejects');
-     
-         select('#MotherPlotter').append('g')
-         .attr('height', this.plotDimension.height).attr('transform', 'translate(25, '+this.margin.top+')')
-         .attr('id', 'plotGroup');
-         */
-        // this.table = <ITable> await getById('Demo_Revise');//all of the data is still 
-     
-         // I THINK THIS IS WHAT IS KILLING THE APP
+ 
+         // I THINK THIS IS WHAT IS KILLING THE APP? MOST LIKELY THE OBJECTS LOADING
          let patID = (await this.demoTable.colData('PAT_ID')).map(d => +d);
          let GENDER = (await this.demoTable.colData('PAT_GENDER')).map(d => d);
          let MARITAL_STATUS = (await this.demoTable.colData('PAT_MARITAL_STAT')).map(d => d);
@@ -301,7 +303,7 @@ export class dataObject implements Subject {
             
            });
        
-           this.cohortDemoObjects = patID.map((id, i) => {
+           let popdemo = patID.map((id, i) => {
              return {
                ID: id,
                GENDER: GENDER[i],
@@ -316,7 +318,9 @@ export class dataObject implements Subject {
                DM_CODE: DM_CODE[i]
              };
            });
-     
+
+           this.populationDemographics = popdemo;
+           return popdemo;
    
         }
 /*

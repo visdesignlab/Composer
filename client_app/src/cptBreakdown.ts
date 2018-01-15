@@ -31,7 +31,7 @@ export class cptBreakdown {
   private parseTime = dataCalc.parseTime;
   private setOrderScale = dataCalc.setOrderScale;
   private getClassAssignment = dataCalc.getClassAssignment;
-  private drawPatOrderRects = dataCalc.drawPatOrderRects;
+ // private drawPatOrderRects = dataCalc.drawPatOrderRects;
   private orderHierarchy = dataCalc.orderHierarchy;
   private patOrderGroup;
   targetPatientOrders;
@@ -89,7 +89,7 @@ constructor(parent: Element) {
     events.on('selected_pat_array', (evt, item)=> {
      
         this.selectedPatientArray = item;
-        this.getCPT(this.selectedPatientArray, this.cptObject);
+       // this.getCPT(this.selectedPatientArray, this.cptObject);
     });
 
     events.on('cpt_object', (evt, item)=> {
@@ -153,26 +153,6 @@ constructor(parent: Element) {
               }
               return minDate
           }
-
-   //uses Phovea to access PRO data and draw table
-   private async getCPT(selectedPatIds, cptObject) {
-
-    let filteredPatOrders = {};
-   // const patOrders = await this.orderTable.objects();
-   
-     cptObject.forEach(item => {
-         if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
-          if (filteredPatOrders[item.PAT_ID] === undefined) {
-     filteredPatOrders[item.PAT_ID] = [];
-   }
-     filteredPatOrders[item.PAT_ID].push(item);
-    }
-     });
-    let mapped = entries(filteredPatOrders);
-
-    events.fire('filtered_CPT', mapped);
-
- };
 
   /**
      *

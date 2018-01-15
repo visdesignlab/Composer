@@ -81,6 +81,7 @@ export class parallel {
   private attachListener() {
 
            events.on('Demo_Revise', (evt, item)=> {
+
            this.table = item;
            this.mapPatientData();
         
@@ -96,10 +97,11 @@ export class parallel {
             events.on('brush_event', (evt, item) => {
              //brush event used to redraw plot
               this.plotPatients(item[0], item[1]);
-              events.fire('dataUpdated', [item[0], this.allData]);
+              events.fire('demo_filtered', [item[0], this.allData]);
+              
             });
 
-            events.on('dataUpdated', (evt, item) =>{//called on brush event and updatePlot in parallel
+            events.on('demo_filtered', (evt, item) =>{//called on brush event and updatePlot in parallel
               this.updateCounter(item[0]);
             });
 
@@ -113,7 +115,7 @@ export class parallel {
              //gos right back to sidebar for the hover count
               events.fire('filter_counted', [this.allData.length, subFilter.length, parent]);
 
-            })
+            });
     
         }
   

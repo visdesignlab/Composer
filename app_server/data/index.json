@@ -1,4 +1,21 @@
 [{
+        "name": "003",
+        "path": "ICD_Set.csv",
+        "separator": ",",
+        "quotechar": "\"",
+        "id": "icd_set",
+        "size": [
+            12631,
+            1
+        ],
+        "type": "table",
+        "idtype": "INDEX",
+        "idcolumn": 0,
+        "columns": [
+            { "name": "003", "value": { "type": "string" } }
+        ]
+    },
+    {
         "name": "demo_revise",
         "path": "demo_with_dm.csv",
         "separator": ",",
