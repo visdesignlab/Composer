@@ -14,6 +14,7 @@ import { axisBottom, axisLeft } from 'd3-axis';
 import { transition } from 'd3-transition';
 import { brushY } from 'd3-brush';
 import * as dataCalc from './dataCalculations';
+
 var similarityScoreDiagram = (function() {
     function similarityScoreDiagram(parent, diagram) {
         var _this = this;

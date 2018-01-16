@@ -4,8 +4,10 @@
 
 import * as ajax from 'phovea_core/src/ajax';
 import * as d3 from 'd3';
+import * as json from 'json-stringify-safe';
+//import * as fs from 'graceful-fs';
 import {BaseType, select, selectAll, event} from 'd3-selection';
-import {nest, values, keys, map, entries} from 'd3-collection'
+import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
 import {line, curveMonotoneX} from 'd3-shape';
@@ -19,6 +21,10 @@ import * as distributionDiagram from './distributionDiagram';
 import {ITable, asTable} from 'phovea_core/src/table';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
+import { writeJson } from 'fs-extra';
+import * as dataCalculations from './dataCalculations';
+import * as similarityScoreDiagram from './similarityScoreDiagram';
+import { dataCalc } from './dataCalculations';
 
 export class populationStat {
 
@@ -26,12 +32,19 @@ export class populationStat {
     private icdObjects;
     private cptObjects;
     private populationDemo;
+    private populationPromis;
+    private parseTime = dataCalculations.parseTime;
+    private findMinDate = dataCalculations.findMinDate;
+    private findMaxDate = dataCalculations.findMaxDate;
 
     constructor(parent: Element) {
 
         this.$node = select(parent);
 
         this.$node.append('div').classed('pop_count', true).append('text').text('number of patients:   ');
+
+        const dgmPromisPhysicalDiv = this.$node.append('Div').classed('allDiagramDiv', true);
+        similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
 
         const distributions = this.$node.append('div').classed('distributions', true);
         distributionDiagram.create(distributions.node());
@@ -45,22 +58,57 @@ export class populationStat {
     private attachListener() {  
 
         events.on('population demo loaded', (evt, item)=> {
-            console.log(item);
+           // console.log(item);
             this.populationDemo = item;
             this.showStats();
+        });
+        events.on('pro_object', (evt, item)=> {
+            this.populationPromis = item;
+            this.promisReformat(item);
         });
     }
 
     private showStats () {
         let popCount = this.populationDemo.length;
         this.$node.select('.pop_count').append('text').text(this.populationDemo.length);
-
-        this.loadSet();
-   
-
+        
     }
 
-    private async loadSet () {
+    private promisReformat (promis) {
+
+        let PROMIS = promis.filter((d) => {
+           return d['FORM'] == 'PROMIS Bank v1.2 - Physical Function'
+          });
+
+        let filteredPatOrders = {};
+
+        PROMIS.forEach((d) => {
+            let maxDiff = 0;
+           // console.log(d);
+            
+             if (filteredPatOrders[d.PAT_ID] === undefined) {
+            filteredPatOrders[d.PAT_ID] = [];
+          }
+            filteredPatOrders[d.PAT_ID].push(d);
+            
+          });
+
+          let mapped = entries(filteredPatOrders);
+          //return filteredPatOrders; 
+          let patPromis = mapped.map(d=> {
+              return {
+                key: d.key,
+                value: d.value,
+                min_date: this.findMinDate(d.value),
+                max_date: this.findMaxDate(d.value),
+              }
+         });
+
+          console.log(patPromis);
+          events.fire('gotPromisScore', patPromis);
+    }
+
+    private async loadICDSet () {
 
         let ch1 = []; //Certain infectious and parasitic diseases
         let ch2 = []; //neoplasms
@@ -146,17 +194,12 @@ export class populationStat {
           
         };
 
-       // icd_obj.({id: 2, square:3}); //add some data
-        let json = JSON.stringify(icd_obj); //convert it back to json
-        var fs = require('fs');
-        fs.writeFile('myjsonfile.json', json, 'utf8'); // write it back 
-
-       //console.log(ICD);
-    }
+    
+   //writeJson('test', icd_obj);
 
    
 
-}
+}}
 
 export function create(parent: Element) {
     return new populationStat(parent);

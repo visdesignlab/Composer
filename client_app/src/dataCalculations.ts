@@ -47,7 +47,7 @@ export class dataCalc {
 }
 
  /**
-     * Utility method
+     * Used in calc for pat promis scores
      * @param pat
      * @returns {Date}
      */
@@ -61,6 +61,25 @@ export class dataCalc {
         }
        
         return minDate
+        
+    }
+
+     /**
+     * Used in calc for pat promis scores
+     * @param pat
+     * @returns {Date}
+     */
+    export function findMaxDate(pat) {
+
+        let maxDate = this.parseTime(pat[0]['ASSESSMENT_START_DTM'], null);
+
+        for (let index = 0; index < pat.length; index++) {
+            if (!pat[index]['ASSESSMENT_START_DTM']) continue;
+            if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) > maxDate)
+                maxDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
+        }
+       
+        return maxDate
         
     }
 
@@ -133,7 +152,6 @@ export class dataCalc {
       
         events.fire('query_order_type', value);
 
-        
       });
   }
 
@@ -193,91 +211,6 @@ export class dataCalc {
 
   }
 
-
-  /**
-   *
-   * @param ordersInfo
-   */
-
-  export function drawPatOrderRects(ordersInfo, targetProInfo) {
-
-     let timeType = 'PROC_DTM';
-
-      let minDate = this.findMinDate(targetProInfo);
-  
-         ordersInfo.forEach((d) => {
-        let time = this.parseTime(d['ORDER_DTM'], minDate).getTime();
-       // let time = this.parseTime(d[timeType], minDate).getTime();
-        d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
-      });
- 
-
-      const self = this;
-
-      events.on ('query_order', event => {
-          this.currentlySelectedName = event.args[0];
-       
-      });
-
-      let orderRect = this.svg.select('#pat_rect_line')
-      .selectAll('.orderRect')
-      .data([ordersInfo]);
-
-      orderRect.exit().remove();
-
-      let orderRectEnter = orderRect.enter()
-      .append('g')
-      .classed('orderRect', true);
-      
-      orderRect = orderRectEnter.merge(orderRect);
-
-      let rects = orderRect.selectAll('rect')
-      .data((d) => d);
-
-      rects.exit().remove();
-
-      let rectsEnter = rects.enter()
-      .append('rect');
-      rects = rectsEnter.merge(rects);
-      rects.attr('class', this.getClassAssignment('ORDER_CATALOG_TYPE'))
-      .attr('class', this.getClassAssignment('ORDER_STATUS'))
-      .attr('x', (g) => this.timeScale(g.diff))
-      .attr('y', 0)
-      .attr('width', this.orderBar.width)
-      .attr('height', this.orderBar.height)
-     
-      //this is the mousclick event that greys rects
-      .on('click', (d)=> {
-          this.assignCurrentName.bind(this);
-          console.log(d.ORDER_DTM);
-          events.fire('date clicked', d.ORDER_DTM);
-        })//end the mousclick event that shows the graph
-      .on("mouseover", (d) => {
-        let t = transition('t').duration(500);
-        select(".tooltip")
-          .html(() => {
-            return this.renderOrdersTooltip(d);
-          })
-          .transition(t)
-          .style("opacity", 1)
-          .style("left", `${event.pageX + 10}px`)
-          .style("top", `${event.pageY + 10}px`);
-      })
-      .on("mouseout", () => {
-        let t = transition('t').duration(500);
-        select(".tooltip").transition(t)
-        .style("opacity", 0);
-      });
-      
-      
-      d3.selectAll('.MEDICATION, .PROCEDURE')
-      .classed('selectedOrder', d =>  d.PRIMARY_MNEMONIC == this.currentlySelectedName)
-      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.PRIMARY_MNEMONIC !== this.currentlySelectedName);
-      
-       this.svg.select('.xAxis')
-      .call(axisBottom(this.timeScale))
-
-  }
   
 //make this more generic
   export function reformatCPT(patProInfo, similarOrdersInfo) {

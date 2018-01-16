@@ -104,18 +104,6 @@ export class parallel {
             events.on('demo_filtered', (evt, item) =>{//called on brush event and updatePlot in parallel
               this.updateCounter(item[0]);
             });
-
-            events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
-            
-              let parent = item[0];
-              let choice = item[1];
-           
-              let subFilter = this.allData.filter(d => d[parent] == choice);
-
-             //gos right back to sidebar for the hover count
-              events.fire('filter_counted', [this.allData.length, subFilter.length, parent]);
-
-            });
     
         }
   
