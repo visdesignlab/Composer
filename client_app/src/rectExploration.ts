@@ -50,6 +50,7 @@ export class rectExploration {
   private cohortProInfo;
  
   private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
+  private findMinDateCPT = dataCalc.findMinDateCPT;
   private parseTime = dataCalc.parseTime;
   private setOrderScale = dataCalc.setOrderScale;
   private getClassAssignment = dataCalc.getClassAssignment;
@@ -267,17 +268,6 @@ export class rectExploration {
 
  }
 
- private findMinDateCPT(pat) {
-   
-           let minDate = new Date();
-           for (let index = 0; index < pat.length; index++) {
-               if (!pat[index]['PROC_DTM']) continue;
-               if (this.parseTime(pat[index]['PROC_DTM'], null) < minDate)
-                   minDate = this.parseTime(pat[index]['PROC_DTM'], null)
-           }
-           return minDate
-       }
-
     /**
      * firing event to update the vis for info of a patient
      */
@@ -454,7 +444,6 @@ export class rectExploration {
             .append('text')
             .text('Medications');
         
-  
   }
 
       //this is where your order search starts

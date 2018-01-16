@@ -29,6 +29,7 @@ export class distributionDiagram {
     private AGE;
     private CCI;
     private GENDER;
+    private days;
     private distibutionDivs;
     private midLineCohort;
     private populationDemo;
@@ -43,6 +44,10 @@ export class distributionDiagram {
             .classed('distributionDiv', true)
            // .classed('hidden', true);
 
+           this.days = this.$node.append('div').classed('distribution', true).attr('id', 'days').append('svg')
+           .attr('height', this.distributionDimension.height + 70)
+           .attr('width', this.distributionDimension.width + 60);
+
         this.BMI = this.$node.append('div').classed('distribution', true).attr('id', 'BMI').append('svg')
             .attr('height', this.distributionDimension.height + 70)
             .attr('width', this.distributionDimension.width + 60);
@@ -54,11 +59,7 @@ export class distributionDiagram {
         this.CCI = this.$node.append('div').classed('distribution', true).attr('id', 'CCI').append('svg')
         .attr('height', this.distributionDimension.height + 70)
         .attr('width', this.distributionDimension.width + 60);
-/*
-        this.GENDER = this.$node.append('div').classed('distribution', true).attr('id', 'GENDER').append('svg')
-        .attr('height', this.distributionDimension.height + 70)
-        .attr('width', this.distributionDimension.width + 60);
-*/
+
         this.svg =  this.$node.selectAll('svg');
 
         this.distibutionDivs = this.$node.selectAll('.distribution');
@@ -137,12 +138,20 @@ export class distributionDiagram {
            this.drawDiagram(selected, all, 'CCI');
         });
 
+        events.on('day_dist', (evt, item)=> {
+            //this.drawPROMIS(item, 'days');
+            this.drawDiagram(null, item, 'days');
+        })
+
     }
+
 
     /**
      * Draw the diagram with the given data from getSimilarRows
      */
     private drawDiagram(selected, patData, type) {
+    
+
         var self = this;
    
         this.$node.classed('hidden', false);
@@ -175,7 +184,7 @@ export class distributionDiagram {
         this.yScale.domain([0, 1]);
 
         this.yScale.domain([0, max(histogramDataALL, function (d) {
-            return d.frequency + .2;
+            return d.frequency + .1;
         })]);
 
         //////////////bar groups for all data////////////////////////////////

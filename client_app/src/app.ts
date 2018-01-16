@@ -107,9 +107,6 @@ export class App {
      
     this.setBusy(false);
 
-    //this update_temp_similar is from testing at beginning of project. 
-    events.fire('update_temp_similar', ['PAT_ID', '20559329', 10]);
-
     events.on('parallel', () => {
 
     //parallel coord plot 
