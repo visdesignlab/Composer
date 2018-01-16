@@ -3,6 +3,7 @@
  */
 
 import * as ajax from 'phovea_core/src/ajax';
+import {brushX} from 'd3-brush';
 import * as d3 from 'd3';
 import * as json from 'json-stringify-safe';
 //import * as fs from 'graceful-fs';
@@ -25,10 +26,12 @@ import { writeJson } from 'fs-extra';
 import * as dataCalculations from './dataCalculations';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import { dataCalc } from './dataCalculations';
+import { Domain } from 'domain';
 
 export class populationStat {
 
     private $node;
+    private brush;
     private icdObjects;
     private cptObjects;
     private populationDemo;
@@ -36,15 +39,34 @@ export class populationStat {
     private parseTime = dataCalculations.parseTime;
     private findMinDate = dataCalculations.findMinDate;
     private findMaxDate = dataCalculations.findMaxDate;
+    private maxDay;
+    private timeScale;
+    private timeScaleMini;
 
     constructor(parent: Element) {
 
         this.$node = select(parent);
+//1252 days is the max number of days for the patients
+        this.timeScale = scaleLinear()
+            .domain([0, 1251])
+            .range([0, 700]).clamp(true);
 
-        this.$node.append('div').classed('pop_count', true).append('text').text('number of patients:   ');
+        this.timeScaleMini = scaleLinear()
+            .domain([0, 1251])
+            .range([0, 700])
+            .clamp(true);
+
+        let patientCountText = this.$node.append('div').classed('pop_count', true)
+        .style('height', '25px').style('margin-top', '40px');
+
+        patientCountText.append('text').text('Number of Patients:   ');
+
+        this.$node.append('div').classed('day_line', true);
 
         const dgmPromisPhysicalDiv = this.$node.append('Div').classed('allDiagramDiv', true);
         similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+
+        //const promis_stats = this.$node.append('div').classed('promis_stats', true).append('svg');
 
         const distributions = this.$node.append('div').classed('distributions', true);
         distributionDiagram.create(distributions.node());
@@ -66,11 +88,86 @@ export class populationStat {
             this.populationPromis = item;
             this.promisReformat(item);
         });
+
+        events.on('timeline_max_set', (evt, item)=> {
+            //console.log(item);
+            this.maxDay = item;
+            select('.day_line').select('.maxDay').text(this.maxDay + " Days");
+        });
     }
 
     private showStats () {
+
         let popCount = this.populationDemo.length;
+
         this.$node.select('.pop_count').append('text').text(this.populationDemo.length);
+
+        let timeline = this.$node.select('.day_line');
+
+        let timelineMin = timeline.append('text').text('0 Days');
+
+        let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
+                          .attr('height', 50).attr('width', 710);
+
+        let timelineLine = timelineSVG.append('line')
+                .attr('x1', 0)
+                .attr('x2',675)
+                .attr('y1', 0)
+                .attr('y2', 0)
+                .attr('stroke-width', 1)
+                .attr('stroke', 'red')
+                .attr('transform', 'translate(20, 50)');
+
+        let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
+
+         // ----- SLIDER
+
+        let slider = timelineSVG.append('g')
+         .attr('class', 'slider')
+         .attr('transform', `translate(20,20)`);
+
+        let that = this;
+
+        this.brush = brushX()
+        .extent([[0, 0], [700, 30]])
+        .handleSize(0)
+        .on("end", () => {
+            if (event.selection === null) {
+              //this.setOrderScale();
+             
+            } else {
+              let start = this.timeScale.invert(event.selection[0]);
+              let end = this.timeScale.invert(event.selection[1]);
+          
+            
+              timelineSVG//.select('.context')
+              .append('g')
+              .attr('class', '.xAxisMini')
+              .attr('transform', () => `translate(0,30)`)
+              .call(axisBottom(this.timeScale));
+
+              events.fire('domain updated', [start, end]);
+            }
+           // this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
+           // this.reformatCPT(this.targetCPT)
+           // this.drawMiniRects(this.targetProInfo, this.targetCPT);
+          });
+
+
+        slider.call(this.brush);
+        // .call(this.brush.move, this.timeScale.range());
+
+     // -----
+    }
+
+    private updateDays(start, end) {
+
+        let startDay = this.timeScale(start);
+        let endDay = this.timeScale(end);
+
+        console.log(startDay);
+        console.log(endDay);
+        this.maxDay = endDay;
         
     }
 

@@ -64,6 +64,17 @@ export class dataCalc {
         
     }
 
+    export function findMinDateCPT(pat) {
+   
+        let minDate = new Date();
+        for (let index = 0; index < pat.length; index++) {
+            if (!pat[index]['PROC_DTM']) continue;
+            if (this.parseTime(pat[index]['PROC_DTM'], null) < minDate)
+                minDate = this.parseTime(pat[index]['PROC_DTM'], null)
+        }
+        return minDate
+    }
+
      /**
      * Used in calc for pat promis scores
      * @param pat
