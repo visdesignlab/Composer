@@ -65,6 +65,9 @@ export class App {
         .attr('type', 'button')
         .attr('value', 'Parallel Coordinate')
         .on('click', () => events.fire('parrallel'));
+    
+          // query box
+    queryBox.create(main.node());
 
     const parallelView = main.append('div').classed('parallel_view', true);
     const populationView = main.append('div').classed('population_view', true);
@@ -74,8 +77,7 @@ export class App {
 
      // distributionDiagram
    // distributionDiagram.create(main.node());
-    // query box
-    queryBox.create(main.node());
+  
 
     //start time count
     //main.append('div').attr('id', 'start_date').append('text');
@@ -98,8 +100,8 @@ export class App {
     */
 
       // PROMIS diagrams
-    const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
-    similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
+   // const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
+   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
      //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
      //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
      

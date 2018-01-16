@@ -123,7 +123,6 @@ export class SideBar {
           select(this.parentNode.parentNode).select('rect').attr('width', 0);
           select(this.parentNode.parentNode).select('text').text(' ');
        
-          //console.log('leaving');
         });
     
         listlabel.on('click', function(d){

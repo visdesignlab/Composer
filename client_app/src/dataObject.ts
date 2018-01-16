@@ -47,6 +47,8 @@ export class dataObject {
 
     selectedPatIds;//array of ids for defined patients 
 
+    startDate;
+
     //attempting to set up structure to hold filters
     filterRequirements = {
                           'demo': null, //this is sent from sidebar
@@ -54,7 +56,7 @@ export class dataObject {
                           'cpt': null
                          };
 
-    startDate;
+    
 
     constructor() {
         /* 
@@ -86,7 +88,7 @@ export class dataObject {
 
         events.on('Demo_Revise', (evt, item) => {
             this.demoTable = item;
-            //console.log('demo table loaded');
+            console.log(item);
             this.mapDemoData().then(value => {
                 events.fire('population demo loaded', value);
             });
@@ -108,7 +110,7 @@ export class dataObject {
         events.on('CPT_codes', (evt, item)=> {
             this.cptTable = item;
             console.log('cpt table loaded');
-            this.getDataObjects('cpt_object', this.cptTable);
+            //this.getDataObjects('cpt_object', this.cptTable);
         });
 
         events.on('ICD_codes', (evt, item)=> {
@@ -134,6 +136,7 @@ export class dataObject {
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
 
             this.cohortProObjects = item;
+            events.fire('cpt_loaded', item);
             //console.log('promis objects loaded');
         });
 
@@ -175,6 +178,18 @@ export class dataObject {
             this.cohortIdArray = item;
             this.getCPT(this.cohortIdArray, this.cohortCptObjects);
         });
+
+        events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
+            
+            let parent = item[0];
+            let choice = item[1];
+         
+            let subFilter = this.populationDemographics.filter(d => d[parent] == choice);
+
+           //gos right back to sidebar for the hover count
+            events.fire('filter_counted', [this.populationDemographics.length, subFilter.length, parent]);
+
+          });
 
     }
 

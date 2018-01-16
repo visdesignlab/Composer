@@ -53,7 +53,7 @@ export class similarityScoreDiagram {
 
     height = 400;
     width = 600;
-    promisDimension = {height: 400, width: 600};
+    promisDimension = {height: 500, width: 750};
     margin = {x: 80, y: 40};
     sliderWidth = 10;
     similarBar = {width: 4, height: 10};
@@ -76,7 +76,7 @@ export class similarityScoreDiagram {
 
         // scales
         this.timeScale = scaleLinear()
-            .range([0, this.promisDimension.width - 1.2 * this.margin.x])
+            .range([0, this.promisDimension.width - this.margin.x])
             .clamp(true);
 
         this.scoreScale = scaleLinear()
@@ -147,7 +147,7 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
-
+/*
         // item: pat_id, number of similar patients, DATA
         events.on('update_similar', (evt, item) => { // called in queryBox
 
@@ -159,12 +159,12 @@ export class similarityScoreDiagram {
             this.cohortProInfo = entries(item[2]['similar_PRO']);
             this.targetOrderInfo = item[2]['pat_Orders'][item[0]].slice();
             this.cohortOrderInfo = entries(item[2]['similar_Orders']);
-            
+ 
             this.clearDiagram();
             this.drawDiagram();
            // this.addSimilarOrderPoints(item[2]['pat_Orders'][item[0]].slice(), entries(item[2]['similar_Orders']));
            
-        });
+        });*/
 
         // item: pat_id, DATA
         events.on('update_all_info', (evt, item) => {  // called in query box
@@ -198,7 +198,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('gotPromisScore', (evt, item) => {  // called in parrallel on brush and 
-                
+            
                 this.cohortProInfo = item;  
                 this.clearDiagram();
                 this.drawDiagram();
@@ -225,98 +225,77 @@ export class similarityScoreDiagram {
      */
     private drawDiagram() {
         
-        // ----- add diff days to the data
+            // ----- add diff days to the data
    
-        let maxDiff = 0;
-
-        let minPatDate = this.findMinDate(this.targetProInfo);
-        this.targetProInfo.forEach((d) => {
-                d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minPatDate.getTime()) / (1000 * 60 * 60 * 24));
-                maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-            });
-        this.targetProInfo.sort((a, b) => ascending(a.diff, b.diff));
+            let maxDiff = 0;// this sets the score scale max.
+                                //need to make this dynamic. 
     
+            this.cohortProInfo.forEach((g) => {
+            //console.log(g);
+            let minDate = g.min_date;
+            let maxDate = g.max_date;
+        
+                g.value.forEach((d) => {
+                    try {
+                        d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                        maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+                    }
+                    catch (TypeError) {
+                        d.diff = -1;
+                    }//console.log(d.diff);
+                })
 
-        this.cohortProInfo.forEach((g) => {
-           
-        let minDate = this.findMinDate(g.value);
-            g.value.forEach((d) => {
-                try {
-                    d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                    maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-                }
-                catch (TypeError) {
-                    d.diff = -1;
-                }
-            })
-        });
-
-        let similarData = this.cohortProInfo.map((d) => {
-            let res = d.value.filter((g) => {
-                return g['FORM'] == this.diagram
+                g.maxDiff = Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                console.log(g.maxDiff);
             });
-            res.sort((a, b) => ascending(a.diff, b.diff));
-            return res;
-        });
-
-        const patData = this.targetProInfo.filter((d) => {
-            return d['FORM'] == this.diagram
-        });
-
-        // -----  set domains and axis
-
-        // time scale
-
-        this.timeScale.domain([-1, maxDiff]);
-
-        this.svg.select('.xAxis')
-            .call(axisBottom(this.timeScale));
-
-        // -------  define line function
-
-        const lineFunc = line()
-            .curve(curveMonotoneX)
-            .x((d) => {
-                return this.timeScale(d['diff']);
-            })
-            .y((d) => {
-                return this.scoreScale(+d['SCORE']);
+    
+            let similarData = this.cohortProInfo.map((d) => {
+                let res = d.value.filter((g) => {
+                    return g['FORM'] == this.diagram
+                });
+                res.sort((a, b) => ascending(a.diff, b.diff));
+                return res;
             });
 
-        // ------- draw
-
-        const medScoreGroup = this.svg.select('#similar_score');
-        medScoreGroup.selectAll('.med_group')
-            .data(similarData)
-            .enter()
-            .append('g')
-            .attr('transform', () => {
-                return `translate(${this.margin.x},${this.margin.y})`;
-            })
-            .each(function (d) {
-                let currGroup = select(this);
-                currGroup.append('g')
-                    .append('path')
-                    .attr('class', 'proLine') // TODO later after getting classification
-                    .attr('d', () => lineFunc(d));
-            })
-            .on('click', (d) => console.log(d));
-
-            const patScoreGroup = this.svg.select('#pat_score');
-            const patLine = patScoreGroup
+            console.log(this.cohortProInfo);
+    
+         
+            // -----  set domains and axis
+            // time scale
+            this.timeScale.domain([-1, maxDiff]);
+    
+            this.svg.select('.xAxis')
+                .call(axisBottom(this.timeScale));
+    
+            // -------  define line function
+            const lineFunc = line()
+                .curve(curveMonotoneX)
+                .x((d) => {
+                    return this.timeScale(d['diff']);
+                })
+                .y((d) => {
+                    return this.scoreScale(+d['SCORE']);
+                });
+    
+            // ------- draw
+            const medScoreGroup = this.svg.select('#similar_score');
+            medScoreGroup.selectAll('.med_group')
+                .data(similarData)
+                .enter()
                 .append('g')
                 .attr('transform', () => {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 })
-                .selectAll('.patLine')
-                .data([patData])
-                .enter()
-                .append('path')
-                .attr('class', 'patLine')
-                .attr('d', (d) => lineFunc(d))
+                .each(function (d) {
+                    let currGroup = select(this);
+                    currGroup.append('g')
+                        .append('path')
+                        .attr('class', 'proLine') // TODO later after getting classification
+                        .attr('d', () => lineFunc(d));
+                })
                 .on('click', (d) => console.log(d));
-    
-    }
+        
+        }
     
 
     /**
@@ -420,7 +399,6 @@ export class similarityScoreDiagram {
                         .attr('y2', self.scoreScale(0) + self.margin.y)
                         .on('click', () => console.log(d));
 
-                
                 }
                 else {
                     select(this).classed('selectedOrder', false);
