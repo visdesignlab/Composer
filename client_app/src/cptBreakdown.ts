@@ -99,8 +99,8 @@ constructor(parent: Element) {
     });
 
     events.on('filtered_CPT', (evt, item) => {
-      
-      this.addSimilarOrderPoints(this.targetProInfo, item);
+      console.log('made it  '+ item);
+      this.addSimilarOrderPoints(null, item);
     });
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
@@ -161,28 +161,37 @@ constructor(parent: Element) {
     private addSimilarOrderPoints(patProInfo, similarOrdersInfo) {
 
               // -------  target patient
+       
 
-              let minDate = this.findMinDate(patProInfo);
+           // let minDate = this.findMinDate(patProInfo);
+        let minDate = new Date();
+        
+            similarOrdersInfo.forEach((d) => {
+               
+                let minDatePat = this.findMinDateCPT(d);
+                console.log('min date pat :'+ minDatePat);
+                if(minDate > minDatePat) minDate = minDatePat;
+                console.log('min date  :'+ minDate);
+                let time = this.parseTime(d['PROC_DTM'], minDate).getTime();
+                d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+
+            });
+        
               
-                      similarOrdersInfo.forEach((d) => {
-                          let time = this.parseTime(d['PROC_DTM'], minDate).getTime();
-                          d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                      });
-      
-              const self = this;
+        const self = this;
 
               // ----- add diff days to the data
          
-              let filteredOrders = [];
-              similarOrdersInfo.forEach((g) => {
+        let filteredOrders = [];
+        similarOrdersInfo.forEach((g) => {
 
                 //g.array = [];
+        let minDate;
       
-                 if(g.value != null){
-                      let minDate = this.findMinDateCPT(g.value);
-                 }
+        if(g.value != null) minDate = this.findMinDateCPT(g.value);
+                      
                 // let minDate = this.findMinDate(similarOrdersInfo.value);
-                  g.value.forEach((d) => {
+            g.value.forEach((d) => {
 
                       d.array = []; 
                       d.time = d['PROC_DTM'];
@@ -210,18 +219,18 @@ constructor(parent: Element) {
 
                      });
 
-                     let filter = g.value.map(function(blob) {
-                        let temp = [];
-                        temp.push(blob.array);  
-                        return {
+            let filter = g.value.map(function(blob) {
+                    let temp = [];
+                    temp.push(blob.array);  
+                    return {
                             key: blob.PAT_ID,
                             value : temp,
                             time: blob.PROC_DTM,
                             diff : blob.diff
                             };
-                        });
+                    });
 
-                      filteredOrders.push(filter);
+                    filteredOrders.push(filter);
                            
                 });
             

@@ -95,15 +95,15 @@ export class populationStat {
         });
         events.on('pro_object', (evt, item)=> {
             this.populationPromis = item;
-            console.log(item);
-           // this.promisReformat(item, 1123);
+           // console.log(item);
+          
         });
 
         events.on('pro_object_filtered', (evt, item)=> {
-           // this.populationPromis = item;
+          
            this.filteredPromis = item;
-            console.log(item);
-           // this.promisReformat(item, 1123);
+           // console.log(item);
+          
         });
 
         events.on('timeline_max_set', (evt, item)=> {
@@ -117,7 +117,7 @@ export class populationStat {
     private showStats () {
 
         let popCount = this.populationDemo.length;
-
+        
         this.$node.select('.fillTotal').text(this.populationDemo.length);
         //this.$node.select('.select_count').append('text').text(this.filteredPromis.length);
 
@@ -190,40 +190,6 @@ export class populationStat {
         
     }
 
-    private promisReformat (promis, formID : number) {//YOU NEED TO COMBINE THIS WITH PROMIS IN DATAOBJECTS
-/*
-        let PROMIS = promis.filter((d) => {
-           return d['FORM_ID'] == 1123
-          });
-
-        let filteredPatOrders = {};
-
-        PROMIS.forEach((d) => {
-            let maxDiff = 0;
-           // console.log(d);
-            
-             if (filteredPatOrders[d.PAT_ID] === undefined) {
-            filteredPatOrders[d.PAT_ID] = [];
-          }
-            filteredPatOrders[d.PAT_ID].push(d);
-            
-          });
-
-          let mapped = entries(filteredPatOrders);
-          //return filteredPatOrders; 
-          let patPromis = mapped.map(d=> {
-              return {
-                key: d.key,
-                value: d.value,
-                min_date: this.findMinDate(d.value),
-                max_date: this.findMaxDate(d.value),
-              }
-         });
-
-          console.log(patPromis);
-          events.fire('gotPromisScore', patPromis);
-          */
-    }
 
     private async loadICDSet () {
 

@@ -93,11 +93,11 @@ export class App {
       //order hierarchy
     patOrderBreakdown.create(main.node());
      this.$node.select('.orderBreakdownDiv').classed('hidden', true);
-
+*/
     const cpt = main.append('Div').classed('cptDiv', true);
     cptBreak.create(cpt.node());
     this.$node.select('.cptDiv').classed('hidden', true);
-    */
+    
 
       // PROMIS diagrams
    // const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
@@ -134,8 +134,18 @@ export class App {
           
                   });
 
-        events.on('show_PROMIS', ()=> {
-          this.$node.select('.main').select('.allDiagramDiv').classed('hidden', false);
+    events.on('load_cpt', () => {
+          
+      // console.log('works!');
+       this.$node.select('.main').select('.distributions').classed('hidden', true);
+      // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
+       this.$node.select('.main').select('.cptDiv').classed('hidden', false);
+       this.$node.select('.main').select('.rectDiv').classed('hidden', false);
+
+   });
+
+        events.on('show_distributions', ()=> {
+          this.$node.select('.main').select('.distributions').classed('hidden', false);
           //this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
           this.$node.select('.main').select('.cptDiv').classed('hidden', true);
           this.$node.select('.main').select('.rectDiv').classed('hidden', true);
