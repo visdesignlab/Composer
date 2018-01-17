@@ -16,9 +16,15 @@ import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
+import * as dataCalculations from './dataCalculations';
 
 
 export class dataObject {
+
+    private findMinDate = dataCalculations.findMinDate;
+    private findMaxDate = dataCalculations.findMaxDate;
+    private parseTime = dataCalculations.parseTime;
+
     //tables for all patient data
     demoTable : ITable;
     orderTable : ITable;
@@ -88,7 +94,7 @@ export class dataObject {
 
         events.on('Demo_Revise', (evt, item) => {
             this.demoTable = item;
-            console.log(item);
+            //console.log(item);
             this.mapDemoData().then(value => {
                 events.fire('population demo loaded', value);
             });
@@ -109,7 +115,7 @@ export class dataObject {
 
         events.on('CPT_codes', (evt, item)=> {
             this.cptTable = item;
-            console.log('cpt table loaded');
+            //console.log('cpt table loaded');
             //this.getDataObjects('cpt_object', this.cptTable);
         });
 
@@ -136,8 +142,8 @@ export class dataObject {
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
 
             this.cohortProObjects = item;
-            events.fire('cpt_loaded', item);
-            //console.log('promis objects loaded');
+            this.getPromisScores(null, this.cohortProObjects);
+            
         });
 
         events.on('cpt_object', (evt, item)=> {
@@ -169,7 +175,7 @@ export class dataObject {
 
             this.filterRequirements.demo = item;
             //console.log(this.filterRequirements);
-            this.updateDemo(item, this.populationDemographics);
+            this.demoFilter(item, this.populationDemographics);
 
           });
 
@@ -197,9 +203,15 @@ export class dataObject {
 
 
     }
-//pulled from parallel coord
-    private updateDemo(sidebarFilter, demoObjects) {//picks up the filters from sidebar and creates sidebarfiltered data
+
+//pulled from paralle coord
+    private demoFilter(sidebarFilter, demoObjects) {
+        //picks up the filters from sidebar and creates sidebarfiltered data
         //this works with the value returned by the mapped patient demo
+        //sets patId array to filter
+
+          this.selectedPatIds = [];
+
           let filter = demoObjects;
     
           sidebarFilter.forEach( d=> {
@@ -226,30 +238,76 @@ export class dataObject {
         }
           
          });
+            filter.forEach(element => {
+                this.selectedPatIds.push(element.ID);
+            });
 
            this.filteredCohortDemo = filter;
+           console.log(this.selectedPatIds);
+           console.log(this.cohortProObjects);
 
-           events.fire('demo_filtered', [filter, this.populationDemographics]);
+           this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
             
        }
+
     
     //uses Phovea to access PROMIS data and draw table for cohort
     private async getPromisScores(selectedPatIds, proObjects) {
 
-        let filteredPatScore = {};
-     
-        proObjects.forEach(item => {
-        if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
-        if (filteredPatScore[item.PAT_ID] === undefined) {
-         filteredPatScore[item.PAT_ID] = [];
+      // let mapped = entries(filteredPatScore);
+      // this.cohortProInfo = mapped;
+      // events.fire('pro_object_filtered', filteredPatScore);
+    let PROMIS = proObjects.filter((d) => {
+        return d['FORM_ID'] == 1123
+    });
+
+    let yayornay = 'nay';
+
+    let filteredPatOrders = {};
+
+    if (selectedPatIds !== null ) {
+
+        yayornay = 'yay';
+
+        proObjects.forEach((d) => {
+                // let maxDiff = 0;
+                // console.log(d);
+                
+            if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
+                    if (filteredPatOrders[d.PAT_ID] === undefined) {
+                        filteredPatOrders[d.PAT_ID] = [];
+                        }
+                        filteredPatOrders[d.PAT_ID].push(d);
+                        }
+            });
         }
-       filteredPatScore[item.PAT_ID].push(item);
-        }
+
+    if (selectedPatIds == null){
+        proObjects.forEach((d) => {
+               // if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
+                    if (filteredPatOrders[d.PAT_ID] === undefined) {
+                            filteredPatOrders[d.PAT_ID] = [];
+                            }
+                            filteredPatOrders[d.PAT_ID].push(d);
+                          //  }
         });
-       let mapped = entries(filteredPatScore);
-       this.cohortProInfo = mapped;
-       events.fire('gotPromisScore', mapped);
- 
+
+       }
+    
+       let mapped = entries(filteredPatOrders);
+       //return filteredPatOrders; 
+       let patPromis = mapped.map(d=> {
+           return {
+             key: d.key,
+             value: d.value,
+             min_date: this.findMinDate(d.value),
+             max_date: this.findMaxDate(d.value),
+           }
+      });
+
+      console.log(patPromis);
+      events.fire('gotPromisScores', patPromis);
+
      };
 
      //uses Phovea to access PRO data and draw table
