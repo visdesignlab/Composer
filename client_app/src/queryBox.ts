@@ -108,12 +108,13 @@ export class QueryBox {
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'CPT Codes')
-            .on('click', () => events.fire('show_cpt'));
+           // .on('click', () => events.fire('show_cpt'));
+            .on('click', () => events.fire('load_cpt'));
 
         form.append('input')
             .attr('type', 'button')
-            .attr('value', 'PROMIS Scores')
-            .on('click', () => events.fire('show_PROMIS'));
+            .attr('value', 'Show Stats')
+            .on('click', () => events.fire('show_distributions'));
 
         form.append('label')
             .attr('for', 'start_date')

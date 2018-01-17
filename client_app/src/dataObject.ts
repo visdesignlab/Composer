@@ -94,7 +94,7 @@ export class dataObject {
 
         events.on('Demo_Revise', (evt, item) => {
             this.demoTable = item;
-            //console.log(item);
+            
             this.mapDemoData().then(value => {
                 events.fire('population demo loaded', value);
             });
@@ -103,25 +103,32 @@ export class dataObject {
 
         events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
             this.proTable = item;
-            //console.log('pro table loaded');
+            
             this.getDataObjects('pro_object', this.proTable);
         });
                  
         events.on('Orders', (evt, item)=> {
-            console.log('order table loaded');
+            
             //this.orderTable = item;
            // this.getDataObjects('order_object', this.orderTable);
         });
 
         events.on('CPT_codes', (evt, item)=> {
             this.cptTable = item;
-            //console.log('cpt table loaded');
+          
             //this.getDataObjects('cpt_object', this.cptTable);
         });
 
+        events.on('load_cpt', ()=> {
+            //this is called from cpt button 
+            //loads the cpt objects form the table for all patients
+            this.getDataObjects('cpt_object', this.cptTable);
+           
+        })
+
         events.on('ICD_codes', (evt, item)=> {
             this.icdTable = item;
-            //console.log('icd table loaded');
+            
            // this.getDataObjects('icd_object', this.cptTable);
             
         });
@@ -132,7 +139,7 @@ export class dataObject {
         //THESE ARE TAKING AN ETERNITY. NEED TO USE RANGES TO FILTER TABLES
         events.on('demo_object', (evt, item)=> {
            // this.populationDemographics = item;
-            //console.log('demo objects loaded');
+           
         });
 
         events.on('order_object', (evt, item)=> {
@@ -149,8 +156,9 @@ export class dataObject {
         events.on('cpt_object', (evt, item)=> {
 
             this.cohortCptObjects = item;
-           // console.log('cpt objects loaded');
-            events.fire('update_target');
+            this.getCPT(this.selectedPatIds, this.cohortCptObjects);
+          
+           // events.fire('update_target');
            // this.getOrders(this.patCptObjects);
         });
 
@@ -174,7 +182,7 @@ export class dataObject {
           events.on('filter_data', (evt, item) => { // called in sidebar
 
             this.filterRequirements.demo = item;
-            //console.log(this.filterRequirements);
+         
             this.demoFilter(item, this.populationDemographics);
 
           });
@@ -243,9 +251,7 @@ export class dataObject {
             });
 
            this.filteredCohortDemo = filter;
-           console.log(this.selectedPatIds);
-           console.log(this.cohortProObjects);
-
+          
            this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
             
        }
@@ -265,14 +271,13 @@ export class dataObject {
 
     let filteredPatOrders = {};
 
-    if (selectedPatIds !== null ) {
+    if (selectedPatIds != null ) {
 
         yayornay = 'yay';
 
         proObjects.forEach((d) => {
                 // let maxDiff = 0;
-                // console.log(d);
-                
+               
             if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
                     if (filteredPatOrders[d.PAT_ID] === undefined) {
                         filteredPatOrders[d.PAT_ID] = [];
@@ -305,9 +310,8 @@ export class dataObject {
            }
       });
 
-      console.log(patPromis);
       events.fire('gotPromisScores', patPromis);
-
+      if (yayornay == 'yay')events.fire('filteredPatients', patPromis);
      };
 
      //uses Phovea to access PRO data and draw table
@@ -327,8 +331,7 @@ export class dataObject {
      let mapped = entries(filteredPatOrders);
 
     events.fire('filtered_CPT', mapped);
-
-    return mapped;
+    //return mapped;
 
  };
 
@@ -413,7 +416,7 @@ export class dataObject {
            //get target patient orders
 
            let filteredPatOrders = [];
-           // console.log(this.patProObjects + 'found in promis score');
+         
             this.cohortCptObjects.forEach(item => {
             if (patID.indexOf(item.PAT_ID) !== -1) {
            
@@ -428,7 +431,7 @@ export class dataObject {
      private async getTargetPromisScore(targetPatId) {
  
         let filteredPatScore = [];
-       // console.log(this.patProObjects + 'found in promis score');
+     
         this.cohortProObjects.forEach(item => {
         if (targetPatId.indexOf(item.PAT_ID) !== -1) {
         filteredPatScore.push(item);

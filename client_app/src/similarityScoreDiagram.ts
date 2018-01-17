@@ -87,11 +87,11 @@ export class similarityScoreDiagram {
 
         this.lineScale = scaleLinear()
             .domain([1, 6071])
-            .range([1.5, .2]).clamp(true);
+            .range([1, .2])//.clamp(true);
 
         this.lineOpacity = scaleLinear()
             .domain([1, 6071])
-            .range([1, .2]).clamp(true);
+            .range([.8, .2])//.clamp(true);
 
         // axis
         scoreGroup.append('g')
@@ -160,11 +160,11 @@ export class similarityScoreDiagram {
 
         events.on('updateDays', (evt, item)=> {
            // this.maxDay = this.timeScale(item[0]);
-            console.log(this.maxDay);
+           // console.log(this.maxDay);
         });
 
         events.on('domain updated', (evt, item)=> {
-            console.log(item);
+           // console.log(item);
 
             this.maxDay = item[1];
             this.minDay = item[0];
@@ -275,11 +275,7 @@ export class similarityScoreDiagram {
     private drawDiagram() {
 
         let lineCount = this.cohortProInfo.length;
-        console.log(lineCount);
-        let scaledO = this.lineOpacity(lineCount);
-      //  console.log(Math.floor(scaledO, -2));   // 1.01)
-        console.log(this.lineScale(lineCount));
-
+  
         let similarData = this.cohortProInfo.map((d) => {
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram
@@ -327,9 +323,6 @@ export class similarityScoreDiagram {
 
                 })
                 .on('click', (d) => console.log(d));
-
-                console.log('the opacity of what the line should be ' + that.lineOpacity(lineCount));
-                console.log(selectAll('.proLine').nodes());
         
         }
     
