@@ -152,17 +152,6 @@ export class rectExploration {
   
   private attachListener() {
 
-    // item: pat_id, number of similar patients, DATA
-    events.on('update_similar', (evt, item) => { // called in queryBox
-
-      // this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
-      // this.cohortProInfo = entries(item[2]['similar_PRO']);
-
-      // this.setOrderScale();
-      // this.targetOrders = item[2]['pat_Orders'][item[0]].slice();
-      // this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
-       //this.drawMiniRects(this.targetProInfo, this.targetCPT);
-    });
 
     events.on('target_updated', (evt, item) => {
         

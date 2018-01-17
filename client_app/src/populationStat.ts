@@ -27,6 +27,7 @@ import * as dataCalculations from './dataCalculations';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import { dataCalc } from './dataCalculations';
 import { Domain } from 'domain';
+import { path } from 'd3-path';
 
 export class populationStat {
 
@@ -36,6 +37,7 @@ export class populationStat {
     private cptObjects;
     private populationDemo;
     private populationPromis;
+    private filteredPromis;
     private parseTime = dataCalculations.parseTime;
     private findMinDate = dataCalculations.findMinDate;
     private findMaxDate = dataCalculations.findMaxDate;
@@ -59,7 +61,13 @@ export class populationStat {
         let patientCountText = this.$node.append('div').classed('pop_count', true)
         .style('height', '25px').style('margin-top', '40px');
 
-        patientCountText.append('text').text('Number of Patients:   ');
+        let totalPop = patientCountText.append('text').text(`total patient count: `)
+        patientCountText.append('text').classed('fillTotal', true);
+
+        let selectPop = this.$node.append('div').classed('select_count', true)
+        .style('height', '25px').style('margin-top', '40px')
+        selectPop.append('text').text('Number of Select Patients:   ');
+        selectPop.append('text').classed('fillSelect', true);
 
         this.$node.append('div').classed('day_line', true);
 
@@ -73,12 +81,13 @@ export class populationStat {
 
         this.attachListener();
         
-
-
     }
 
     private attachListener() {  
-
+        events.on('filteredPatients', (evt, item)=>{
+            this.filteredPromis = item;
+            this.$node.select('.fillSelect').text(this.filteredPromis.length);
+        })
         events.on('population demo loaded', (evt, item)=> {
            // console.log(item);
             this.populationDemo = item;
@@ -86,7 +95,15 @@ export class populationStat {
         });
         events.on('pro_object', (evt, item)=> {
             this.populationPromis = item;
-            this.promisReformat(item);
+            console.log(item);
+           // this.promisReformat(item, 1123);
+        });
+
+        events.on('pro_object_filtered', (evt, item)=> {
+           // this.populationPromis = item;
+           this.filteredPromis = item;
+            console.log(item);
+           // this.promisReformat(item, 1123);
         });
 
         events.on('timeline_max_set', (evt, item)=> {
@@ -94,20 +111,22 @@ export class populationStat {
             this.maxDay = item;
             select('.day_line').select('.maxDay').text(this.maxDay + " Days");
         });
+        events.on('filteredPatients', (evt, item)=> this.filteredPromis = item);
     }
 
     private showStats () {
 
         let popCount = this.populationDemo.length;
 
-        this.$node.select('.pop_count').append('text').text(this.populationDemo.length);
+        this.$node.select('.fillTotal').text(this.populationDemo.length);
+        //this.$node.select('.select_count').append('text').text(this.filteredPromis.length);
 
         let timeline = this.$node.select('.day_line');
 
         let timelineMin = timeline.append('text').text('0 Days');
 
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
-                          .attr('height', 50).attr('width', 710);
+                          .attr('height', 70).attr('width', 710);
 
         let timelineLine = timelineSVG.append('line')
                 .attr('x1', 0)
@@ -143,7 +162,7 @@ export class populationStat {
               timelineSVG//.select('.context')
               .append('g')
               .attr('class', '.xAxisMini')
-              .attr('transform', () => `translate(0,30)`)
+              .attr('transform', () => `translate(0,50)`)
               .call(axisBottom(this.timeScale));
 
               events.fire('domain updated', [start, end]);
@@ -171,10 +190,10 @@ export class populationStat {
         
     }
 
-    private promisReformat (promis) {
-
+    private promisReformat (promis, formID : number) {//YOU NEED TO COMBINE THIS WITH PROMIS IN DATAOBJECTS
+/*
         let PROMIS = promis.filter((d) => {
-           return d['FORM'] == 'PROMIS Bank v1.2 - Physical Function'
+           return d['FORM_ID'] == 1123
           });
 
         let filteredPatOrders = {};
@@ -203,6 +222,7 @@ export class populationStat {
 
           console.log(patPromis);
           events.fire('gotPromisScore', patPromis);
+          */
     }
 
     private async loadICDSet () {

@@ -12,6 +12,7 @@ import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
+import * as d3 from 'd3';
 //import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
@@ -59,6 +60,8 @@ export class similarityScoreDiagram {
     promisDimension = {height: 500, width: 750};
     margin = {x: 80, y: 40};
     sliderWidth = 10;
+    lineScale;
+    lineOpacity;
 
     constructor(parent: Element, diagram) {
 
@@ -81,6 +84,14 @@ export class similarityScoreDiagram {
         this.scoreScale = scaleLinear()
             .domain([80, 10])
             .range([0, this.promisDimension.height - 3 * this.margin.y]).clamp(true);
+
+        this.lineScale = scaleLinear()
+            .domain([1, 6071])
+            .range([1.5, .2]).clamp(true);
+
+        this.lineOpacity = scaleLinear()
+            .domain([1, 6071])
+            .range([1, .2]).clamp(true);
 
         // axis
         scoreGroup.append('g')
@@ -157,12 +168,13 @@ export class similarityScoreDiagram {
 
             this.maxDay = item[1];
             this.minDay = item[0];
+
             this.clearDiagram();
             this.drawDiagram();
 
 
         })
-
+/*
         // item: pat_id, DATA
         events.on('update_all_info', (evt, item) => {  // called in query box
 
@@ -183,7 +195,7 @@ export class similarityScoreDiagram {
             this.filteredOrders.medGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).medicationGroup;
             this.filteredOrders.proGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).procedureGroup;
            
-        });
+        });*/
 
         events.on('target_updated', (evt, item) => {
       
@@ -194,7 +206,7 @@ export class similarityScoreDiagram {
        
         });
 
-        events.on('gotPromisScore', (evt, item) => {  // called in parrallel on brush and 
+        events.on('gotPromisScores', (evt, item) => {  // called in parrallel on brush and 
             
                 this.cohortProInfo = item;  
                 this.clearDiagram();
@@ -248,11 +260,10 @@ export class similarityScoreDiagram {
         console.log(max(diffArray));
         events.fire('timeline_max_set', max(diffArray));
    
-       
-
         this.maxDay = maxDiff;
 
         events.fire('day_dist', this.cohortProInfo);
+        
         this.drawDiagram();
 
     }
@@ -262,6 +273,12 @@ export class similarityScoreDiagram {
      * @param args
      */
     private drawDiagram() {
+
+        let lineCount = this.cohortProInfo.length;
+        console.log(lineCount);
+        let scaledO = this.lineOpacity(lineCount);
+      //  console.log(Math.floor(scaledO, -2));   // 1.01)
+        console.log(this.lineScale(lineCount));
 
         let similarData = this.cohortProInfo.map((d) => {
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
@@ -290,6 +307,7 @@ export class similarityScoreDiagram {
     
             // ------- draw
             const medScoreGroup = this.svg.select('#similar_score');
+            let that = this;
             medScoreGroup.selectAll('.med_group')
                 .data(similarData)
                 .enter()
@@ -301,10 +319,17 @@ export class similarityScoreDiagram {
                     let currGroup = select(this);
                     currGroup.append('g')
                         .append('path')
-                        .attr('class', 'proLine') // TODO later after getting classification
+                        .attr('class', 'proLine') 
+                        .attr('stroke-width', that.lineScale(lineCount))
+                        .attr('stroke-opacity', that.lineScale(lineCount))
+                        //.style('stroke-width', `${this.lineScale(lineCount)}`)// TODO later after getting classification
                         .attr('d', () => lineFunc(d));
+
                 })
                 .on('click', (d) => console.log(d));
+
+                console.log('the opacity of what the line should be ' + that.lineOpacity(lineCount));
+                console.log(selectAll('.proLine').nodes());
         
         }
     
