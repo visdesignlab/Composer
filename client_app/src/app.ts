@@ -60,12 +60,6 @@ export class App {
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
 
-    //test button to create parallel when I want to
-    main.append('input')
-        .attr('type', 'button')
-        .attr('value', 'Parallel Coordinate')
-        .on('click', () => events.fire('parrallel'));
-    
           // query box
     queryBox.create(main.node());
 
@@ -89,7 +83,7 @@ export class App {
 
     rectExploration.create(main.node());
     this.$node.select('.rectDiv').classed('hidden', true);
-    
+  
       //order hierarchy
     patOrderBreakdown.create(main.node());
      this.$node.select('.orderBreakdownDiv').classed('hidden', true);

@@ -82,6 +82,13 @@ export class dataObject {
 
         let startDateSelection = d3.select('#start_date').select('text');
 
+        events.on('filtered_CPT_by_order', (evt, item)=> {
+           
+            this.filterbyCPT(item);
+
+           
+        });
+
         events.on('start_date_updated', (evt, item)=> {
          
             this.startDate = item;
@@ -207,8 +214,18 @@ export class dataObject {
 
     }
 
-    private updateFiltered (filters, population){
+    private filterbyCPT (selectedCPT){
 
+        let tempPatArray = [];
+
+        console.log(selectedCPT);
+        selectedCPT.forEach(element => {
+            console.log(element[0].key);
+            tempPatArray.push(element[0].key);
+        });
+        
+        this.selectedPatIds = tempPatArray;
+        this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
 
     }
 
