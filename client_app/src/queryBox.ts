@@ -73,7 +73,7 @@ export class QueryBox {
         //     .attr('type', 'button')
         //     .attr('value', 'Reset')
         //     .on('click', () => events.fire('update_init', ['func', 'init']));
-
+/*
         form.append('label')
             .attr('for', 'text_pat_id')
             .text('Patient ID');
@@ -88,7 +88,7 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'Update Target Patient')
             .on('click', () => events.fire('update_target'));
-
+*/
 /*
         form.append('input')
             .attr('type', 'button')
@@ -116,6 +116,12 @@ export class QueryBox {
             .attr('value', 'Show Stats')
             .on('click', () => events.fire('show_distributions'));
 
+         //test button to create parallel when I want to
+        form.append('input')
+        .attr('type', 'button')
+        .attr('value', 'Parallel Coordinate')
+        .on('click', () => events.fire('parrallel'));
+/*
         form.append('label')
             .attr('for', 'start_date')
             .attr('id', 'start_date_label')
@@ -131,7 +137,7 @@ export class QueryBox {
             .attr('id', 'pat_or_event')
             .text(this.startBool);
 
-
+*/
         this.attachListener();
     }
 

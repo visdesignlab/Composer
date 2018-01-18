@@ -33,9 +33,12 @@ export class cptBreakdown {
   private getClassAssignment = dataCalc.getClassAssignment;
  // private drawPatOrderRects = dataCalc.drawPatOrderRects;
   private orderHierarchy = dataCalc.orderHierarchy;
+  private findMaxDate = dataCalc.findMaxDate;
   private patOrderGroup;
   targetPatientOrders;
   targetProInfo
+  currentlySelectedName;
+  queryDataArray;
   //similarPatientsProInfo;
 
 
@@ -48,6 +51,8 @@ export class cptBreakdown {
   selectedPatientArray;
   cptObject;
   filteredCPT;
+
+  maxDay;
     
 constructor(parent: Element) {
 
@@ -56,7 +61,9 @@ constructor(parent: Element) {
    // .classed('cptBreakdownDiv', true)
    // .attr('transform', `translate(-50,0)`)
     .attr('width', this.rectBoxDimension.width)
-    .attr('height', this.rectBoxDimension.height*4);;
+    .attr('height', this.rectBoxDimension.height*4);
+
+    this.drawQueryBox();
 
     this.svg = this.$node.append('svg')
     .attr('class', 'cptSVG')
@@ -98,6 +105,15 @@ constructor(parent: Element) {
      
     });
 
+    events.on('timeline_max_set', (evt, item) =>{
+        
+        this.maxDay = item;
+        
+        });
+   
+    
+
+
     events.on('filtered_CPT', (evt, item) => {
       console.log('made it  '+ item);
       this.addSimilarOrderPoints(null, item);
@@ -105,6 +121,7 @@ constructor(parent: Element) {
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
         selectAll('.patCPTRecord').remove();
+        console.log(item);
         this.drawOrders(item);
     });
 
@@ -121,6 +138,77 @@ constructor(parent: Element) {
    
   }
 
+  private drawQueryBox (){
+
+    let form = this.$node.append('form');
+
+    form.append('input')
+            .attr('type', 'text')
+            .attr('placeholder', 'Search Order Name')
+            .attr('id', 'order_search')
+            .attr('value');
+
+    form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'order search')
+            .on('click', () => this.queryOrder());
+
+    form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'filter cohort by selected')
+            .on('click', () => {
+              events.fire('filtered_CPT_by_order', this.queryDataArray);
+              selectAll('.selectedOrder').classed('selectedOrder', false);
+              selectAll('.unselectedOrder').classed('unselectedOrder', false);
+            });
+}
+
+ /**
+     * firing event to update the vis for info of a patient
+     */
+    private queryOrder() {
+
+        let withQuery = [];
+            
+        if (this.currentlySelectedName != undefined ){
+          this.currentlySelectedName = undefined;
+        }
+  
+        const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+      
+   
+            let dataset = 'selected';
+            let targetOrder = value;
+            
+           let rects = selectAll('.visitDays').selectAll('rect');
+     
+           events.fire('query_order', value);
+  
+           let selectedRects = rects.nodes();
+           let selected =  <any>( <any>selectedRects );
+           let parentElem;
+           selected.forEach(node=> {
+            node.classList.remove('selectedOrder', 'unselectedOrder');
+  
+            if(node.classList.contains(value)){
+           
+              node.classList.add('selectedOrder');
+              let parent = node.parentNode.parentNode.parentNode;
+  
+            if(parentElem != parent){
+               withQuery.push(parent.__data__);
+               parentElem = parent;
+        
+            };
+  
+            }else{node.classList.add('unselectedOrder');}
+            });
+  
+         
+    this.queryDataArray = withQuery;
+    
+  }
+    
   
  /**
      * Utility method
@@ -144,16 +232,35 @@ constructor(parent: Element) {
      * @returns {Date}
      */
     private findMinDateCPT(pat) {
-      
+               
               let minDate = new Date();
               for (let index = 0; index < pat.length; index++) {
                   if (!pat[index]['PROC_DTM']) continue;
-                  if (this.parseTime(pat[index]['PROC_DTM'], null) < minDate)
+                  if (this.parseTime(pat[index]['PROC_DTM'], null).getTime() < minDate.getTime())
                       minDate = this.parseTime(pat[index]['PROC_DTM'], null)
+                     // console.log(minDate);
               }
               return minDate
           }
 
+     /**
+     * Used in calc for pat promis scores
+     * @param pat
+     * @returns {Date}
+     */
+    private findMaxDateCPT(pat) {
+
+        let maxDate = this.parseTime(pat[0]['PROC_DTM'], null);
+
+        for (let index = 0; index < pat.length; index++) {
+            if (!pat[index]['PROC_DTM']) continue;
+            if (this.parseTime(pat[index]['PROC_DTM'], null) > maxDate)
+                maxDate = this.parseTime(pat[index]['PROC_DTM'], null)
+        }
+       
+        return maxDate
+        
+    }
   /**
      *
      * @param ordersInfo
@@ -165,13 +272,17 @@ constructor(parent: Element) {
 
            // let minDate = this.findMinDate(patProInfo);
         let minDate = new Date();
+        let maxDate = this.parseTime(similarOrdersInfo[0].value[0]['PROC_DTM'], null);
         
             similarOrdersInfo.forEach((d) => {
                
-                let minDatePat = this.findMinDateCPT(d);
-                console.log('min date pat :'+ minDatePat);
-                if(minDate > minDatePat) minDate = minDatePat;
-                console.log('min date  :'+ minDate);
+                let minDatePat = this.findMinDateCPT(d.value);
+                let maxDatePat = this.findMaxDateCPT(d.value);
+
+                if(minDate.getTime() > minDatePat.getTime()) minDate = minDatePat;
+                if(maxDate.getTime() < maxDatePat.getTime())maxDate = maxDatePat;
+
+               // console.log('min date  :'+ minDate);
                 let time = this.parseTime(d['PROC_DTM'], minDate).getTime();
                 d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -233,6 +344,9 @@ constructor(parent: Element) {
                     filteredOrders.push(filter);
                            
                 });
+
+                console.log(maxDate);
+                this.timeScale.domain([0, this.maxDay]);
             
               events.fire('cpt_filtered', filteredOrders);
               this.filteredCPT = filteredOrders;
