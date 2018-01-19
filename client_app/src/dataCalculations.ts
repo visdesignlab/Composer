@@ -14,6 +14,10 @@ import {axisBottom, axisLeft} from 'd3-axis';
 import {transition} from 'd3-transition';
 import * as d3 from 'd3';
 
+/*
+This is for calculations that I do repeatedly that I don't want to keep typing
+*/
+
 export class dataCalc {
 
     startDate;
@@ -21,29 +25,9 @@ export class dataCalc {
 
     constructor(parent: Element) {
 
-        this.filteredOrders = this.getTargetPatient();
+       // this.filteredOrders = this.getTargetPatient();
     }
 
-     private getTargetPatient () {
-     // item: pat_id, number of similar patients, DATA
-
-       events.on('update_similar', (evt, item) => { // called in queryBox
-
-       this.filteredOrders = item[1]['Orders'][item[0]];
-
-    });
-
-    // item: pat_id, DATA
-    events.on('update_all_info', (evt, item) => {  // called in query box
-    
-       this.filteredOrders = item[1]['Orders'][item[0]];
-    
-  });
-
-   
-    return this.filteredOrders;
-  
-}
 }
 
  /**

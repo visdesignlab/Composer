@@ -17,7 +17,7 @@ import * as d3 from 'd3';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
-import * as dataObject from './dataObject'
+import * as dataManager from './dataManager';
 import {ITable, asTable} from 'phovea_core/src/table';
 import {IAnyVector, INumericalVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
@@ -48,7 +48,7 @@ export class similarityScoreDiagram {
     private orderHierarchy = dataCalc.orderHierarchy;
 
     private maxDay;
-    private minDay;
+    private minDay = 0;
 
    filteredOrders = {
        medGroup : [],
@@ -146,7 +146,7 @@ export class similarityScoreDiagram {
             .attr('id', 'pat_orders');
 
             this.svg.append('g')
-            .attr('id', 'similar_orders');
+            .attr('id', 'promis_orders');
 
         this.attachListener();
 
@@ -157,10 +157,6 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
-
-        events.on('updateDays', (evt, item)=> {
-        
-        });
 
         events.on('domain updated', (evt, item)=> {
           
@@ -175,31 +171,9 @@ export class similarityScoreDiagram {
 
 
         })
-/*
-        // item: pat_id, DATA
-        events.on('update_all_info', (evt, item) => {  // called in query box
-
-            this.svg.select('.slider')  // reset slider
-                .call(this.brush)
-                .call(this.brush.move, this.scoreScale.range());
-
-            this.targetProInfo = item[1]['PROMIS_Scores'][item[0]];
-            this.cohortProInfo = [];
-
-            this.clearDiagram();
-           // this.drawDiagram();
-           // this.addOrderSquares(item[1]['Orders'][item[0]]);
-
-            //this splits the order hierarchy into 2 arrays of medicaiton and 
-            //procedures for the patient but it is
-            //not recognized in the drawpatientrects();
-            this.filteredOrders.medGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).medicationGroup;
-            this.filteredOrders.proGroup = this.orderHierarchy(item[1]['Orders'][item[0]]).procedureGroup;
-           
-        });*/
 
         events.on('target_updated', (evt, item) => {
-      console.log('is this firing?');
+     
             this.targetProInfo = item[1];
             this.setOrderScale();
             this.clearDiagram();
@@ -208,7 +182,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('gotPromisScores', (evt, item) => {  // called in parrallel on brush and 
-            console.log('got promis score firing?');
+            
                 this.cohortProInfo = item;  
                 this.clearDiagram();
                 this.getDays();
@@ -216,7 +190,7 @@ export class similarityScoreDiagram {
                     });
 
          events.on('gotTargetPromisScore', (evt, item)=> {
-            console.log('got target promis score firing?');
+            
                 this.targetProInfo = item;
                 this.clearDiagram();
                // this.drawDiagram();
@@ -238,30 +212,30 @@ export class similarityScoreDiagram {
         let diffArray = [];
 
         this.cohortProInfo.forEach((g) => {
-        //console.log(g);
-        let minDate = g.min_date;
-        let maxDate = g.max_date;
+                       // console.log(g);
+                        let minDate = g.min_date;
+                        let maxDate = g.max_date;
 
-        g.value.forEach((d) => {
-        try {
-        d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-        maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-        }
-        catch (TypeError) {
-        d.diff = -1;
-        }//console.log(d.diff);
-        })
+                        g.value.forEach((d) => {
+                        try {
+                        d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                        maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+                        }
+                        catch (TypeError) {
+                        d.diff = -1;
+                        }//console.log(d.diff);
+                        })
 
-        g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
-        diffArray.push(g.days + 1);
+                        g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+                        diffArray.push(g.days + 1);
 
-        });
+                        });
 
         diffArray.sort((a, b) => ascending(a, b));
-        console.log(max(diffArray));
+    
         events.fire('timeline_max_set', max(diffArray));
    
-        this.maxDay = 365;// this is where the max day starts on load. 
+        //this.maxDay = 365;// this is where the max day starts on load. 
 
         events.fire('day_dist', this.cohortProInfo);
         
@@ -276,7 +250,7 @@ export class similarityScoreDiagram {
     private drawDiagram() {
 
             let lineCount = this.cohortProInfo.length;
-
+            console.log(this.cohortProInfo);
        
         let similarData = this.cohortProInfo.map((d) => {
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
@@ -288,7 +262,7 @@ export class similarityScoreDiagram {
     
             // -----  set domains and axis
             // time scale
-            this.timeScale.domain([0, this.maxDay]);
+            this.timeScale.domain([this.minDay, this.maxDay]);
     
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
@@ -324,11 +298,28 @@ export class similarityScoreDiagram {
                         .attr('d', () => lineFunc(d));
 
                 })
-                .on('click', (d) => console.log(d));
+                .on('click', (d) => {
+                    
+                    events.fire('line_clicked', d);
+                    this.addPromisDots(d)});
         
         }
     
+    private addPromisDots (d){
 
+        
+        let promisData = d;
+        console.log(d);
+        promisData.forEach(element => {
+           // console.log(element.diff);
+            console.log(element.SCORE);
+        });
+        let promisRects = this.svg.select('#promis_orders').append('g').selectAll('circle').data(promisData);
+        promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
+        .attr('cy', d=> this.scoreScale(d.SCORE)).attr('r', 5);
+
+      
+    }
     /**
      * Utility method
      * @param start
