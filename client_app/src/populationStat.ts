@@ -51,7 +51,7 @@ export class populationStat {
 //1252 days is the max number of days for the patients
         this.timeScale = scaleLinear()
             .domain([0, 1251])
-            .range([0, 700]).clamp(true);
+            .range([10, 700]).clamp(true);
 
         this.timeScaleMini = scaleLinear()
             .domain([0, 1251])
@@ -127,7 +127,7 @@ export class populationStat {
 
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
                           .attr('height', 70).attr('width', 710);
-
+/*
         let timelineLine = timelineSVG.append('line')
                 .attr('x1', 0)
                 .attr('x2',675)
@@ -135,8 +135,8 @@ export class populationStat {
                 .attr('y2', 0)
                 .attr('stroke-width', 1)
                 .attr('stroke', 'red')
-                .attr('transform', 'translate(20, 50)');
-
+                .attr('transform', 'translate(30, 50)');
+*/
         let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
 
          // ----- SLIDER
@@ -148,7 +148,7 @@ export class populationStat {
         let that = this;
 
         this.brush = brushX()
-        .extent([[0, 0], [700, 30]])
+        .extent([[10, 10], [700, 30]])
         .handleSize(0)
         .on("end", () => {
             if (event.selection === null) {
@@ -162,20 +162,20 @@ export class populationStat {
               timelineSVG//.select('.context')
               .append('g')
               .attr('class', '.xAxisMini')
-              .attr('transform', () => `translate(0,50)`)
+              .attr('transform', () => `translate(30,50)`)
               .call(axisBottom(this.timeScale));
 
               events.fire('domain updated', [start, end]);
             }
            // this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
            // this.reformatCPT(this.targetCPT)
-           // this.drawMiniRects(this.targetProInfo, this.targetCPT);
+        
           });
 
 
-        slider.call(this.brush);
-        // .call(this.brush.move, this.timeScale.range());
-
+        slider.call(this.brush)
+         .call(this.brush.move, [20,this.timeScale(365)]);
+         
      // -----
     }
 
