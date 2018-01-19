@@ -19,7 +19,7 @@ import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalculations from './dataCalculations';
 
 
-export class dataObject {
+export class dataManager {
 
     private findMinDate = dataCalculations.findMinDate;
     private findMaxDate = dataCalculations.findMaxDate;
@@ -61,8 +61,6 @@ export class dataObject {
                           'icd': null,
                           'cpt': null
                          };
-
-    
 
     constructor() {
         /* 
@@ -542,7 +540,7 @@ export class dataObject {
   }
 
   export function create() {
-    return new dataObject();
+    return new dataManager();
 }
 
    

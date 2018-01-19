@@ -11,12 +11,15 @@ import * as events from 'phovea_core/src/event';
 //import {Constants} from './constants';
 import * as parallel from './parallel';
 import {scaleLinear,scaleTime,scaleOrdinal, scaleBand} from 'd3-scale';
+//importing other modules from app
+import * as demoGraph from './demoGraphs';
 
 export class SideBar {
 
   private $node;
   private filters;
   private popRectScale;
+
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'value': ['W', 'H' ]},
@@ -33,6 +36,9 @@ export class SideBar {
   constructor(parent: Element) {
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
+    this.$node.append('div').attr('id', 'filterDiv');
+    const distributions = this.$node.append('div').classed('distributions', true);
+    demoGraph.create(distributions.node());
 
     this.attachListener();
   }
@@ -61,7 +67,7 @@ export class SideBar {
     let parents = [];
     let that = this;
 
-    let form = this.$node.append('form').append('div').attr('padding-top', 250);
+    let form = this.$node.select('#filterDiv').append('form').append('div').attr('padding-top', 250);
     
     let labels = form.selectAll('div')
         .data(this.header);
