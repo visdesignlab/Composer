@@ -159,18 +159,19 @@ export class similarityScoreDiagram {
     private attachListener() {
 
         events.on('updateDays', (evt, item)=> {
-           // this.maxDay = this.timeScale(item[0]);
-           // console.log(this.maxDay);
+        
         });
 
         events.on('domain updated', (evt, item)=> {
-           // console.log(item);
-
+          
             this.maxDay = item[1];
             this.minDay = item[0];
 
-            this.clearDiagram();
-            this.drawDiagram();
+            if(this.cohortProInfo != undefined){
+
+                this.clearDiagram();
+                this.drawDiagram();
+            }
 
 
         })
@@ -198,7 +199,7 @@ export class similarityScoreDiagram {
         });*/
 
         events.on('target_updated', (evt, item) => {
-      
+      console.log('is this firing?');
             this.targetProInfo = item[1];
             this.setOrderScale();
             this.clearDiagram();
@@ -207,7 +208,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('gotPromisScores', (evt, item) => {  // called in parrallel on brush and 
-            
+            console.log('got promis score firing?');
                 this.cohortProInfo = item;  
                 this.clearDiagram();
                 this.getDays();
@@ -215,7 +216,7 @@ export class similarityScoreDiagram {
                     });
 
          events.on('gotTargetPromisScore', (evt, item)=> {
-            
+            console.log('got target promis score firing?');
                 this.targetProInfo = item;
                 this.clearDiagram();
                // this.drawDiagram();
@@ -260,7 +261,7 @@ export class similarityScoreDiagram {
         console.log(max(diffArray));
         events.fire('timeline_max_set', max(diffArray));
    
-        this.maxDay = maxDiff;
+        this.maxDay = 365;// this is where the max day starts on load. 
 
         events.fire('day_dist', this.cohortProInfo);
         
@@ -274,8 +275,9 @@ export class similarityScoreDiagram {
      */
     private drawDiagram() {
 
-        let lineCount = this.cohortProInfo.length;
-  
+            let lineCount = this.cohortProInfo.length;
+
+       
         let similarData = this.cohortProInfo.map((d) => {
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram
