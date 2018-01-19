@@ -270,8 +270,6 @@ export class rectExploration {
 
       const value = (<HTMLInputElement>document.getElementById('order_search')).value;
     
-    
-
       if (this.queryBool == "order"){
        
         let dataset = 'selected';

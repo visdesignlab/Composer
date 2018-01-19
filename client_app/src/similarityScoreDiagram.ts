@@ -240,6 +240,7 @@ export class similarityScoreDiagram {
         //console.log(g);
         let minDate = g.min_date;
         let maxDate = g.max_date;
+        g.patDays = 'test';
 
         g.value.forEach((d) => {
         try {
@@ -277,16 +278,25 @@ export class similarityScoreDiagram {
         let lineCount = this.cohortProInfo.length;
   
         let similarData = this.cohortProInfo.map((d) => {
+            //console.log(d.days);
+            d.scale = this.timeScale.domain([0, d.days]);
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram
             });
+           
             res.sort((a, b) => ascending(a.diff, b.diff));
+            res.forEach(r=> {r.scale = d.scale;
+                            r.maxday = d.days});
+            
             return res;
             });
     
             // -----  set domains and axis
             // time scale
-            this.timeScale.domain([0, this.maxDay]);
+            this.timeScale.domain([0,  this.maxDay]);
+            console.log(similarData);
+            console.log(this.cohortProInfo);
+           // d3.max(similarData, (d) => d.days)
     
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
@@ -295,7 +305,7 @@ export class similarityScoreDiagram {
             const lineFunc = line()
                 .curve(curveMonotoneX)
                 .x((d) => {
-                    return this.timeScale(d['diff']);
+                    return this.timeScale(+d['diff']);
                 })
                 .y((d) => {
                     return this.scoreScale(+d['SCORE']);
@@ -312,17 +322,21 @@ export class similarityScoreDiagram {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 })
                 .each(function (d) {
-                    let currGroup = select(this);
-                    currGroup.append('g')
+                    let currGroup = select(this)
+                    //currGroup.append('g')
                         .append('path')
                         .attr('class', 'proLine') 
                         .attr('stroke-width', that.lineScale(lineCount))
                         .attr('stroke-opacity', that.lineScale(lineCount))
                         //.style('stroke-width', `${this.lineScale(lineCount)}`)// TODO later after getting classification
-                        .attr('d', () => lineFunc(d));
+                        .attr('d', () => lineFunc(d))
+                       
 
                 })
                 .on('click', (d) => console.log(d));
+
+            let lines = select('#similar_score').selectAll('.proline');
+            lines.on('click', (d) => console.log(d));
         
         }
     
