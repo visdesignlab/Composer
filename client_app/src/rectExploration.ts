@@ -152,7 +152,7 @@ export class rectExploration {
   
   private attachListener() {
 
-
+/*
     events.on('target_updated', (evt, item) => {
         
         this.targetCPT = item[0];
@@ -161,7 +161,7 @@ export class rectExploration {
         this.setOrderScale();
        // this.drawPatOrderRects(item[0], item[1]);
         this.reformatCPT(this.targetProInfo, this.targetCPT);
-    });
+    });*/
 
     events.on('show_cpt', (evt)=> {
       this.queryBool = 'cpt';

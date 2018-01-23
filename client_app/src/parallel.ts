@@ -27,7 +27,7 @@ import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
 import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
-import * as dataObject from './dataObject';
+import * as dataManager from './dataManager';
 
 export class parallel {
 
