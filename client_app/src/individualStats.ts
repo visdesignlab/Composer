@@ -32,6 +32,7 @@ export class individualStats {
     private attachListener () {
         events.on('line_clicked', (evt, item)=> {
             console.log(item);
+            this.statWin.selectAll('div').remove();
             this.drawOrderWin(item);
         });
 

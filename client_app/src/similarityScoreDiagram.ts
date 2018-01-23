@@ -301,7 +301,8 @@ export class similarityScoreDiagram {
                 .on('click', (d) => {
                     
                     events.fire('line_clicked', d);
-                    this.addPromisDots(d)});
+                   // this.addPromisDots(d);
+                });
         
         }
     
