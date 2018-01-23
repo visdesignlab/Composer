@@ -301,7 +301,7 @@ export class similarityScoreDiagram {
                 .on('click', (d) => {
                     
                     events.fire('line_clicked', d);
-                   // this.addPromisDots(d);
+                    this.addPromisDots(d);
                 });
         
         }
@@ -315,9 +315,13 @@ export class similarityScoreDiagram {
            // console.log(element.diff);
             console.log(element.SCORE);
         });
-        let promisRects = this.svg.select('#promis_orders').append('g').selectAll('circle').data(promisData);
+        let promisRects = this.svg.select('#similar_score').selectAll('g').append('g')
+        //.attr('transform', () => {
+        //    return `translate(${this.margin.x},${this.margin.y})`;
+       // })
+        .selectAll('circle').data(promisData);
         promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
-        .attr('cy', d=> this.scoreScale(d.SCORE)).attr('r', 5);
+        .attr('cy', d=> this.scoreScale(d.SCORE)).attr('r', 5).attr('fill', '#21618C');
 
       
     }
