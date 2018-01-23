@@ -13,9 +13,11 @@ import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
 //import * as patOrderBreakdown from './patOrderBreakdown';
 import * as parallel from './parallel';
-import * as dataObject from './dataObject';
+import * as dataManager from './dataManager';
 import * as cptBreak from './cptBreakdown';
 import * as populationStat from './populationStat';
+import * as inStat from './individualStats';
+import { individualStats } from './individualStats';
 
 
 /**
@@ -50,7 +52,7 @@ export class App {
     // loading header
     this.$node.select('h3').remove();
 
-    const data = dataObject.create();//dataobject with all the info
+    const data = dataManager.create();//dataobject with all the info
     
     // create side bar
     const sideBarDiv = this.$node.append('div').classed('sideBar', true);
@@ -68,6 +70,8 @@ export class App {
 
     // population distributions, initial visualization for all of the data
     populationStat.create(populationView.node());
+
+    inStat.create(main.node());
 
      // distributionDiagram
    // distributionDiagram.create(main.node());

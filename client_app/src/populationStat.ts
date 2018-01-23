@@ -23,9 +23,8 @@ import {ITable, asTable} from 'phovea_core/src/table';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
 import { writeJson } from 'fs-extra';
-import * as dataCalculations from './dataCalculations';
+import * as dataCalc from './dataCalculations';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
-import { dataCalc } from './dataCalculations';
 import { Domain } from 'domain';
 import { path } from 'd3-path';
 
@@ -38,9 +37,9 @@ export class populationStat {
     private populationDemo;
     private populationPromis;
     private filteredPromis;
-    private parseTime = dataCalculations.parseTime;
-    private findMinDate = dataCalculations.findMinDate;
-    private findMaxDate = dataCalculations.findMaxDate;
+    private parseTime = dataCalc.parseTime;
+    private findMinDate = dataCalc.findMinDate;
+    private findMaxDate = dataCalc.findMaxDate;
     private maxDay;
     private timeScale;
     private timeScaleMini;
@@ -76,8 +75,8 @@ export class populationStat {
 
         //const promis_stats = this.$node.append('div').classed('promis_stats', true).append('svg');
 
-        const distributions = this.$node.append('div').classed('distributions', true);
-        distributionDiagram.create(distributions.node());
+      //  const distributions = this.$node.append('div').classed('distributions', true);
+      //  distributionDiagram.create(distributions.node());
 
         this.attachListener();
         
