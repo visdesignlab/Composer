@@ -212,26 +212,9 @@ export class similarityScoreDiagram {
         let diffArray = [];
 
         this.cohortProInfo.forEach((g) => {
-<<<<<<< HEAD
-        //console.log(g);
-        let minDate = g.min_date;
-        let maxDate = g.max_date;
-        g.patDays = 'test';
-
-        g.value.forEach((d) => {
-        try {
-        d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-        maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-        }
-        catch (TypeError) {
-        d.diff = -1;
-        }//console.log(d.diff);
-        })
-=======
                        // console.log(g);
                         let minDate = g.min_date;
                         let maxDate = g.max_date;
->>>>>>> zero
 
                         g.value.forEach((d) => {
                         try {
@@ -285,14 +268,7 @@ export class similarityScoreDiagram {
     
             // -----  set domains and axis
             // time scale
-<<<<<<< HEAD
-            this.timeScale.domain([0,  this.maxDay]);
-            console.log(similarData);
-            console.log(this.cohortProInfo);
-           // d3.max(similarData, (d) => d.days)
-=======
             this.timeScale.domain([this.minDay, this.maxDay]);
->>>>>>> zero
     
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
@@ -329,18 +305,11 @@ export class similarityScoreDiagram {
                        
 
                 })
-<<<<<<< HEAD
-                .on('click', (d) => console.log(d));
-
-            let lines = select('#similar_score').selectAll('.proline');
-            lines.on('click', (d) => console.log(d));
-=======
                 .on('click', (d) => {
                     
                     events.fire('line_clicked', d);
                     this.addPromisDots(d);
                 });
->>>>>>> zero
         
         }
     
