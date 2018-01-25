@@ -305,12 +305,68 @@
         ]
     },
     {
-        "name": "PRO_selected",
-        "path": "shrank_cleaned_PRO_index.csv",
+        "name": "PRO_PF",
+        "path": "PROMIS_SCORES_PF.csv",
         "separator": ",",
-        "id": "PRO_selected",
+        "id": "PRO_PF",
         "size": [
-            1124,
+            30525,
+            7
+        ],
+        "type": "table",
+        "idtype": "INDEX",
+        "idcolumn": 0,
+        "columns": [{
+                "name": "PAT_ID",
+                "value": {
+                    "type": "int"
+                }
+            },
+            {
+                "name": "VISIT_NO",
+                "value": {
+                    "type": "int"
+                }
+            },
+            {
+                "name": "ASSESSMENT_ID",
+                "value": {
+                    "type": "int"
+                }
+            },
+            {
+                "name": "ASSESSMENT_START_DTM",
+                "value": {
+                    "type": "string"
+                }
+            },
+            {
+                "name": "FORM_ID",
+                "value": {
+                    "type": "int"
+                }
+            },
+            {
+                "name": "FORM",
+                "value": {
+                    "type": "string"
+                }
+            },
+            {
+                "name": "SCORE",
+                "value": {
+                    "type": "float"
+                }
+            }
+        ]
+    },
+    {
+        "name": "PRO_SAMPLE",
+        "path": "PRO_PF_SAMPLE.csv",
+        "separator": ",",
+        "id": "PRO_SAMPLE",
+        "size": [
+            1602,
             7
         ],
         "type": "table",
