@@ -305,12 +305,12 @@
         ]
     },
     {
-        "name": "PRO_selected",
-        "path": "shrank_cleaned_PRO_index.csv",
+        "name": "PRO_PF",
+        "path": "PROMIS_SCORES_PF.csv",
         "separator": ",",
-        "id": "PRO_selected",
+        "id": "PRO_PF",
         "size": [
-            1124,
+            30525,
             7
         ],
         "type": "table",

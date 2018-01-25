@@ -206,6 +206,19 @@ constructor(parent: Element) {
   
          
     this.queryDataArray = withQuery;
+    console.log(withQuery);
+    withQuery.forEach(d=> {
+        console.log(targetOrder);
+        d.forEach(element => {
+           //console.log(element.value);
+           let sel = element.value.find(function(e) {
+            console.log("target order: "+ targetOrder);
+            return targetOrder;
+          });
+          console.log(sel);
+          // let sel = element.value.find(d => {return d.contains(targetOrder)});
+        });
+    });
     
   }
     
@@ -493,7 +506,8 @@ constructor(parent: Element) {
         
         // Surgery: 10021 – 69990.
         let surgery = rects.filter((d)=>  {
-            return d > 10020 && d < 69991
+           // return d > 10020 && d < 69991
+           return d == 63030;
         });   
         //class assigned to each rect with code in this range
         let surgeryRects = surgery.nodes();

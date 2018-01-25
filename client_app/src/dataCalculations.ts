@@ -126,6 +126,7 @@ export class dataCalc {
             else
                 time = parseT2(date)
         }
+        //console.log(' :' + time);
         return time
     }
 //get med and pro groups for target patient
