@@ -41,6 +41,7 @@ export class dataCalc {
         for (let index = 0; index < pat.length; index++) {
             if (!pat[index]['ASSESSMENT_START_DTM']) continue;
             if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
+           // if (pat[index]['ASSESSMENT_START_DTM'] < minDate)
                 minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
         }
        

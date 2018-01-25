@@ -25,86 +25,9 @@ export class QueryBox {
         let self = this;
 
         let form = this.$node.append('form');
-/*
-        form.append('label')
-            .attr('for', 'dataset_selection')
-            .text('Dataset: ');
 
-        form.append("input")
-            .attr('type', 'radio')
-            .attr("name", "dataset_selection")
-            .attr("value", "selected")
-            .property('checked', true)
-            .on("click", function () {
-                let val = select(this).attr("value");
-                if (val !== self.dataset) {
-                    self.dataset = val;
-                    events.fire('update_dataset', ['dataset', self.dataset])
-                }
-            });
-
-        form.append('label')
-            .html('Selected');
-
-        form.append('input')
-            .attr('type', 'radio')
-            .attr('value', 'all')
-            .attr('name', 'dataset_selection')
-            .on('click', function () {
-                let val = select(this).attr("value");
-                if (val !== self.dataset) {
-                    self.dataset = val;
-                    events.fire('update_dataset', ['dataset', self.dataset])
-                }
-            });
-
-        form.append('label')
-            .html('All');
-*/
         form.append('br');
 
-        // // these events are only handled in tables
-        // this.$node.append('input')
-        //     .attr('type', 'button')
-        //     .attr('value', 'Latest')
-        //     .on('click', () => events.fire('update_latest', ['func', 'latest'])); // only 'Demo' is updated
-        //
-        // this.$node.append('input')
-        //     .attr('type', 'button')
-        //     .attr('value', 'Reset')
-        //     .on('click', () => events.fire('update_init', ['func', 'init']));
-/*
-        form.append('label')
-            .attr('for', 'text_pat_id')
-            .text('Patient ID');
-
-        form.append('input')
-            .attr('type', 'text')
-            .attr('placeholder', 'Search PAT_ID')
-            .attr('id', 'text_pat_id')
-            .attr('value', '20559329');
-
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Update Target Patient')
-            .on('click', () => events.fire('update_target'));
-*/
-/*
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'All Info')
-            .on('click', () => this.updateAllInfo());
-
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'similar')
-            .on('click', () => this.updateSimilar());
-
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Orders')
-            .on('click', () => events.fire('show_orders'));
-*/
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'CPT Codes')
@@ -120,7 +43,7 @@ export class QueryBox {
         form.append('input')
         .attr('type', 'button')
         .attr('value', 'Parallel Coordinate')
-        .on('click', () => events.fire('parrallel'));
+        .on('click', () => events.fire('parallel'));
 /*
         form.append('label')
             .attr('for', 'start_date')
