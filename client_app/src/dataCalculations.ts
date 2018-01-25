@@ -41,6 +41,7 @@ export class dataCalc {
         for (let index = 0; index < pat.length; index++) {
             if (!pat[index]['ASSESSMENT_START_DTM']) continue;
             if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
+           // if (pat[index]['ASSESSMENT_START_DTM'] < minDate)
                 minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
         }
        
@@ -126,6 +127,7 @@ export class dataCalc {
             else
                 time = parseT2(date)
         }
+        //console.log(' :' + time);
         return time
     }
 //get med and pro groups for target patient
