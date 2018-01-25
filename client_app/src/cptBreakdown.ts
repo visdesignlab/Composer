@@ -156,6 +156,7 @@ constructor(parent: Element) {
               selectAll('.selectedOrder').classed('selectedOrder', false);
               selectAll('.unselectedOrder').classed('unselectedOrder', false);
               events.fire('min date to cpt', this.queryDateArray);
+              let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
             });
 }
 
@@ -176,7 +177,7 @@ constructor(parent: Element) {
   
         const value = (<HTMLInputElement>document.getElementById('order_search')).value;
       
-        let targetOrder = value;
+        this.targetOrder = value;
 
         this.filteredCPT.forEach(element => {
             let elementBool;
