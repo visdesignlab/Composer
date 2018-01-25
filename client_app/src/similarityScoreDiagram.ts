@@ -73,7 +73,9 @@ export class similarityScoreDiagram {
         this.$node.append('input')
         .attr('type', 'button')
         .attr('value', 'Update Target Patient')
-        .on('click', () => this.shiftDays());
+        .on('click', () => {
+            this.clearDiagram();
+            this.shiftDays(null)});
 
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
@@ -182,7 +184,7 @@ export class similarityScoreDiagram {
             this.targetProInfo = item[1];
             this.setOrderScale();
             this.clearDiagram();
-            this.getDays();
+            this.getDays(null);
        
         });
 
@@ -190,7 +192,7 @@ export class similarityScoreDiagram {
                // console.log('filtered promis objects' + item)
                 this.cohortProInfo = item;  
                 this.clearDiagram();
-                this.getDays();
+                this.getDays(null);
 
                     });
 
@@ -206,16 +208,45 @@ export class similarityScoreDiagram {
            // this.addSimilarOrderPoints(this.targetOrderInfo, item);
         });
 
+        events.on('min date to cpt', (evt, item)=> {
+            this.addMinDay(item);
+        });
+
     }
 
-    private getDays () {
+    private addMinDay(eventArray) {
+
+        console.log(eventArray);
+
+        let cohort = this.cohortProInfo;
+    
+        for(var i= 0;  i< cohort.length; i++) {
+
+            var keyA = cohort[i].key;
+
+            for(var j = 0; j< eventArray.length; j++) {
+
+              var keyB = eventArray[j].key;
+
+              if(keyA == keyB) {
+                cohort[i].CPTtime = eventArray[j].time;
+              }
+            } 
+          }
+        
+          console.log(cohort);
+          this.cohortProInfo = cohort;
+   
+}
+
+    private getDays (date) {
 
          // ----- add diff days to the data
         
         let maxDiff = 0;// this sets the score scale max.
          //need to make this dynamic. 
         let diffArray = [];
-        console.log(this.cohortProInfo);
+        //console.log(this.cohortProInfo);
 
         this.cohortProInfo.forEach((g) => {
                        // console.log(g);
@@ -253,19 +284,21 @@ export class similarityScoreDiagram {
 
     }
 
-    private shiftDays () {
+    private shiftDays (day) {
 
         // ----- add diff days to the data
        
        let maxDiff = 0;// this sets the score scale max.
         //need to make this dynamic. 
-       console.log(this.cohortProInfo);
+      // console.log(this.cohortProInfo);
 
        this.cohortProInfo.forEach((g) => {
-                        let minDate;
-                       console.log(g.value[1]);
-                       if(g.value[1] != undefined ) {
-                        minDate = this.parseTime(g.value[1]['ASSESSMENT_START_DTM'], null);
+
+                       let minDate;
+                       console.log(g);
+
+                       if(g.CPTtime != undefined ) {
+                        minDate = this.parseTime(g.CPTtime, null);
                        }else minDate = this.parseTime(g.value[0]['ASSESSMENT_START_DTM'], null);
                        //these have already been parsed
                        let maxDate = g.max_date;

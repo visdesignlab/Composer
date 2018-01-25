@@ -29,6 +29,7 @@ export class dataManager {
     demoTable : ITable;
     orderTable : ITable;
     proTable : ITable;
+    proTableSample : ITable;
     cptTable : ITable;
     icdTable : ITable
 
@@ -45,6 +46,7 @@ export class dataManager {
     cohortOrderInfo; //defined cohort 
 
     cohortProObjects;//Promis scores as objects for cohort
+    cohortProObSample;
     patOrderObjects;//orders as objects for all patient data
     populationDemographics;//demo for whole population
     filteredCohortDemo;//demographic info as objects for defined cohort
@@ -72,7 +74,7 @@ export class dataManager {
        // this.loadData('Orders');
         this.loadData('CPT_codes');
         this.loadData('ICD_codes');
-        this.loadData('PRO_PF');
+        this.loadData('PRO_SAMPLE');
 
         this.attachListener();
 
@@ -126,10 +128,10 @@ export class dataManager {
             //this.getDataObjects('cpt_object', this.cptTable);
         });
 
-        events.on('PRO_PF', (evt, item)=> {
-            console.log(item);
-            //this.proTable = item;
-            //this.getDataObjects('pro_object', this.proTable);
+        events.on('PRO_SAMPLE', (evt, item)=> {
+            //console.log(item);
+            this.proTableSample = item;
+           // this.getDataObjects('pro_sample', this.proTableSample);
         })
 
         events.on('load_cpt', ()=> {
@@ -161,10 +163,16 @@ export class dataManager {
         });
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
-
+            console.log(item);
             this.cohortProObjects = item;
             this.getPromisScores(null, this.cohortProObjects);
             
+        });
+
+        events.on('pro_sample', (evt, item)=> {//picked up by similarity diagram
+            console.log(item);
+           // this.cohortProObjects = item;
+           // this.getPromisScores(null, this.cohortProObjects);
         });
 
         events.on('cpt_object', (evt, item)=> {
@@ -286,9 +294,10 @@ export class dataManager {
       // let mapped = entries(filteredPatScore);
       // this.cohortProInfo = mapped;
       // events.fire('pro_object_filtered', filteredPatScore);
-    let PROMIS = proObjects.filter((d) => {
-        return d['FORM_ID'] == 1123
-    });
+   // let PROMIS = proObjects.filter((d) => {
+    //    return d['FORM_ID'] == 1123
+   // });
+   let PROMIS = proObjects;
 
     let yayornay = 'nay';
 

@@ -39,6 +39,8 @@ export class cptBreakdown {
   targetProInfo
   currentlySelectedName;
   queryDataArray;
+  queryDateArray;
+  targetOrder;
   //similarPatientsProInfo;
 
 
@@ -115,26 +117,19 @@ constructor(parent: Element) {
 
 
     events.on('filtered_CPT', (evt, item) => {
-      console.log('made it  '+ item);
+      //console.log('made it  '+ item);
+      console.log(item.length);
+
       this.addSimilarOrderPoints(null, item);
     });
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
         selectAll('.patCPTRecord').remove();
-        console.log(item);
+       // console.log('filter by order'+ item);
         this.drawOrders(item);
+
     });
 
-      // item: pat_id, number of similar patients, DATA
-      events.on('update_similar', (evt, item) => { // called in queryBox
-
-        this.targetProInfo = item[2]['pat_PRO'][item[0]].slice();
-       // this.similarPatientsProInfo = entries(item[2]['similar_PRO']);
- 
-        this.setOrderScale();
-        this.targetPatientOrders = item[2]['pat_Orders'][item[0]].slice();
-      
-     });
    
   }
 
@@ -160,6 +155,7 @@ constructor(parent: Element) {
               events.fire('filtered_CPT_by_order', this.queryDataArray);
               selectAll('.selectedOrder').classed('selectedOrder', false);
               selectAll('.unselectedOrder').classed('unselectedOrder', false);
+              events.fire('min date to cpt', this.queryDateArray);
             });
 }
 
@@ -168,7 +164,11 @@ constructor(parent: Element) {
      */
     private queryOrder() {
 
+       // console.log(this.filteredCPT);
+        
+
         let withQuery = [];
+        let queryDate = [];
             
         if (this.currentlySelectedName != undefined ){
           this.currentlySelectedName = undefined;
@@ -176,18 +176,32 @@ constructor(parent: Element) {
   
         const value = (<HTMLInputElement>document.getElementById('order_search')).value;
       
-   
-            let dataset = 'selected';
-            let targetOrder = value;
+        let targetOrder = value;
+
+        this.filteredCPT.forEach(element => {
+            let elementBool;
+            element.forEach(g => {
+                if (g.value[0].includes(+value)){
+                    if(elementBool != g.key){
+                        withQuery.push(element);
+                        queryDate.push(g);
+                    }elementBool = g.key;
+                    }
+            });
+          
+        });
             
-           let rects = selectAll('.visitDays').selectAll('rect');
-     
-           events.fire('query_order', value);
+        let rects = selectAll('.visitDays').selectAll('rect');
+       // let groups = selectAll('.visitDays');
+
+        events.fire('query_order', value);
   
-           let selectedRects = rects.nodes();
-           let selected =  <any>( <any>selectedRects );
-           let parentElem;
-           selected.forEach(node=> {
+        let selectedRects = rects.nodes();
+       
+
+        let selected =  <any>( <any>selectedRects );
+        let parentElem;
+        selected.forEach(node=> {
             node.classList.remove('selectedOrder', 'unselectedOrder');
   
             if(node.classList.contains(value)){
@@ -196,7 +210,7 @@ constructor(parent: Element) {
               let parent = node.parentNode.parentNode.parentNode;
   
             if(parentElem != parent){
-               withQuery.push(parent.__data__);
+        
                parentElem = parent;
         
             };
@@ -206,20 +220,8 @@ constructor(parent: Element) {
   
          
     this.queryDataArray = withQuery;
-    console.log(withQuery);
-    withQuery.forEach(d=> {
-        console.log(targetOrder);
-        d.forEach(element => {
-           //console.log(element.value);
-           let sel = element.value.find(function(e) {
-            console.log("target order: "+ targetOrder);
-            return targetOrder;
-          });
-          console.log(sel);
-          // let sel = element.value.find(d => {return d.contains(targetOrder)});
-        });
-    });
-    
+    this.queryDateArray = queryDate;
+ 
   }
     
   
@@ -279,10 +281,8 @@ constructor(parent: Element) {
      * @param ordersInfo
      */
     private addSimilarOrderPoints(patProInfo, similarOrdersInfo) {
-
-              // -------  target patient
-       
-
+        console.log('pat pro'+ patProInfo);
+        console.log('simm order info' + similarOrdersInfo);
            // let minDate = this.findMinDate(patProInfo);
         let minDate = new Date();
         let maxDate = this.parseTime(similarOrdersInfo[0].value[0]['PROC_DTM'], null);
