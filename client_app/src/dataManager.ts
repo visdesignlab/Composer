@@ -72,8 +72,11 @@ export class dataManager {
        // this.loadData('Orders');
         this.loadData('CPT_codes');
         this.loadData('ICD_codes');
+        this.loadData('PRO_PF');
 
         this.attachListener();
+
+
     }
 
     private attachListener(){
@@ -108,7 +111,6 @@ export class dataManager {
 
         events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
             this.proTable = item;
-            
             this.getDataObjects('pro_object', this.proTable);
         });
                  
@@ -124,6 +126,12 @@ export class dataManager {
             //this.getDataObjects('cpt_object', this.cptTable);
         });
 
+        events.on('PRO_PF', (evt, item)=> {
+            console.log(item);
+            //this.proTable = item;
+            //this.getDataObjects('pro_object', this.proTable);
+        })
+
         events.on('load_cpt', ()=> {
             //this is called from cpt button 
             //loads the cpt objects form the table for all patients
@@ -132,6 +140,7 @@ export class dataManager {
         })
 
         events.on('ICD_codes', (evt, item)=> {
+
             this.icdTable = item;
             
            // this.getDataObjects('icd_object', this.cptTable);
@@ -216,9 +225,8 @@ export class dataManager {
 
         let tempPatArray = [];
 
-        console.log(selectedCPT);
+     
         selectedCPT.forEach(element => {
-            console.log(element[0].key);
             tempPatArray.push(element[0].key);
         });
         
@@ -290,7 +298,7 @@ export class dataManager {
 
         yayornay = 'yay';
 
-        proObjects.forEach((d) => {
+        PROMIS.forEach((d) => {
                 // let maxDiff = 0;
                
             if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
@@ -303,7 +311,7 @@ export class dataManager {
         }
 
     if (selectedPatIds == null){
-        proObjects.forEach((d) => {
+        PROMIS.forEach((d) => {
                // if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
                     if (filteredPatOrders[d.PAT_ID] === undefined) {
                             filteredPatOrders[d.PAT_ID] = [];
@@ -414,53 +422,7 @@ export class dataManager {
            return popdemo;
    
         }
-/*
-     private async updateTargetPatient(patID) {
 
-         //get target patient PROMIS Scores
-         
-
-          let filteredPatScore = [];
-          
-           this.cohortProObjects.forEach(item => {
-           if (patID.indexOf(item.PAT_ID) !== -1) {
-           filteredPatScore.push(item);
-           }
-           }); 
-
-           //get target patient orders
-
-           let filteredPatOrders = [];
-         
-            this.cohortCptObjects.forEach(item => {
-            if (patID.indexOf(item.PAT_ID) !== -1) {
-           
-            filteredPatOrders.push(item);
-         }
-       }); 
-           events.fire('target_updated', [filteredPatOrders, filteredPatScore]);
-     };*/
-
-      //uses Phovea to access PROMIS data and draw table for cohort
-      /*
-     private async getTargetPromisScore(targetPatId) {
- 
-        let filteredPatScore = [];
-     
-        this.cohortProObjects.forEach(item => {
-        if (targetPatId.indexOf(item.PAT_ID) !== -1) {
-        filteredPatScore.push(item);
-        }
-        }); 
-       
-       //this.targetProInfo = filteredPatScore;
-
-       console.log(this.targetProInfo);//these are the same what the fuck is wrong
-       console.log(filteredPatScore);
-
-       events.fire('gotTargetPromisScore', filteredPatScore);
- 
-     };*/
 
     public selectedPatientId(data){//this adds all of the filtered patient ids to an array
 
@@ -502,24 +464,7 @@ export class dataManager {
         events.fire('orders_updated',[this.targetProInfo, this.cohortOrderInfo, this.cohortProInfo]);
  
      };
-/*
-       //uses Phovea to access PRO data and draw table for target patient
-    private async getTargetOrders(targetPatId) {
-   
 
-        let filteredPatOrders = [];
-        // console.log(this.patProObjects + 'found in promis score');
-         this.cohortProObjects.forEach(item => {
-         if (targetPatId.indexOf(item.PAT_ID) !== -1) {
-        
-         filteredPatOrders.push(item);
-      }
-    }); 
-
- //events.fire('orders_updated',[this.patOrderObjects, this.targetPatientProInfo, this.similarPatientProInfo]);
-        events.fire('target_orders_updated',[this.targetProInfo, filteredPatOrders, this.cohortProInfo]);
- 
-     };*/
 
     public async loadData(id: string){ //loads the tables from Phovea
     
