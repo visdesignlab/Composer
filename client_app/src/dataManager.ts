@@ -294,11 +294,10 @@ export class dataManager {
       // let mapped = entries(filteredPatScore);
       // this.cohortProInfo = mapped;
       // events.fire('pro_object_filtered', filteredPatScore);
-   // let PROMIS = proObjects.filter((d) => {
-    //    return d['FORM_ID'] == 1123
-   // });
-   let PROMIS = proObjects;
-
+    let PROMIS = proObjects.filter((d) => {
+        return d['FORM_ID'] == 1123
+    });
+   
     let yayornay = 'nay';
 
     let filteredPatOrders = {};

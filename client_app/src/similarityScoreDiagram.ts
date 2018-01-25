@@ -72,10 +72,12 @@ export class similarityScoreDiagram {
 
         this.$node.append('input')
         .attr('type', 'button')
-        .attr('value', 'Update Target Patient')
+        .attr('value', 'Update Start Day to Event')
         .on('click', () => {
             this.clearDiagram();
             this.shiftDays(null)});
+
+        this.$node.append('text').attr('id', 'eventLabel');
 
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
