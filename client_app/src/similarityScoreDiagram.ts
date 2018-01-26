@@ -75,7 +75,8 @@ export class similarityScoreDiagram {
         .attr('value', 'Update Start Day to Event')
         .on('click', () => {
             this.clearDiagram();
-            this.shiftDays(null)});
+           // this.shiftDays(null)}
+              this.getDays(this.cohortProInfo)});
 
         this.$node.append('text').attr('id', 'eventLabel');
 
@@ -214,6 +215,8 @@ export class similarityScoreDiagram {
             this.addMinDay(item);
         });
 
+       // events.on('gotPromisScores', patPromis')
+
     }
 
     private addMinDay(eventArray) {
@@ -251,9 +254,14 @@ export class similarityScoreDiagram {
         //console.log(this.cohortProInfo);
 
         this.cohortProInfo.forEach((g) => {
-                       // console.log(g);
-                        let minDate = g.min_date;//these have already been parsed
-                        let maxDate = g.max_date;
+
+                let  minDate;
+
+                if(g.CPTtime != undefined && date != null ) {
+                    minDate = this.parseTime(g.CPTtime, null);
+                }else minDate = this.parseTime(g.value[0]['ASSESSMENT_START_DTM'], null);
+               //these have already been parsed
+               let maxDate = g.max_date;
 
                         g.value.forEach((d) => {
                         try {
@@ -286,57 +294,6 @@ export class similarityScoreDiagram {
 
     }
 
-    private shiftDays (day) {
-
-        // ----- add diff days to the data
-       
-       let maxDiff = 0;// this sets the score scale max.
-        //need to make this dynamic. 
-      // console.log(this.cohortProInfo);
-
-       this.cohortProInfo.forEach((g) => {
-
-                       let minDate;
-                       console.log(g);
-
-                       if(g.CPTtime != undefined ) {
-                        minDate = this.parseTime(g.CPTtime, null);
-                       }else minDate = this.parseTime(g.value[0]['ASSESSMENT_START_DTM'], null);
-                       //these have already been parsed
-                       let maxDate = g.max_date;
-
-                     //  console.log('min in nat state   :'+ minDate);
-                      // console.log(minDate.getTime());
-
-                       g.value.forEach((d) => {
-                       try {
-                       d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                       maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-                       }
-                       catch (TypeError) {
-                       d.diff = -1;
-                       }//console.log(d.diff);
-                       })
-
-                       g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
-                      
-                       g.value.sort((a, b) => ascending(a.diff, b.diff))
-
-                       });
-
-        console.log(this.cohortProInfo);
-
-      // diffArray.sort((a, b) => ascending(a, b));
-   
-      // events.fire('timeline_max_set', max(diffArray));
-  
-       //this.maxDay = 365;// this is where the max day starts on load. 
-
-       events.fire('day_dist', this.cohortProInfo);
-       
-       this.drawDiagram();
-
-   }
 
     /**
      * Draw the diagram with the given data from getSimilarRows
