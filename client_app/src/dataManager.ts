@@ -52,6 +52,7 @@ export class dataManager {
     filteredCohortDemo;//demographic info as objects for defined cohort
     cohortCptObjects;//CPT as objects for defined cohort
     cohortIcdObjects;//ICD objects for cohort
+    filteredPatPromis;
 
     selectedPatIds;//array of ids for defined patients 
 
@@ -178,7 +179,7 @@ export class dataManager {
         events.on('cpt_object', (evt, item)=> {
 
             this.cohortCptObjects = item;
-            this.getCPT(this.selectedPatIds, this.cohortCptObjects);
+            this.getCPT(this.selectedPatIds, this.cohortCptObjects, this.filteredPatPromis);
           
            // events.fire('update_target');
            // this.getOrders(this.patCptObjects);
@@ -212,7 +213,7 @@ export class dataManager {
           events.on('selected_pat_array', (evt, item)=> {
      
             this.cohortIdArray = item;
-            this.getCPT(this.cohortIdArray, this.cohortCptObjects);
+            this.getCPT(this.cohortIdArray, this.cohortCptObjects, this.filteredPatPromis);
         });
 
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
@@ -342,11 +343,13 @@ export class dataManager {
       });
 
       events.fire('gotPromisScores', patPromis);
+      this.filteredPatPromis = patPromis;
+
       if (yayornay == 'yay')events.fire('filteredPatients', patPromis);
      };
 
      //uses Phovea to access PRO data and draw table
-   private async getCPT(selectedPatIds, cptObject) {
+   private async getCPT(selectedPatIds, cptObject, filteredPatPromis) {
 
     let filteredPatOrders = {};
    // const patOrders = await this.orderTable.objects();
@@ -377,7 +380,7 @@ export class dataManager {
         }
         }); 
 
-        this.getCPT(patID, cptObject).then(value => {//gets CPT for target patient
+        this.getCPT(patID, cptObject, this.filteredPatPromis).then(value => {//gets CPT for target patient
 
             events.fire('target_updated', [value, filteredPatScore]);
 

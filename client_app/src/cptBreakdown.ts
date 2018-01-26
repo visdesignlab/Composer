@@ -41,6 +41,7 @@ export class cptBreakdown {
   queryDataArray;
   queryDateArray;
   targetOrder;
+  cohortProInfo;
   //similarPatientsProInfo;
 
 
@@ -113,14 +114,20 @@ constructor(parent: Element) {
         
         });
    
-    
+    events.on('gotPromisScores', (evt, item)=>{
+       // this.cohortProInfo = item;
+    });
+
+    events.on('filteredPatients', (evt, item)=> {
+        this.cohortProInfo = item;
+    })
 
 
     events.on('filtered_CPT', (evt, item) => {
       //console.log('made it  '+ item);
       console.log(item.length);
 
-      this.addSimilarOrderPoints(null, item);
+      this.addSimilarOrderPoints(this.cohortProInfo, item);
     });
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
@@ -282,18 +289,33 @@ constructor(parent: Element) {
      * @param ordersInfo
      */
     private addSimilarOrderPoints(patProInfo, similarOrdersInfo) {
-        console.log('pat pro'+ patProInfo);
-        console.log('simm order info' + similarOrdersInfo);
+        //console.log('pat pro'+ patProInfo);
+       // console.log('simm order info' + similarOrdersInfo);
            // let minDate = this.findMinDate(patProInfo);
         let minDate = new Date();
         let maxDate = this.parseTime(similarOrdersInfo[0].value[0]['PROC_DTM'], null);
-        
+
+        for(var i= 0;  i< similarOrdersInfo.length; i++) {
+
+            var keycpt = similarOrdersInfo[i].key;
+
+            for(var j = 0; j < patProInfo.length; j++) {
+              //console.log(patProInfo[j]);
+              var keypromis = patProInfo[j].key;
+
+              if(keycpt == keypromis) {
+                similarOrdersInfo[i].minPromis = patProInfo[j].min_date;
+              }
+            } 
+          } console.log(similarOrdersInfo);
+
             similarOrdersInfo.forEach((d) => {
                
+
                 let minDatePat = this.findMinDateCPT(d.value);
                 let maxDatePat = this.findMaxDateCPT(d.value);
 
-                if(minDate.getTime() > minDatePat.getTime()) minDate = minDatePat;
+                if(minDate.getTime() > minDatePat.getTime())minDate = minDatePat;
                 if(maxDate.getTime() < maxDatePat.getTime())maxDate = maxDatePat;
 
                // console.log('min date  :'+ minDate);
@@ -308,12 +330,13 @@ constructor(parent: Element) {
               // ----- add diff days to the data
          
         let filteredOrders = [];
+
         similarOrdersInfo.forEach((g) => {
 
                 //g.array = [];
-        let minDate;
+        let minDate = g.minPromis;//changed min date for cpt to min date of promis score
       
-        if(g.value != null) minDate = this.findMinDateCPT(g.value);
+       // if(g.value != null) minDate = this.findMinDateCPT(g.value);
                       
                 // let minDate = this.findMinDate(similarOrdersInfo.value);
             g.value.forEach((d) => {
