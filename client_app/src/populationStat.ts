@@ -49,13 +49,8 @@ export class populationStat {
         this.$node = select(parent);
 //1252 days is the max number of days for the patients
         this.timeScale = scaleLinear()
-            .domain([0, 1251])
+            .domain([-150, 1251])
             .range([10, 700]).clamp(true);
-
-        this.timeScaleMini = scaleLinear()
-            .domain([0, 1251])
-            .range([0, 700])
-            .clamp(true);
 
         let patientCountText = this.$node.append('div').classed('pop_count', true)
         .style('height', '25px').style('margin-top', '40px');
