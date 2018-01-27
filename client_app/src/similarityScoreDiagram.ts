@@ -373,7 +373,7 @@ export class similarityScoreDiagram {
        // })
         .selectAll('circle').data(promisData);
         promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
-        .attr('cy', d=> this.scoreScale(d.SCORE)).attr('r', 5).attr('fill', '#21618C');
+        .attr('cy', (d)=> this.scoreScale(d.SCORE)).attr('r', 5).attr('fill', '#21618C');
 
       
     }
