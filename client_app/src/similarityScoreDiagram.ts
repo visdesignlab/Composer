@@ -254,12 +254,12 @@ export class similarityScoreDiagram {
         //console.log(this.cohortProInfo);
 
         this.cohortProInfo.forEach((g) => {
-
+                console.log(g);
                 let  minDate;
 
                 if(g.CPTtime != undefined && date != null ) {
                     minDate = this.parseTime(g.CPTtime, null);
-                }else minDate = this.parseTime(g.value[0]['ASSESSMENT_START_DTM'], null);
+                }else minDate = g.min_date;
                //these have already been parsed
                let maxDate = g.max_date;
 
@@ -302,8 +302,7 @@ export class similarityScoreDiagram {
     private drawDiagram() {
 
             let lineCount = this.cohortProInfo.length;
-            console.log(this.cohortProInfo);
-            console.log('minday' + this.minDay);
+   
         let similarData = this.cohortProInfo.map((d) => {
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram
