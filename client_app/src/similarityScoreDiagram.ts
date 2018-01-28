@@ -254,12 +254,12 @@ export class similarityScoreDiagram {
         //console.log(this.cohortProInfo);
 
         this.cohortProInfo.forEach((g) => {
-
+                console.log(g);
                 let  minDate;
 
                 if(g.CPTtime != undefined && date != null ) {
                     minDate = this.parseTime(g.CPTtime, null);
-                }else minDate = this.parseTime(g.value[0]['ASSESSMENT_START_DTM'], null);
+                }else minDate = g.min_date;
                //these have already been parsed
                let maxDate = g.max_date;
 
@@ -302,8 +302,7 @@ export class similarityScoreDiagram {
     private drawDiagram() {
 
             let lineCount = this.cohortProInfo.length;
-            console.log(this.cohortProInfo);
-            console.log('minday' + this.minDay);
+   
         let similarData = this.cohortProInfo.map((d) => {
             //console.log(d.days);
             d.scale = this.timeScale.domain([0, d.days]);
@@ -380,7 +379,7 @@ export class similarityScoreDiagram {
        // })
         .selectAll('circle').data(promisData);
         promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
-        .attr('cy', d=> this.scoreScale(d.SCORE)).attr('r', 5).attr('fill', '#21618C');
+        .attr('cy', (d)=> this.scoreScale(d.SCORE)).attr('r', 5).attr('fill', '#21618C');
 
       
     }
