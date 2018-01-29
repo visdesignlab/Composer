@@ -50,12 +50,7 @@ export class DataManager {
     cohortIcdObjects;//ICD objects for cohort
     filteredPatPromis;
 
-    selectedPatIds;//array of ids for defined patients 
-
     startDate;
-    cohortCounter = 0;
-    cohortfilterarray = [];
-    cohortkeeperarray = [];
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -157,7 +152,7 @@ export class DataManager {
         events.on('cpt_object', (evt, item)=> {
 
             this.cohortCptObjects = item;
-            this.getCPT(this.selectedPatIds, this.cohortCptObjects, this.filteredPatPromis);
+            this.getCPT(this.cohortIdArray, this.cohortCptObjects, this.filteredPatPromis);
             console.log('cptfinding');
          
         });
@@ -174,7 +169,7 @@ export class DataManager {
             this.filterRequirements.demo = item;
          
             this.demoFilter(item, this.populationDemographics);
-            this.addCohortFilter();
+
           });
 
         events.on('selected_pat_array', (evt, item)=> {
@@ -195,30 +190,7 @@ export class DataManager {
 
           });
 
-        events.on('clear_cohorts', () => {
-              this.removeCohortFilterArray();
-              
-          });
 
-    }
-
-    private addCohortFilter () {
-
-        let filter = this.filterRequirements;
-
-
-        this.cohortfilterarray.push(filter);
-        this.cohortCounter =+ 1;
-
-        events.fire('cohort_added', this.cohortfilterarray);
-
-
-    }
-
-    private removeCohortFilterArray () {
-
-        this.cohortfilterarray = [];
-      
 
     }
 
@@ -229,7 +201,7 @@ export class DataManager {
         //this works with the value returned by the mapped patient demo
         //sets patId array to filter
 
-          this.selectedPatIds = [];
+          this.cohortIdArray = [];
 
           let filter = demoObjects;
     
@@ -257,17 +229,17 @@ export class DataManager {
         }
          });
             filter.forEach((element) => {
-                this.selectedPatIds.push(element.ID);
+                this.cohortIdArray.push(element.ID);
             });
 
            this.filteredCohortDemo = filter;
-           this.mapPromisScores(this.selectedPatIds, this.cohortProObjects);
+           this.mapPromisScores(this.cohortIdArray, this.cohortProObjects);
        }
 
     //uses Phovea to access PROMIS data and draw table for cohort
-    private async mapPromisScores(selectedPatIds, proObjects) {
+    private async mapPromisScores(cohortIdArray, proObjects) {
 
-        let PROMIS = proObjects.filter((d) => {
+        proObjects = proObjects.filter((d) => {
             return d['FORM_ID'] === 1123
         });
 
@@ -275,13 +247,13 @@ export class DataManager {
 
         let filteredPatOrders = {};
 
-        if (selectedPatIds != null ) {
+        if (cohortIdArray != null ) {
 
             yayornay = 'yay';
 
-            PROMIS.forEach((d) => {
+            proObjects.forEach((d) => {
 
-                if (selectedPatIds.indexOf(d.PAT_ID) != -1) {
+                if (cohortIdArray.indexOf(d.PAT_ID) != -1) {
                         if (filteredPatOrders[d.PAT_ID] == undefined) {
                             filteredPatOrders[d.PAT_ID] = [];
                             }
@@ -290,8 +262,8 @@ export class DataManager {
                 });
             }
 
-        if (selectedPatIds == null){
-            PROMIS.forEach((d) => {
+        if (cohortIdArray == null){
+            proObjects.forEach((d) => {
 
                         if (filteredPatOrders[d.PAT_ID] == undefined) {
                                 filteredPatOrders[d.PAT_ID] = [];
@@ -320,13 +292,13 @@ export class DataManager {
      };
 
      //uses Phovea to access PRO data and draw table
-   private async getCPT(selectedPatIds, cptObject, filteredPatPromis) {
+   private async getCPT(cohortIdArray, cptObject, filteredPatPromis) {
 
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
-        if (selectedPatIds != null) {
+        if (cohortIdArray != null) {
             cptObject.forEach((item) => {
-                if (selectedPatIds.indexOf(item.PAT_ID) != -1) {
+                if (cohortIdArray.indexOf(item.PAT_ID) != -1) {
                 if (filteredPatOrders[item.PAT_ID] === undefined) {
             filteredPatOrders[item.PAT_ID] = [];
         }
@@ -335,7 +307,7 @@ export class DataManager {
             });
             }
 
-        if (selectedPatIds == null) {
+        if (cohortIdArray == null) {
             cptObject.forEach((d) => {
                 if (filteredPatOrders[d.PAT_ID] === undefined) {
                         filteredPatOrders[d.PAT_ID] = [];
@@ -413,9 +385,9 @@ export class DataManager {
             });
         }
 
-        this.selectedPatIds = tempPatArray;
-        this.mapPromisScores(this.selectedPatIds, this.cohortProObjects);
-        events.fire('selected_pat_array', this.selectedPatIds);
+        this.cohortIdArray = tempPatArray;
+        this.mapPromisScores(this.cohortIdArray, this.cohortProObjects);
+        events.fire('selected_pat_array', this.cohortIdArray);
     }
 
     public async loadData(id: string) { //loads the tables from Phovea

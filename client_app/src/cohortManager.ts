@@ -17,33 +17,16 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalculations from './dataCalculations';
-/*
-interface IfilterRequirements {
-    'demo': null, //this is sent from sidebar
-    'icd': null,
-    'cpt': null
-   };*/
+
 
 export class CohortManager {
 
-    private findMinDate = dataCalculations.findMinDate;
-    private findMaxDate = dataCalculations.findMaxDate;
-    private parseTime = dataCalculations.parseTime;
+    cohortIdArray;//array of ids for defined patients 
 
-    //tables for all patient data
-    demoTable : ITable;
-    orderTable : ITable;
-    proTable : ITable;
-    proTableSample : ITable;
-    cptTable : ITable;
-    icdTable : ITable;
-
-    selectedPatIds;//array of ids for defined patients 
-
- 
     cohortCounter = 0;
     cohortfilterarray = [];
     cohortkeeperarray = [];
+    selectedCohort;
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -57,30 +40,47 @@ export class CohortManager {
 
         this.attachListener();
 
-
     }
 
     private attachListener(){
 
+        events.on('clear_cohorts', () => {
+            this.removeCohortFilterArray();
+        });
+
+          // item: [d, parentValue]
+          events.on('filter_data', (evt, item) => { // called in sidebar
+
+            this.filterRequirements.demo = item;
+
+            this.addCohortFilter(item);
+          });
+
+          events.on('cohort_selected', (evt, item)=>{
+            let cohort = item[0];
+            let index = item[1];
+           // console.log('this is the selected filter    '+ cohort);
+           // console.log('this is the index for the cohort in array  ' + index);
+            this.selectedCohort = this.cohortfilterarray[index];
+            console.log(this.selectedCohort);
+          });
+
+
 
     }
 
-    private addCohortFilter () {
-
-        let filter = this.filterRequirements;
-
-
+    private addCohortFilter (filter) {
         this.cohortfilterarray.push(filter);
         this.cohortCounter =+ 1;
 
         events.fire('cohort_added', this.cohortfilterarray);
-
+        console.log(this.cohortfilterarray);
     }
 
     private removeCohortFilterArray () {
 
         this.cohortfilterarray = [];
-      
+        this.cohortCounter = 0;
 
     }
 
@@ -90,5 +90,3 @@ export class CohortManager {
   export function create() {
     return new CohortManager();
 }
-
-   
