@@ -176,15 +176,15 @@ export class similarityScoreDiagram {
             if(this.cohortProInfo != undefined){
 
                 this.clearDiagram();
-                this.drawDiagram();
+                this.drawPromisChart();
             }
 
 
         })
 
-        events.on('gotPromisScores', (evt, item) => {  // called in parrallel on brush and 
-               // console.log('filtered promis objects' + item)
-                this.cohortProInfo = item;  
+        events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
+            
+                this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
 
@@ -198,7 +198,7 @@ export class similarityScoreDiagram {
             this.addMinDay(item);
         });
 
-       // events.on('gotPromisScores', patPromis')
+       // events.on('got_promis_scores', patPromis')
 
     }
 
@@ -272,7 +272,7 @@ export class similarityScoreDiagram {
 
         events.fire('day_dist', this.cohortProInfo);
         
-        this.drawDiagram();
+        this.drawPromisChart();
 
     }
 
@@ -281,7 +281,7 @@ export class similarityScoreDiagram {
      * Draw the diagram with the given data from getSimilarRows
      * @param args
      */
-    private drawDiagram() {
+    private drawPromisChart() {
 
         console.log('draw diagram');
 

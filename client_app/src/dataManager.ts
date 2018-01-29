@@ -24,7 +24,7 @@ interface IfilterRequirements {
     'cpt': null
    };*/
 
-export class dataManager {
+export class DataManager {
 
     private findMinDate = dataCalculations.findMinDate;
     private findMaxDate = dataCalculations.findMaxDate;
@@ -55,6 +55,7 @@ export class dataManager {
     startDate;
     cohortCounter = 0;
     cohortfilterarray = [];
+    cohortkeeperarray = [];
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -70,7 +71,7 @@ export class dataManager {
 
         this.loadData('Demo_Revise');
         this.loadData('PROMIS_Scores');
-       // this.loadData('Orders');
+
         this.loadData('CPT_codes');
         this.loadData('ICD_codes');
 
@@ -85,7 +86,7 @@ export class dataManager {
 
         events.on('filtered_CPT_by_order', (evt, item)=> {
            
-            this.filterbyCPT(item);
+            this.getSelectedIdArray(item, 'cpt');
 
         });
 
@@ -112,12 +113,6 @@ export class dataManager {
             this.proTable = item;
             this.getDataObjects('pro_object', this.proTable);
         });
-                 
-        events.on('Orders', (evt, item)=> {
-            
-            //this.orderTable = item;
-           // this.getDataObjects('order_object', this.orderTable);
-        });
 
         events.on('CPT_codes', (evt, item)=> {
             this.cptTable = item;
@@ -130,7 +125,7 @@ export class dataManager {
             //loads the cpt objects form the table for all patients
             this.getDataObjects('cpt_object', this.cptTable);
            
-        })
+        });
 
         events.on('ICD_codes', (evt, item)=> {
 
@@ -152,10 +147,10 @@ export class dataManager {
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
             console.log(item);
             this.cohortProObjects = item;
-            this.getPromisScores(null, item);
+            this.mapPromisScores(null, item);
         });
 
-        events.on('gotPromisScores', (evt, item)=> {
+        events.on('got_promis_scores', (evt, item)=> {
            // this.getCPT(null, this.cohortCptObjects, this.filteredPatPromis);
         });
 
@@ -227,19 +222,6 @@ export class dataManager {
 
     }
 
-    private filterbyCPT (selectedCPT){
-
-        let tempPatArray = [];
-
-     
-        selectedCPT.forEach(element => {
-            tempPatArray.push(element[0].key);
-        });
-        
-        this.selectedPatIds = tempPatArray;
-        this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
-
-    }
 
 //pulled from paralle coord
     private demoFilter(sidebarFilter, demoObjects) {
@@ -279,93 +261,87 @@ export class dataManager {
             });
 
            this.filteredCohortDemo = filter;
-           this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
+           this.mapPromisScores(this.selectedPatIds, this.cohortProObjects);
        }
 
-    
     //uses Phovea to access PROMIS data and draw table for cohort
-    private async getPromisScores(selectedPatIds, proObjects) {
-        console.log(selectedPatIds);
-      // let mapped = entries(filteredPatScore);
-      // this.cohortProInfo = mapped;
-      // events.fire('pro_object_filtered', filteredPatScore);
-    let PROMIS = proObjects.filter((d) => {
-        return d['FORM_ID'] === 1123
-    });
-   
-    let yayornay = 'nay';
+    private async mapPromisScores(selectedPatIds, proObjects) {
 
-    let filteredPatOrders = {};
+        let PROMIS = proObjects.filter((d) => {
+            return d['FORM_ID'] === 1123
+        });
 
-    if (selectedPatIds != null ) {
+        let yayornay = 'nay';
 
-        yayornay = 'yay';
+        let filteredPatOrders = {};
 
-        PROMIS.forEach((d) => {
-               
-            if (selectedPatIds.indexOf(d.PAT_ID) != -1) {
-                    if (filteredPatOrders[d.PAT_ID] == undefined) {
-                        filteredPatOrders[d.PAT_ID] = [];
-                        }
-                        filteredPatOrders[d.PAT_ID].push(d);
-                        }
-            });
-        }
+        if (selectedPatIds != null ) {
 
-    if (selectedPatIds == null){
-        PROMIS.forEach((d) => {
+            yayornay = 'yay';
 
-                    if (filteredPatOrders[d.PAT_ID] == undefined) {
+            PROMIS.forEach((d) => {
+
+                if (selectedPatIds.indexOf(d.PAT_ID) != -1) {
+                        if (filteredPatOrders[d.PAT_ID] == undefined) {
                             filteredPatOrders[d.PAT_ID] = [];
                             }
                             filteredPatOrders[d.PAT_ID].push(d);
-                          //  }
+                            }
+                });
+            }
+
+        if (selectedPatIds == null){
+            PROMIS.forEach((d) => {
+
+                        if (filteredPatOrders[d.PAT_ID] == undefined) {
+                                filteredPatOrders[d.PAT_ID] = [];
+                                }
+                                filteredPatOrders[d.PAT_ID].push(d);
+                            //  }
+            });
+
+        }
+        let mapped = entries(filteredPatOrders);
+        //return filteredPatOrders;
+        let patPromis = mapped.map(d=> {
+            return {
+                key: d.key,
+                value: d.value,
+                min_date: this.findMinDate(d.value),
+                max_date: this.findMaxDate(d.value),
+            }
         });
 
-       }
-       let mapped = entries(filteredPatOrders);
-       //return filteredPatOrders;
-       let patPromis = mapped.map(d=> {
-           return {
-             key: d.key,
-             value: d.value,
-             min_date: this.findMinDate(d.value),
-             max_date: this.findMaxDate(d.value),
-           }
-      });
+        events.fire('got_promis_scores', patPromis);
+        this.filteredPatPromis = patPromis;
+        console.log(this.filteredPatPromis);
 
-      events.fire('gotPromisScores', patPromis);
-      this.filteredPatPromis = patPromis;
-      console.log(this.filteredPatPromis);
-
-      if (yayornay == 'yay')events.fire('filteredPatients', patPromis);
+        if (yayornay == 'yay')events.fire('filteredPatients', patPromis);
      };
 
      //uses Phovea to access PRO data and draw table
    private async getCPT(selectedPatIds, cptObject, filteredPatPromis) {
 
-    let filteredPatOrders = {};
-   // const patOrders = await this.orderTable.objects();
-   if (selectedPatIds != null) {
-     cptObject.forEach((item) => {
-         if (selectedPatIds.indexOf(item.PAT_ID) != -1) {
-          if (filteredPatOrders[item.PAT_ID] === undefined) {
-     filteredPatOrders[item.PAT_ID] = [];
-   }
-     filteredPatOrders[item.PAT_ID].push(item);
-    }
-     });
-    }
+        let filteredPatOrders = {};
+        // const patOrders = await this.orderTable.objects();
+        if (selectedPatIds != null) {
+            cptObject.forEach((item) => {
+                if (selectedPatIds.indexOf(item.PAT_ID) != -1) {
+                if (filteredPatOrders[item.PAT_ID] === undefined) {
+            filteredPatOrders[item.PAT_ID] = [];
+        }
+            filteredPatOrders[item.PAT_ID].push(item);
+            }
+            });
+            }
 
-     if (selectedPatIds == null) {
-        cptObject.forEach((d) => {
-               // if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
-                    if (filteredPatOrders[d.PAT_ID] === undefined) {
-                            filteredPatOrders[d.PAT_ID] = [];
-                            }
-                            filteredPatOrders[d.PAT_ID].push(d);
-                          //  }
-        });
+        if (selectedPatIds == null) {
+            cptObject.forEach((d) => {
+                if (filteredPatOrders[d.PAT_ID] === undefined) {
+                        filteredPatOrders[d.PAT_ID] = [];
+                    }
+                filteredPatOrders[d.PAT_ID].push(d);
+            });
     }
 
      const mapped = entries(filteredPatOrders);
@@ -422,68 +398,41 @@ export class dataManager {
         }
 
 
-    public selectedPatientId(data){//this adds all of the filtered patient ids to an array
 
-        let ids = [];
-        
-                data.forEach(element => {
-                   ids.push(element.ID);
-               });
+     private getSelectedIdArray (selectedData, typeofData: string)   {
 
-      
-        this.selectedPatIds = ids;
+        let tempPatArray = [];
 
+        if(typeofData == 'cpt') {
+            selectedData.forEach((element) => {
+                tempPatArray.push(element[0].key);
+            });
+        }else {
+            selectedData.forEach((element) => {
+                tempPatArray.push(element.ID);
+            });
+        }
+
+        this.selectedPatIds = tempPatArray;
+        this.mapPromisScores(this.selectedPatIds, this.cohortProObjects);
         events.fire('selected_pat_array', this.selectedPatIds);
-
-        this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
-       // this.getOrders(this.selectedPatIds);
-
-     }
- 
-     //uses Phovea to access PRO data and draw table for similar cohort
-  /*  private async getOrders(selectedPatIds) {
-  
-        let filteredPatOrders = {};
-        //const patOrders = await this.orderTable.objects();
-       
-         this.patOrderObjects.forEach(item => {
-             if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
-              if (filteredPatOrders[item.PAT_ID] === undefined) {
-         filteredPatOrders[item.PAT_ID] = [];
-        }
-         filteredPatOrders[item.PAT_ID].push(item);
-        }
-         });
-        let mapped = entries(filteredPatOrders);
-   
-        this.cohortOrderInfo = mapped;
-
- //events.fire('orders_updated',[this.patOrderObjects, this.targetPatientProInfo, this.similarPatientProInfo]);
-        events.fire('orders_updated',[null, this.cohortOrderInfo, this.cohortProInfo]);
- 
-     };*/
-
-
-    public async loadData(id: string){ //loads the tables from Phovea
-    
-       let table = <ITable> await getById(id);
-      
-       events.fire(id, table);//sends the id string to the getDataObjects
-   
     }
 
-    public async getDataObjects(id: string, table: ITable){ 
+    public async loadData(id: string) { //loads the tables from Phovea
+       let table = <ITable> await getById(id);
+       events.fire(id, table);//sends the id string to the getDataObjects
+    }
 
+    public async getDataObjects(id: string, table: ITable) {
         let object = await table.objects();
         events.fire(id, object);
-
     }
 
 
   }
 
   export function create() {
-    return new dataManager();
+    return new DataManager();
 }
 
    
