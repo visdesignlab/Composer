@@ -17,7 +17,12 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalculations from './dataCalculations';
-
+/*
+interface IfilterRequirements {
+    'demo': null, //this is sent from sidebar
+    'icd': null,
+    'cpt': null
+   };*/
 
 export class dataManager {
 
@@ -53,10 +58,10 @@ export class dataManager {
 
     //attempting to set up structure to hold filters
     filterRequirements = {
-                          'demo': null, //this is sent from sidebar
-                          'icd': null,
-                          'cpt': null
-                         };
+        'demo': null, //this is sent from sidebar
+        'icd': null,
+        'cpt': null
+       };
 
     constructor() {
         /* 
@@ -82,7 +87,6 @@ export class dataManager {
            
             this.filterbyCPT(item);
 
-           
         });
 
         events.on('start_date_updated', (evt, item)=> {
@@ -204,14 +208,11 @@ export class dataManager {
     }
 
     private addCohortFilter () {
-        console.log(this.cohortCounter);
-        
+
         let filter = this.filterRequirements;
-        //console.log(filter);
+
 
         this.cohortfilterarray.push(filter);
-        //when a filter is passed to to a 
-        console.log(this.cohortfilterarray);
         this.cohortCounter =+ 1;
 
         events.fire('cohort_added', this.cohortfilterarray);
@@ -222,7 +223,7 @@ export class dataManager {
     private removeCohortFilterArray () {
 
         this.cohortfilterarray = [];
-        console.log('cohort array empty  '+this.cohortfilterarray);
+      
 
     }
 
