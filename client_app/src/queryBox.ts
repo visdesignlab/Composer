@@ -88,12 +88,6 @@ export class QueryBox {
             let startLabelBool = select('#pat_or_event').text(this.startBool);
         });
 
-        events.on('number_of_similar_patients', (evt, item) => {  // called in distribution diagram
-            select('#text_num_similar').attr('value', item[0]);
-            this.updateSimilar();
-
-        });
-
         events.on('cohort_added', (evt, item)=> {
             this.cohortKeeper.selectAll('label').remove();
             item.forEach((cohort, i) => {
@@ -106,10 +100,7 @@ export class QueryBox {
             });
             
         });
-/*
-        events.on('selected_updated', (evt, item)=>{
-            events.fire('update_similar', [item, item.length, null]);
-        });*/
+
     }
 
 
@@ -117,6 +108,7 @@ export class QueryBox {
      * getting the similar patients info and firing events to update the vis
      * @returns {Promise<void>}
      */
+    /*
     private async updateSimilar() {
 
         const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
@@ -131,10 +123,7 @@ export class QueryBox {
 
                 this.setBusy(false);
                 this.similarArgs = args;
-               // console.log(this.similarArgs.ids);
-              //  console.log('value  '+ value);
-               // console.log('args  '+ args);
-               
+
 
                 // caught by svgTable and scoreDiagram and statHistogram
                 events.fire('update_similar', [value, n, args]);
@@ -145,7 +134,7 @@ export class QueryBox {
             console.log('Not a Number');
         }
 
-    }
+    }*/
 
     /**
      * firing event to update the vis for info of a patient
