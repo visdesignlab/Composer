@@ -14,10 +14,12 @@ import * as distributionDiagram from './distributionDiagram';
 //import * as patOrderBreakdown from './patOrderBreakdown';
 import * as parallel from './parallel';
 import * as dataManager from './dataManager';
+import * as cohortManager from './cohortManager';
 import * as cptBreak from './cptBreakdown';
 import * as populationStat from './populationStat';
 import * as inStat from './individualStats';
 import { individualStats } from './individualStats';
+import { CohortManager } from './cohortManager';
 
 
 /**
@@ -53,6 +55,7 @@ export class App {
     this.$node.select('h3').remove();
 
     const data = dataManager.create();//dataobject with all the info
+    const cohort = cohortManager.create();
     
     // create side bar
     const sideBarDiv = this.$node.append('div').classed('sideBar', true);
@@ -73,25 +76,7 @@ export class App {
 
     inStat.create(main.node());
 
-     // distributionDiagram
-   // distributionDiagram.create(main.node());
-  
 
-    //start time count
-    //main.append('div').attr('id', 'start_date').append('text');
- 
-    /* hid the rectEx, order, CPT views to separate
-
-    //rect exploration draws target patient cpt orders
-    //user can query cpt orders 
-
-    rectExploration.create(main.node());
-    this.$node.select('.rectDiv').classed('hidden', true);
-  
-      //order hierarchy
-    patOrderBreakdown.create(main.node());
-     this.$node.select('.orderBreakdownDiv').classed('hidden', true);
-*/
     const cpt = main.append('Div').classed('cptDiv', true);
     cptBreak.create(cpt.node());
     this.$node.select('.cptDiv').classed('hidden', true);

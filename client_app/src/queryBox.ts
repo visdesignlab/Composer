@@ -72,14 +72,14 @@ export class QueryBox {
             let startLabelBool = select('#pat_or_event').text(this.startBool);
 
         });
-
+/*
         events.on('date clicked', (evt, item)=>  {
 
             this.startDay = item;
             let startLabel = select('#start_date_label').text(item).style('color', 'red');
             console.log(this.startDay);
 
-        });
+        });*/
 
         events.on('start_date_patient', (evt, item)=> {
             this.startBool = '0 date determined by patient';
@@ -92,13 +92,12 @@ export class QueryBox {
             this.cohortKeeper.selectAll('label').remove();
             item.forEach((cohort, i) => {
                 let label = this.cohortKeeper.append('label').text('Cohort  '+ (i+1) );
-                label.data(item[i]);
+                //label.data(item[i]);
                 label.on('click', ()=> {
-                    console.log(i);
-                    console.log(cohort);
+                    events.fire('cohort_selected', [cohort, i]);
                 });
             });
-            
+
         });
 
     }
