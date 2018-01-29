@@ -63,30 +63,14 @@ export class QueryBox {
      */
     private attachListener() {
 
-        // TODO test!
-        // Only used for the initial testing (events fired in app.ts).
-        // Should be removed at the end.
-        events.on('update_temp_similar', (evt, item) => {
-
-            const url = `/data_api/getSimilarRows/${item[1]}/${item[2]}/${this.dataset}`;
-            this.setBusy(true);
-            this.getData(url).then((args) => {
-
-                this.setBusy(false);
-                this.similarArgs = args;
-               // console.log(args);
-                events.fire('update_similar', [item[1], item[2], args]); // caught by svgTable and scoreDiagram and statHistogram
-               // console.log('testing  ' + item);
-            });
-        });
 
         events.on('update_start_event', (evt, item)=>  {
-            
+
             console.log('button press');
             let startLabel = select('#start_date_label').style('color', 'black');
             this.startBool = '0 date determined by event';
             let startLabelBool = select('#pat_or_event').text(this.startBool);
-         
+
         });
 
         events.on('date clicked', (evt, item)=>  {
@@ -113,7 +97,12 @@ export class QueryBox {
         events.on('cohort_added', (evt, item)=> {
             this.cohortKeeper.selectAll('label').remove();
             item.forEach((cohort, i) => {
-                this.cohortKeeper.append('label').text('Cohort  '+ (i+1) );
+                let label = this.cohortKeeper.append('label').text('Cohort  '+ (i+1) );
+                label.data(item[i]);
+                label.on('click', ()=> {
+                    console.log(i);
+                    console.log(cohort);
+                });
             });
             
         });
