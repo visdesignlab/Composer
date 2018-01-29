@@ -335,9 +335,8 @@ constructor(parent: Element) {
 
                 //g.array = [];
         let minDate = g.minPromis;//changed min date for cpt to min date of promis score
-      
-       // if(g.value != null) minDate = this.findMinDateCPT(g.value);
-                      
+
+
                 // let minDate = this.findMinDate(similarOrdersInfo.value);
             g.value.forEach((d) => {
 
@@ -346,7 +345,7 @@ constructor(parent: Element) {
 
                       try {
                           d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                        
+
                         }
                       catch (TypeError) {
                           console.log('error');
@@ -362,7 +361,7 @@ constructor(parent: Element) {
                       if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5'])    };
                       if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6'])    };
                       if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7'])    };
-                    
+
                       d.diff = d.diff;
 
                      });
@@ -379,7 +378,7 @@ constructor(parent: Element) {
                     });
 
                     filteredOrders.push(filter);
-                           
+
                 });
 
                 console.log(maxDate);
