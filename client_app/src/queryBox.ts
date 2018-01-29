@@ -13,6 +13,7 @@ export class QueryBox {
     private dataset;
     startDay;
     startBool;
+    cohortKeeper;
 
     constructor(parent: Element) {
 
@@ -22,9 +23,18 @@ export class QueryBox {
             .append('div')
             .classed('queryDiv', true);
 
-        let self = this;
+        const self = this;
+        const form = this.$node.append('form');
+        this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 50);
 
-        let form = this.$node.append('form');
+        form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Clear Cohorts')
+            .on('click', () => {
+            events.fire('clear_cohorts');
+                this.cohortKeeper.selectAll('label').remove();
+            });
+
 
         form.append('br');
 
@@ -41,26 +51,10 @@ export class QueryBox {
 
          //test button to create parallel when I want to
         form.append('input')
-        .attr('type', 'button')
-        .attr('value', 'Parallel Coordinate')
-        .on('click', () => events.fire('parallel'));
-/*
-        form.append('label')
-            .attr('for', 'start_date')
-            .attr('id', 'start_date_label')
-           .text(this.startDay);
-            
-        form.append('input')
             .attr('type', 'button')
-            .attr('id', 'start_date')
-            .attr('value', 'Update Start Day')
-            .on('click', () => events.fire('update_start_event'));
+            .attr('value', 'Parallel Coordinate')
+            .on('click', () => events.fire('parallel'));
 
-        form.append('label')
-            .attr('id', 'pat_or_event')
-            .text(this.startBool);
-
-*/
         this.attachListener();
     }
 
@@ -114,6 +108,14 @@ export class QueryBox {
             select('#text_num_similar').attr('value', item[0]);
             this.updateSimilar();
 
+        });
+
+        events.on('cohort_added', (evt, item)=> {
+            this.cohortKeeper.selectAll('label').remove();
+            item.forEach((cohort, i) => {
+                this.cohortKeeper.append('label').text('Cohort  '+ (i+1) );
+            });
+            
         });
 /*
         events.on('selected_updated', (evt, item)=>{

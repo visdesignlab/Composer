@@ -182,15 +182,6 @@ export class similarityScoreDiagram {
 
         })
 
-        events.on('target_updated', (evt, item) => {
-     
-            this.targetProInfo = item[1];
-            this.setOrderScale();
-            this.clearDiagram();
-            this.getDays(null);
-       
-        });
-
         events.on('gotPromisScores', (evt, item) => {  // called in parrallel on brush and 
                // console.log('filtered promis objects' + item)
                 this.cohortProInfo = item;  
@@ -198,14 +189,6 @@ export class similarityScoreDiagram {
                 this.getDays(null);
 
                     });
-
-         events.on('gotTargetPromisScore', (evt, item)=> {
-            
-                this.targetProInfo = item;
-                this.clearDiagram();
-               // this.drawDiagram();
-                        
-        });
 
         events.on('filtered_CPT', (evt, item)=> {
            // this.addSimilarOrderPoints(this.targetOrderInfo, item);
@@ -247,14 +230,14 @@ export class similarityScoreDiagram {
     private getDays (date) {
 
          // ----- add diff days to the data
-        
+        console.log(this.cohortProInfo);
         let maxDiff = 0;// this sets the score scale max.
          //need to make this dynamic. 
         let diffArray = [];
         //console.log(this.cohortProInfo);
 
         this.cohortProInfo.forEach((g) => {
-                console.log(g);
+               
                 let  minDate;
 
                 if(g.CPTtime != undefined && date != null ) {
@@ -280,7 +263,6 @@ export class similarityScoreDiagram {
 
                         });
 
-                        
 
         diffArray.sort((a, b) => ascending(a, b));
     
@@ -300,6 +282,8 @@ export class similarityScoreDiagram {
      * @param args
      */
     private drawDiagram() {
+
+        console.log('draw diagram');
 
             let lineCount = this.cohortProInfo.length;
    

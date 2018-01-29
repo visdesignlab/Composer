@@ -31,14 +31,7 @@ export class dataManager {
     proTable : ITable;
     proTableSample : ITable;
     cptTable : ITable;
-    icdTable : ITable
-
-    //assigned target patient info
-    targetPatId;//string id for target patient
-    targetProInfo;//PROMIS score filtered from proTable
-  //  targetProObjects;//PROMIS Scores as objects for target patient
-    targetOrderInfo;
-    targetOrderObjects;
+    icdTable : ITable;
 
     //defined cohort info
     cohortIdArray;
@@ -46,8 +39,6 @@ export class dataManager {
     cohortOrderInfo; //defined cohort 
 
     cohortProObjects;//Promis scores as objects for cohort
-    cohortProObSample;
-    patOrderObjects;//orders as objects for all patient data
     populationDemographics;//demo for whole population
     filteredCohortDemo;//demographic info as objects for defined cohort
     cohortCptObjects;//CPT as objects for defined cohort
@@ -57,6 +48,8 @@ export class dataManager {
     selectedPatIds;//array of ids for defined patients 
 
     startDate;
+    cohortCounter = 0;
+    cohortfilterarray = [];
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -75,7 +68,6 @@ export class dataManager {
        // this.loadData('Orders');
         this.loadData('CPT_codes');
         this.loadData('ICD_codes');
-        this.loadData('PRO_SAMPLE');
 
         this.attachListener();
 
@@ -129,12 +121,6 @@ export class dataManager {
             //this.getDataObjects('cpt_object', this.cptTable);
         });
 
-        events.on('PRO_SAMPLE', (evt, item)=> {
-            //console.log(item);
-            this.proTableSample = item;
-           // this.getDataObjects('pro_sample', this.proTableSample);
-        })
-
         events.on('load_cpt', ()=> {
             //this is called from cpt button 
             //loads the cpt objects form the table for all patients
@@ -159,30 +145,22 @@ export class dataManager {
            
         });
 
-        events.on('order_object', (evt, item)=> {
-            //this.patOrderObjects = item;
-        });
-
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
             console.log(item);
             this.cohortProObjects = item;
-            this.getPromisScores(null, this.cohortProObjects);
-            
+            this.getPromisScores(null, item);
         });
 
-        events.on('pro_sample', (evt, item)=> {//picked up by similarity diagram
-            console.log(item);
-           // this.cohortProObjects = item;
-           // this.getPromisScores(null, this.cohortProObjects);
+        events.on('gotPromisScores', (evt, item)=> {
+           // this.getCPT(null, this.cohortCptObjects, this.filteredPatPromis);
         });
 
         events.on('cpt_object', (evt, item)=> {
 
             this.cohortCptObjects = item;
             this.getCPT(this.selectedPatIds, this.cohortCptObjects, this.filteredPatPromis);
-          
-           // events.fire('update_target');
-           // this.getOrders(this.patCptObjects);
+            console.log('cptfinding');
+         
         });
 
         events.on('icd_object', (evt, item)=> {
@@ -191,26 +169,16 @@ export class dataManager {
        
         });
 
-        /* 
-        // WHEN THE DATA CHANGES REASSIGN TARGET AND COHORT
-        */
-         events.on('update_target', () => { //this is picked up from target patient search in query box
-
-            const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-            this.updateTarget(value, this.cohortCptObjects);
-       
-         });
-
           // item: [d, parentValue]
           events.on('filter_data', (evt, item) => { // called in sidebar
 
             this.filterRequirements.demo = item;
          
             this.demoFilter(item, this.populationDemographics);
-
+            this.addCohortFilter();
           });
 
-          events.on('selected_pat_array', (evt, item)=> {
+        events.on('selected_pat_array', (evt, item)=> {
      
             this.cohortIdArray = item;
             this.getCPT(this.cohortIdArray, this.cohortCptObjects, this.filteredPatPromis);
@@ -228,6 +196,34 @@ export class dataManager {
 
           });
 
+        events.on('clear_cohorts', () => {
+              this.removeCohortFilterArray();
+              
+          });
+
+    }
+
+    private addCohortFilter () {
+        console.log(this.cohortCounter);
+        
+        let filter = this.filterRequirements;
+        //console.log(filter);
+
+        this.cohortfilterarray.push(filter);
+        //when a filter is passed to to a 
+        console.log(this.cohortfilterarray);
+        this.cohortCounter =+ 1;
+
+        events.fire('cohort_added', this.cohortfilterarray);
+    
+
+    }
+
+    private removeCohortFilterArray () {
+
+        this.cohortfilterarray = [];
+        console.log(this.cohortfilterarray);
+        
     }
 
     private filterbyCPT (selectedCPT){
@@ -263,40 +259,37 @@ export class dataManager {
          
            filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
           }else{
-           if (choice.length == 1){
+           if (choice.length === 1){
              filter = filter.filter(d => d[parent] == choice);
-          }else if(choice.length == 2){
+          }else if(choice.length === 2){
              filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
              console.log(filter);
-          }else if(choice.length == 2){
+          }else if(choice.length === 2){
             filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
             console.log(filter);
-         }else if(choice.length == 3){
+         }else if(choice.length === 3){
             filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
             console.log(filter);
           }
         }
-          
          });
-            filter.forEach(element => {
+            filter.forEach((element) => {
                 this.selectedPatIds.push(element.ID);
             });
 
            this.filteredCohortDemo = filter;
-          
            this.getPromisScores(this.selectedPatIds, this.cohortProObjects);
-            
        }
 
     
     //uses Phovea to access PROMIS data and draw table for cohort
     private async getPromisScores(selectedPatIds, proObjects) {
-
+        console.log(selectedPatIds);
       // let mapped = entries(filteredPatScore);
       // this.cohortProInfo = mapped;
       // events.fire('pro_object_filtered', filteredPatScore);
     let PROMIS = proObjects.filter((d) => {
-        return d['FORM_ID'] == 1123
+        return d['FORM_ID'] === 1123
     });
    
     let yayornay = 'nay';
@@ -308,10 +301,9 @@ export class dataManager {
         yayornay = 'yay';
 
         PROMIS.forEach((d) => {
-                // let maxDiff = 0;
                
-            if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
-                    if (filteredPatOrders[d.PAT_ID] === undefined) {
+            if (selectedPatIds.indexOf(d.PAT_ID) != -1) {
+                    if (filteredPatOrders[d.PAT_ID] == undefined) {
                         filteredPatOrders[d.PAT_ID] = [];
                         }
                         filteredPatOrders[d.PAT_ID].push(d);
@@ -321,8 +313,8 @@ export class dataManager {
 
     if (selectedPatIds == null){
         PROMIS.forEach((d) => {
-               // if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
-                    if (filteredPatOrders[d.PAT_ID] === undefined) {
+
+                    if (filteredPatOrders[d.PAT_ID] == undefined) {
                             filteredPatOrders[d.PAT_ID] = [];
                             }
                             filteredPatOrders[d.PAT_ID].push(d);
@@ -330,9 +322,8 @@ export class dataManager {
         });
 
        }
-    
        let mapped = entries(filteredPatOrders);
-       //return filteredPatOrders; 
+       //return filteredPatOrders;
        let patPromis = mapped.map(d=> {
            return {
              key: d.key,
@@ -344,6 +335,7 @@ export class dataManager {
 
       events.fire('gotPromisScores', patPromis);
       this.filteredPatPromis = patPromis;
+      console.log(this.filteredPatPromis);
 
       if (yayornay == 'yay')events.fire('filteredPatients', patPromis);
      };
@@ -353,40 +345,34 @@ export class dataManager {
 
     let filteredPatOrders = {};
    // const patOrders = await this.orderTable.objects();
-   
-     cptObject.forEach(item => {
-         if (selectedPatIds.indexOf(item.PAT_ID) !== -1) {
+   if (selectedPatIds != null) {
+     cptObject.forEach((item) => {
+         if (selectedPatIds.indexOf(item.PAT_ID) != -1) {
           if (filteredPatOrders[item.PAT_ID] === undefined) {
      filteredPatOrders[item.PAT_ID] = [];
    }
      filteredPatOrders[item.PAT_ID].push(item);
     }
      });
-     let mapped = entries(filteredPatOrders);
+    }
+
+     if (selectedPatIds == null) {
+        cptObject.forEach((d) => {
+               // if (selectedPatIds.indexOf(d.PAT_ID) !== -1) {
+                    if (filteredPatOrders[d.PAT_ID] === undefined) {
+                            filteredPatOrders[d.PAT_ID] = [];
+                            }
+                            filteredPatOrders[d.PAT_ID].push(d);
+                          //  }
+        });
+    }
+
+     const mapped = entries(filteredPatOrders);
 
     events.fire('filtered_CPT', mapped);
     //return mapped;
 
  };
-
-       //gets CPT objects for target patient and maps them to draw
-    private async updateTarget(patID, cptObject) {
-
-        let filteredPatScore = [];//gets PROMIS Scores for target patient
-  
-        this.cohortProObjects.forEach(item => {
-            if (patID.indexOf(item.PAT_ID) !== -1) {
-            filteredPatScore.push(item);
-        }
-        }); 
-
-        this.getCPT(patID, cptObject, this.filteredPatPromis).then(value => {//gets CPT for target patient
-
-            events.fire('target_updated', [value, filteredPatScore]);
-
-          });
-          
-    };
 
     public async mapDemoData() {
 
@@ -454,7 +440,7 @@ export class dataManager {
      }
  
      //uses Phovea to access PRO data and draw table for similar cohort
-    private async getOrders(selectedPatIds) {
+  /*  private async getOrders(selectedPatIds) {
   
         let filteredPatOrders = {};
         //const patOrders = await this.orderTable.objects();
@@ -472,9 +458,9 @@ export class dataManager {
         this.cohortOrderInfo = mapped;
 
  //events.fire('orders_updated',[this.patOrderObjects, this.targetPatientProInfo, this.similarPatientProInfo]);
-        events.fire('orders_updated',[this.targetProInfo, this.cohortOrderInfo, this.cohortProInfo]);
+        events.fire('orders_updated',[null, this.cohortOrderInfo, this.cohortProInfo]);
  
-     };
+     };*/
 
 
     public async loadData(id: string){ //loads the tables from Phovea
