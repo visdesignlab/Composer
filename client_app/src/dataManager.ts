@@ -215,15 +215,15 @@ export class dataManager {
         this.cohortCounter =+ 1;
 
         events.fire('cohort_added', this.cohortfilterarray);
-    
+
 
     }
 
     private removeCohortFilterArray () {
 
         this.cohortfilterarray = [];
-        console.log(this.cohortfilterarray);
-        
+        console.log('cohort array empty  '+this.cohortfilterarray);
+
     }
 
     private filterbyCPT (selectedCPT){
