@@ -27,22 +27,19 @@ export class cptBreakdown {
   private timeScale;
   private scoreScale;
   private svg;
-  //private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
   private parseTime = dataCalc.parseTime;
   private setOrderScale = dataCalc.setOrderScale;
   private getClassAssignment = dataCalc.getClassAssignment;
- // private drawPatOrderRects = dataCalc.drawPatOrderRects;
+
   private orderHierarchy = dataCalc.orderHierarchy;
   private findMaxDate = dataCalc.findMaxDate;
   private patOrderGroup;
-  targetPatientOrders;
-  targetProInfo
   currentlySelectedName;
   queryDataArray;
   queryDateArray;
-  targetOrder;
   cohortProInfo;
-  //similarPatientsProInfo;
+  private targetOrder;
+
 
 
   rectBoxDimension = {width: 1100, height: 90 };
@@ -113,10 +110,6 @@ constructor(parent: Element) {
         this.maxDay = item;
         
         });
-   
-    events.on('gotPromisScores', (evt, item)=>{
-       // this.cohortProInfo = item;
-    });
 
     events.on('filteredPatients', (evt, item)=> {
         this.cohortProInfo = item;
@@ -127,12 +120,12 @@ constructor(parent: Element) {
       //console.log('made it  '+ item);
       console.log(item.length);
 
-      this.addSimilarOrderPoints(this.cohortProInfo, item);
+      this.mapCPT(this.cohortProInfo, item);
     });
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
         selectAll('.patCPTRecord').remove();
-       // console.log('filter by order'+ item);
+
         this.drawOrders(item);
 
     });
@@ -231,25 +224,9 @@ constructor(parent: Element) {
     this.queryDateArray = queryDate;
  
   }
-    
-  
- /**
-     * Utility method
-     * @param pat
-     * @returns {Date}
-     */
-    private findMinDate(pat) {
-      
-              let minDate = new Date();
-              for (let index = 0; index < pat.length; index++) {
-                  if (!pat[index]['ASSESSMENT_START_DTM']) continue;
-                  if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
-                      minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
-              }
-              return minDate
-          }
 
-           /**
+
+    /**
      * Utility method
      * @param pat
      * @returns {Date}
@@ -288,28 +265,26 @@ constructor(parent: Element) {
      *
      * @param ordersInfo
      */
-    private addSimilarOrderPoints(patProInfo, similarOrdersInfo) {
-        //console.log('pat pro'+ patProInfo);
-       // console.log('simm order info' + similarOrdersInfo);
-           // let minDate = this.findMinDate(patProInfo);
+    private mapCPT(patProInfo, CPTobjects) {
+    
         let minDate = new Date();
-        let maxDate = this.parseTime(similarOrdersInfo[0].value[0]['PROC_DTM'], null);
+        let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
 
-        for(var i= 0;  i< similarOrdersInfo.length; i++) {
+        for(var i= 0;  i< CPTobjects.length; i++) {
 
-            var keycpt = similarOrdersInfo[i].key;
+            var keycpt = CPTobjects[i].key;
 
             for(var j = 0; j < patProInfo.length; j++) {
               //console.log(patProInfo[j]);
               var keypromis = patProInfo[j].key;
 
               if(keycpt == keypromis) {
-                similarOrdersInfo[i].minPromis = patProInfo[j].min_date;
+                CPTobjects[i].minPromis = patProInfo[j].min_date;
               }
             } 
-          } console.log(similarOrdersInfo);
+          } console.log(CPTobjects);
 
-            similarOrdersInfo.forEach((d) => {
+          CPTobjects.forEach((d) => {
                
 
                 let minDatePat = this.findMinDateCPT(d.value);
@@ -331,13 +306,11 @@ constructor(parent: Element) {
          
         let filteredOrders = [];
 
-        similarOrdersInfo.forEach((g) => {
+        CPTobjects.forEach((g) => {
 
                 //g.array = [];
         let minDate = g.minPromis;//changed min date for cpt to min date of promis score
 
-
-                // let minDate = this.findMinDate(similarOrdersInfo.value);
             g.value.forEach((d) => {
 
                       d.array = []; 
@@ -386,8 +359,8 @@ constructor(parent: Element) {
             
               events.fire('cpt_filtered', filteredOrders);
               this.filteredCPT = filteredOrders;
-              this.drawOrders(filteredOrders);
-             
+             // this.drawOrders(filteredOrders);
+                console.log('cpt filtered and timescale set');
           }
 
         private drawOrders (filteredCPT) {
@@ -423,7 +396,7 @@ constructor(parent: Element) {
 
          let rectGroup = patGroups.select('.patInnerGroup')
             .selectAll('.visitDays')
-            .data(d => d)     
+            .data(d => d);
 
         let rectGroupEnter = rectGroup
             .enter()
@@ -472,7 +445,7 @@ constructor(parent: Element) {
             .on('click', function (d) {
               console.log(d);
               let parentData = select(this.parentNode).data;
-             console.log(parentData);
+             
               
             });
 
