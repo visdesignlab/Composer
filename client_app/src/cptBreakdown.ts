@@ -20,6 +20,7 @@ import * as d3 from 'd3';
 import {tsv} from 'd3-request';
 import {argFilter} from 'phovea_core/src/';
 import { filteredOrders } from './similarityScoreDiagram';
+import * as codeDict from './cptDictionary';
 
 export class cptBreakdown {
 
@@ -39,7 +40,7 @@ export class cptBreakdown {
   queryDateArray;
   cohortProInfo;
   private targetOrder;
-
+  private codes;
 
 
   rectBoxDimension = {width: 1100, height: 90 };
@@ -51,11 +52,11 @@ export class cptBreakdown {
   selectedPatientArray;
   cptObject;
   filteredCPT;
-
   maxDay;
     
 constructor(parent: Element) {
-
+    this.codes = codeDict.create();
+    this.cptchecker();
     this.$node = select(parent)
    // .append('div')
    // .classed('cptBreakdownDiv', true)
@@ -113,7 +114,7 @@ constructor(parent: Element) {
 
     events.on('filteredPatients', (evt, item)=> {
         this.cohortProInfo = item;
-    })
+    });
 
 
     events.on('filtered_CPT', (evt, item) => {
@@ -160,9 +161,15 @@ constructor(parent: Element) {
             });
 }
 
- /**
-     * firing event to update the vis for info of a patient
-     */
+    private cptchecker() {
+      //  const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+       // console.log(value);
+       /*
+        this.codes.forEach(element => {
+            console.log(element);
+        });*/
+        console.log(this.codes);
+    }
     private queryOrder() {
 
        // console.log(this.filteredCPT);
@@ -356,10 +363,10 @@ constructor(parent: Element) {
 
                 console.log(maxDate);
                 this.timeScale.domain([0, this.maxDay]);
-            
-              events.fire('cpt_filtered', filteredOrders);
-              this.filteredCPT = filteredOrders;
-             // this.drawOrders(filteredOrders);
+
+                events.fire('cpt_filtered', filteredOrders);
+                this.filteredCPT = filteredOrders;
+
                 console.log('cpt filtered and timescale set');
           }
 
@@ -445,8 +452,7 @@ constructor(parent: Element) {
             .on('click', function (d) {
               console.log(d);
               let parentData = select(this.parentNode).data;
-             
-              
+
             });
 
         

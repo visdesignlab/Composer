@@ -1,6 +1,6 @@
 /**
- * Created by Jen Rogers on 12/14/17.
- * data for the views. 
+ * Created by Jen Rogers on 1/29/18.
+ * data for the views.
  */
 import * as ajax from 'phovea_core/src/ajax';
 import {ITable, asTable} from 'phovea_core/src/table';
@@ -17,6 +17,8 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalculations from './dataCalculations';
+import * as codeDict from './cptDictionary';
+
 
 
 export class CohortManager {
@@ -27,6 +29,8 @@ export class CohortManager {
     cohortfilterarray = [];
     cohortkeeperarray = [];
     selectedCohort;
+    cptCodes;
+    codes;
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -36,7 +40,11 @@ export class CohortManager {
        };
 
     constructor() {
+        this.codes = codeDict.create();
 
+        console.log(this.codes.pt);
+        console.log(this.codes.surgery);
+        console.log(this.codes.injection);
 
         this.attachListener();
 
