@@ -331,12 +331,17 @@ export class DataManager {
                 max_date: this.findMaxDate(d.value),
             }
         });
-
-        events.fire('got_promis_scores', patPromis);
+        if (yayornay !== 'yay'){
+            console.log('nay!');
+            events.fire('got_promis_scores', patPromis);
+        };
+       
         this.filteredPatPromis = patPromis;
         //console.log(this.filteredPatPromis);
 
-        if (yayornay == 'yay')events.fire('filtered_patient_promis', patPromis);
+        if (yayornay == 'yay'){
+            console.log('yay!');
+            events.fire('filtered_patient_promis', patPromis);}
      };
 
      //uses Phovea to access PRO data and draw table
@@ -366,7 +371,7 @@ export class DataManager {
 
         const mapped = entries(filteredPatOrders);
 
-         events.fire('filtered_CPT', mapped);
+        events.fire('filtered_CPT', mapped);
  };
 
           /**

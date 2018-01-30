@@ -190,6 +190,14 @@ export class similarityScoreDiagram {
 
                     });
 
+        events.on('selected cohort change', (evt, item) => {  // called in parrallel on brush and 
+            
+                this.cohortProInfo = item;
+                this.clearDiagram();
+                this.getDays(null);
+        
+                    });
+
         events.on('filtered_CPT', (evt, item)=> {
            // this.addSimilarOrderPoints(this.targetOrderInfo, item);
         });
