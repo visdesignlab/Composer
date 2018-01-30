@@ -36,16 +36,12 @@ export class CohortManager {
     filterRequirements = {
         'demo': null, //this is sent from sidebar
         'icd': null,
-        'cpt': null
+        'cpt': []
        };
 
     constructor() {
         this.codes = codeDict.create();
-
-        console.log(this.codes.pt);
-        console.log(this.codes.surgery);
-        console.log(this.codes.injection);
-
+       
         this.attachListener();
 
     }
@@ -60,8 +56,7 @@ export class CohortManager {
           events.on('filter_data', (evt, item) => { // called in sidebar
 
             this.filterRequirements.demo = item;
-
-            this.addCohortFilter(item);
+            this.addCohortFilter(this.filterRequirements);
           });
 
           events.on('cohort_selected', (evt, item)=>{
@@ -73,16 +68,23 @@ export class CohortManager {
             console.log(this.selectedCohort);
           });
 
+          events.on('filtered_CPT_by_order', (evt, item)=>{
+              console.log(item[1]);
+              console.log(this.selectedCohort);
+              this.selectedCohort.cpt.push(item[1]);
+          });
+
 
 
     }
 
     private addCohortFilter (filter) {
+
         this.cohortfilterarray.push(filter);
         this.cohortCounter =+ 1;
 
         events.fire('cohort_added', this.cohortfilterarray);
-        console.log(this.cohortfilterarray);
+        this.selectedCohort = this.cohortfilterarray[0];
     }
 
     private removeCohortFilterArray () {

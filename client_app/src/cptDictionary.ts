@@ -20,37 +20,34 @@ import * as dataCalculations from './dataCalculations';
 
 
 export class CPTDictionary {
-    public pt = {
-        'physical therapy evaluation' : [97001, 97002],//combined eval and re eval. this should potentially be separate?
-        'theraputic excercises' : 97110,
-        'manual therapy' : 97140,
-        'theraputic activities': 97530,
-        'self-care': 97535,
-        'home management training': 97535,
-        'neuromuscular re-education': 97112,
-        'aquatic therapy': 97113,
-        'physical performance test': 97750,
-        'physical performance measurement': 97750,
-        'Extremity muscle testing': 95831,
-        'trunk muscle testing': 95831
-     };
+    public codeDict = {
+        'PT' : {
+            'physical therapy evaluation' : [97001, 97002],//combined eval and re eval. this should potentially be separate?
+            'theraputic excercises' : 97110,
+            'manual therapy' : 97140,
+            'theraputic activities': 97530,
+            'self-care': 97535,
+            'home management training': 97535,
+            'neuromuscular re-education': 97112,
+            'aquatic therapy': 97113,
+            'physical performance test': 97750,
+            'physical performance measurement': 97750,
+            'Extremity muscle testing': 95831,
+            'trunk muscle testing': 95831
+        },
 
-    public injection = {
-         'injection': [
-             62310, 62312, 62313, 62314, 62315, 62316, 62317, 62318,
-             62320, 62321, 62322, 62323, 62324, 62325, 62326, 62327
-         ]
-     };
+        'injection' : {
+            'injection': [
+                62310, 62312, 62313, 62314, 62315, 62316, 62317, 62318,
+                62320, 62321, 62322, 62323, 62324, 62325, 62326, 62327
+            ]
+        },
 
-    public surgery = {
-         'surgery': 63030,
-     };
-
-    constructor() {
-
-       
-
+        'surgery' : {
+            'surgery': 63030,
+        }
     }
+
 }
 
   export function create() {

@@ -81,7 +81,7 @@ export class DataManager {
 
         events.on('filtered_CPT_by_order', (evt, item)=> {
            
-            this.getSelectedIdArray(item, 'cpt');
+            this.getSelectedIdArray(item[0], 'cpt');
 
         });
 

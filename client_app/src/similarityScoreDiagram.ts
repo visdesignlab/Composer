@@ -204,8 +204,6 @@ export class similarityScoreDiagram {
 
     private addMinDay(eventArray) {
 
-        console.log(eventArray);
-
         let cohort = this.cohortProInfo;
     
         for(var i= 0;  i< cohort.length; i++) {
@@ -221,8 +219,6 @@ export class similarityScoreDiagram {
               }
             } 
           }
-        
-          console.log(cohort);
           this.cohortProInfo = cohort;
    
 }
@@ -230,11 +226,10 @@ export class similarityScoreDiagram {
     private getDays (date) {
 
          // ----- add diff days to the data
-        console.log(this.cohortProInfo);
+      
         let maxDiff = 0;// this sets the score scale max.
          //need to make this dynamic. 
         let diffArray = [];
-        //console.log(this.cohortProInfo);
 
         this.cohortProInfo.forEach((g) => {
                
@@ -253,8 +248,8 @@ export class similarityScoreDiagram {
                         }
                         catch (TypeError) {
                         d.diff = -1;
-                        }//console.log(d.diff);
-                        })
+                        }
+                        });
 
                         g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
                         diffArray.push(g.days + 1);
@@ -283,12 +278,10 @@ export class similarityScoreDiagram {
      */
     private drawPromisChart() {
 
-        console.log('draw diagram');
-
             let lineCount = this.cohortProInfo.length;
    
         let similarData = this.cohortProInfo.map((d) => {
-            //console.log(d.days);
+           
             d.scale = this.timeScale.domain([0, d.days]);
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram
@@ -354,13 +347,8 @@ export class similarityScoreDiagram {
     
     private addPromisDots (d){
 
-        
         let promisData = d;
-        console.log(d);
-        promisData.forEach(element => {
-           // console.log(element.diff);
-            console.log(element.SCORE);
-        });
+
         let promisRects = this.svg.select('#similar_score').selectAll('g').append('g')
         //.attr('transform', () => {
         //    return `translate(${this.margin.x},${this.margin.y})`;
@@ -379,9 +367,6 @@ export class similarityScoreDiagram {
 
         let lowScore = this.scoreScale.invert(end);
         let highScore = this.scoreScale.invert(start);
-
-        console.log(end);
-        console.log(lowScore);
 
         let pro = this.svg.select('#pro_score')
             .selectAll('path')

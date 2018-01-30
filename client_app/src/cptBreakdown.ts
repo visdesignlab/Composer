@@ -56,7 +56,7 @@ export class cptBreakdown {
     
 constructor(parent: Element) {
     this.codes = codeDict.create();
-    this.cptchecker();
+    //this.cptchecker();
     this.$node = select(parent)
    // .append('div')
    // .classed('cptBreakdownDiv', true)
@@ -85,7 +85,6 @@ constructor(parent: Element) {
 
 
     this.attachListener();
-  
 }
 
   /**
@@ -118,8 +117,6 @@ constructor(parent: Element) {
 
 
     events.on('filtered_CPT', (evt, item) => {
-      //console.log('made it  '+ item);
-      console.log(item.length);
 
       this.mapCPT(this.cohortProInfo, item);
     });
@@ -127,7 +124,7 @@ constructor(parent: Element) {
     events.on('filtered_CPT_by_order', (evt, item)=> {
         selectAll('.patCPTRecord').remove();
 
-        this.drawOrders(item);
+        this.drawOrders(item[0]);
 
     });
 
@@ -153,7 +150,7 @@ constructor(parent: Element) {
             .attr('type', 'button')
             .attr('value', 'filter cohort by selected')
             .on('click', () => {
-              events.fire('filtered_CPT_by_order', this.queryDataArray);
+              events.fire('filtered_CPT_by_order', [this.queryDataArray, this.targetOrder]);
               selectAll('.selectedOrder').classed('selectedOrder', false);
               selectAll('.unselectedOrder').classed('unselectedOrder', false);
               events.fire('min date to cpt', this.queryDateArray);
@@ -162,18 +159,10 @@ constructor(parent: Element) {
 }
 
     private cptchecker() {
-      //  const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-       // console.log(value);
-       /*
-        this.codes.forEach(element => {
-            console.log(element);
-        });*/
-        console.log(this.codes);
+        //this is where you are going to filter by category
     }
-    private queryOrder() {
 
-       // console.log(this.filteredCPT);
-        
+    private queryOrder() {
 
         let withQuery = [];
         let queryDate = [];
@@ -186,7 +175,7 @@ constructor(parent: Element) {
       
         this.targetOrder = value;
 
-        this.filteredCPT.forEach(element => {
+        this.filteredCPT.forEach((element) => {
             let elementBool;
             element.forEach(g => {
                 if (g.value[0].includes(+value)){
@@ -203,7 +192,8 @@ constructor(parent: Element) {
        // let groups = selectAll('.visitDays');
 
         events.fire('query_order', value);
-  
+
+        //THIS IS WHERE THE RECT CLASSESARE TARGETED//
         let selectedRects = rects.nodes();
        
 
@@ -226,7 +216,7 @@ constructor(parent: Element) {
             }else{node.classList.add('unselectedOrder');}
             });
   
-         
+
     this.queryDataArray = withQuery;
     this.queryDateArray = queryDate;
  
@@ -245,7 +235,6 @@ constructor(parent: Element) {
                   if (!pat[index]['PROC_DTM']) continue;
                   if (this.parseTime(pat[index]['PROC_DTM'], null).getTime() < minDate.getTime())
                       minDate = this.parseTime(pat[index]['PROC_DTM'], null)
-                     // console.log(minDate);
               }
               return minDate
           }
@@ -282,14 +271,14 @@ constructor(parent: Element) {
             var keycpt = CPTobjects[i].key;
 
             for(var j = 0; j < patProInfo.length; j++) {
-              //console.log(patProInfo[j]);
+            
               var keypromis = patProInfo[j].key;
 
               if(keycpt == keypromis) {
                 CPTobjects[i].minPromis = patProInfo[j].min_date;
               }
             } 
-          } console.log(CPTobjects);
+          } 
 
           CPTobjects.forEach((d) => {
                
@@ -300,7 +289,6 @@ constructor(parent: Element) {
                 if(minDate.getTime() > minDatePat.getTime())minDate = minDatePat;
                 if(maxDate.getTime() < maxDatePat.getTime())maxDate = maxDatePat;
 
-               // console.log('min date  :'+ minDate);
                 let time = this.parseTime(d['PROC_DTM'], minDate).getTime();
                 d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -361,7 +349,7 @@ constructor(parent: Element) {
 
                 });
 
-                console.log(maxDate);
+               
                 this.timeScale.domain([0, this.maxDay]);
 
                 events.fire('cpt_filtered', filteredOrders);
