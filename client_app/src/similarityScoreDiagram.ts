@@ -400,7 +400,7 @@ export class similarityScoreDiagram {
         med.filter(function (d) {
             if (!d.length) return false;
             return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
-        }).style('opacity', 1)
+        }).style('opacity', 1);
 
     }
 
