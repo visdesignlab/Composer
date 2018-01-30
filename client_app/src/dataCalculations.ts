@@ -49,18 +49,7 @@ export class dataCalc {
         
     }
 
-    export function findMinDateCPT(pat) {
-   
-        let minDate = new Date();
-        for (let index = 0; index < pat.length; index++) {
-            if (!pat[index]['PROC_DTM']) continue;
-            if (this.parseTime(pat[index]['PROC_DTM'], null) < minDate)
-                minDate = this.parseTime(pat[index]['PROC_DTM'], null)
-        }
-        return minDate
-    }
-
-     /**
+        /**
      * Used in calc for pat promis scores
      * @param pat
      * @returns {Date}
@@ -79,6 +68,40 @@ export class dataCalc {
         
     }
 
+     /**
+     * Utility method
+     * @param pat
+     * @returns {Date}
+     */
+    export function findMinDateCPT(pat) {
+               
+        let minDate = new Date();
+        for (let index = 0; index < pat.length; index++) {
+            if (!pat[index]['PROC_DTM']) continue;
+            if (this.parseTime(pat[index]['PROC_DTM'], null).getTime() < minDate.getTime())
+                minDate = this.parseTime(pat[index]['PROC_DTM'], null)
+        }
+        return minDate
+    }
+
+    /**
+    * Used in calc for pat promis scores
+    * @param pat
+    * @returns {Date}
+    */
+    export function findMaxDateCPT(pat) {
+
+    let maxDate = this.parseTime(pat[0]['PROC_DTM'], null);
+
+    for (let index = 0; index < pat.length; index++) {
+        if (!pat[index]['PROC_DTM']) continue;
+        if (this.parseTime(pat[index]['PROC_DTM'], null) > maxDate)
+            maxDate = this.parseTime(pat[index]['PROC_DTM'], null)
+    }
+    
+    return maxDate;
+    
+    }
     /**
      * filteres target patient orders into arrays 
      * @param ordersInfo

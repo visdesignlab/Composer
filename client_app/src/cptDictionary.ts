@@ -21,6 +21,7 @@ import * as dataCalculations from './dataCalculations';
 
 export class CPTDictionary {
     public codeDict = {
+
         'PT' : {
             'physical therapy evaluation' : [97001, 97002],//combined eval and re eval. this should potentially be separate?
             'theraputic excercises' : 97110,

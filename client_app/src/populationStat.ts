@@ -77,7 +77,7 @@ export class populationStat {
         
     }
 
-    private attachListener() {  
+    private attachListener() {
         events.on('filteredPatients', (evt, item)=>{
             this.filteredPromis = item;
             this.$node.select('.fillSelect').text(this.filteredPromis.length);
@@ -90,14 +90,14 @@ export class populationStat {
         events.on('pro_object', (evt, item)=> {
             this.populationPromis = item;
            // console.log(item);
-          
+
         });
 
         events.on('pro_object_filtered', (evt, item)=> {
-          
+
            this.filteredPromis = item;
            // console.log(item);
-          
+
         });
 
         events.on('timeline_max_set', (evt, item)=> {

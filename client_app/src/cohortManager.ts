@@ -25,7 +25,7 @@ export class CohortManager {
 
     cohortIdArray;//array of ids for defined patients 
 
-    cohortCounter = 0;
+    cohortIndex = 0;
     cohortfilterarray = [];
     cohortkeeperarray = [];
     selectedCohort;
@@ -41,7 +41,6 @@ export class CohortManager {
 
     constructor() {
         this.codes = codeDict.create();
-       
         this.attachListener();
 
     }
@@ -60,18 +59,32 @@ export class CohortManager {
           });
 
           events.on('cohort_selected', (evt, item)=>{
+
+            d3.select('#cohortKeeper').selectAll('.selected').classed('selected', false);
             let cohort = item[0];
             let index = item[1];
-           // console.log('this is the selected filter    '+ cohort);
-           // console.log('this is the index for the cohort in array  ' + index);
-            this.selectedCohort = this.cohortfilterarray[index];
-            console.log(this.selectedCohort);
+            this.cohortIndex = index;
+           // this.selectedCohort = this.cohortfilterarray[index];
+            this.selectedCohort = this.cohortkeeperarray[index];
+            let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index)
+            selectedLabel[0].classList.add('selected');
           });
 
           events.on('filtered_CPT_by_order', (evt, item)=>{
-              console.log(item[1]);
-              console.log(this.selectedCohort);
-              this.selectedCohort.cpt.push(item[1]);
+             // this.selectedCohort.cpt.push(item[1]);
+          });
+
+          events.on('cohort_filtered_demo', (evt, item) => {
+             this.cohortkeeperarray.push(item);
+             this.cohortIndex = this.cohortkeeperarray.length - 1;
+             this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
+             let index = +this.cohortIndex;
+         
+           //  let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName('cohort');
+            // let selected = document.getElementById('cohortKeeper');
+            // console.log(selectedLabel[index]);
+             //console.log(selectedLabel[this.cohortIndex]);
+             //selectedLabel[this.cohortIndex].classList.add('selected');
           });
 
 
@@ -81,16 +94,14 @@ export class CohortManager {
     private addCohortFilter (filter) {
 
         this.cohortfilterarray.push(filter);
-        this.cohortCounter =+ 1;
-
         events.fire('cohort_added', this.cohortfilterarray);
-        this.selectedCohort = this.cohortfilterarray[0];
     }
 
     private removeCohortFilterArray () {
 
         this.cohortfilterarray = [];
-        this.cohortCounter = 0;
+        this.cohortkeeperarray = [];
+        this.cohortIndex = 0;
 
     }
 

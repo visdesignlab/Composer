@@ -1,22 +1,26 @@
 .queryDiv {
-  padding: 1em;
+    padding: 1em;
 }
 
 .queryDiv li {
     min-width: 15em;
     display: inline-block;
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .queryDiv input {
-  margin-left: 5px;
+    margin-left: 5px;
 }
 
 .queryDiv p {
-  display: inline-block;
-  margin-left: 5px;
+    display: inline-block;
+    margin-left: 5px;
 }
 
 label {
-  margin-left: 5px;
+    margin-left: 8px;
+}
+
+.selected {
+    color: aqua;
 }
