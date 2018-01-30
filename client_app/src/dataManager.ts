@@ -16,7 +16,7 @@ import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
-import * as dataCalculations from './dataCalculations';
+import * as dataCalc from './dataCalculations';
 /*
 interface IfilterRequirements {
     'demo': null, //this is sent from sidebar
@@ -26,9 +26,11 @@ interface IfilterRequirements {
 
 export class DataManager {
 
-    private findMinDate = dataCalculations.findMinDate;
-    private findMaxDate = dataCalculations.findMaxDate;
-    private parseTime = dataCalculations.parseTime;
+    private findMinDate = dataCalc.findMinDate;
+    private findMaxDate = dataCalc.findMaxDate;
+    private findMinDateCPT = dataCalc.findMinDateCPT;
+    private findMaxDateCPT = dataCalc.findMaxDateCPT;
+    private parseTime = dataCalc.parseTime;
 
     //tables for all patient data
     demoTable : ITable;
@@ -45,7 +47,7 @@ export class DataManager {
 
     cohortProObjects;//Promis scores as objects for cohort
     populationDemographics;//demo for whole population
-    filteredCohortDemo;//demographic info as objects for defined cohort
+    //filteredCohortDemo;//demographic info as objects for defined cohort
     cohortCptObjects;//CPT as objects for defined cohort
     cohortIcdObjects;//ICD objects for cohort
     filteredPatPromis;
@@ -134,10 +136,6 @@ export class DataManager {
         // THESE SET VARIABLES TO OBJECTS AND SEND OBJECTS TO VIEWS
         */
         //THESE ARE TAKING AN ETERNITY. NEED TO USE RANGES TO FILTER TABLES
-        events.on('demo_object', (evt, item)=> {
-           // this.populationDemographics = item;
-           
-        });
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
             console.log(item);
@@ -172,6 +170,11 @@ export class DataManager {
 
           });
 
+          events.on('filtered_CPT', (evt, item) => {
+
+            this.mapCPT(this.filteredPatPromis, item);
+          });
+
         events.on('selected_pat_array', (evt, item)=> {
      
             this.cohortIdArray = item;
@@ -195,17 +198,13 @@ export class DataManager {
     }
 
 
-//pulled from paralle coord
+//pulled from parallel coord
     private demoFilter(sidebarFilter, demoObjects) {
-        //picks up the filters from sidebar and creates sidebarfiltered data
-        //this works with the value returned by the mapped patient demo
-        //sets patId array to filter
 
-          this.cohortIdArray = [];
+           this.cohortIdArray = [];
 
           let filter = demoObjects;
-    
-          sidebarFilter.forEach( d=> {
+          sidebarFilter.forEach( (d)=> {
            
            let parent = d.attributeName;
            let choice = d.checkedOptions;
@@ -232,9 +231,58 @@ export class DataManager {
                 this.cohortIdArray.push(element.ID);
             });
 
-           this.filteredCohortDemo = filter;
+           //this.filteredCohortDemo = filter;
+           events.fire('cohort_filtered_demo', filter);//should I maybe use the array instead?
            this.mapPromisScores(this.cohortIdArray, this.cohortProObjects);
        }
+
+       public async mapDemoData() {
+
+            let that = this;
+
+            // I THINK THIS IS WHAT IS KILLING THE APP? MOST LIKELY THE OBJECTS LOADING
+            let patID = (await this.demoTable.colData('PAT_ID')).map(d => +d);
+            let GENDER = (await this.demoTable.colData('PAT_GENDER')).map(d => d);
+            let MARITAL_STATUS = (await this.demoTable.colData('PAT_MARITAL_STAT')).map(d => d);
+            let TOBACCO = (await this.demoTable.colData('TOBACCO_USER')).map(d => d);
+            let ALCOHOL = (await this.demoTable.colData('ALCOHOL_USER')).map(d => d);
+            let DRUG_USER = (await this.demoTable.colData('ILLICIT_DRUG_USER')).map(d => d);
+            let RACE = (await this.demoTable.colData('PAT_RACE')).map(d => d);
+            let BMI = (await this.demoTable.colData('BMI')).map(d => +d);
+            let patDOB = (await this.demoTable.colData('PAT_BIRTHDATE')).map(d => new Date(String(d)));
+            let CCI = (await this.demoTable.colData('CCI')).map(d => +d);
+            let DM_CODE = (await this.demoTable.colData('DM_CODE')).map(d => +d);
+        
+            let patAge = [];
+        
+            patDOB.forEach((d) => { 
+                let diff = Date.now() - d.getTime();
+                patAge.push(diff / (1000 * 60 * 60 * 24 * 365.25));
+            
+            });
+        
+            let popdemo = patID.map((id, i) => {
+                return {
+                ID: id,
+                GENDER: GENDER[i],
+                AGE: patAge[i],
+                BMI: BMI[i],
+                MARITAL_STATUS: MARITAL_STATUS[i],
+                TOBACCO: TOBACCO[i],
+                ALCOHOL: ALCOHOL[i],
+                DRUG_USER: DRUG_USER[i],
+                RACE : RACE[i],
+                CCI: CCI[i],
+                DM_CODE: DM_CODE[i]
+                };
+            });
+
+            this.populationDemographics = popdemo;
+    
+            return popdemo;
+  
+       }
+
 
     //uses Phovea to access PROMIS data and draw table for cohort
     private async mapPromisScores(cohortIdArray, proObjects) {
@@ -286,9 +334,9 @@ export class DataManager {
 
         events.fire('got_promis_scores', patPromis);
         this.filteredPatPromis = patPromis;
-        console.log(this.filteredPatPromis);
+        //console.log(this.filteredPatPromis);
 
-        if (yayornay == 'yay')events.fire('filteredPatients', patPromis);
+        if (yayornay == 'yay')events.fire('filtered_patient_promis', patPromis);
      };
 
      //uses Phovea to access PRO data and draw table
@@ -316,58 +364,110 @@ export class DataManager {
             });
     }
 
-     const mapped = entries(filteredPatOrders);
+        const mapped = entries(filteredPatOrders);
 
-    events.fire('filtered_CPT', mapped);
-    //return mapped;
-
+         events.fire('filtered_CPT', mapped);
  };
 
-    public async mapDemoData() {
+          /**
+     *
+     * @param ordersInfo
+     */
+    //you need the promis objects and the cpt objects
+    private mapCPT(patProInfo, CPTobjects) {
 
-         let that = this;
- 
-         // I THINK THIS IS WHAT IS KILLING THE APP? MOST LIKELY THE OBJECTS LOADING
-         let patID = (await this.demoTable.colData('PAT_ID')).map(d => +d);
-         let GENDER = (await this.demoTable.colData('PAT_GENDER')).map(d => d);
-         let MARITAL_STATUS = (await this.demoTable.colData('PAT_MARITAL_STAT')).map(d => d);
-         let TOBACCO = (await this.demoTable.colData('TOBACCO_USER')).map(d => d);
-         let ALCOHOL = (await this.demoTable.colData('ALCOHOL_USER')).map(d => d);
-         let DRUG_USER = (await this.demoTable.colData('ILLICIT_DRUG_USER')).map(d => d);
-         let RACE = (await this.demoTable.colData('PAT_RACE')).map(d => d);
-         let BMI = (await this.demoTable.colData('BMI')).map(d => +d);
-         let patDOB = (await this.demoTable.colData('PAT_BIRTHDATE')).map(d => new Date(String(d)));
-         let CCI = (await this.demoTable.colData('CCI')).map(d => +d);
-         let DM_CODE = (await this.demoTable.colData('DM_CODE')).map(d => +d);
-     
-         let patAge = [];
-     
-         patDOB.forEach((d) => { 
-             let diff = Date.now() - d.getTime();
-             patAge.push(diff / (1000 * 60 * 60 * 24 * 365.25));
+        let minDate = new Date();
+        let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
+
+        for(var i= 0;  i< CPTobjects.length; i++) {
+
+            var keycpt = CPTobjects[i].key;
+
+            for(var j = 0; j < patProInfo.length; j++) {
             
-           });
-       
-           let popdemo = patID.map((id, i) => {
-             return {
-               ID: id,
-               GENDER: GENDER[i],
-               AGE: patAge[i],
-               BMI: BMI[i],
-               MARITAL_STATUS: MARITAL_STATUS[i],
-               TOBACCO: TOBACCO[i],
-               ALCOHOL: ALCOHOL[i],
-               DRUG_USER: DRUG_USER[i],
-               RACE : RACE[i],
-               CCI: CCI[i],
-               DM_CODE: DM_CODE[i]
-             };
-           });
+              var keypromis = patProInfo[j].key;
 
-           this.populationDemographics = popdemo;
-           return popdemo;
-   
-        }
+              if(keycpt == keypromis) {
+                CPTobjects[i].minPromis = patProInfo[j].min_date;
+              }
+            } 
+          } 
+
+          CPTobjects.forEach((d) => {
+                let minDatePat = this.findMinDateCPT(d.value);
+                let maxDatePat = this.findMaxDateCPT(d.value);
+
+                if(minDate.getTime() > minDatePat.getTime())minDate = minDatePat;
+                if(maxDate.getTime() < maxDatePat.getTime())maxDate = maxDatePat;
+
+                let time = this.parseTime(d['PROC_DTM'], minDate).getTime();
+                d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
+            });
+        
+              
+        const self = this;
+
+              // ----- add diff days to the data
+         
+        let filteredOrders = [];
+
+        CPTobjects.forEach((g) => {
+
+                //g.array = [];
+        let minDate = g.minPromis;//changed min date for cpt to min date of promis score
+
+            g.value.forEach((d) => {
+
+                      d.array = []; 
+                      d.time = d['PROC_DTM'];
+
+                      try {
+                          d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+
+                        }
+                      catch (TypeError) {
+                          console.log('error');
+                          d.diff = -1;
+                      }
+                      if(d['CPT_1'] !== 0){ d.array.push(d['CPT_1']);   };
+                      if(d['CPT_2'] !== 0){ d.array.push(d['CPT_2']);    };
+                      if(d['CPT_3'] !== 0){ d.array.push(d['CPT_3']);    };
+                      if(d['CPT_4'] !== 0){ d.array.push(d['CPT_4']);    };
+                      if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5']);    };
+                      if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6']);    };
+                      if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7']);    };
+                      if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5']);    };
+                      if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6']);    };
+                      if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7']);    };
+
+                      d.diff = d.diff;
+
+                     });
+
+            let filter = g.value.map(function(blob) {
+                    let temp = [];
+                    temp.push(blob.array);
+                    return {
+                            key: blob.PAT_ID,
+                            value : temp,
+                            time: blob.PROC_DTM,
+                            diff : blob.diff
+                            };
+                    });
+
+                    filteredOrders.push(filter);
+
+                });
+
+               
+               // this.timeScale.domain([0, this.maxDay]);
+               // this.filteredCPT = filteredOrders;
+               
+                events.fire('cpt_mapped', filteredOrders);
+                
+
+                console.log('cpt filtered and timescale set');
+          }
 
 
 

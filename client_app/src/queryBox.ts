@@ -89,15 +89,22 @@ export class QueryBox {
         });
 
         events.on('cohort_added', (evt, item)=> {
+            
             this.cohortKeeper.selectAll('label').remove();
+            let counter = -1;
+            let nodeArray = [];
             item.forEach((cohort, i) => {
-                let label = this.cohortKeeper.append('label').text('Cohort  '+ (i+1) );
+                let label = this.cohortKeeper.append('label').classed('cohort', true).classed(i, true).text('Cohort  '+ (i+1) );
+                counter = counter + 1;
                 //label.data(item[i]);
                 label.on('click', ()=> {
                     events.fire('cohort_selected', [cohort, i]);
                 });
             });
-
+            let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+            let picked = cohortLabels[counter];
+            picked.classList.add('selected');
+            console.log(picked.classList);
         });
 
     }

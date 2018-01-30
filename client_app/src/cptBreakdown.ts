@@ -34,14 +34,15 @@ export class cptBreakdown {
 
   private orderHierarchy = dataCalc.orderHierarchy;
   private findMaxDate = dataCalc.findMaxDate;
+  private findMinDateCPT = dataCalc.findMinDateCPT;
+  private findMaxDateCPT = dataCalc.findMaxDateCPT;
   private patOrderGroup;
-  currentlySelectedName;
-  queryDataArray;
-  queryDateArray;
-  cohortProInfo;
+  private currentlySelectedName;
   private targetOrder;
   private codes;
-
+  queryDataArray;
+  queryDateArray;
+  cohortProObjects;
 
   rectBoxDimension = {width: 1100, height: 90 };
   orderBar = {width: 10, height: 60 };
@@ -56,11 +57,7 @@ export class cptBreakdown {
     
 constructor(parent: Element) {
     this.codes = codeDict.create();
-    //this.cptchecker();
     this.$node = select(parent)
-   // .append('div')
-   // .classed('cptBreakdownDiv', true)
-   // .attr('transform', `translate(-50,0)`)
     .attr('width', this.rectBoxDimension.width)
     .attr('height', this.rectBoxDimension.height*4);
 
@@ -94,31 +91,20 @@ constructor(parent: Element) {
   private attachListener() {
 
     events.on('selected_pat_array', (evt, item)=> {
-     
         this.selectedPatientArray = item;
-       // this.getCPT(this.selectedPatientArray, this.cptObject);
-    });
-
-    events.on('cpt_object', (evt, item)=> {
-      
-        this.cptObject = item;
-     
     });
 
     events.on('timeline_max_set', (evt, item) =>{
-        
         this.maxDay = item;
-        
         });
 
     events.on('filteredPatients', (evt, item)=> {
-        this.cohortProInfo = item;
+        this.cohortProObjects = item;
     });
 
-
-    events.on('filtered_CPT', (evt, item) => {
-
-      this.mapCPT(this.cohortProInfo, item);
+    events.on('cpt_mapped', (evt, item)=> {
+         this.timeScale.domain([0, this.maxDay]);
+         this.filteredCPT = item;
     });
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
@@ -128,7 +114,6 @@ constructor(parent: Element) {
 
     });
 
-   
   }
 
   private drawQueryBox (){
@@ -199,7 +184,9 @@ constructor(parent: Element) {
 
         let selected =  <any>( <any>selectedRects );
         let parentElem;
-        selected.forEach(node=> {
+
+        selected.forEach((node)=> {
+
             node.classList.remove('selectedOrder', 'unselectedOrder');
   
             if(node.classList.contains(value)){
@@ -222,142 +209,6 @@ constructor(parent: Element) {
  
   }
 
-
-    /**
-     * Utility method
-     * @param pat
-     * @returns {Date}
-     */
-    private findMinDateCPT(pat) {
-               
-              let minDate = new Date();
-              for (let index = 0; index < pat.length; index++) {
-                  if (!pat[index]['PROC_DTM']) continue;
-                  if (this.parseTime(pat[index]['PROC_DTM'], null).getTime() < minDate.getTime())
-                      minDate = this.parseTime(pat[index]['PROC_DTM'], null)
-              }
-              return minDate
-          }
-
-     /**
-     * Used in calc for pat promis scores
-     * @param pat
-     * @returns {Date}
-     */
-    private findMaxDateCPT(pat) {
-
-        let maxDate = this.parseTime(pat[0]['PROC_DTM'], null);
-
-        for (let index = 0; index < pat.length; index++) {
-            if (!pat[index]['PROC_DTM']) continue;
-            if (this.parseTime(pat[index]['PROC_DTM'], null) > maxDate)
-                maxDate = this.parseTime(pat[index]['PROC_DTM'], null)
-        }
-       
-        return maxDate
-        
-    }
-  /**
-     *
-     * @param ordersInfo
-     */
-    private mapCPT(patProInfo, CPTobjects) {
-    
-        let minDate = new Date();
-        let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
-
-        for(var i= 0;  i< CPTobjects.length; i++) {
-
-            var keycpt = CPTobjects[i].key;
-
-            for(var j = 0; j < patProInfo.length; j++) {
-            
-              var keypromis = patProInfo[j].key;
-
-              if(keycpt == keypromis) {
-                CPTobjects[i].minPromis = patProInfo[j].min_date;
-              }
-            } 
-          } 
-
-          CPTobjects.forEach((d) => {
-               
-
-                let minDatePat = this.findMinDateCPT(d.value);
-                let maxDatePat = this.findMaxDateCPT(d.value);
-
-                if(minDate.getTime() > minDatePat.getTime())minDate = minDatePat;
-                if(maxDate.getTime() < maxDatePat.getTime())maxDate = maxDatePat;
-
-                let time = this.parseTime(d['PROC_DTM'], minDate).getTime();
-                d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
-
-            });
-        
-              
-        const self = this;
-
-              // ----- add diff days to the data
-         
-        let filteredOrders = [];
-
-        CPTobjects.forEach((g) => {
-
-                //g.array = [];
-        let minDate = g.minPromis;//changed min date for cpt to min date of promis score
-
-            g.value.forEach((d) => {
-
-                      d.array = []; 
-                      d.time = d['PROC_DTM'];
-
-                      try {
-                          d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-
-                        }
-                      catch (TypeError) {
-                          console.log('error');
-                          d.diff = -1;
-                      }
-                      if(d['CPT_1'] !== 0){ d.array.push(d['CPT_1']);   };
-                      if(d['CPT_2'] !== 0){ d.array.push(d['CPT_2'])    };
-                      if(d['CPT_3'] !== 0){ d.array.push(d['CPT_3'])    };
-                      if(d['CPT_4'] !== 0){ d.array.push(d['CPT_4'])    };
-                      if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5'])    };
-                      if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6'])    };
-                      if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7'])    };
-                      if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5'])    };
-                      if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6'])    };
-                      if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7'])    };
-
-                      d.diff = d.diff;
-
-                     });
-
-            let filter = g.value.map(function(blob) {
-                    let temp = [];
-                    temp.push(blob.array);  
-                    return {
-                            key: blob.PAT_ID,
-                            value : temp,
-                            time: blob.PROC_DTM,
-                            diff : blob.diff
-                            };
-                    });
-
-                    filteredOrders.push(filter);
-
-                });
-
-               
-                this.timeScale.domain([0, this.maxDay]);
-
-                events.fire('cpt_filtered', filteredOrders);
-                this.filteredCPT = filteredOrders;
-
-                console.log('cpt filtered and timescale set');
-          }
-
         private drawOrders (filteredCPT) {
 
             let patGroups = this.patOrderGroup
@@ -365,14 +216,10 @@ constructor(parent: Element) {
             .data(filteredCPT);
             //.data(similarOrdersInfo);
 
-        let patGroupEnter = patGroups
-            .enter()
-            //.append('g').attr('class', d=>d[0].key)//.attr('class', d=> d.key);
-            .append('g').attr('class', 'patCPTRecord')
-
-           // patGroupEnter
-           // .attr('transform', 
-          //  (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
+            let patGroupEnter = patGroups
+                .enter()
+                //.append('g').attr('class', d=>d[0].key)//.attr('class', d=> d.key);
+                .append('g').attr('class', 'patCPTRecord')
 
             patGroups = patGroupEnter.merge(patGroups);
             patGroups.exit().remove();
@@ -381,65 +228,65 @@ constructor(parent: Element) {
             .attr('transform', 
             (d, i) => `translate(0,${this.rectBoxDimension.height - 50 + (i + 1) * (this.similarBar.height + 5)})`);
 
-        let patGroupText = patGroupEnter
-            .append('text').text(d=>d[0].key)
-            .attr('transform', `translate(0,10)`);
+            let patGroupText = patGroupEnter
+                .append('text').text(d=>d[0].key)
+                .attr('transform', `translate(0,10)`);
 
-        let patInnerGroup = patGroupEnter.append('g')
-            .classed('patInnerGroup', true)
-            .attr('transform', 'translate(60, 0)');
+            let patInnerGroup = patGroupEnter.append('g')
+                .classed('patInnerGroup', true)
+                .attr('transform', 'translate(60, 0)');
 
-         let rectGroup = patGroups.select('.patInnerGroup')
-            .selectAll('.visitDays')
-            .data(d => d);
+            let rectGroup = patGroups.select('.patInnerGroup')
+                .selectAll('.visitDays')
+                .data(d => d);
 
-        let rectGroupEnter = rectGroup
-            .enter()
-            .append('g')
+            let rectGroupEnter = rectGroup
+                .enter()
+                .append('g')
 
-        rectGroup = rectGroupEnter.merge(rectGroup);
+            rectGroup = rectGroupEnter.merge(rectGroup);
 
-        rectGroup.exit().remove();
+            rectGroup.exit().remove();
 
-        rectGroup.classed('visitDays', true)
-         .attr('transform', (d) => `translate(`+ this.timeScale(d.diff) +`,0)`);
+            rectGroup.classed('visitDays', true)
+            .attr('transform', (d) => `translate(`+ this.timeScale(d.diff) +`,0)`);
 
-        let rects = rectGroup.selectAll('rect')
-              .data(d => d.value[0]);
+            let rects = rectGroup.selectAll('rect')
+                .data(d => d.value[0]);
 
-        let rectsEnter = rects
-              .enter()
-              .append('rect')
-              .attr('class', d => d);
-        
-        rects = rectsEnter.merge(rects);
+            let rectsEnter = rects
+                .enter()
+                .append('rect')
+                .attr('class', d => d);
+            
+            rects = rectsEnter.merge(rects);
 
-        rects.exit().remove();
+            rects.exit().remove();
 
-        rects
-              .attr('y', 0)
-              .attr('width', this.similarBar.width)
-              .attr('height', this.similarBar.height)
-           
-           .on("mouseover", (d) => {
-                let t = transition('t').duration(500);
-                select(".tooltip")
-                    .html(() => {
-                        return this.renderOrdersTooltip(d);
-                    })
-                    .transition(t)
-                    .style("opacity", 1)
-                    .style("left", `${event.pageX + 10}px`)
-                    .style("top", `${event.pageY + 10}px`);
-            })
-            .on("mouseout", () => {
-                let t = transition('t').duration(500);
-                select(".tooltip").transition(t)
-                    .style("opacity", 0);
-            })
-            .on('click', function (d) {
-              console.log(d);
-              let parentData = select(this.parentNode).data;
+            rects
+                .attr('y', 0)
+                .attr('width', this.similarBar.width)
+                .attr('height', this.similarBar.height)
+            
+            .on("mouseover", (d) => {
+                    let t = transition('t').duration(500);
+                    select(".tooltip")
+                        .html(() => {
+                            return this.renderOrdersTooltip(d);
+                        })
+                        .transition(t)
+                        .style("opacity", 1)
+                        .style("left", `${event.pageX + 10}px`)
+                        .style("top", `${event.pageY + 10}px`);
+                })
+                .on("mouseout", () => {
+                    let t = transition('t').duration(500);
+                    select(".tooltip").transition(t)
+                        .style("opacity", 0);
+                })
+                .on('click', function (d) {
+                console.log(d);
+                let parentData = select(this.parentNode).data;
 
             });
 
