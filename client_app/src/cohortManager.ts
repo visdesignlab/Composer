@@ -24,7 +24,7 @@ import * as codeDict from './cptDictionary';
 export class CohortManager {
 
     cohortIdArray;//array of ids for defined patients 
-
+    allPatientPromis;
     cohortIndex = 0;
     cohortfilterarray = [];
     cohortkeeperarray = [];
@@ -49,6 +49,13 @@ export class CohortManager {
 
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
+            this.selectedCohort = this.allPatientPromis;
+            events.fire('selected cohort change', this.selectedCohort);
+        });
+
+        events.on('got_promis_scores', (evt, item)=> {
+            console.log('got promis scores fired');
+            this.allPatientPromis = item;
         });
 
           // item: [d, parentValue]
@@ -68,23 +75,21 @@ export class CohortManager {
             this.selectedCohort = this.cohortkeeperarray[index];
             let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index)
             selectedLabel[0].classList.add('selected');
+            
+            events.fire('selected cohort change', this.selectedCohort);
           });
 
           events.on('filtered_CPT_by_order', (evt, item)=>{
              // this.selectedCohort.cpt.push(item[1]);
           });
 
-          events.on('cohort_filtered_demo', (evt, item) => {
+          events.on('filtered_patient_promis', (evt, item) => {
              this.cohortkeeperarray.push(item);
              this.cohortIndex = this.cohortkeeperarray.length - 1;
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              let index = +this.cohortIndex;
          
-           //  let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName('cohort');
-            // let selected = document.getElementById('cohortKeeper');
-            // console.log(selectedLabel[index]);
-             //console.log(selectedLabel[this.cohortIndex]);
-             //selectedLabel[this.cohortIndex].classList.add('selected');
+             events.fire('selected cohort change', this.selectedCohort);
           });
 
 
