@@ -337,14 +337,18 @@ export class similarityScoreDiagram {
                         .attr('stroke-opacity', that.lineScale(lineCount))
                         //.style('stroke-width', `${this.lineScale(lineCount)}`)// TODO later after getting classification
                         .attr('d', () => lineFunc(d))
-                       
 
                 })
                 .on('click', (d) => {
-                    
+
                     events.fire('line_clicked', d);
                     this.addPromisDots(d);
                 });
+
+               let zeroLine = medScoreGroup.append('line').classed('zeroLine', true)
+                            .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+                            .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
+                            .attr('y1', 0).attr('y2', 400).attr('stroke-width', .5).attr('stroke', 'red');
         
         }
     
@@ -365,7 +369,6 @@ export class similarityScoreDiagram {
         promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> this.scoreScale(d.SCORE)).attr('r', 5).attr('fill', '#21618C');
 
-      
     }
     /**
      * Utility method
@@ -410,6 +413,7 @@ export class similarityScoreDiagram {
         this.svg.select('#similar_score').selectAll('g').remove();
         this.svg.select('#pat_orders').selectAll('line,g').remove();
         this.svg.select('#similar_orders').selectAll('g').remove();
+        this.svg.select('.zeroLine').remove();
     }
 
 
