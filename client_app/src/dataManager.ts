@@ -42,7 +42,6 @@ export class DataManager {
 
     //defined cohort info
     cohortIdArray;
-    cohortProInfo; //used in order squares
     cohortOrderInfo; //defined cohort 
 
     cohortProObjects;//Promis scores as objects for cohort
@@ -113,23 +112,17 @@ export class DataManager {
 
         events.on('CPT_codes', (evt, item)=> {
             this.cptTable = item;
-          
-            //this.getDataObjects('cpt_object', this.cptTable);
         });
 
         events.on('load_cpt', ()=> {
-            //this is called from cpt button 
+            //this is called from cpt button
             //loads the cpt objects form the table for all patients
             this.getDataObjects('cpt_object', this.cptTable);
-           
         });
 
         events.on('ICD_codes', (evt, item)=> {
 
             this.icdTable = item;
-            
-           // this.getDataObjects('icd_object', this.cptTable);
-            
         });
 
         /* 
@@ -169,10 +162,10 @@ export class DataManager {
 
           });
 
-          events.on('selected cohort change', (evt, item) => {  // called in parrallel on brush and 
-            
-            this.cohortProInfo = item;
+          events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
 
+            this.filteredPatPromis = item;
+         
                 });
 
           events.on('filtered_CPT', (evt, item) => {
@@ -470,13 +463,10 @@ export class DataManager {
                 });
 
                
-               // this.timeScale.domain([0, this.maxDay]);
-               // this.filteredCPT = filteredOrders;
-               
                 events.fire('cpt_mapped', filteredOrders);
                 
 
-                console.log('cpt filtered and timescale set');
+                console.log('cpt filtered');
           }
 
 

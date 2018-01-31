@@ -190,7 +190,7 @@ export class similarityScoreDiagram {
 
                     });
 
-        events.on('selected cohort change', (evt, item) => {  // called in parrallel on brush and 
+        events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
             
                 this.cohortProInfo = item;
                 this.clearDiagram();

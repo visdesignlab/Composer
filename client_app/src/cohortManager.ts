@@ -50,7 +50,7 @@ export class CohortManager {
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
             this.selectedCohort = this.allPatientPromis;
-            events.fire('selected cohort change', this.selectedCohort);
+            events.fire('selected_cohort_change', this.selectedCohort);
         });
 
         events.on('got_promis_scores', (evt, item)=> {
@@ -76,7 +76,7 @@ export class CohortManager {
             let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index)
             selectedLabel[0].classList.add('selected');
             
-            events.fire('selected cohort change', this.selectedCohort);
+            events.fire('selected_cohort_change', this.selectedCohort);
           });
 
           events.on('filtered_CPT_by_order', (evt, item)=>{
@@ -89,7 +89,7 @@ export class CohortManager {
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              let index = +this.cohortIndex;
          
-             events.fire('selected cohort change', this.selectedCohort);
+             events.fire('selected_cohort_change', this.selectedCohort);
           });
 
 
