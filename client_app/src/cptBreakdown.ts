@@ -49,9 +49,7 @@ export class cptBreakdown {
   similarBar = {width: 8, height: 30 };
   margin = {top: 20, right: 10, bottom: 10, left: 10};
   contextDimension = {width: this.rectBoxDimension.width, height:55};
- 
-  selectedPatientArray;
-  cptObject;
+
   filteredCPT;
   maxDay;
     
@@ -90,17 +88,9 @@ constructor(parent: Element) {
   
   private attachListener() {
 
-    events.on('selected_pat_array', (evt, item)=> {
-        this.selectedPatientArray = item;
-    });
-
     events.on('timeline_max_set', (evt, item) =>{
         this.maxDay = item;
         });
-
-    events.on('filteredPatients', (evt, item)=> {
-        this.cohortProObjects = item;
-    });
 
     events.on('cpt_mapped', (evt, item)=> {
          this.timeScale.domain([0, this.maxDay]);
@@ -129,7 +119,10 @@ constructor(parent: Element) {
     form.append('input')
             .attr('type', 'button')
             .attr('value', 'order search')
-            .on('click', () => this.queryOrder());
+            .on('click', () => {
+               // this.queryOrder();
+                this.cptchecker();
+            });
 
     form.append('input')
             .attr('type', 'button')
@@ -145,6 +138,33 @@ constructor(parent: Element) {
 
     private cptchecker() {
         //this is where you are going to filter by category
+        const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+        let codes = value.split(' ');
+        //console.log(codes);
+        let withQuery = [];
+        let queryDate = [];
+       // console.log(this.filteredCPT);
+        //let found = arr1.some(r=> arr2.includes(r))
+        this.filteredCPT.forEach((element) => {
+            let elementBool;
+            element.forEach(g => {
+                if(codes.some(r=> g.value[0].includes(+r))){
+                   
+                    if(elementBool != g.key){
+                        withQuery.push(element);
+                        queryDate.push(g);
+                    }elementBool = g.key;
+                }
+                
+                    });
+            });
+            console.log(withQuery);
+
+        this.queryDataArray = withQuery;
+        this.queryDateArray = queryDate;
+
+        events.fire('query_order', value);
+
     }
 
     private queryOrder() {
@@ -188,24 +208,18 @@ constructor(parent: Element) {
         selected.forEach((node)=> {
 
             node.classList.remove('selectedOrder', 'unselectedOrder');
-  
+
             if(node.classList.contains(value)){
-           
+
               node.classList.add('selectedOrder');
               let parent = node.parentNode.parentNode.parentNode;
-  
+
             if(parentElem != parent){
-        
                parentElem = parent;
-        
             };
   
             }else{node.classList.add('unselectedOrder');}
             });
-  
-
-    this.queryDataArray = withQuery;
-    this.queryDateArray = queryDate;
  
   }
 

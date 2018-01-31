@@ -191,7 +191,7 @@ export class similarityScoreDiagram {
                     });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-            
+            console.log('selected cohort change');
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
