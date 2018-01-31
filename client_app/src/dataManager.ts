@@ -1,6 +1,6 @@
 /**
  * Created by Jen Rogers on 12/14/17.
- * data for the views. 
+ * data for the views.
  */
 import * as ajax from 'phovea_core/src/ajax';
 import {ITable, asTable} from 'phovea_core/src/table';
@@ -152,7 +152,6 @@ export class DataManager {
             this.cohortCptObjects = item;
             this.getCPT(this.cohortIdArray, this.cohortCptObjects, this.filteredPatPromis);
             console.log('cptfinding');
-         
         });
 
         events.on('icd_object', (evt, item)=> {
@@ -169,6 +168,12 @@ export class DataManager {
             this.demoFilter(item, this.populationDemographics);
 
           });
+
+          events.on('selected cohort change', (evt, item) => {  // called in parrallel on brush and 
+            
+            this.cohortProInfo = item;
+
+                });
 
           events.on('filtered_CPT', (evt, item) => {
 
@@ -334,10 +339,10 @@ export class DataManager {
         if (yayornay !== 'yay'){
             console.log('nay!');
             events.fire('got_promis_scores', patPromis);
+            console.log(patPromis);
         };
        
         this.filteredPatPromis = patPromis;
-        //console.log(this.filteredPatPromis);
 
         if (yayornay == 'yay'){
             console.log('yay!');
