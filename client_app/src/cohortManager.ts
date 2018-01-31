@@ -60,9 +60,9 @@ export class CohortManager {
 
           // item: [d, parentValue]
           events.on('filter_data', (evt, item) => { // called in sidebar
-
-            this.filterRequirements.demo = item;
-            this.addCohortFilter(this.filterRequirements);
+            let filterReq = {demo: null};
+            filterReq.demo = item;
+            this.addCohortFilter(filterReq);
           });
 
           events.on('cohort_selected', (evt, item)=>{

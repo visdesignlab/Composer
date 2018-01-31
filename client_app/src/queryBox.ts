@@ -31,8 +31,8 @@ export class QueryBox {
             .attr('type', 'button')
             .attr('value', 'Clear Cohorts')
             .on('click', () => {
-            events.fire('clear_cohorts');
-                this.cohortKeeper.selectAll('label').remove();
+                events.fire('clear_cohorts');
+                this.cohortKeeper.selectAll('div').remove();
             });
 
 
@@ -82,15 +82,22 @@ export class QueryBox {
 
         events.on('cohort_added', (evt, item)=> {
             
-            this.cohortKeeper.selectAll('label').remove();
+            this.cohortKeeper.selectAll('div').remove();
             let counter = -1;
             let nodeArray = [];
             item.forEach((cohort, i) => {
-                let label = this.cohortKeeper.append('label').classed('cohort', true).classed(i, true).text('Cohort  '+ (i+1) );
+                console.log(cohort.demo);
+                let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
+                let cohortlabel = cohortBox.append('div').append('text').text('Cohort  '+ (i+1) );
+                let cohortfilter = item[i].demo.forEach(element => {
+                                                cohortBox.append('text').text(element.attributeName + ' ');
+                });
+
                 counter = counter + 1;
                 //label.data(item[i]);
-                label.on('click', ()=> {
+                cohortlabel.on('click', ()=> {
                     events.fire('cohort_selected', [cohort, i]);
+                    console.log(cohort);
                 });
             });
             let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
