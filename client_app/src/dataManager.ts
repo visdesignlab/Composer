@@ -131,7 +131,7 @@ export class DataManager {
         //THESE ARE TAKING AN ETERNITY. NEED TO USE RANGES TO FILTER TABLES
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
-            console.log(item);
+        
             this.cohortProObjects = item;
             this.mapPromisScores(null, item);
         });
@@ -144,7 +144,7 @@ export class DataManager {
 
             this.cohortCptObjects = item;
             this.getCPT(this.cohortIdArray, this.cohortCptObjects, this.filteredPatPromis);
-            console.log('cptfinding');
+            
         });
 
         events.on('icd_object', (evt, item)=> {
@@ -171,6 +171,7 @@ export class DataManager {
           events.on('filtered_CPT', (evt, item) => {
 
             this.mapCPT(this.filteredPatPromis, item);
+
           });
 
         events.on('selected_pat_array', (evt, item)=> {
@@ -330,15 +331,12 @@ export class DataManager {
             }
         });
         if (yayornay !== 'yay'){
-            console.log('nay!');
             events.fire('got_promis_scores', patPromis);
-            console.log(patPromis);
         };
-       
+
         this.filteredPatPromis = patPromis;
 
         if (yayornay == 'yay'){
-            console.log('yay!');
             events.fire('filtered_patient_promis', patPromis);}
      };
 
