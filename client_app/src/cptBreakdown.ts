@@ -118,7 +118,14 @@ constructor(parent: Element) {
 
     form.append('input')
             .attr('type', 'button')
-            .attr('value', 'order search')
+            .attr('value', 'search for event')
+            .on('click', () => {
+                this.queryOrder();
+                //this.cptchecker();
+            });
+    form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'search for codes')
             .on('click', () => {
                // this.queryOrder();
                 this.cptchecker();
@@ -192,11 +199,14 @@ constructor(parent: Element) {
             });
           
         });
+
+        this.queryDataArray = withQuery;
+        this.queryDateArray = queryDate;
+
+        events.fire('query_order', value);
             
         let rects = selectAll('.visitDays').selectAll('rect');
        // let groups = selectAll('.visitDays');
-
-        events.fire('query_order', value);
 
         //THIS IS WHERE THE RECT CLASSESARE TARGETED//
         let selectedRects = rects.nodes();
@@ -217,10 +227,10 @@ constructor(parent: Element) {
             if(parentElem != parent){
                parentElem = parent;
             };
-  
+
             }else{node.classList.add('unselectedOrder');}
             });
- 
+
   }
 
         private drawOrders (filteredCPT) {
