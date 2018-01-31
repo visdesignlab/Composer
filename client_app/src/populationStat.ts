@@ -43,6 +43,7 @@ export class populationStat {
     private maxDay;
     private timeScale;
     private timeScaleMini;
+    private selectedcohort;
 
     constructor(parent: Element) {
 
@@ -83,14 +84,8 @@ export class populationStat {
             this.$node.select('.fillSelect').text(this.filteredPromis.length);
         })
         events.on('population demo loaded', (evt, item)=> {
-           // console.log(item);
             this.populationDemo = item;
             this.showStats();
-        });
-        events.on('pro_object', (evt, item)=> {
-            this.populationPromis = item;
-           // console.log(item);
-
         });
 
         events.on('pro_object_filtered', (evt, item)=> {
@@ -99,6 +94,13 @@ export class populationStat {
            // console.log(item);
 
         });
+
+        events.on('selected_cohort_change', (evt, item)=> {
+
+            this.selectedcohort = item;
+            this.$node.select('.fillSelect').text(this.selectedcohort.length);
+ 
+         });
 
         events.on('timeline_max_set', (evt, item)=> {
             //console.log(item);
