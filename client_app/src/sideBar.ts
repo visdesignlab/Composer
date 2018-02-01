@@ -142,60 +142,48 @@ export class SideBar {
 
           let lines = select('#plotGroup').selectAll('path');
           let filterGroup = lines.filter(d => d[parentValue] == choice);
-         
+
           filterGroup.classed(parentValue, true);
-     
+
 
         });
-        
+
         let filterList = [];
         that.filters = [];
 
         let filterButton = form.insert('input').attr('type', 'button').attr('value', 'filter')
                           .on('click', function(d){
-                          // let filterList = [];
-                          //let input = form.selectAll('li').nodes();
-                          //let filterInput = input.filter(d=> d.lastChild['checked']);
-/*
-                          let input = form.selectAll('li').nodes();
-                          let filterInput = input.filter(d=> d.lastChild['checked']);
-                        
-                          filterInput.forEach(d=> {
-                            that.filters.push([d.innerText, d.parentNode.attributes[0].value]);
-                          });*/
- 
-         let parentFilter = form.selectAll('ul.parent');
 
-         parentFilter.each(function (element) {
-       
-          let filter = {
-        
-          attributeName:(this).attributes[0].value,
-          checkedOptions: []
-      
-          };
+    
+                          let parentFilter = form.selectAll('ul.parent');
 
-          let children = select(this).selectAll('li').selectAll('input');
-         // let children = select(this).selectAll('li');
-          console.log(children.nodes());
-          children.nodes().forEach(d => {
-            console.log(select(d).property('checked'));
-            if(select(d).property('checked')){
-              filter.checkedOptions.push(d['value']);
-              d['checked'] = false;
-            }
-          });
+                          parentFilter.each(function (element) {
+          
+                                 let filter = {
+                                     attributeName:(this).attributes[0].value,
+                                     checkedOptions: []
+                                    };
 
-        filterList.push(filter);
-        });
+                          let children = select(this).selectAll('li').selectAll('input');
+          
+              
+                          children.nodes().forEach(d => {
+                                 if(select(d).property('checked')){
+                                    filter.checkedOptions.push(d['value']);
+                                    d['checked'] = false;
+                                  }
+                              });
 
-         events.fire('filter_data', filterList);
-          that.filters = [];
-          filterList = [];
-          parentFilter.classed('parent', false);
-          form.selectAll('li').classed('hidden', true);
-        });
-  }
+                          filterList.push(filter);
+                          });
+
+                          events.fire('filter_data', filterList);
+                          that.filters = [];
+                          filterList = [];
+                          parentFilter.classed('parent', false);
+                          form.selectAll('li').classed('hidden', true);
+                          });
+          }
 
  }
 
