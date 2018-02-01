@@ -44,10 +44,10 @@ export class DataManager {
     cohortIdArray;
     cohortOrderInfo; //defined cohort 
 
-    cohortProObjects;//Promis scores as objects for cohort
-    populationDemographics;//demo for whole population
+    totalProObjects;//Promis scores as objects for cohort
+    totalDemoObjects;//demo for whole population
     //filteredCohortDemo;//demographic info as objects for defined cohort
-    cohortCptObjects;//CPT as objects for defined cohort
+    totalCptObjects;//CPT as objects for defined cohort
     cohortIcdObjects;//ICD objects for cohort
     filteredPatPromis;
 
@@ -67,12 +67,10 @@ export class DataManager {
 
         this.loadData('Demo_Revise');
         this.loadData('PROMIS_Scores');
-
-        this.loadData('CPT_codes');
         this.loadData('ICD_codes');
+        this.loadData('CPT_codes');
 
         this.attachListener();
-
 
     }
 
@@ -81,7 +79,7 @@ export class DataManager {
         let startDateSelection = d3.select('#start_date').select('text');
 
         events.on('filtered_CPT_by_order', (evt, item)=> {
-           
+
             this.getSelectedIdArray(item[0], 'cpt');
 
         });
@@ -112,6 +110,7 @@ export class DataManager {
 
         events.on('CPT_codes', (evt, item)=> {
             this.cptTable = item;
+            events.fire('load_cpt');
         });
 
         events.on('load_cpt', ()=> {
@@ -131,71 +130,61 @@ export class DataManager {
         //THESE ARE TAKING AN ETERNITY. NEED TO USE RANGES TO FILTER TABLES
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
-        
-            this.cohortProObjects = item;
+            this.totalProObjects = item;
             this.mapPromisScores(null, item);
         });
 
         events.on('got_promis_scores', (evt, item)=> {
-           // this.getCPT(null, this.cohortCptObjects, this.filteredPatPromis);
+           // this.getCPT(null, this.totalCptObjects, this.filteredPatPromis);
         });
 
         events.on('cpt_object', (evt, item)=> {
-
-            this.cohortCptObjects = item;
-            this.getCPT(this.cohortIdArray, this.cohortCptObjects, this.filteredPatPromis);
-            
+            console.log('cpt objects loaded  '+ item.length);
+            this.totalCptObjects = item;
+            //this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
         });
 
         events.on('icd_object', (evt, item)=> {
-
             this.cohortIcdObjects = item;
-       
         });
 
           // item: [d, parentValue]
-          events.on('filter_data', (evt, item) => { // called in sidebar
-
+        events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
             this.filterRequirements.demo = item;
-            console.log(item);
-            this.demoFilter(item, this.populationDemographics);
-
+            this.demoFilter(item, this.totalDemoObjects);
           });
 
-          events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-
+        events.on('new_cohort_added', (evt, item)=> {
             this.filteredPatPromis = item;
-         
+           // console.log(this.totalCptObjects);
+            this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
+        });
+
+        events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
+            this.filteredPatPromis = item;
+            //console.log(this.filteredPatPromis);
                 });
 
-          events.on('filtered_CPT', (evt, item) => {
-
+        events.on('filtered_CPT', (evt, item) => {
             this.mapCPT(this.filteredPatPromis, item);
-
           });
 
         events.on('selected_pat_array', (evt, item)=> {
-     
+            console.log(this.totalCptObjects.length);
             this.cohortIdArray = item;
-            this.getCPT(this.cohortIdArray, this.cohortCptObjects, this.filteredPatPromis);
+            this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
         });
 
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
-            
             let parent = item[0];
             let choice = item[1];
-         
-            let subFilter = this.populationDemographics.filter(d => d[parent] == choice);
+            let subFilter = this.totalDemoObjects.filter(d => d[parent] == choice);
 
            //gos right back to sidebar for the hover count
-            events.fire('filter_counted', [this.populationDemographics.length, subFilter.length, parent]);
+            events.fire('filter_counted', [this.totalDemoObjects.length, subFilter.length, parent]);
 
           });
-
-
-
     }
-
 
 //pulled from parallel coord
     private demoFilter(sidebarFilter, demoObjects) {
@@ -232,7 +221,7 @@ export class DataManager {
 
            //this.filteredCohortDemo = filter;
            events.fire('cohort_filtered_demo', filter);//should I maybe use the array instead?
-           this.mapPromisScores(this.cohortIdArray, this.cohortProObjects);
+           this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
 
        public async mapDemoData() {
@@ -276,7 +265,7 @@ export class DataManager {
                 };
             });
 
-            this.populationDemographics = popdemo;
+            this.totalDemoObjects = popdemo;
     
             return popdemo;
   
@@ -368,6 +357,7 @@ export class DataManager {
         const mapped = entries(filteredPatOrders);
 
         events.fire('filtered_CPT', mapped);
+        console.log('cpt for you    '+ mapped.length);
  };
 
           /**
@@ -469,7 +459,7 @@ export class DataManager {
 
 
 
-     private getSelectedIdArray (selectedData, typeofData: string)   {
+    private getSelectedIdArray (selectedData, typeofData: string)   {
 
         let tempPatArray = [];
 
@@ -484,8 +474,18 @@ export class DataManager {
         }
 
         this.cohortIdArray = tempPatArray;
-        this.mapPromisScores(this.cohortIdArray, this.cohortProObjects);
+        this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
         events.fire('selected_pat_array', this.cohortIdArray);
+    }
+
+    private getCohortIdArray (selectedData)   {
+
+        let tempPatArray = [];
+        selectedData.forEach((element) => {
+                tempPatArray.push(element.ID);
+            });
+
+        return tempPatArray;
     }
 
     public async loadData(id: string) { //loads the tables from Phovea

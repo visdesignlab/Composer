@@ -177,7 +177,7 @@ export class SideBar {
                           filterList.push(filter);
                           });
 
-                          events.fire('filter_data', filterList);
+                          events.fire('demo_filter_button_pushed', filterList);
                           that.filters = [];
                           filterList = [];
                           parentFilter.classed('parent', false);

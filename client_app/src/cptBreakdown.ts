@@ -96,6 +96,11 @@ constructor(parent: Element) {
          this.timeScale.domain([0, this.maxDay]);
          this.filteredCPT = item;
     });
+    events.on('selected_cpt_change', (evt, item) => {
+        this.timeScale.domain([0, this.maxDay]);
+        this.filteredCPT = item;
+        console.log(item.length);
+    });
 
     events.on('filtered_CPT_by_order', (evt, item)=> {
         selectAll('.patCPTRecord').remove();

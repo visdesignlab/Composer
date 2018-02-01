@@ -1,6 +1,6 @@
 /**
  * Created by Jen Rogers on 1/29/18.
- * data for the views.
+ * cohortkeeper to keep all those cohorts.
  */
 import * as ajax from 'phovea_core/src/ajax';
 import {ITable, asTable} from 'phovea_core/src/table';
@@ -19,16 +19,17 @@ import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalculations from './dataCalculations';
 import * as codeDict from './cptDictionary';
 
-
-
 export class CohortManager {
 
-    cohortIdArray;//array of ids for defined patients 
+    cohortIdArray;//array of ids for defined patients
     allPatientPromis;
     cohortIndex = 0;
     cohortfilterarray = [];
     cohortkeeperarray = [];
-    selectedCohort;
+    cptObjectKeeper = [];
+    selectedCohort;//this is going to be the selected cohort from the cohort keeper array
+    selectedFilter;//this is the selected filter from the cohortfilterarray;
+    selectedCPT;
     cptCodes;
     codes;
 
@@ -59,7 +60,7 @@ export class CohortManager {
         });
 
           // item: [d, parentValue]
-          events.on('filter_data', (evt, item) => { // called in sidebar
+          events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
             let filterReq = {demo: null, cpt: []};
             filterReq.demo = item;
             this.addCohortFilter(filterReq);
@@ -71,12 +72,14 @@ export class CohortManager {
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
-           // this.selectedCohort = this.cohortfilterarray[index];
-            this.selectedCohort = this.cohortkeeperarray[index];
-            let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index)
+            this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
+            this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
+            this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
+            let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
             selectedLabel[0].classList.add('selected');
             
             events.fire('selected_cohort_change', this.selectedCohort);
+            events.fire('selected_cpt_change', this.selectedCPT);
           });
 
           events.on('filtered_CPT_by_order', (evt, item)=>{
@@ -87,9 +90,19 @@ export class CohortManager {
              this.cohortkeeperarray.push(item);
              this.cohortIndex = this.cohortkeeperarray.length - 1;
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
+             this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
              let index = +this.cohortIndex;
          
              events.fire('selected_cohort_change', this.selectedCohort);
+             events.fire('new_cohort_added', this.selectedCohort);
+          });
+
+          events.on('cpt_mapped', (evt, item)=> {
+              console.log('cpt for you  ' + item.length);
+              this.cptObjectKeeper.push(item);
+              console.log(this.cptObjectKeeper);
+              this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
+
           });
     }
 
@@ -103,6 +116,7 @@ export class CohortManager {
 
         this.cohortfilterarray = [];
         this.cohortkeeperarray = [];
+        this.cptObjectKeeper = [];
         this.cohortIndex = 0;
 
     }
