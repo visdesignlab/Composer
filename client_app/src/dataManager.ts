@@ -157,7 +157,7 @@ export class DataManager {
           events.on('filter_data', (evt, item) => { // called in sidebar
 
             this.filterRequirements.demo = item;
-         
+            console.log(item);
             this.demoFilter(item, this.populationDemographics);
 
           });
