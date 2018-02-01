@@ -147,11 +147,10 @@ constructor(parent: Element) {
         //this is where you are going to filter by category
         const value = (<HTMLInputElement>document.getElementById('order_search')).value;
         let codes = value.split(' ');
-        //console.log(codes);
+  
         let withQuery = [];
         let queryDate = [];
-       // console.log(this.filteredCPT);
-        //let found = arr1.some(r=> arr2.includes(r))
+
         this.filteredCPT.forEach((element) => {
             let elementBool;
             element.forEach(g => {
@@ -165,7 +164,6 @@ constructor(parent: Element) {
                 
                     });
             });
-            console.log(withQuery);
 
         this.queryDataArray = withQuery;
         this.queryDateArray = queryDate;
@@ -313,8 +311,6 @@ constructor(parent: Element) {
                 let parentData = select(this.parentNode).data;
 
             });
-
-        
 
          // this.svg.select('#similar_orders').selectAll('.similarRect')
             //  .append('text')

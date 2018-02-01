@@ -91,7 +91,7 @@ export class populationStat {
         events.on('pro_object_filtered', (evt, item)=> {
 
            this.filteredPromis = item;
-           // console.log(item);
+    
 
         });
 
@@ -103,7 +103,7 @@ export class populationStat {
          });
 
         events.on('timeline_max_set', (evt, item)=> {
-            //console.log(item);
+        
             this.maxDay = item;
             select('.day_line').select('.maxDay').text(this.maxDay + " Days");
         });
@@ -180,8 +180,6 @@ export class populationStat {
         let startDay = this.timeScale(start);
         let endDay = this.timeScale(end);
 
-        console.log(startDay);
-        console.log(endDay);
         this.maxDay = endDay;
         
     }
@@ -218,7 +216,7 @@ export class populationStat {
             if(element[0] == 'A' || element[0] == 'B')ch1.push(element);
             if (element[0] == 'C')ch2.push(element);
             if(element[0] == 'D'){
-               // console.log(element + " "+ element[1]);
+             
                 if(element[1] == ('0' || '1' || '2' || '3' || '4')){ch2.push(element);}
                 if(element[1] == '5' || '6' || '7' || '8'){ch3.push(element);}
             }

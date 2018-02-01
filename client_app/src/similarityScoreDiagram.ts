@@ -50,6 +50,9 @@ export class similarityScoreDiagram {
     private maxDay;
     private minDay = 0;
 
+    private zeroEvent = 'First Promis Score';
+    private targetOrder;
+
    filteredOrders = {
        medGroup : [],
        proGroup : [],
@@ -59,9 +62,9 @@ export class similarityScoreDiagram {
     width = 600;
     promisDimension = {height: 500, width: 750};
     margin = {x: 80, y: 40};
-    sliderWidth = 10;
-    lineScale;
-    lineOpacity;
+    private sliderWidth = 10;
+    private lineScale;
+    private lineOpacity;
 
     constructor(parent: Element, diagram) {
 
@@ -75,8 +78,10 @@ export class similarityScoreDiagram {
         .attr('value', 'Update Start Day to Event')
         .on('click', () => {
             this.clearDiagram();
-           // this.shiftDays(null)}
-              this.getDays(this.cohortProInfo)});
+            this.getDays(this.cohortProInfo);
+            this.zeroEvent = this.targetOrder;
+            this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
+            });
 
         this.$node.append('text').attr('id', 'eventLabel');
 
@@ -167,6 +172,11 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
+        events.on('filtered_CPT_by_order', (evt, item)=> {
+            this.targetOrder = item[1];
+           // console.log(this.zeroEvent);
+           
+        });
 
         events.on('domain updated', (evt, item)=> {
           
@@ -174,16 +184,14 @@ export class similarityScoreDiagram {
             this.minDay = item[0];
 
             if(this.cohortProInfo != undefined){
-
                 this.clearDiagram();
                 this.drawPromisChart();
             }
 
-
-        })
+        });
 
         events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
-                console.log('got promis score');
+               
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
@@ -191,7 +199,7 @@ export class similarityScoreDiagram {
                     });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-            console.log('selected cohort change');
+           
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
@@ -213,15 +221,10 @@ export class similarityScoreDiagram {
     private addMinDay(eventArray) {
 
         let cohort = this.cohortProInfo;
-    
         for(var i= 0;  i< cohort.length; i++) {
-
             var keyA = cohort[i].key;
-
             for(var j = 0; j< eventArray.length; j++) {
-
               var keyB = eventArray[j].key;
-
               if(keyA == keyB) {
                 cohort[i].CPTtime = eventArray[j].time;
               }
@@ -270,16 +273,10 @@ export class similarityScoreDiagram {
         diffArray.sort((a, b) => ascending(a, b));
     
         events.fire('timeline_max_set', max(diffArray));
-   
-        //this.maxDay = 365;// this is where the max day starts on load. 
-
         events.fire('day_dist', this.cohortProInfo);
         
         this.drawPromisChart();
-
     }
-
-
     /**
      * Draw the diagram with the given data from getSimilarRows
      * @param args
@@ -288,17 +285,16 @@ export class similarityScoreDiagram {
 
             let lineCount = this.cohortProInfo.length;
    
-        let similarData = this.cohortProInfo.map((d) => {
+            let similarData = this.cohortProInfo.map((d) => {
            
             d.scale = this.timeScale.domain([0, d.days]);
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
-            return g['FORM'] == this.diagram
+            return g['FORM'] == this.diagram;
             });
            
             res.sort((a, b) => ascending(a.diff, b.diff));
             res.forEach(r=> {r.scale = d.scale;
-                            r.maxday = d.days});
-            
+                             r.maxday = d.days;});
             return res;
             });
     
@@ -312,12 +308,8 @@ export class similarityScoreDiagram {
             // -------  define line function
             const lineFunc = line()
                 .curve(curveMonotoneX)
-                .x((d) => {
-                    return this.timeScale(+d['diff']);
-                })
-                .y((d) => {
-                    return this.scoreScale(+d['SCORE']);
-                });
+                .x((d) => { return this.timeScale(+d['diff']); })
+                .y((d) => { return this.scoreScale(+d['SCORE']); });
     
             // ------- draw
             const medScoreGroup = this.svg.select('#similar_score');
@@ -331,14 +323,11 @@ export class similarityScoreDiagram {
                 })
                 .each(function (d) {
                     let currGroup = select(this)
-                    //currGroup.append('g')
                         .append('path')
                         .attr('class', 'proLine') 
                         .attr('stroke-width', that.lineScale(lineCount))
                         .attr('stroke-opacity', that.lineScale(lineCount))
-                        //.style('stroke-width', `${this.lineScale(lineCount)}`)// TODO later after getting classification
-                        .attr('d', () => lineFunc(d))
-
+                        .attr('d', () => lineFunc(d));
                 })
                 .on('click', (d) => {
 
@@ -346,11 +335,13 @@ export class similarityScoreDiagram {
                     this.addPromisDots(d);
                 });
 
-               let zeroLine = medScoreGroup.append('line').classed('zeroLine', true)
-                            .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
-                            .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
-                            .attr('y1', 0).attr('y2', 400).attr('stroke-width', .5).attr('stroke', 'red');
-        
+               let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
+                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+
+               zeroLine.append('line')
+                    .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
+                    .attr('y1', 0).attr('y2', 400).attr('stroke-width', .5).attr('stroke', 'red');
+                zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
         }
     
     private addPromisDots (d){
