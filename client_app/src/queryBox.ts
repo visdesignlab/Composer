@@ -40,9 +40,10 @@ export class QueryBox {
 
         form.append('input')
             .attr('type', 'button')
-            .attr('value', 'CPT Codes')
+            .attr('value', 'Load CPT Codes')
            // .on('click', () => events.fire('show_cpt'));
-            .on('click', () => events.fire('load_cpt'));
+           // .on('click', () => events.fire('load_cpt'));
+            .on('click', () => console.log('fake button'));
 
         form.append('input')
             .attr('type', 'button')
@@ -80,7 +81,6 @@ export class QueryBox {
         });
 
         events.on('cohort_added', (evt, item)=> {
-            
             this.cohortKeeper.selectAll('div').remove();
             let counter = -1;
             let nodeArray = [];
