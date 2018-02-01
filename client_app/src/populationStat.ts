@@ -54,13 +54,13 @@ export class populationStat {
             .range([10, 700]).clamp(true);
 
         let patientCountText = this.$node.append('div').classed('pop_count', true)
-        .style('height', '25px').style('margin-top', '40px');
+        .style('height', '25px').style('margin-top', '20px');
 
         let totalPop = patientCountText.append('text').text(`total patient count: `)
         patientCountText.append('text').classed('fillTotal', true);
 
         let selectPop = this.$node.append('div').classed('select_count', true)
-        .style('height', '25px').style('margin-top', '40px')
+        .style('height', '25px').style('margin-top', '5px')
         selectPop.append('text').text('Number of Select Patients:   ');
         selectPop.append('text').classed('fillSelect', true);
 
