@@ -99,10 +99,9 @@ constructor(parent: Element) {
     events.on('selected_cpt_change', (evt, item) => {
         this.timeScale.domain([0, this.maxDay]);
         this.filteredCPT = item;
-        console.log(item.length);
     });
 
-    events.on('filtered_CPT_by_order', (evt, item)=> {
+    events.on('filter_cohort_by_event', (evt, item)=> {
         selectAll('.patCPTRecord').remove();
 
         this.drawOrders(item[0]);
@@ -125,14 +124,14 @@ constructor(parent: Element) {
             .attr('type', 'button')
             .attr('value', 'search for event')
             .on('click', () => {
-                this.queryOrder();
+                this.searchByEvent();
                 //this.cptchecker();
             });
     form.append('input')
             .attr('type', 'button')
             .attr('value', 'search for codes')
             .on('click', () => {
-               // this.queryOrder();
+               // this.searchByEvent();
                 this.cptchecker();
             });
 
@@ -140,7 +139,7 @@ constructor(parent: Element) {
             .attr('type', 'button')
             .attr('value', 'filter cohort by selected')
             .on('click', () => {
-              events.fire('filtered_CPT_by_order', [this.queryDataArray, this.targetOrder]);
+              events.fire('filter_cohort_by_event', [this.queryDataArray, this.targetOrder]);
               selectAll('.selectedOrder').classed('selectedOrder', false);
               selectAll('.unselectedOrder').classed('unselectedOrder', false);
               events.fire('min date to cpt', this.queryDateArray);
@@ -166,8 +165,7 @@ constructor(parent: Element) {
                         queryDate.push(g);
                     }elementBool = g.key;
                 }
-                
-                    });
+                });
             });
 
         this.queryDataArray = withQuery;
@@ -177,7 +175,7 @@ constructor(parent: Element) {
 
     }
 
-    private queryOrder() {
+    private searchByEvent() {
 
         let withQuery = [];
         let queryDate = [];

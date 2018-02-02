@@ -17,12 +17,6 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalc from './dataCalculations';
-/*
-interface IfilterRequirements {
-    'demo': null, //this is sent from sidebar
-    'icd': null,
-    'cpt': null
-   };*/
 
 export class DataManager {
 
@@ -78,10 +72,10 @@ export class DataManager {
 
         let startDateSelection = d3.select('#start_date').select('text');
 
-        events.on('filtered_CPT_by_order', (evt, item)=> {
-
+        events.on('filter_cohort_by_event', (evt, item)=> {
+            console.log('filtered by order  '+ item);
+            //let idArray = this.getCohortIdArrayAfterMap(item[0], 'cpt');
             this.getSelectedIdArray(item[0], 'cpt');
-
         });
 
         events.on('start_date_updated', (evt, item)=> {
@@ -139,7 +133,7 @@ export class DataManager {
         });
 
         events.on('cpt_object', (evt, item)=> {
-            console.log('cpt objects loaded  '+ item.length);
+            
             this.totalCptObjects = item;
             //this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
         });
@@ -157,7 +151,7 @@ export class DataManager {
         events.on('new_cohort_added', (evt, item)=> {
             this.filteredPatPromis = item;
            // console.log(this.totalCptObjects);
-            this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
+            this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
@@ -170,9 +164,8 @@ export class DataManager {
           });
 
         events.on('selected_pat_array', (evt, item)=> {
-            console.log(this.totalCptObjects.length);
             this.cohortIdArray = item;
-            this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
+            this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
@@ -330,7 +323,7 @@ export class DataManager {
      };
 
      //uses Phovea to access PRO data and draw table
-   private async getCPT(cohortIdArray, cptObject, filteredPatPromis) {
+   private async getCPT(cohortIdArray, cptObject) {
 
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
@@ -357,7 +350,7 @@ export class DataManager {
         const mapped = entries(filteredPatOrders);
 
         events.fire('filtered_CPT', mapped);
-        console.log('cpt for you    '+ mapped.length);
+       
  };
 
           /**
@@ -375,16 +368,16 @@ export class DataManager {
             var keycpt = CPTobjects[i].key;
 
             for(var j = 0; j < patProInfo.length; j++) {
-            
+
               var keypromis = patProInfo[j].key;
 
               if(keycpt == keypromis) {
                 CPTobjects[i].minPromis = patProInfo[j].min_date;
               }
             } 
-          } 
+          };
 
-          CPTobjects.forEach((d) => {
+        CPTobjects.forEach((d) => {
                 let minDatePat = this.findMinDateCPT(d.value);
                 let maxDatePat = this.findMaxDateCPT(d.value);
 
@@ -399,7 +392,6 @@ export class DataManager {
         const self = this;
 
               // ----- add diff days to the data
-         
         let filteredOrders = [];
 
         CPTobjects.forEach((g) => {
@@ -407,57 +399,49 @@ export class DataManager {
                 //g.array = [];
         let minDate = g.minPromis;//changed min date for cpt to min date of promis score
 
-            g.value.forEach((d) => {
+        g.value.forEach((d) => {
 
-                      d.array = []; 
-                      d.time = d['PROC_DTM'];
+            d.array = []; 
+            d.time = d['PROC_DTM'];
 
-                      try {
-                          d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-
-                        }
-                      catch (TypeError) {
-                          console.log('error');
-                          d.diff = -1;
+            try {
+                d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                } catch (TypeError) {
+                        console.log('error');
+                        d.diff = -1;
                       }
-                      if(d['CPT_1'] !== 0){ d.array.push(d['CPT_1']);   };
-                      if(d['CPT_2'] !== 0){ d.array.push(d['CPT_2']);    };
-                      if(d['CPT_3'] !== 0){ d.array.push(d['CPT_3']);    };
-                      if(d['CPT_4'] !== 0){ d.array.push(d['CPT_4']);    };
-                      if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5']);    };
-                      if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6']);    };
-                      if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7']);    };
-                      if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5']);    };
-                      if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6']);    };
-                      if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7']);    };
+                if(d['CPT_1'] !== 0){ d.array.push(d['CPT_1']);   };
+                if(d['CPT_2'] !== 0){ d.array.push(d['CPT_2']);    };
+                if(d['CPT_3'] !== 0){ d.array.push(d['CPT_3']);    };
+                if(d['CPT_4'] !== 0){ d.array.push(d['CPT_4']);    };
+                if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5']);    };
+                if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6']);    };
+                if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7']);    };
+                if(d['CPT_5'] !== 0){ d.array.push(d['CPT_5']);    };
+                if(d['CPT_6'] !== 0){ d.array.push(d['CPT_6']);    };
+                if(d['CPT_7'] !== 0){ d.array.push(d['CPT_7']);    };
 
-                      d.diff = d.diff;
-
-                     });
-
-            let filter = g.value.map(function(blob) {
-                    let temp = [];
-                    temp.push(blob.array);
-                    return {
-                            key: blob.PAT_ID,
-                            value : temp,
-                            time: blob.PROC_DTM,
-                            diff : blob.diff
-                            };
-                    });
-
-                    filteredOrders.push(filter);
+                d.diff = d.diff;
 
                 });
 
-               
-                events.fire('cpt_mapped', filteredOrders);
-                
+        let filter = g.value.map(function(blob) {
+            let temp = [];
+            temp.push(blob.array);
+            return {
+                    key: blob.PAT_ID,
+                    value : temp,
+                    time: blob.PROC_DTM,
+                    diff : blob.diff
+                };
+            });
 
-                console.log('cpt filtered');
-          }
+        filteredOrders.push(filter);
 
+        });
 
+        events.fire('cpt_mapped', filteredOrders);
+    }
 
     private getSelectedIdArray (selectedData, typeofData: string)   {
 
@@ -474,11 +458,13 @@ export class DataManager {
         }
 
         this.cohortIdArray = tempPatArray;
+      
         this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
-        events.fire('selected_pat_array', this.cohortIdArray);
+        events.fire('mapped_cpt_filtered', selectedData);
+        //events.fire('selected_pat_array', this.cohortIdArray);
     }
 
-    private getCohortIdArray (selectedData)   {
+    private getCohortIdArrayAfterMap (selectedData, typeofData: string)   {
 
         let tempPatArray = [];
         selectedData.forEach((element) => {

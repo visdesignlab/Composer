@@ -40,7 +40,7 @@ export class QueryBox {
 
         form.append('input')
             .attr('type', 'button')
-            .attr('value', 'Load CPT Codes')
+            .attr('value', 'Change Promis Score Scale')
            // .on('click', () => events.fire('show_cpt'));
            // .on('click', () => events.fire('load_cpt'));
             .on('click', () => console.log('fake button'));
