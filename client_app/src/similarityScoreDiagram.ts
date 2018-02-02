@@ -172,10 +172,8 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
-        events.on('filtered_CPT_by_order', (evt, item)=> {
+        events.on('filter_cohort_by_event', (evt, item)=> {
             this.targetOrder = item[1];
-           // console.log(this.zeroEvent);
-           
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -191,7 +189,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
-               
+
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);

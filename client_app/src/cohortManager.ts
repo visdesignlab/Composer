@@ -77,7 +77,7 @@ export class CohortManager {
             this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
             let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
             selectedLabel[0].classList.add('selected');
-            
+
             events.fire('selected_cohort_change', this.selectedCohort);
             events.fire('selected_cpt_change', this.selectedCPT);
           });
@@ -86,21 +86,34 @@ export class CohortManager {
              // this.selectedCohort.cpt.push(item[1]);
           });
 
+          events.on('mapped_cpt_filtered', (evt, item)=>{
+              //console.log(this.cohortIndex);
+              console.log('index filtered pat:'+ this.cohortIndex);
+              this.selectedCPT = item;
+              //THIS IS JACKED UP WHY IS IT JACKED UP
+              this.cptObjectKeeper[this.cohortIndex - 1] = item;
+              console.log(this.cptObjectKeeper);
+          });
+
           events.on('filtered_patient_promis', (evt, item) => {
+             // (console.log('filtred patient promis'));
+              console.log('index filtered pat:'+ this.cohortIndex);
              this.cohortkeeperarray.push(item);
              this.cohortIndex = this.cohortkeeperarray.length - 1;
+             console.log('index filtered pat:'+ this.cohortIndex);
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
-             let index = +this.cohortIndex;
+             //let index = +this.cohortIndex;
          
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('new_cohort_added', this.selectedCohort);
           });
 
           events.on('cpt_mapped', (evt, item)=> {
-              console.log('cpt for you  ' + item.length);
+              console.log('index cpt mapped:'+ this.cohortIndex);
+              //console.log('cpt for you  ' + item.length);
               this.cptObjectKeeper.push(item);
-              console.log(this.cptObjectKeeper);
+              //console.log(this.cptObjectKeeper);
               this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
 
           });
