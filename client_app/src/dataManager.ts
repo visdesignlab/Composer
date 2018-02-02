@@ -73,9 +73,10 @@ export class DataManager {
         let startDateSelection = d3.select('#start_date').select('text');
 
         events.on('filter_cohort_by_event', (evt, item)=> {
-            console.log('filtered by order  '+ item);
-            //let idArray = this.getCohortIdArrayAfterMap(item[0], 'cpt');
-            this.getSelectedIdArray(item[0], 'cpt');
+
+            let idArray = this.getCohortIdArrayAfterMap(item[0], 'cpt');
+            let filteredPromis = this.filterMappedPromisByArray(idArray, this.filteredPatPromis);
+            events.fire('selected_promis_filtered', filteredPromis);
         });
 
         events.on('start_date_updated', (evt, item)=> {
@@ -363,13 +364,13 @@ export class DataManager {
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
 
-        for(var i= 0;  i< CPTobjects.length; i++) {
+        for(let i= 0;  i< CPTobjects.length; i++) {
 
-            var keycpt = CPTobjects[i].key;
+            let keycpt = CPTobjects[i].key;
 
-            for(var j = 0; j < patProInfo.length; j++) {
+            for(let j = 0; j < patProInfo.length; j++) {
 
-              var keypromis = patProInfo[j].key;
+              let keypromis = patProInfo[j].key;
 
               if(keycpt == keypromis) {
                 CPTobjects[i].minPromis = patProInfo[j].min_date;
@@ -387,8 +388,7 @@ export class DataManager {
                 let time = this.parseTime(d['PROC_DTM'], minDate).getTime();
                 d.diff = Math.ceil((time - minDate.getTime()) / (1000 * 60 * 60 * 24));
             });
-        
-              
+
         const self = this;
 
               // ----- add diff days to the data
@@ -458,20 +458,30 @@ export class DataManager {
         }
 
         this.cohortIdArray = tempPatArray;
-      
+
         this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
         events.fire('mapped_cpt_filtered', selectedData);
         //events.fire('selected_pat_array', this.cohortIdArray);
     }
 
     private getCohortIdArrayAfterMap (selectedData, typeofData: string)   {
-
         let tempPatArray = [];
-        selectedData.forEach((element) => {
+
+        if(typeofData == 'cpt') {
+            selectedData.forEach((element) => {
+                tempPatArray.push(element[0].key);
+            });
+        }else {
+            selectedData.forEach((element) => {
                 tempPatArray.push(element.ID);
             });
+        } return tempPatArray;
+    }
 
-        return tempPatArray;
+    private filterMappedPromisByArray (selectedIdArray, promisObjects)   {
+
+        let res = promisObjects.filter((f) => selectedIdArray.includes(+f.key));
+        return res;
     }
 
     public async loadData(id: string) { //loads the tables from Phovea

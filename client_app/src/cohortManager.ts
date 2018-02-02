@@ -54,6 +54,14 @@ export class CohortManager {
             events.fire('selected_cohort_change', this.selectedCohort);
         });
 
+        events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
+            //console.log(this.cohortIndex);
+            this.cohortkeeperarray[this.cohortIndex] = item;
+            this.selectedCohort = item;
+            events.fire('selected_cohort_change', this.selectedCohort);
+            console.log(this.cptObjectKeeper);
+        });
+
         events.on('got_promis_scores', (evt, item)=> {
             console.log('got promis scores fired');
             this.allPatientPromis = item;
