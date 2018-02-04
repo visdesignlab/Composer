@@ -115,8 +115,7 @@ export class similarityScoreDiagram {
       
         scoreGroup.append('g')
             .attr('class', 'yAxis')
-            .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`)
-            .call(axisLeft(this.scoreScale));
+            .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`);
 
         // ----- SLIDER
 
@@ -172,6 +171,11 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
+
+        events.on('change_promis_scale', ()=>{
+            this.changeScale();
+        });
+
         events.on('filter_cohort_by_event', (evt, item)=> {
             this.targetOrder = item[1];
         });
@@ -182,6 +186,7 @@ export class similarityScoreDiagram {
             this.minDay = item[0];
 
             if(this.cohortProInfo != undefined){
+
                 this.clearDiagram();
                 this.drawPromisChart();
             }
@@ -189,7 +194,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
-
+                console.log('got promis score fired');
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
@@ -197,22 +202,16 @@ export class similarityScoreDiagram {
                     });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-           
+                console.log('selected cohor change fired');
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
         
                     });
 
-        events.on('filtered_CPT', (evt, item)=> {
-           // this.addSimilarOrderPoints(this.targetOrderInfo, item);
-        });
-
         events.on('min date to cpt', (evt, item)=> {
             this.addMinDay(item);
         });
-
-       // events.on('got_promis_scores', patPromis')
 
     }
 
@@ -226,26 +225,28 @@ export class similarityScoreDiagram {
               if(keyA == keyB) {
                 cohort[i].CPTtime = eventArray[j].time;
               }
-            } 
+            }
           }
           this.cohortProInfo = cohort;
-   
+          console.log(cohort);
 }
 
     private getDays (date) {
 
          // ----- add diff days to the data
-      
+
         let maxDiff = 0;// this sets the score scale max.
          //need to make this dynamic. 
         let diffArray = [];
+        if (this.cohortProInfo != null) {
 
-        this.cohortProInfo.forEach((g) => {
-               
+            this.cohortProInfo.forEach((g) => {
+
                 let  minDate;
 
                 if(g.CPTtime != undefined && date != null ) {
                     minDate = this.parseTime(g.CPTtime, null);
+                    console.log(g);
                 }else minDate = g.min_date;
                //these have already been parsed
                let maxDate = g.max_date;
@@ -266,13 +267,32 @@ export class similarityScoreDiagram {
                         g.value.sort((a, b) => ascending(a.diff, b.diff))
 
                         });
+        }else{console.log('error'); }
 
 
         diffArray.sort((a, b) => ascending(a, b));
     
         events.fire('timeline_max_set', max(diffArray));
         events.fire('day_dist', this.cohortProInfo);
-        
+
+        this.drawPromisChart();
+    }
+
+    private changeScale(){
+       // console.log(this.cohortProInfo);
+        this.cohortProInfo.forEach(patient => {
+            let minDiff = patient.value[0].diff;
+            let baseline;
+            console.log(minDiff);
+         patient.value.forEach(value => {
+            if(value.diff == minDiff) baseline = +value.SCORE;
+         });
+         patient.value.forEach(value => {
+            value.SCORE = +value.SCORE - baseline;
+         });
+        });
+        this.clearDiagram();
+        this.scoreScale.domain([50, -50]);
         this.drawPromisChart();
     }
     /**
@@ -284,15 +304,12 @@ export class similarityScoreDiagram {
             let lineCount = this.cohortProInfo.length;
    
             let similarData = this.cohortProInfo.map((d) => {
-           
-            d.scale = this.timeScale.domain([0, d.days]);
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram;
             });
            
             res.sort((a, b) => ascending(a.diff, b.diff));
-            res.forEach(r=> {r.scale = d.scale;
-                             r.maxday = d.days;});
+            res.forEach(r=> r.maxday = d.days);
             return res;
             });
     
@@ -302,6 +319,9 @@ export class similarityScoreDiagram {
     
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
+                
+            this.svg.select('.yAxis')
+                .call(axisLeft(this.scoreScale));
     
             // -------  define line function
             const lineFunc = line()
