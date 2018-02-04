@@ -123,16 +123,7 @@ export class populationStat {
 
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
                           .attr('height', 70).attr('width', 710);
-/*
-        let timelineLine = timelineSVG.append('line')
-                .attr('x1', 0)
-                .attr('x2',675)
-                .attr('y1', 0)
-                .attr('y2', 0)
-                .attr('stroke-width', 1)
-                .attr('stroke', 'red')
-                .attr('transform', 'translate(30, 50)');
-*/
+
         let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
 
          // ----- SLIDER
@@ -163,8 +154,6 @@ export class populationStat {
 
               events.fire('domain updated', [start, end]);
             }
-           // this.drawPatOrderRects(this.targetOrders, this.targetProInfo);
-           // this.reformatCPT(this.targetCPT)
         
           });
 
@@ -181,7 +170,7 @@ export class populationStat {
         let endDay = this.timeScale(end);
 
         this.maxDay = endDay;
-        
+
     }
 
 
@@ -216,7 +205,7 @@ export class populationStat {
             if(element[0] == 'A' || element[0] == 'B')ch1.push(element);
             if (element[0] == 'C')ch2.push(element);
             if(element[0] == 'D'){
-             
+
                 if(element[1] == ('0' || '1' || '2' || '3' || '4')){ch2.push(element);}
                 if(element[1] == '5' || '6' || '7' || '8'){ch3.push(element);}
             }

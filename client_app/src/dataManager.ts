@@ -145,7 +145,7 @@ export class DataManager {
 
           // item: [d, parentValue]
         events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
-            this.filterRequirements.demo = item;
+           // this.filterRequirements.demo = item;
             this.demoFilter(item, this.totalDemoObjects);
           });
 
@@ -303,7 +303,7 @@ export class DataManager {
             });
 
         }
-        let mapped = entries(filteredPatOrders);
+        let mapped =  await entries(filteredPatOrders);
         //return filteredPatOrders;
         let patPromis = mapped.map(d=> {
             return {
@@ -441,27 +441,6 @@ export class DataManager {
         });
 
         events.fire('cpt_mapped', filteredOrders);
-    }
-
-    private getSelectedIdArray (selectedData, typeofData: string)   {
-
-        let tempPatArray = [];
-
-        if(typeofData == 'cpt') {
-            selectedData.forEach((element) => {
-                tempPatArray.push(element[0].key);
-            });
-        }else {
-            selectedData.forEach((element) => {
-                tempPatArray.push(element.ID);
-            });
-        }
-
-        this.cohortIdArray = tempPatArray;
-
-        this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
-        events.fire('mapped_cpt_filtered', selectedData);
-        //events.fire('selected_pat_array', this.cohortIdArray);
     }
 
     private getCohortIdArrayAfterMap (selectedData, typeofData: string)   {

@@ -43,7 +43,7 @@ export class QueryBox {
             .attr('value', 'Change Promis Score Scale')
            // .on('click', () => events.fire('show_cpt'));
            // .on('click', () => events.fire('load_cpt'));
-            .on('click', () => console.log('fake button'));
+            .on('click', () =>events.fire('change_promis_scale'));
 
         form.append('input')
             .attr('type', 'button')
