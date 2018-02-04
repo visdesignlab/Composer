@@ -285,14 +285,18 @@ export class similarityScoreDiagram {
             let baseline;
             console.log(minDiff);
          patient.value.forEach(value => {
+            if(value.diff < Math.abs(minDiff)) minDiff = value.diff;
             if(value.diff == minDiff) baseline = +value.SCORE;
          });
          patient.value.forEach(value => {
+            value.ogScore = value.SCORE;
             value.SCORE = +value.SCORE - baseline;
+            
          });
         });
+        console.log(this.cohortProInfo);
         this.clearDiagram();
-        this.scoreScale.domain([50, -50]);
+        this.scoreScale.domain([30, -30]);
         this.drawPromisChart();
     }
     /**
