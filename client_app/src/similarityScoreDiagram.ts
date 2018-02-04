@@ -297,7 +297,20 @@ export class similarityScoreDiagram {
         console.log(this.cohortProInfo);
         this.clearDiagram();
         this.scoreScale.domain([30, -30]);
+        events.fire('score_scale_changed');
         this.drawPromisChart();
+
+        const medScoreGroup = this.svg.select('#similar_score');
+        let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
+        .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+
+        zeroLine.append('line')
+                .attr('x1', 0).attr('x2', 675)
+                .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
+                .attr('stroke', 'red');
+
+        zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
+
     }
     /**
      * Draw the diagram with the given data from getSimilarRows

@@ -91,23 +91,26 @@ export class populationStat {
         events.on('pro_object_filtered', (evt, item)=> {
 
            this.filteredPromis = item;
-    
-
         });
 
         events.on('selected_cohort_change', (evt, item)=> {
 
             this.selectedcohort = item;
             this.$node.select('.fillSelect').text(this.selectedcohort.length);
- 
+
          });
 
         events.on('timeline_max_set', (evt, item)=> {
-        
+
             this.maxDay = item;
             select('.day_line').select('.maxDay').text(this.maxDay + " Days");
         });
         events.on('filteredPatients', (evt, item)=> this.filteredPromis = item);
+
+        events.on('score_scale_changed', ()=> {
+            select('.slider').call(this.brush).transition()
+            .delay(850).call(this.brush.move, [this.timeScale(-20), this.timeScale(90)]);
+        });
     }
 
     private showStats () {
@@ -160,7 +163,8 @@ export class populationStat {
 
         slider.call(this.brush)
          .call(this.brush.move, [20,this.timeScale(365)]);
-         
+      
+
      // -----
     }
 
