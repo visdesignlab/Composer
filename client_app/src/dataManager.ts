@@ -351,7 +351,7 @@ export class DataManager {
         const mapped = entries(filteredPatOrders);
 
         events.fire('filtered_CPT', mapped);
-       
+
  };
 
           /**

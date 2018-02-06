@@ -163,7 +163,6 @@ export class similarityScoreDiagram {
             .attr('id', 'promis_orders');
 
         this.attachListener();
-
     }
 
 
@@ -281,23 +280,45 @@ export class similarityScoreDiagram {
     private changeScale(){
        // console.log(this.cohortProInfo);
         this.cohortProInfo.forEach(patient => {
-            let minDiff = patient.value[0].diff;
+            let negMin = patient.value[0].diff;
+            let posMin = patient.value[0].diff;
+            let absMin = patient.value[0].diff;
+            let baseStart;
+            let baseEnd;
             let baseline;
-            console.log(minDiff);
+            patient.window = null;
+
+            patient.value.forEach(value => {
+                // console.log(value.diff);
+                if(value.diff < 0) {  // &&  Math.abs(negMin) < Math.abs(negMin)
+                if(Math.abs(value.diff) < Math.abs(negMin)) {
+                    negMin = value.diff;
+                   // console.log(negMin);
+                }};
+                if(value.diff > 0) {  // &&  Math.abs(negMin) < Math.abs(negMin)
+                    if(value.diff < Math.abs(posMin)) {
+                    posMin = value.diff;
+                   // console.log(posMin);
+                    }};
+                if(Math.abs(value.diff) < Math.abs(absMin)) {
+                    absMin = value.diff;
+                        };
+                if(value.diff == absMin) baseline = +value.SCORE;
+                
+            });
+
          patient.value.forEach(value => {
-            if(value.diff < Math.abs(minDiff)) minDiff = value.diff;
-            if(value.diff == minDiff) baseline = +value.SCORE;
-         });
-         patient.value.forEach(value => {
+            value.window = [negMin, posMin];
+            patient.window = [negMin, posMin];
             value.ogScore = value.SCORE;
             value.SCORE = +value.SCORE - baseline;
-            
          });
         });
-        console.log(this.cohortProInfo);
+
+
         this.clearDiagram();
         this.scoreScale.domain([30, -30]);
-        events.fire('score_scale_changed');
+       // events.fire('score_scale_changed');
         this.drawPromisChart();
 
         const medScoreGroup = this.svg.select('#similar_score');
@@ -319,12 +340,12 @@ export class similarityScoreDiagram {
     private drawPromisChart() {
 
             let lineCount = this.cohortProInfo.length;
-   
+
             let similarData = this.cohortProInfo.map((d) => {
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram;
             });
-           
+
             res.sort((a, b) => ascending(a.diff, b.diff));
             res.forEach(r=> r.maxday = d.days);
             return res;
@@ -368,12 +389,14 @@ export class similarityScoreDiagram {
 
                     events.fire('line_clicked', d);
                     this.addPromisDots(d);
+                    this.InterpolationMachine(d);
+                    //console.log(d.parent);
                 });
 
                let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
-               zeroLine.append('line')
+               zeroLine.append('line')//.attr('class', 'myLine')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
                     .attr('y1', 0).attr('y2', 400).attr('stroke-width', .5).attr('stroke', 'red');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
@@ -390,9 +413,52 @@ export class similarityScoreDiagram {
         .selectAll('circle').data(promisData);
         promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> this.scoreScale(d.SCORE)).attr('r', 5).attr('fill', '#21618C');
-
     }
-    /**
+
+    private InterpolationMachine(d) {
+        console.log(d);
+
+
+
+        function point(that, t0, t1) {
+            var x0 = that._x0,
+                y0 = that._y0,
+                x1 = that._x1,
+                y1 = that._y1,
+                dx = (x1 - x0) / 3;
+            that._context.bezierCurveTo(x0 + dx, y0 + dx * t0, x1 - dx, y1 - dx * t1, x1, y1);
+          }
+
+        let lines = selectAll('.proLine').nodes();
+        let yArray = [];
+        lines.forEach(element => {
+            
+           // console.log(this.findY(0, element));
+          // console.log(this.findY(0, null, element));
+           let y = this.findY(0, null, element);
+           yArray.push(y);
+        });
+        let promisRects = this.svg.select('#similar_score').selectAll('g').append('g')
+   
+        .selectAll('circle').data(yArray);
+        promisRects.enter().append('circle').attr('cx', ()=> this.timeScale(0))
+        .attr('cy', (d, i)=> yArray[i]).attr('r', 5).attr('fill', 'red');
+    }
+
+            // Get the coordinates
+private findY(a, b, linePath) {
+         let end = this.timeScale(b);
+        // let point = linePath.getPointAtLength(x);
+         let beginning = this.timeScale(a);
+         let target = Math.floor((beginning + end) / 2);
+         let pos = linePath.getPointAtLength(target);
+        // console.log('length :' + end);
+     ;
+         return pos.y;
+
+}
+
+        /**
      * Utility method
      * @param start
      * @param end
