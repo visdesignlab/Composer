@@ -56,7 +56,7 @@ export class similarityScoreDiagram {
    filteredOrders = {
        medGroup : [],
        proGroup : [],
-   }
+   };
 
     height = 400;
     width = 600;
@@ -116,7 +116,7 @@ export class similarityScoreDiagram {
         scoreGroup.append('g')
             .attr('class', 'xAxis')
             .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
-      
+
         scoreGroup.append('g')
             .attr('class', 'yAxis')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`);
@@ -178,10 +178,12 @@ export class similarityScoreDiagram {
         events.on('change_promis_scale', ()=>{
             if(!this.scaleRelative){
                 this.scaleRelative = true;
-                this.getBaselines(null);
-                this.interpolate();  }
-            else{this.scaleRelative = false};
-            this.changeScale();
+                this.interpolate();
+                  }
+            else{this.scaleRelative = false;
+                this.changeScale(this.cohortProInfo);
+            };
+                
         });
 
         events.on('filter_cohort_by_event', (evt, item)=> {
@@ -303,11 +305,11 @@ export class similarityScoreDiagram {
             });
             if(negative == 0){
                 console.log('all of the days are positive');
-                negMin = 0;
+                negMin = null;
                 posMin = 6000;
             }else if(positive == 0){
                 console.log('all of the days are negative');
-                posMin = 0;
+                posMin = null;
                 negMin = patient.value[0].diff;
             }else{
                 negMin = patient.value[0].diff;
@@ -326,15 +328,19 @@ export class similarityScoreDiagram {
             patient.value.forEach(value => {
 
                 if(value.diff < 0) {  
-                    if(Math.abs(value.diff) < Math.abs(negMin)) {
-                    negMin = value.diff;
-                    console.log(negMin);
-                }};
-                if(value.diff > 0) { 
+                    if(negMin != null) {
+                        if(Math.abs(value.diff) < Math.abs(negMin)) {
+                            negMin = value.diff;
+                            console.log(negMin);
+                        }};
+                    }
+                if(posMin != null) {
+                if(value.diff > 0) {
                     if(value.diff < Math.abs(posMin)) {
                     posMin = value.diff;
                    // console.log(posMin);
                     }};
+                }
                 if(Math.abs(value.diff) < Math.abs(absMin)) {
                     absMin = value.diff;
                         };
@@ -342,32 +348,64 @@ export class similarityScoreDiagram {
                 if(value.diff == absMin) baseline = +value.SCORE; 
                 if(value.diff == negMin) baseStart = +value.SCORE;
                 if(value.diff == posMin) baseEnd = +value.SCORE;
-                
+
             });
 
          patient.value.forEach(value => {
-            value.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
-            patient.window = [[negMin, baseStart], [posMin, baseEnd]];
+             if(posMin == null || negMin == null) {
+                 patient.window = null;
+             }else {
+                value.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
+                patient.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
+             }
+
             value.ogScore = value.SCORE;
             value.relScore = +value.SCORE - baseline;
+            if(patient.window == null) {value.SCORE = +value.SCORE - baseline;}
            // value.SCORE = +value.SCORE - baseline;
          });
+
         });
-        console.log(this.cohortProInfo);
 
     }
     private interpolate() {
-        this.cohortProInfo.forEach(pat => {
-            console.log(pat.window);
-            let interScore = (pat.window[0])
+
+        let cohort = this.cohortProInfo;
+
+        cohort.forEach(pat => {
+            if(pat.window != null && pat.window != undefined) {
+                //console.log(pat.window.neg[0]);
+                let x1 = pat.window.neg[0];
+                let x2 = pat.window.pos[0];
+                let y1 = pat.window.neg[1];
+                let y2 = pat.window.pos[1];
+                let X;
+                let Y;
+
+                if (x1 < x2){X = x1; Y = y1}
+                else {X = x2; Y = y2};
+
+                let slope = (y2 - y1) / (x2 - x1);
+                let b = Y - (slope * X);
+                pat.b = b;
+
+                pat.value.forEach((value) => {
+                    value.relScore = +value.ogScore - b;
+                });
+                //console.log(pat.window);
+            }else{ console.log('no window');}
+           
         });
+        this.cohortProInfo = cohort;
+        //console.log(this.cohortProInfo);
+        this.changeScale(cohort);
     }
 
-    private changeScale() {
-
+    private changeScale(cohort) {
+        console.log(this.cohortProInfo);
        // this.scaleRelative = true;
         if(this.scaleRelative){
-            console.log('true');
+            //console.log('true');
             this.scoreScale.domain([30, -30]);
             this.cohortProInfo.forEach(patient => {
                 patient.value.forEach(value => {
@@ -376,7 +414,7 @@ export class similarityScoreDiagram {
             });
             };
         if(!this.scaleRelative){
-            console.log('false');
+           // console.log('false');
             this.scoreScale.domain([80, 10]);
             this.cohortProInfo.forEach(patient => {
                 patient.value.forEach(value => {
