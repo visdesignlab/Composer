@@ -183,7 +183,7 @@ export class similarityScoreDiagram {
             else{this.scaleRelative = false;
                 this.changeScale(this.cohortProInfo);
             };
-                
+
         });
 
         events.on('filter_cohort_by_event', (evt, item)=> {
@@ -493,11 +493,13 @@ export class similarityScoreDiagram {
                         .attr('d', () => lineFunc(d));
                 })
                 .on('click', (d) => {
-                    //console.log(select(d));
-                    
+
+                    console.log(d[0].window.neg);
+                    let neg = d[0].window.neg[0];
+                    let pos = d[0].window.pos[0];
                     events.fire('line_clicked', d);
                     this.addPromisDots(d);
-                    this.InterpolationMachine(0, 5, d);
+                   // this.InterpolationMachine(neg, 0, d);
                     //console.log(d.parent);
                 });
 
