@@ -55,15 +55,16 @@ export class CohortManager {
         });
 
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
-            //console.log(this.cohortIndex);
+            
             this.cohortkeeperarray[this.cohortIndex] = item;
             this.selectedCohort = item;
             events.fire('selected_cohort_change', this.selectedCohort);
-            console.log(this.cptObjectKeeper);
+            console.log(this.cohortkeeperarray);
+            
         });
 
         events.on('got_promis_scores', (evt, item)=> {
-            console.log('got promis scores fired');
+           
             this.allPatientPromis = item;
         });
 
@@ -88,10 +89,7 @@ export class CohortManager {
 
             events.fire('selected_cohort_change', this.selectedCohort);
             events.fire('selected_cpt_change', this.selectedCPT);
-          });
 
-          events.on('filtered_CPT_by_order', (evt, item)=>{
-             // this.selectedCohort.cpt.push(item[1]);
           });
 
           events.on('mapped_cpt_filtered', (evt, item)=>{
@@ -104,26 +102,28 @@ export class CohortManager {
           });
 
           events.on('filtered_patient_promis', (evt, item) => {
-             // (console.log('filtred patient promis'));
-              console.log('index filtered pat:'+ this.cohortIndex);
+             
              this.cohortkeeperarray.push(item);
              this.cohortIndex = this.cohortkeeperarray.length - 1;
-             console.log('index filtered pat:'+ this.cohortIndex);
+            
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
-             //let index = +this.cohortIndex;
-         
+
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('new_cohort_added', this.selectedCohort);
           });
 
-          events.on('cpt_mapped', (evt, item)=> {
-              console.log('index cpt mapped:'+ this.cohortIndex);
-              //console.log('cpt for you  ' + item.length);
-              this.cptObjectKeeper.push(item);
-              //console.log(this.cptObjectKeeper);
-              this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
+          events.on('filter_cohort_by_event', (evt, item)=> {
+              this.selectedCPT = item[0];
+              this.cptObjectKeeper[this.cohortIndex] = item[0];
+          });
 
+          events.on('cpt_mapped', (evt, item)=> {
+           
+              this.cptObjectKeeper.push(item);
+            
+              this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
+              console.log(this.cptObjectKeeper);
           });
     }
 
@@ -131,6 +131,7 @@ export class CohortManager {
 
         this.cohortfilterarray.push(filter);
         events.fire('cohort_added', this.cohortfilterarray);
+        console.log(this.cohortfilterarray);
     }
 
     private removeCohortFilterArray () {
