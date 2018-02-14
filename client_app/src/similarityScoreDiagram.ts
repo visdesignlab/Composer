@@ -7,7 +7,7 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
-import {line, curveMonotoneX} from 'd3-shape';
+import {line, curveMonotoneX, curveLinear} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
@@ -204,7 +204,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
-                console.log('got promis score fired');
+              
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
@@ -212,11 +212,11 @@ export class similarityScoreDiagram {
                     });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-                console.log('selected cohor change fired');
+            
                 this.cohortProInfo = item;
                 this.clearDiagram();
                 this.getDays(null);
-        
+               // events.fire('change_promis_scale');
                     });
 
         events.on('min date to cpt', (evt, item)=> {
@@ -238,7 +238,6 @@ export class similarityScoreDiagram {
             }
           }
           this.cohortProInfo = cohort;
-          console.log(cohort);
 }
 
     private getDays (date) {
@@ -256,7 +255,6 @@ export class similarityScoreDiagram {
 
                 if(g.CPTtime != undefined && date != null ) {
                     minDate = this.parseTime(g.CPTtime, null);
-                    console.log(g);
                 }else minDate = g.min_date;
                //these have already been parsed
                let maxDate = g.max_date;
@@ -274,7 +272,7 @@ export class similarityScoreDiagram {
                         g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
                         diffArray.push(g.days + 1);
 
-                        g.value.sort((a, b) => ascending(a.diff, b.diff))
+                        g.value.sort((a, b) => ascending(a.diff, b.diff));
 
                         });
         }else{console.log('error'); }
@@ -292,80 +290,89 @@ export class similarityScoreDiagram {
         this.cohortProInfo.forEach(patient => {
             let negative = 0;
             let positive = 0;
+            let zeroValue = false;
             let negMin;
             let posMin;
             let absMin;
 
-            patient.value.forEach(value => {
-                if(value.diff < 0){
-                    negative = negative + 1;
-                }else if(value.diff > 0){
-                    positive = positive + 1;
-                }
+            patient.value.forEach((value) => {
+                if(value.diff < 0) { negative = negative + 1;    }
+                if(value.diff > 0) { positive = positive + 1;    }
+                if(value.diff == Math.abs(0)) {
+                    zeroValue = true;
+                    value.diff = 0;   }
             });
-            if(negative == 0){
-                console.log('all of the days are positive');
-                negMin = null;
-                posMin = 6000;
-            }else if(positive == 0){
-                console.log('all of the days are negative');
-                posMin = null;
-                negMin = patient.value[0].diff;
-            }else{
-                negMin = patient.value[0].diff;
-                posMin = 6000;
-            }
 
             absMin = patient.value[0].diff;
             let baseStart;
             let baseEnd;
             let baseline;
-            patient.window = {
-                'neg' : null,
-                'pos': null
-                };
+            patient.window = {'neg' : null, 'pos': null };
+
+            if(negative == 0){ negMin = null; posMin = 6000;
+            }else if(positive == 0){ posMin = null; negMin = patient.value[0].diff;
+            }else {
+                negMin = patient.value[0].diff;
+                posMin = 6000;
+            }
+            if(zeroValue)  {
+               // console.log('found one');
+                posMin = 0;
+                negMin = 0;
+                absMin = 0;
+            }
 
             patient.value.forEach(value => {
-
-                if(value.diff < 0) {  
-                    if(negMin != null) {
-                        if(Math.abs(value.diff) < Math.abs(negMin)) {
-                            negMin = value.diff;
-                            console.log(negMin);
+                if(absMin != 0) {
+                //if(value.diff != Math.abs(0)){
+                    if(value.diff < 0) {
+                        if(negMin != null) {
+                            if(Math.abs(value.diff) < Math.abs(negMin)) {
+                              //  console.log(negMin + " and "+ value.diff);
+                                negMin = value.diff;
+                            }};
+                        }
+                    if(value.diff > 0) {
+                        if(posMin != null) {
+                        if(value.diff < posMin) {
+                        posMin = value.diff;
                         }};
-                    }
-                if(posMin != null) {
-                if(value.diff > 0) {
-                    if(value.diff < Math.abs(posMin)) {
-                    posMin = value.diff;
-                   // console.log(posMin);
-                    }};
-                }
-                if(Math.abs(value.diff) < Math.abs(absMin)) {
-                    absMin = value.diff;
-                        };
-               // if(this.eventDayBool == true){}
-                if(value.diff == absMin) baseline = +value.SCORE; 
-                if(value.diff == negMin) baseStart = +value.SCORE;
-                if(value.diff == posMin) baseEnd = +value.SCORE;
+                    }}
+
+                if(absMin != 0) {
+                    console.log('absMin not zero')
+                    if(Math.abs(value.diff) < Math.abs(absMin)) {
+                        absMin = +value.diff;
+                            };
+                }else {
+                    console.log('absMin zero ' + absMin);}
+
+                if(value.diff == absMin) {baseline = value.SCORE; };
+                if(value.diff == negMin) {baseStart = value.SCORE; };
+                if(value.diff == posMin) {baseEnd = value.SCORE; };
 
             });
 
-         patient.value.forEach(value => {
+         patient.value.forEach((value) => {
              if(posMin == null || negMin == null) {
                  patient.window = null;
+                 //value.SCORE = +value.SCORE - baseline;
+                 value.ogScore = value.SCORE;
+                 value.relScore = value.SCORE - baseline;
+   
              }else {
                 value.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
                 patient.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
+                value.ogScore = value.SCORE;
+                value.relScore = value.SCORE - baseline;
              }
 
-            value.ogScore = value.SCORE;
-            value.relScore = +value.SCORE - baseline;
-            if(patient.window == null) {value.SCORE = +value.SCORE - baseline;}
-           // value.SCORE = +value.SCORE - baseline;
          });
 
+         if(patient.window != null){ console.log(patient); }
+
         });
+        //console.log(this.cohortProInfo);
 
     }
     private interpolate() {
@@ -374,55 +381,63 @@ export class similarityScoreDiagram {
 
         cohort.forEach(pat => {
             if(pat.window != null && pat.window != undefined) {
-                //console.log(pat.window.neg[0]);
-                let x1 = pat.window.neg[0];
-                let x2 = pat.window.pos[0];
-                let y1 = pat.window.neg[1];
-                let y2 = pat.window.pos[1];
-                let X;
-                let Y;
+                let b;
+                console.log(pat.window.neg[0]);
+               if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
+                   console.log('zero value yo');
+                   //let b;
+                   if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
+                   if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
+               }else{
+                    let x1 = pat.window.neg[0];
+                    let x2 = pat.window.pos[0];
+                    let y1 = pat.window.neg[1];
+                    let y2 = pat.window.pos[1];
+                    let X;
+                    let Y;
 
-                if (x1 < x2){X = x1; Y = y1}
-                else {X = x2; Y = y2};
+                    if (x1 < x2){X = x1; Y = y1}
+                    else {X = x2; Y = y2};
 
-                let slope = (y2 - y1) / (x2 - x1);
-                let b = Y - (slope * X);
-                pat.b = b;
-
+                    let slope = (y2 - y1) / (x2 - x1);
+                    b = Y - (slope * X);
+                    pat.slope = slope;
+                    pat.b = +b;
+               }
+             
+               // console.log(pat);
                 pat.value.forEach((value) => {
-                    value.relScore = +value.ogScore - b;
+                    value.b = b;
+                   // value.slope = slope;
+                    value.relScore = value.ogScore - b;
                 });
-                //console.log(pat.window);
+                
             }else{ console.log('no window');}
            
         });
         this.cohortProInfo = cohort;
-        //console.log(this.cohortProInfo);
+
         this.changeScale(cohort);
     }
 
     private changeScale(cohort) {
-        console.log(this.cohortProInfo);
        // this.scaleRelative = true;
-        if(this.scaleRelative){
-            //console.log('true');
-            this.scoreScale.domain([30, -30]);
+        if(this.scaleRelative)  {
+            this.scoreScale.domain([50, -50]);
             this.cohortProInfo.forEach(patient => {
                 patient.value.forEach(value => {
-                    value.SCORE = value.relScore;
+                    value.SCORE = +value.relScore;
                 });
             });
             };
-        if(!this.scaleRelative){
-           // console.log('false');
+        if(!this.scaleRelative) {
             this.scoreScale.domain([80, 10]);
             this.cohortProInfo.forEach(patient => {
                 patient.value.forEach(value => {
-                    value.SCORE = value.ogScore;
+                    value.SCORE = +value.ogScore;
                 });
             });
         };
-        console.log(this.cohortProInfo);
         this.clearDiagram();
         this.drawPromisChart();
 
@@ -470,9 +485,10 @@ export class similarityScoreDiagram {
     
             // -------  define line function
             const lineFunc = line()
-                .curve(curveMonotoneX)
-                .x((d) => { return this.timeScale(+d['diff']); })
-                .y((d) => { return this.scoreScale(+d['SCORE']); });
+                //.curve(curveMonotoneX)
+                .curve(curveLinear)
+                .x((d) => { return this.timeScale(d['diff']); })
+                .y((d) => { return this.scoreScale(d['SCORE']); });
     
             // ------- draw
             const medScoreGroup = this.svg.select('#similar_score');
@@ -490,17 +506,16 @@ export class similarityScoreDiagram {
                         .attr('class', 'proLine') 
                         .attr('stroke-width', that.lineScale(lineCount))
                         .attr('stroke-opacity', that.lineScale(lineCount))
-                        .attr('d', () => lineFunc(d));
+                        .attr('d', lineFunc);
                 })
                 .on('click', (d) => {
 
-                    console.log(d[0].window.neg);
                     let neg = d[0].window.neg[0];
                     let pos = d[0].window.pos[0];
                     events.fire('line_clicked', d);
                     this.addPromisDots(d);
                    // this.InterpolationMachine(neg, 0, d);
-                    //console.log(d.parent);
+
                 });
 
                let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
@@ -521,21 +536,19 @@ export class similarityScoreDiagram {
         promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> {
             let score; 
-            //if(d.ogScore != undefined){score = d.ogScore}
-           // else{score = d.SCORE};
             score = d.SCORE;
-           // console.log(score);
             return this.scoreScale(score);
         }).attr('r', 5).attr('fill', '#21618C');
+
+        promisRects.append('circle').attr('cx', ()=> this.timeScale(0))
+        .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
     }
 
     private InterpolationMachine(a, b, d) {
-        console.log(d);
 
         let lines = selectAll('.proLine').nodes();
         let yArray = [];
-        lines.forEach(element => {
-           // console.log(element);
+        lines.forEach((element) => {
            let y = this.findY(a, b, element);
            yArray.push(y);
         });
@@ -553,7 +566,7 @@ private findY(a, b, linePath) {
          let beginning = this.timeScale(a);
          let target = Math.floor((beginning + end) / 2);
          let pos = linePath.getPointAtLength(target);
-        // console.log('length :' + end);
+      
 
          return pos.y;
 

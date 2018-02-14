@@ -97,8 +97,10 @@ constructor(parent: Element) {
          this.filteredCPT = item;
     });
     events.on('selected_cpt_change', (evt, item) => {
+        console.log(item);
         this.timeScale.domain([0, this.maxDay]);
         this.filteredCPT = item;
+        this.drawOrders(item);
     });
 
     events.on('filter_cohort_by_event', (evt, item)=> {
