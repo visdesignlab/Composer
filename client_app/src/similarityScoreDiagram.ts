@@ -382,9 +382,9 @@ export class similarityScoreDiagram {
         cohort.forEach(pat => {
             if(pat.window != null && pat.window != undefined) {
                 let b;
-                console.log(pat.window.neg[0]);
+                //console.log(pat.window.neg[0]);
                if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
-                   console.log('zero value yo');
+                   //console.log('zero value yo');
                    //let b;
                    if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
                    if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
@@ -412,7 +412,7 @@ export class similarityScoreDiagram {
                     value.relScore = value.ogScore - b;
                 });
                 
-            }else{ console.log('no window');}
+            }//else{ console.log('no window');}
            
         });
         this.cohortProInfo = cohort;
