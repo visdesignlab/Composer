@@ -34,6 +34,7 @@ export class SideBar {
       ];
       
   constructor(parent: Element) {
+    
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
     this.$node.append('div').attr('id', 'filterDiv');
@@ -67,14 +68,16 @@ export class SideBar {
     let parents = [];
     let that = this;
 
-    let form = this.$node.select('#filterDiv').append('form').append('div').attr('padding-top', 250);
-    
-    let labels = form.selectAll('div')
+    let form = this.$node.select('#filterDiv').append('form');
+
+    let filterButton = form.insert('input').attr('type', 'button').attr('value', 'Create Cohort');
+
+    let labels = form.append('div').classed('labelWrapper', true).selectAll('.labelDiv')
         .data(this.header);
 
     let labelsEnter = labels
         .enter()
-        .append("div");
+        .append('div').classed('labelDiv', true);
 
     labels.exit().remove();
 
@@ -87,10 +90,12 @@ export class SideBar {
         popRects.append('rect').attr('width', 0).attr('height', 16).attr('fill', '#AEB6BF');
         popRects.append('text').attr('fill', '#AEB6BF');
 
+        popRects.classed('hidden', true);
+
         let headerLabel = ul.append('label')
         .text(function(d) {return d.key;}).attr('value', (d=>d.key));
 
-        let listlabel = ul.selectAll('li').data((d) => d.value)
+        let listlabel = ul.selectAll('li').data((d) => d.value);
         
         let listlabelEnter = listlabel.enter().append('li');
 
@@ -103,19 +108,22 @@ export class SideBar {
         ul.selectAll('li').classed('hidden', true);
 
       headerLabel.on('click', function(d){
-        
+       
+         let svgLabel = (this.parentNode.parentNode).querySelector('svg');
          let children = (this.parentNode).querySelectorAll('li');
          children.forEach(element => {
-           if(element.classList.contains('hidden')){
+           if(element.classList.contains('hidden')) {
             element.classList.remove('hidden');
+            svgLabel.classList.remove('hidden');
            }else{
             element.classList.add('hidden');
+            svgLabel.classList.add('hidden');
            }
            
          });
         });
 
-        listlabel.insert("input").attr('type', 'checkbox').attr('value', (d=>d));
+        listlabel.insert('input').attr('type', 'checkbox').attr('value', (d=>d));
 
         let liHover = ul.selectAll('li');
         
@@ -144,15 +152,13 @@ export class SideBar {
           let filterGroup = lines.filter(d => d[parentValue] == choice);
 
           filterGroup.classed(parentValue, true);
-
-
         });
 
         let filterList = [];
         that.filters = [];
 
-        let filterButton = form.insert('input').attr('type', 'button').attr('value', 'filter')
-                          .on('click', function(d){
+      
+       filterButton.on('click', function(d){
 
     
                           let parentFilter = form.selectAll('ul.parent');
