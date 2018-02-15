@@ -514,7 +514,6 @@ export class similarityScoreDiagram {
                     let pos = d[0].window.pos[0];
                     events.fire('line_clicked', d);
                     this.addPromisDots(d);
-                   // this.InterpolationMachine(neg, 0, d);
 
                 });
 
@@ -526,7 +525,7 @@ export class similarityScoreDiagram {
                     .attr('y1', 0).attr('y2', 400).attr('stroke-width', .5).attr('stroke', 'red');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
         }
-    
+
     private addPromisDots (d){
 
         let promisData = d;
@@ -543,34 +542,6 @@ export class similarityScoreDiagram {
         promisRects.append('circle').attr('cx', ()=> this.timeScale(0))
         .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
     }
-
-    private InterpolationMachine(a, b, d) {
-
-        let lines = selectAll('.proLine').nodes();
-        let yArray = [];
-        lines.forEach((element) => {
-           let y = this.findY(a, b, element);
-           yArray.push(y);
-        });
-        let promisRects = this.svg.select('#similar_score').selectAll('g').append('g')
-   
-        .selectAll('circle').data(yArray);
-        promisRects.enter().append('circle').attr('cx', ()=> this.timeScale(0))
-        .attr('cy', (d, i)=> yArray[i]).attr('r', 5).attr('fill', 'red');
-    }
-
-            // Get the coordinates
-private findY(a, b, linePath) {
-         let end = this.timeScale(b);
-        // let point = linePath.getPointAtLength(x);
-         let beginning = this.timeScale(a);
-         let target = Math.floor((beginning + end) / 2);
-         let pos = linePath.getPointAtLength(target);
-      
-
-         return pos.y;
-
-}
 
         /**
      * Utility method
