@@ -316,7 +316,7 @@ export class similarityScoreDiagram {
                 posMin = 6000;
             }
             if(zeroValue)  {
-               // console.log('found one');
+               
                 posMin = 0;
                 negMin = 0;
                 absMin = 0;
@@ -328,7 +328,7 @@ export class similarityScoreDiagram {
                     if(value.diff < 0) {
                         if(negMin != null) {
                             if(Math.abs(value.diff) < Math.abs(negMin)) {
-                              //  console.log(negMin + " and "+ value.diff);
+
                                 negMin = value.diff;
                             }};
                         }
@@ -340,7 +340,6 @@ export class similarityScoreDiagram {
                     }}
 
                 if(absMin != 0) {
-                    console.log('absMin not zero')
                     if(Math.abs(value.diff) < Math.abs(absMin)) {
                         absMin = +value.diff;
                             };
@@ -404,16 +403,16 @@ export class similarityScoreDiagram {
                     pat.slope = slope;
                     pat.b = +b;
                }
-             
+
                // console.log(pat);
                 pat.value.forEach((value) => {
                     value.b = b;
                    // value.slope = slope;
                     value.relScore = value.ogScore - b;
                 });
-                
+
             }//else{ console.log('no window');}
-           
+
         });
         this.cohortProInfo = cohort;
 
@@ -449,16 +448,16 @@ export class similarityScoreDiagram {
     private drawPromisChart() {
 
             if(this.scaleRelative){
-                
+
                 const medScoreGroup = this.svg.select('#similar_score');
                 let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
                 .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
-        
+
                 zeroLine.append('line')
                         .attr('x1', 0).attr('x2', 675)
                         .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
                         .attr('stroke', 'red');
-        
+
                // zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
             }
 
