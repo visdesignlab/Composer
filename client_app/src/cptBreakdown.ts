@@ -213,7 +213,6 @@ constructor(parent: Element) {
 
         //THIS IS WHERE THE RECT CLASSESARE TARGETED//
         let selectedRects = rects.nodes();
-       
 
         let selected =  <any>( <any>selectedRects );
         let parentElem;
