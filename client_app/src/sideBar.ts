@@ -16,6 +16,7 @@ import * as demoGraph from './demoGraphs';
 import {axisBottom} from 'd3-axis';
 import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
 import { all } from 'phovea_core/src/range';
+import {brushX} from 'd3-brush';
 
 export class SideBar {
 
@@ -27,6 +28,7 @@ export class SideBar {
   private yScale;
   private svgWidth;
   private svgHeight;
+  private barBrush;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -71,7 +73,7 @@ export class SideBar {
          let selected = select('#' +parentValue);
          selected.select('text').text(popCount)
          .attr('transform', 'translate('+ this.popRectScale(popCount) +', 10)');
-         selected.select('rect').transition() 
+         selected.select('rect').transition()
          .attr('width', this.popRectScale(popCount));
     
        });
@@ -219,7 +221,6 @@ export class SideBar {
                           form.selectAll('li').classed('hidden', true);
                           });
 
-        
           }
 
   private histogrammer(data, type, ticks){
@@ -230,10 +231,10 @@ export class SideBar {
 
     let maxValue = max(mapped);
 
-   console.log(maxValue);
+   //console.log(maxValue);
 
  // if (type == 'BMI') mapped = mapped.filter(d => d > 0);
-   let x = this.xScale.domain([0, maxValue]).nice();
+    let x = this.xScale.domain([0, maxValue]).nice();
 
     let bins = histogram()
     .domain(x.domain())
@@ -241,10 +242,11 @@ export class SideBar {
     (mapped);
 
     //return bins;
+    //console.log(data);
 
     let histogramData = bins.map(function (d) {
       totalPatients -= d.length;
-      return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length};
+      return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, name: type};
     });
 
     return histogramData;
@@ -266,12 +268,12 @@ export class SideBar {
     (mappedBMI);
 
     let AGEbins = histogram()
-    .domain([0,100])
+    .domain([10,100])
     .thresholds(10)
     (mappedAGE);
 
     let CCIbins = histogram()
-    .domain([0,100])
+    .domain([0,23])
     .thresholds(10)
     (mappedCCI);
 
@@ -279,12 +281,14 @@ export class SideBar {
     let binCCI = this.histogrammer(data, 'CCI', 22);
     let binAGE = this.histogrammer(data, 'AGE', 9);
 
+   // 'scale': this.xScale.domain([0, binBMI[0].binCount])
+
    this.distributionHeader = [
-    {'key': 'BMI', 'label': 'BMI', 'value': binBMI},
-    {'key': 'CCI', 'label': 'CCI', 'value': binCCI},
-    {'key': 'AGE', 'label': 'Age', 'value': binAGE},
+    {'key': 'BMI', 'label': 'BMI', 'value': binBMI, 'scale': this.xScale.domain([0, binBMI[0].binCount])},
+    {'key': 'CCI', 'label': 'CCI', 'value': binCCI, 'scale': this.xScale.domain([0, binCCI[0].binCount])},
+    {'key': 'AGE', 'label': 'Age', 'value': binAGE, 'scale': this.xScale.domain([0, binAGE[0].binCount])}
     ];
-    console.log(this.distributionHeader);
+   // console.log(this.distributionHeader);
     this.drawDistributionBands(this.distributionHeader);
     this.drawHistogram(binBMI, 'BMI');
     this.drawHistogram(binCCI, 'CCI');
@@ -298,13 +302,15 @@ export class SideBar {
         return d['frequency'] + .1;
     })]);
 
+   // console.log(histobins);
+
     //////////////bar groups for all data////////////////////////////////
     let barGroupsALL = this.$node.select('.distributionWrapper').select('.' +type).selectAll('.barALL')
     .data(histobins);
 
     barGroupsALL.exit().remove();
 
-let barEnterALL = barGroupsALL.enter().append("g")
+    let barEnterALL = barGroupsALL.enter().append("g")
     .attr("class", "barALL");
 
     barGroupsALL = barEnterALL.merge(barGroupsALL);
@@ -332,10 +338,21 @@ let barEnterALL = barGroupsALL.enter().append("g")
 
   private drawDistributionBands(data) {
 
+   // console.log(data);
+
+    let barBrush = brushX()
+    .extent([[0, 0], [this.svgWidth, 30]])
+    .handleSize(0);
+   
+  let x = function(d) {return d.scale};
+
+
   let distScale = scaleLinear().domain([0, 1000]);
 
-   let x = this.xScale.domain([0, 80]).nice();
-   let xAxis = axisBottom(x).ticks(10);
+  let bmiScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
+  let CCIScale = scaleLinear().domain([0, 23]).range([0, this.svgWidth]);
+  let AGEScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
+
    let distLabel = this.$node.select('.distributionWrapper');
    let distDiagrams = distLabel.selectAll('.distLabel').data(data);
    let distLabelEnter = distDiagrams.enter().append('div').classed('distLabel', true);
@@ -348,13 +365,68 @@ let barEnterALL = barGroupsALL.enter().append("g")
 
    let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true).classed('hidden', true);
    let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', this.svgWidth);//.classed('hidden', true)
-
+ 
   let rects = distFilter_svg.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 20)
   .attr('opacity', (d)=> distScale(d['length']))
   .attr('x', (d, i)=> i * this.svgWidth/d.binCount);
   //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);
 
-   distSvg.append('text').text('test');
+  let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
+
+  let bmiBrush = brushX()
+  .extent([[0, 0], [this.svgWidth, 30]])
+  .handleSize(0)
+  .on("end", () => {
+    if (event.selection === null) {
+      //this.setOrderScale();
+    
+    } else {
+      let start = bmiScale.invert(event.selection[0]);
+      let end = bmiScale.invert(event.selection[1]);
+      console.log(Math.floor((start+1)/10)*10, start);
+      console.log(Math.ceil((end+1)/10)*10, end);
+      let Dom1 = Math.floor((start+1)/10)*10;
+      let Dom2 = Math.ceil((end+1)/10)*10;
+    }
+  });
+
+  let cciBrush =  brushX()
+  .extent([[0, 0], [this.svgWidth, 30]])
+  .handleSize(0)
+  .on("end", () => {
+    if (event.selection === null) {
+      //this.setOrderScale();
+    
+    } else {
+      let start = CCIScale.invert(event.selection[0]);
+      let end = CCIScale.invert(event.selection[1]);
+      console.log(Math.floor((start+1)/10)*10, start);
+      console.log(Math.ceil((end+1)/10)*10, end);
+      let Dom1 = Math.floor((start+1)/10)*10;
+      let Dom2 = Math.ceil((end+1)/10)*10;
+    }
+  });
+
+  let ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
+                  .on("end", () => {
+                    if (event.selection === null) {
+                      //this.setOrderScale();
+                    
+                    } else {
+                      let start = AGEScale.invert(event.selection[0]);
+                      let end = AGEScale.invert(event.selection[1]);
+                      console.log(Math.floor((start+1)/10)*10, start);
+                      console.log(Math.ceil((end+1)/10)*10, end);
+                      let Dom1 = Math.floor((start+1)/10)*10;
+                      let Dom2 = Math.ceil((end+1)/10)*10;
+                    }
+                  });
+                  
+  this.$node.select('#BMI-Brush').call(bmiBrush);
+
+  this.$node.select('#CCI-Brush').call(cciBrush);
+               
+  this.$node.select('#AGE-Brush').call(ageBrush);
 
    label.on('click', function(d){
 
@@ -366,7 +438,10 @@ let barEnterALL = barGroupsALL.enter().append("g")
     }
 
    });
+
+
   }
+
  }
 
 export function create(parent:Element) {

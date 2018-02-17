@@ -60,7 +60,7 @@ export class populationStat {
         patientCountText.append('text').classed('fillTotal', true);
 
         let selectPop = this.$node.append('div').classed('select_count', true)
-        .style('height', '25px').style('margin-top', '5px')
+        .style('height', '25px').style('margin-top', '5px');
         selectPop.append('text').text('Number of Select Patients:   ');
         selectPop.append('text').classed('fillSelect', true);
 
@@ -162,7 +162,7 @@ export class populationStat {
 
 
         slider.call(this.brush)
-         .call(this.brush.move, [20,this.timeScale(365)]);
+         .call(this.brush.move, [this.timeScale(-30), this.timeScale(180)]);
       
 
      // -----
