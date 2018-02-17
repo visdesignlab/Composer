@@ -475,20 +475,20 @@ export class similarityScoreDiagram {
             // -----  set domains and axis
             // time scale
             this.timeScale.domain([this.minDay, this.maxDay]);
-    
+
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
-                
+
             this.svg.select('.yAxis')
                 .call(axisLeft(this.scoreScale));
-    
             // -------  define line function
             const lineFunc = line()
                 //.curve(curveMonotoneX)
                 .curve(curveLinear)
-                .x((d) => { return this.timeScale(d['diff']); })
-                .y((d) => { return this.scoreScale(d['SCORE']); });
-    
+                .x((d) => { return this.timeScale(+d['diff']); })
+                .y((d) => { return this.scoreScale(+d['SCORE']); });
+
+           // console.log(similarData);
             // ------- draw
             const medScoreGroup = this.svg.select('#similar_score');
             let that = this;
@@ -560,7 +560,6 @@ export class similarityScoreDiagram {
             if (!d.length) return false;
             return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
         }).style('opacity', 1);
-
 
         let med = this.svg.select('#similar_score')
             .selectAll('path')

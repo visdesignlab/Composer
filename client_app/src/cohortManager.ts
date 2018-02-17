@@ -55,12 +55,12 @@ export class CohortManager {
         });
 
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
-            
+
             this.cohortkeeperarray[this.cohortIndex] = item;
             this.selectedCohort = item;
             events.fire('selected_cohort_change', this.selectedCohort);
             console.log(this.cohortkeeperarray);
-            
+
         });
 
         events.on('got_promis_scores', (evt, item)=> {
