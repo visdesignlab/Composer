@@ -29,6 +29,9 @@ export class SideBar {
   private svgWidth;
   private svgHeight;
   private barBrush;
+  private bmiRange;
+  private cciRange;
+  private ageRange;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -39,8 +42,6 @@ export class SideBar {
         {'key': 'ALCOHOL','label': 'Alcohol Use', 'value': ['Yes', 'No', 'Not Asked', 'NaN' ]},
         {'key': 'DRUG_USER','label': 'Drug Use', 'value': ['Yes', 'No', 'Not Asked', 'NaN' ]},
         {'key': 'DM_CODE', 'label': 'Diabetic', 'value': [250.0, 0 ]},
-      //  {'key': 'BMI', 'label': 'BMI', 'value': null},
-      //  {'key': 'CCI', 'label': 'BMI', 'value': null},
 
       ];
 
@@ -75,20 +76,24 @@ export class SideBar {
          .attr('transform', 'translate('+ this.popRectScale(popCount) +', 10)');
          selected.select('rect').transition()
          .attr('width', this.popRectScale(popCount));
-    
+
        });
 
        events.on('population demo loaded', (evt, item)=> {
-            
+
         this.populationDemo = item;
         this.distribute(item);
-     
+
        });
       }
 
   async init() {
 
     this.filters = [];
+    this.bmiRange = null;
+    this.cciRange = null;
+    this.ageRange = null;
+    
     let parents = [];
     let that = this;
 
@@ -173,7 +178,10 @@ export class SideBar {
           let choice = d;
 
           let parentValue = this.parentNode.attributes[0].value;
-          let parental = this.parentNode.classList.add('parent');
+          let parental = this.parentNode;
+          if(parental.classList.contains('parent')) {
+            parental.classList.remove('parent');
+           }else{ parental.classList.add('parent'); }
 
           parents.push(parental);
 
@@ -214,6 +222,14 @@ export class SideBar {
                           filterList.push(filter);
                           });
 
+                          if(this.bmiRange != null){
+                            let filter = {
+                              attributeName: 'BMI',
+                              checkedOptions: this.bmiRange,
+                             };
+                            console.log(filter);
+                            filterList.push(filter);
+                          }
                           events.fire('demo_filter_button_pushed', filterList);
                           that.filters = [];
                           filterList = [];
@@ -343,50 +359,51 @@ export class SideBar {
     let barBrush = brushX()
     .extent([[0, 0], [this.svgWidth, 30]])
     .handleSize(0);
-   
-  let x = function(d) {return d.scale};
+
+    let x = function(d) {return d.scale};
 
 
-  let distScale = scaleLinear().domain([0, 1000]);
+    let distScale = scaleLinear().domain([0, 1000]);
 
-  let bmiScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
-  let CCIScale = scaleLinear().domain([0, 23]).range([0, this.svgWidth]);
-  let AGEScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
+    let bmiScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
+    let CCIScale = scaleLinear().domain([0, 23]).range([0, this.svgWidth]);
+    let AGEScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
 
-   let distLabel = this.$node.select('.distributionWrapper');
-   let distDiagrams = distLabel.selectAll('.distLabel').data(data);
-   let distLabelEnter = distDiagrams.enter().append('div').classed('distLabel', true);
-   distDiagrams.exit().remove();
-   distDiagrams = distLabelEnter.merge(distDiagrams);
-   this.$node.selectAll('.distLabel').attr('height', '30');
-   let ul = distDiagrams.append('ul');
-   let label = ul.append('label').attr('value', (d=>d.key)).text(function(d) {return d.label;});
-   let distFilter = distDiagrams.append('g').classed('distFilter', true).attr('width', this.svgWidth);
+    let distLabel = this.$node.select('.distributionWrapper');
+    let distDiagrams = distLabel.selectAll('.distLabel').data(data);
+    let distLabelEnter = distDiagrams.enter().append('div').classed('distLabel', true);
+    distDiagrams.exit().remove();
+    distDiagrams = distLabelEnter.merge(distDiagrams);
+    this.$node.selectAll('.distLabel').attr('height', '30');
+    let ul = distDiagrams.append('ul');
+    let label = ul.append('label').attr('value', (d=>d.key)).text(function(d) {return d.label;});
+    let distFilter = distDiagrams.append('g').classed('distFilter', true).attr('width', this.svgWidth);
 
-   let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true).classed('hidden', true);
-   let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', this.svgWidth);//.classed('hidden', true)
- 
-  let rects = distFilter_svg.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 20)
-  .attr('opacity', (d)=> distScale(d['length']))
-  .attr('x', (d, i)=> i * this.svgWidth/d.binCount);
-  //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);
+    let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true).classed('hidden', true);
+    let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', this.svgWidth);//.classed('hidden', true)
+  
+    let rects = distFilter_svg.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 20)
+    .attr('opacity', (d)=> distScale(d['length']))
+    .attr('x', (d, i)=> i * this.svgWidth/d.binCount);
+    //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);
 
-  let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
-
-  let bmiBrush = brushX()
-  .extent([[0, 0], [this.svgWidth, 30]])
-  .handleSize(0)
-  .on("end", () => {
-    if (event.selection === null) {
-      //this.setOrderScale();
-    
-    } else {
+    let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
+    let that = this;
+    let bmiBrush = brushX()
+    .extent([[0, 0], [this.svgWidth, 30]])
+    .handleSize(0)
+    .on("end", () => {
+      if (event.selection === null) {
+        //this.setOrderScale();
+    }else {
       let start = bmiScale.invert(event.selection[0]);
       let end = bmiScale.invert(event.selection[1]);
       console.log(Math.floor((start+1)/10)*10, start);
       console.log(Math.ceil((end+1)/10)*10, end);
       let Dom1 = Math.floor((start+1)/10)*10;
       let Dom2 = Math.ceil((end+1)/10)*10;
+      let parent = 'BMI';
+      let children = [Dom1, Dom2];
     }
   });
 
