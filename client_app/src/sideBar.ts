@@ -32,6 +32,9 @@ export class SideBar {
   private bmiRange;
   private cciRange;
   private ageRange;
+  private bmiBrush;
+  private cciBrush;
+  private ageBrush;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -181,7 +184,7 @@ export class SideBar {
           let parental = this.parentNode;
           if(parental.classList.contains('parent')) {
             parental.classList.remove('parent');
-           }else{ parental.classList.add('parent'); }
+           }else { parental.classList.add('parent'); }
 
           parents.push(parental);
 
@@ -199,7 +202,7 @@ export class SideBar {
       
        filterButton.on('click', function(d){
 
-    
+                          console.log(that.bmiRange);
                           let parentFilter = form.selectAll('ul.parent');
 
                           parentFilter.each(function (element) {
@@ -222,17 +225,45 @@ export class SideBar {
                           filterList.push(filter);
                           });
 
-                          if(this.bmiRange != null){
+                          if(that.bmiRange != null){
                             let filter = {
                               attributeName: 'BMI',
-                              checkedOptions: this.bmiRange,
+                              checkedOptions: that.bmiRange,
                              };
-                            console.log(filter);
+                            filterList.push(filter);
+                          }
+                          if(that.cciRange != null){
+                            let filter = {
+                              attributeName: 'CCI',
+                              checkedOptions: that.cciRange,
+                             };
+                            filterList.push(filter);
+                          }
+                          if(that.ageRange != null){
+                            let filter = {
+                              attributeName: 'AGE',
+                              checkedOptions: that.ageRange,
+                             };
                             filterList.push(filter);
                           }
                           events.fire('demo_filter_button_pushed', filterList);
                           that.filters = [];
                           filterList = [];
+                          that.bmiRange = null;
+                       
+                          that.cciRange = null;
+                       
+                          that.ageRange = null;
+
+                          that.$node.select('#BMI-Brush').call(that.bmiBrush)
+                          .call(that.bmiBrush.move, null);
+                          that.$node.select('#CCI-Brush').call(that.cciBrush)
+                          .call(that.cciBrush.move, null);
+                          that.$node.select('#AGE-Brush').call(that.ageBrush)
+                          .call(that.ageBrush.move, null);
+                        
+                      
+
                           parentFilter.classed('parent', false);
                           form.selectAll('li').classed('hidden', true);
                           });
@@ -354,13 +385,11 @@ export class SideBar {
 
   private drawDistributionBands(data) {
 
-   // console.log(data);
-
     let barBrush = brushX()
     .extent([[0, 0], [this.svgWidth, 30]])
     .handleSize(0);
 
-    let x = function(d) {return d.scale};
+   // let x = function(d) {return d.scale};
 
 
     let distScale = scaleLinear().domain([0, 1000]);
@@ -389,7 +418,8 @@ export class SideBar {
 
     let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
     let that = this;
-    let bmiBrush = brushX()
+
+    this.bmiBrush = brushX()
     .extent([[0, 0], [this.svgWidth, 30]])
     .handleSize(0)
     .on("end", () => {
@@ -398,16 +428,15 @@ export class SideBar {
     }else {
       let start = bmiScale.invert(event.selection[0]);
       let end = bmiScale.invert(event.selection[1]);
-      console.log(Math.floor((start+1)/10)*10, start);
-      console.log(Math.ceil((end+1)/10)*10, end);
       let Dom1 = Math.floor((start+1)/10)*10;
       let Dom2 = Math.ceil((end+1)/10)*10;
-      let parent = 'BMI';
-      let children = [Dom1, Dom2];
+
+      this.bmiRange = [Dom1, Dom2];
+     
     }
   });
 
-  let cciBrush =  brushX()
+  this.cciBrush =  brushX()
   .extent([[0, 0], [this.svgWidth, 30]])
   .handleSize(0)
   .on("end", () => {
@@ -421,10 +450,11 @@ export class SideBar {
       console.log(Math.ceil((end+1)/10)*10, end);
       let Dom1 = Math.floor((start+1)/10)*10;
       let Dom2 = Math.ceil((end+1)/10)*10;
+      this.cciRange = [Dom1, Dom2];
     }
   });
 
-  let ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
+  this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
                   .on("end", () => {
                     if (event.selection === null) {
                       //this.setOrderScale();
@@ -436,14 +466,15 @@ export class SideBar {
                       console.log(Math.ceil((end+1)/10)*10, end);
                       let Dom1 = Math.floor((start+1)/10)*10;
                       let Dom2 = Math.ceil((end+1)/10)*10;
+                      this.ageRange = [Dom1, Dom2];
                     }
                   });
                   
-  this.$node.select('#BMI-Brush').call(bmiBrush);
+  this.$node.select('#BMI-Brush').call(this.bmiBrush);
 
-  this.$node.select('#CCI-Brush').call(cciBrush);
+  this.$node.select('#CCI-Brush').call(this.cciBrush);
                
-  this.$node.select('#AGE-Brush').call(ageBrush);
+  this.$node.select('#AGE-Brush').call(this.ageBrush);
 
    label.on('click', function(d){
 

@@ -187,27 +187,34 @@ export class DataManager {
 
           let filter = demoObjects;
           sidebarFilter.forEach( (d)=> {
-           
+           console.log(d);
            let parent = d.attributeName;
            let choice = d.checkedOptions;
-       
-          if (parent == 'DM_CODE'){
-         
-           filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
-          }else{
-           if (choice.length === 1){
-             filter = filter.filter(d => d[parent] == choice);
-          }else if(choice.length === 2){
-             filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
-             console.log(filter);
-          }else if(choice.length === 2){
-            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
+           if(parent != 'BMI' || parent != 'CCI' || parent != 'AGE')   {
+
+                if (parent == 'DM_CODE') {
+                        filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
+                }else{ 
+                        if (choice.length === 1){
+                            filter = filter.filter(d => d[parent] == choice);
+                        }else if(choice.length === 2){
+                            filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
+                            console.log(filter);
+                        }else if(choice.length === 2){
+                            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
+                            console.log(filter);
+                        }else if(choice.length === 3){
+                            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
+                            console.log(filter);
+                        }
+                }
+           }else{
+               //console.log(parent);
+              // console.log(choice);
+               filter = filter.filter(d => d[parent] > choice[0] && d[parent] < choice[1]);
             console.log(filter);
-         }else if(choice.length === 3){
-            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
-            console.log(filter);
-          }
-        }
+           }
+  
          });
             filter.forEach((element) => {
                 this.cohortIdArray.push(element.ID);

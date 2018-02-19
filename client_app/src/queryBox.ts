@@ -81,6 +81,7 @@ export class QueryBox {
         });
 
         events.on('cohort_added', (evt, item)=> {
+            console.log(item);
             this.cohortKeeper.selectAll('div').remove();
             let counter = -1;
             let nodeArray = [];
@@ -88,7 +89,9 @@ export class QueryBox {
                
                 let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
                 let cohortlabel = cohortBox.append('div').append('text').text('Cohort  '+ (i+1) );
-                let cohortfilter = item[i].demo.forEach(element => {
+                let cohortfilter;
+                
+                cohortfilter = item[i].demo.forEach(element => {
                                                 cohortBox.append('text').text(element.attributeName + ': ')
                                                 element.checkedOptions.forEach(op => {
                                                     cohortBox.append('text').text(op + ', ');
