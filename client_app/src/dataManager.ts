@@ -183,18 +183,20 @@ export class DataManager {
 //pulled from parallel coord
     private demoFilter(sidebarFilter, demoObjects) {
 
-           this.cohortIdArray = [];
+         this.cohortIdArray = [];
 
           let filter = demoObjects;
           sidebarFilter.forEach( (d)=> {
            console.log(d);
            let parent = d.attributeName;
            let choice = d.checkedOptions;
-           if(parent != 'BMI' || parent != 'CCI' || parent != 'AGE')   {
+           if(parent != 'BMI' || 'CCI' || 'AGE') {
 
                 if (parent == 'DM_CODE') {
+                    console.log('dm code');
                         filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
                 }else{ 
+                        console.log('other');
                         if (choice.length === 1){
                             filter = filter.filter(d => d[parent] == choice);
                         }else if(choice.length === 2){
@@ -208,15 +210,15 @@ export class DataManager {
                             console.log(filter);
                         }
                 }
-           }else{
-               //console.log(parent);
-              // console.log(choice);
-               filter = filter.filter(d => d[parent] > choice[0] && d[parent] < choice[1]);
-            console.log(filter);
+           }else if(parent == 'BMI' || parent == 'CCI' || parent == 'AGE'){
+                console.log('p '+ parent);
+                filter = filter.filter(d => +d[parent] > choice[0] && +d[parent] < choice[1]);
+                console.log(filter);
            }
   
          });
             filter.forEach((element) => {
+               // console.log(element['CCI']);
                 this.cohortIdArray.push(element.ID);
             });
 
@@ -367,6 +369,8 @@ export class DataManager {
      */
     //you need the promis objects and the cpt objects
     private mapCPT(patProInfo, CPTobjects) {
+
+        console.log(CPTobjects);
 
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
