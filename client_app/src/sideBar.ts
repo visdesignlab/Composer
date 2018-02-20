@@ -305,9 +305,9 @@ export class SideBar {
 
     let mappedBMI = data.map((d: number) => +d['BMI']);
 
-    let mappedAGE = data.map((d: number) => d['AGE']);
+    let mappedAGE = data.map((d: number) => +d['AGE']);
 
-    let mappedCCI = data.map((d: number) => d['CCI']);
+    let mappedCCI = data.map((d: number) => +d['CCI']);
 
     let BMIbins = histogram()
     .domain([0,100])
@@ -441,15 +441,14 @@ export class SideBar {
   .handleSize(0)
   .on("end", () => {
     if (event.selection === null) {
-      //this.setOrderScale();
-    
+
     } else {
       let start = CCIScale.invert(event.selection[0]);
       let end = CCIScale.invert(event.selection[1]);
-      console.log(Math.floor((start+1)/10)*10, start);
-      console.log(Math.ceil((end+1)/10)*10, end);
-      let Dom1 = Math.floor((start+1)/10)*10;
-      let Dom2 = Math.ceil((end+1)/10)*10;
+      console.log(Math.floor(start), start);
+      console.log(Math.ceil(end), end);
+      let Dom1 = Math.floor(start);
+      let Dom2 = Math.ceil(end);
       this.cciRange = [Dom1, Dom2];
     }
   });
@@ -457,8 +456,7 @@ export class SideBar {
   this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
                   .on("end", () => {
                     if (event.selection === null) {
-                      //this.setOrderScale();
-                    
+
                     } else {
                       let start = AGEScale.invert(event.selection[0]);
                       let end = AGEScale.invert(event.selection[1]);
