@@ -489,21 +489,28 @@ export class similarityScoreDiagram {
                 .x((d) => { return this.timeScale(+d['diff']); })
                 .y((d) => { return this.scoreScale(+d['SCORE']); });
 
-           // console.log(similarData);
             // ------- draw
             const medScoreGroup = this.svg.select('#similar_score');
+
+           medScoreGroup.append("clipPath").attr('id', 'clip')
+           .append('rect')
+           .attr('width', 850)
+           .attr('height', this.height);
+
             let that = this;
-            medScoreGroup.selectAll('.med_group')
+            medScoreGroup.selectAll('.line_group')
                 .data(similarData)
                 .enter()
                 .append('g')
+                .classed('line_group', true)
                 .attr('transform', () => {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 })
                 .each(function (d) {
                     let currGroup = select(this)
                         .append('path')
-                        .attr('class', 'proLine') 
+                        .attr('class', 'proLine')
+                        .attr("clip-path","url(#clip)")
                         .attr('stroke-width', that.lineScale(lineCount))
                         .attr('stroke-opacity', that.lineScale(lineCount))
                         .attr('d', lineFunc);
