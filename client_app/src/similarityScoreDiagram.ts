@@ -97,12 +97,12 @@ export class similarityScoreDiagram {
 
         // scales
         this.timeScale = scaleLinear()
-            .range([0, this.promisDimension.width - this.margin.x])
-            .clamp(true);
+            .range([0, this.promisDimension.width - this.margin.x]);
+            //.clamp(true);
 
         this.scoreScale = scaleLinear()
-            .domain([80, 10])
-            .range([0, this.promisDimension.height - 3 * this.margin.y]).clamp(true);
+            .domain([80, 0])
+            .range([0, this.promisDimension.height - 3 * this.margin.y]);//.clamp(true);
 
         this.lineScale = scaleLinear()
             .domain([1, 6071])
@@ -281,8 +281,9 @@ export class similarityScoreDiagram {
     
         events.fire('timeline_max_set', max(diffArray));
         events.fire('day_dist', this.cohortProInfo);
-
-        this.drawPromisChart();
+        if(this.maxDay != undefined){
+            this.drawPromisChart();
+        }
     }
 
     private async getBaselines(pat)  {
@@ -430,7 +431,7 @@ export class similarityScoreDiagram {
             });
             };
         if(!this.scaleRelative) {
-            this.scoreScale.domain([80, 10]);
+            this.scoreScale.domain([80, 0]);
             this.cohortProInfo.forEach(patient => {
                 patient.value.forEach(value => {
                     value.SCORE = +value.ogScore;
