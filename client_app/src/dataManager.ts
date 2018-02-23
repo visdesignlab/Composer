@@ -93,12 +93,13 @@ export class DataManager {
             this.demoTable = item;
             
             this.mapDemoData().then(value => {
-                events.fire('population demo loaded', value);
+               events.fire('population demo loaded', value);
             });
-           // this.getDataObjects('demo_object', this.demoTable);
+            this.getDataObjects('demo_object', this.demoTable);
         });
 
         events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
+            //console.log(item);
             this.proTable = item;
             this.getDataObjects('pro_object', this.proTable);
         });
@@ -117,6 +118,12 @@ export class DataManager {
         events.on('ICD_codes', (evt, item)=> {
 
             this.icdTable = item;
+        });
+
+        events.on('PROMIS_TEST', (evt, item)=> {
+          //  this.proTable = item;
+           // console.log(this.proTable);
+           // this.getDataObjects('pro_object', this.proTable);
         });
 
         /* 
@@ -210,10 +217,10 @@ export class DataManager {
                             console.log(filter);
                         }
                 }
-           }else if(parent == 'BMI' || parent == 'CCI' || parent == 'AGE'){
-                console.log('p '+ parent);
+           }
+           if(parent == 'BMI' || parent == 'CCI' || parent == 'AGE') {
+                
                 filter = filter.filter(d => +d[parent] > choice[0] && +d[parent] < choice[1]);
-                console.log(filter);
            }
   
          });
@@ -222,7 +229,8 @@ export class DataManager {
                 this.cohortIdArray.push(element.ID);
             });
 
-           //this.filteredCohortDemo = filter;
+           //this is a test, manual array for filter
+        
            events.fire('cohort_filtered_demo', filter);//should I maybe use the array instead?
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
