@@ -197,16 +197,14 @@ export class SideBar {
         let filterList = [];
         that.filters = [];
 
-       // let distributions = listlabel.append('div').
 
-      
        filterButton.on('click', function(d){
 
                           console.log(that.bmiRange);
                           let parentFilter = form.selectAll('ul.parent');
 
                           parentFilter.each(function (element) {
-          
+
                                  let filter = {
                                      attributeName:(this).attributes[0].value,
                                      checkedOptions: []
@@ -246,6 +244,7 @@ export class SideBar {
                              };
                             filterList.push(filter);
                           }
+
                           events.fire('demo_filter_button_pushed', filterList);
                           that.filters = [];
                           filterList = [];
