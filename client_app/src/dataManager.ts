@@ -342,7 +342,7 @@ export class DataManager {
 
      //uses Phovea to access PRO data and draw table
    private async getCPT(cohortIdArray, cptObject) {
-
+        console.log(cptObject);
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
         if (cohortIdArray != null) {
