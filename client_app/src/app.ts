@@ -20,6 +20,7 @@ import * as populationStat from './populationStat';
 import * as inStat from './individualStats';
 import { individualStats } from './individualStats';
 import { CohortManager } from './cohortManager';
+import * as PlotKeeper from './plotKeeper';
 
 
 /**
@@ -70,9 +71,11 @@ export class App {
 
     const parallelView = main.append('div').classed('parallel_view', true);
     const populationView = main.append('div').classed('population_view', true);
+    const plots = main.append('div').classed('plot_view', true);
 
     // population distributions, initial visualization for all of the data
     populationStat.create(populationView.node());
+    PlotKeeper.create(plots.node());
 
     inStat.create(main.node());
 

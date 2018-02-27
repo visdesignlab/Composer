@@ -68,8 +68,9 @@ export class similarityScoreDiagram {
     private eventDayBool;
     private scaleRelative = false;
 
-    constructor(parent: Element, diagram) {
+    constructor(parent: Element, diagram, cohortData) {
 
+        console.log(cohortData);
         this.diagram = diagram;
         this.$node = select(parent)
             .append('div')
@@ -423,7 +424,7 @@ export class similarityScoreDiagram {
     private changeScale(cohort) {
        // this.scaleRelative = true;
         if(this.scaleRelative)  {
-            this.scoreScale.domain([50, -50]);
+            this.scoreScale.domain([30, -30]);
             this.cohortProInfo.forEach(patient => {
                 patient.value.forEach(value => {
                     value.SCORE = +value.relScore;
@@ -627,6 +628,6 @@ export class similarityScoreDiagram {
 export let targetPatientOrders;
 
 
-export function create(parent: Element, diagram) {
-    return new similarityScoreDiagram(parent, diagram);
+export function create(parent: Element, diagram, cohortData) {
+    return new similarityScoreDiagram(parent, diagram, cohortData);
 }
