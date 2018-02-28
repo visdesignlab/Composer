@@ -70,7 +70,7 @@ export class CohortManager {
 
           // item: [d, parentValue]
           events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
-            let filterReq = {demo: null, cpt: []};
+            let filterReq = {demo: null, cpt: [], length: null};
             filterReq.demo = item;
             this.addCohortFilter(filterReq);
           });
@@ -111,6 +111,8 @@ export class CohortManager {
 
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('new_cohort_added', this.selectedCohort);
+             events.fire('test', [this.cohortfilterarray, this.cohortkeeperarray]);
+
           });
 
           events.on('filter_cohort_by_event', (evt, item)=> {

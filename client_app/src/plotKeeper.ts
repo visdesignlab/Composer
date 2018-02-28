@@ -33,22 +33,36 @@ export class PlotKeeper {
     private $node;
     private cohortData;
     private plotDiv
+    private maxDay;
+    private minDay;
 
     constructor(parent: Element) {
 
         this.$node = select(parent);
 
         this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-        similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.cohortData);
+        similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.cohortData, this.maxDay, this.minDay);
         
         this.attachListener();
     }
 
     private attachListener(){
+        let that = this;
+
+        events.on('domain updated', (evt, item)=> {
+            
+            this.maxDay = item[1];
+            this.minDay = item[0];
+        });
+
+        events.on('cohort_made', ()=> {
+           // similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.cohortData, this.maxDay, this.minDay);
+        });
 
         events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
             console.log('fired');
-            this.cohortData = item;
+            that.cohortData = item;
+            //similarityScoreDiagram.create(that.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.cohortData);
             //this.clearDiagram();
            // this.getDays(null);
            //similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.cohortData);
