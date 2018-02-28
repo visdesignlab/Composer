@@ -231,7 +231,7 @@ export class DataManager {
 
            //this is a test, manual array for filter
         
-           events.fire('cohort_filtered_demo', filter);//should I maybe use the array instead?
+           events.fire('cohort_filtered_demo', [filter.length, sidebarFilter]);//should I maybe use the array instead?
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
 

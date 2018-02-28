@@ -17,6 +17,7 @@ import * as dataManager from './dataManager';
 import * as cohortManager from './cohortManager';
 import * as cptBreak from './cptBreakdown';
 import * as populationStat from './populationStat';
+import * as timelineKeeper from './timelinekeeper';
 import * as inStat from './individualStats';
 import { individualStats } from './individualStats';
 import { CohortManager } from './cohortManager';
@@ -71,17 +72,19 @@ export class App {
 
     const parallelView = main.append('div').classed('parallel_view', true);
     const populationView = main.append('div').classed('population_view', true);
+    const timeline = main.append('div').classed('timeline_view', true)
     const plots = main.append('div').classed('plot_view', true);
 
     // population distributions, initial visualization for all of the data
-    populationStat.create(populationView.node());
+    //populationStat.create(populationView.node());
+    timelineKeeper.create(timeline.node());
     PlotKeeper.create(plots.node());
 
     inStat.create(main.node());
 
 
     const cpt = main.append('Div').classed('cptDiv', true);
-    cptBreak.create(cpt.node());
+   // cptBreak.create(cpt.node());
     this.$node.select('.cptDiv').classed('hidden', true);
     
 

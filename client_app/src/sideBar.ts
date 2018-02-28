@@ -200,7 +200,7 @@ export class SideBar {
 
        filterButton.on('click', function(d){
 
-                          console.log(that.bmiRange);
+                          //console.log(that.bmiRange);
                           let parentFilter = form.selectAll('ul.parent');
 
                           parentFilter.each(function (element) {
@@ -244,7 +244,7 @@ export class SideBar {
                              };
                             filterList.push(filter);
                           }
-
+                          events.fire('cohort_made');
                           events.fire('demo_filter_button_pushed', filterList);
                           that.filters = [];
                           filterList = [];
