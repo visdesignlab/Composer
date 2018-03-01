@@ -132,9 +132,10 @@ export class CohortManager {
               console.log(this.cptObjectKeeper);
           });
 
-          events.on('filter-by-code', (evt, item)=>{
+          events.on('filter_by_code', (evt, item)=>{
             this.cohortfilterarray[this.cohortIndex].cpt.push(item);
             console.log(this.cohortfilterarray[this.cohortIndex]);
+            events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
           });
     }
 
