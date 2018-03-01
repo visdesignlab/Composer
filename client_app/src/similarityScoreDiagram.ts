@@ -305,6 +305,8 @@ export class similarityScoreDiagram {
 
     private async getBaselines(pat)  {
 
+        console.log('baselines now');
+
         this.cohortProInfo.forEach(patient => {
             let negative = 0;
             let positive = 0;
@@ -386,10 +388,10 @@ export class similarityScoreDiagram {
 
          });
 
-         if(patient.window != null){ console.log(patient); }
+        // if(patient.window != null){ consPole.log(patient); }
 
         });
-        //console.log(this.cohortProInfo);
+        console.log(this.cohortProInfo);
 
     }
     private interpolate() {
