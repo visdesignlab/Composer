@@ -101,6 +101,10 @@ export class CohortManager {
               console.log(this.cptObjectKeeper);
           });
 
+          events.on('show_distributions', ()=> {
+              events.fire('cohort_stats', [this.selectedCohort, this.cohortIndex]);
+          });
+
           events.on('filtered_patient_promis', (evt, item) => {
              
              this.cohortkeeperarray.push(item);
@@ -111,7 +115,7 @@ export class CohortManager {
 
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('new_cohort_added', this.selectedCohort);
-             events.fire('test', [this.cohortfilterarray, this.cohortkeeperarray]);
+             events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
 
           });
 
@@ -126,6 +130,11 @@ export class CohortManager {
             
               this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
               console.log(this.cptObjectKeeper);
+          });
+
+          events.on('filter-by-code', (evt, item)=>{
+            this.cohortfilterarray[this.cohortIndex].cpt.push(item);
+            console.log(this.cohortfilterarray[this.cohortIndex]);
           });
     }
 

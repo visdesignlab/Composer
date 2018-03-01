@@ -73,7 +73,7 @@ export class similarityScoreDiagram {
        // this.maxDay = max;
         //this.minDay = min;
 
-        this.init();
+      
        // console.log('test   '+cohortData);
         this.diagram = diagram;
         this.$node = select(parent)
@@ -91,6 +91,13 @@ export class similarityScoreDiagram {
             this.zeroEvent = this.targetOrder;
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             });
+
+        this.$node.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Change Promis Score Scale')
+           // .on('click', () => events.fire('show_cpt'));
+           // .on('click', () => events.fire('load_cpt'));
+            .on('click', () =>events.fire('change_promis_scale'));
 
         this.$node.append('text').attr('id', 'eventLabel');
 
