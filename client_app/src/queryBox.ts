@@ -95,17 +95,26 @@ export class QueryBox {
 
         events.on('add_to_cohort_bar', (evt, item)=> {
           
-            this.cohortKeeper.selectAll('div').remove();
+            this.drawCohortLabels(item[0], item[1]);
+          
+        });
+        events.on('update_filters', (evt, item)=> {
+            this.drawCohortLabels(item[0], item[1]);
+        });
+    }
+
+    private drawCohortLabels(filterKeeper, cohorts) {
+        
+                    this.cohortKeeper.selectAll('div').remove();
             let counter = -1;
             let nodeArray = [];
-            let filters = item[0];
-            let cohort = item[1];
+            let filters = filterKeeper;
 
             filters.forEach((cohort, i) => {
                 //console.log(item[1][i].length);
                 let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
                 let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
-                let cohortCount = cohortBox.append('div').classed('cohort-label', true).append('text').text(item[1][i].length);
+                let cohortCount = cohortBox.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
                 let cohortfilter;
                 
                 
@@ -121,22 +130,35 @@ export class QueryBox {
                 //cohortBox.append('text').text(cohort[i].length);
                 });
 
-      
+               
+
+                if(filters[i].cpt != 0){
+
+                    filters[i].cpt.forEach(code => {cohortBox.append('text').text(' CPT: '+ code);
+                        
+                })};
+
                 counter = counter + 1;
                 //label.data(item[i]);
                 cohortlabel.on('click', ()=> {
-    
-                    this.selected = cohort;
+                    console.log(cohort);
+                    console.log(i);
+                    this.selected = i;
                     events.fire('cohort_selected', [cohort, i]);
 
                 });
             });
-            let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
-            let picked = cohortLabels[counter];
-            picked.classList.add('selected');
-          
-        });
+            if(this.selected == undefined){
 
+                let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+                let picked = cohortLabels[counter];
+                picked.classList.add('selected');
+            }else{
+                console.log(this.selected);
+                let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+                let picked = cohortLabels[this.selected];
+                picked.classList.add('selected');
+            }
     }
 
     private drawQueryBox (){
@@ -174,7 +196,7 @@ export class QueryBox {
                   selectAll('.unselectedOrder').classed('unselectedOrder', false);
                   events.fire('min date to cpt', this.queryDateArray);
                   let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
-                  events.fire('filter-by-code', this.targetOrder);
+                  events.fire('filter_by_code', this.targetOrder);
         });
     }
     
