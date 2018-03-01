@@ -22,6 +22,7 @@ import * as inStat from './individualStats';
 import { individualStats } from './individualStats';
 import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
+import * as cohortStat from './cohortStat';
 
 
 /**
@@ -86,8 +87,11 @@ export class App {
     const cpt = main.append('Div').classed('cptDiv', true);
    // cptBreak.create(cpt.node());
     this.$node.select('.cptDiv').classed('hidden', true);
-    
 
+    //const cstat = main.append('Div').classed('cohort_stat_view', true);
+    cohortStat.create(main.node());
+   // cptBreak.create(cpt.node());
+   // this.$node.select('.cohort_stat_view');//.classed('hidden', true);
       // PROMIS diagrams
    // const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
    // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');

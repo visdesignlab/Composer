@@ -41,27 +41,20 @@ export class QueryBox {
                 this.cohortKeeper.selectAll('div').remove();
             });
 
-
-        form.append('br');
-
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Change Promis Score Scale')
-           // .on('click', () => events.fire('show_cpt'));
-           // .on('click', () => events.fire('load_cpt'));
-            .on('click', () =>events.fire('change_promis_scale'));
-
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'Show Stats')
             .on('click', () => events.fire('show_distributions'));
 
+        form.append('br');
+
          //test button to create parallel when I want to
+         /*
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'Parallel Coordinate')
             .on('click', () => events.fire('parallel'));
-
+        */
         this.drawQueryBox();
 
         this.attachListener();
@@ -72,13 +65,7 @@ export class QueryBox {
      */
     private attachListener() {
 
-        events.on('test', (evt, item)=>{
-           // console.log(item);
-            console.log(item[0]);
-            console.log(item[1]);
-        });
-
-        events.on('cpt_mapped', (evt, item)=> {
+    events.on('cpt_mapped', (evt, item)=> {
             //this.timeScale.domain([0, this.maxDay]);
             this.filteredCPT = item;
        });
@@ -92,7 +79,7 @@ export class QueryBox {
 
 
         events.on('update_start_event', (evt, item)=>  {
-
+            console.log('does this even do anything?');
             let startLabel = select('#start_date_label').style('color', 'black');
             this.startBool = '0 date determined by event';
             let startLabelBool = select('#pat_or_event').text(this.startBool);
@@ -106,7 +93,7 @@ export class QueryBox {
             let startLabelBool = select('#pat_or_event').text(this.startBool);
         });
 
-        events.on('test', (evt, item)=> {
+        events.on('add_to_cohort_bar', (evt, item)=> {
           
             this.cohortKeeper.selectAll('div').remove();
             let counter = -1;
@@ -187,7 +174,8 @@ export class QueryBox {
                   selectAll('.unselectedOrder').classed('unselectedOrder', false);
                   events.fire('min date to cpt', this.queryDateArray);
                   let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
-                });
+                  events.fire('filter-by-code', this.targetOrder);
+        });
     }
     
         private cptchecker() {
