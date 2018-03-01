@@ -137,6 +137,10 @@ export class CohortManager {
             console.log(this.cohortfilterarray[this.cohortIndex]);
             events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
           });
+
+          events.on('cohort_stats', ()=>{
+            events.fire('send_cohort', this.selectedCohort);
+          });
     }
 
     private addCohortFilter (filter) {
