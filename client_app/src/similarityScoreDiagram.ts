@@ -88,6 +88,7 @@ export class similarityScoreDiagram {
             this.getDays(this.cohortProInfo);
             this.eventDayBool = true;
             this.getBaselines(null);
+            this.interpolate(this.cohortProInfo);
             this.zeroEvent = this.targetOrder;
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             });
@@ -195,7 +196,7 @@ export class similarityScoreDiagram {
         events.on('change_promis_scale', ()=>{
             if(!this.scaleRelative){
                 this.scaleRelative = true;
-                this.interpolate();
+                this.interpolate(this.cohortProInfo);
                   }
             else{this.scaleRelative = false;
                 this.changeScale(this.cohortProInfo);
@@ -305,7 +306,6 @@ export class similarityScoreDiagram {
 
     private async getBaselines(pat)  {
 
-        console.log('baselines now');
 
         this.cohortProInfo.forEach(patient => {
             let negative = 0;
@@ -391,14 +391,12 @@ export class similarityScoreDiagram {
         // if(patient.window != null){ consPole.log(patient); }
 
         });
-        console.log(this.cohortProInfo);
+        
 
     }
-    private interpolate() {
+    private interpolate(cohort) {
 
-        let cohort = this.cohortProInfo;
-
-        cohort.forEach(pat => {
+     cohort.forEach(pat => {
             if(pat.window != null && pat.window != undefined) {
                 let b;
                 //console.log(pat.window.neg[0]);
@@ -429,15 +427,20 @@ export class similarityScoreDiagram {
                     value.b = b;
                    // value.slope = slope;
                     value.relScore = value.ogScore - b;
+
                 });
 
             }//else{ console.log('no window');}
 
         });
         this.cohortProInfo = cohort;
-
+        console.log(cohort);
+        events.fire('cohort_interpolated', cohort);
         this.changeScale(cohort);
+        //return newCohort;
     }
+
+    
 
     private changeScale(cohort) {
        // this.scaleRelative = true;
