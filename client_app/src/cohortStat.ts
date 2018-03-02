@@ -77,6 +77,7 @@ export class CohortStat{
         let topStart = [];
         let middleStart = [];
         let bottomStart = [];
+        let barray = [];
 
         cohort.forEach(patient => {
             if(patient.value.length == 1){
@@ -88,7 +89,10 @@ export class CohortStat{
 
             }
             if(patient.b != undefined){
-                console.log(patient.b);
+                barray.push(patient.b);
+                if(patient.b >= 43){topStart.push(patient)};
+                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
+                if(patient.b <= 29){bottomStart.push(patient)};
                 patient.scorespan = [patient.b];
                 patient.value.forEach(value => {
                     if(value.diff > 0 && value.diff < 30){console.log(value.SCORE)};
@@ -98,10 +102,15 @@ export class CohortStat{
             }
             
         });
-        console.log(outofrange);
-      
+        
+        this.statWrapper.append('div').append('input') .attr('type', 'button')
+        .attr('value', 'Aggregate').on('click', () =>events.fire('aggregate', bottomStart));
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score : '+ oneval.length);
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score for than 90 days from code: '+ outofrange.length);
+        this.statWrapper.append('div').append('text').text('Average interpolated score at 0 day: ' + d3.mean(barray));
+        this.statWrapper.append('div').append('text').text('Top Starting Percentile (>=43): ' + topStart.length + ' patients');
+        this.statWrapper.append('div').append('text').text('Top Starting Percentile (<43, >29): ' + middleStart.length + ' patients');
+        this.statWrapper.append('div').append('text').text('Top Starting Percentile (<=29): ' + bottomStart.length + ' patients');
     }
 
     private async interpolate(cohort) {
