@@ -193,6 +193,13 @@ export class similarityScoreDiagram {
      */
     private attachListener() {
 
+        events.on('aggregate', (evt, item)=> {
+            console.log(item);
+            this.cohortProInfo = item;
+            this.clearDiagram();
+            this.drawPromisChart();
+        });
+
         events.on('change_promis_scale', ()=>{
             if(!this.scaleRelative){
                 this.scaleRelative = true;
