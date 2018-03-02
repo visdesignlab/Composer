@@ -141,13 +141,19 @@ export class CohortManager {
           events.on('cohort_stats', ()=>{
             events.fire('send_cohort', this.selectedCohort);
           });
+
+          events.on('cohort_interpolated', (evt, item)=>{
+            this.cohortkeeperarray[this.cohortIndex] = item;
+            this.selectedCohort = item;
+          
+          });
     }
 
     private addCohortFilter (filter) {
 
         this.cohortfilterarray.push(filter);
         events.fire('cohort_added', this.cohortfilterarray);
-        console.log(this.cohortfilterarray);
+    
     }
 
     private removeCohortFilterArray () {

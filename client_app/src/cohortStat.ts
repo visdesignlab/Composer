@@ -37,16 +37,28 @@ export class CohortStat{
     }
 
     private attachListener(){
+
+        events.on('cohort_interpolated', (evt, item)=>{
+
+        
+            //this.interpolate(item).then(value=> console.log(value));
+            console.log(item);
+            this.cohort = item;
+
+        });
+
         events.on('cohort_stats', (evt, item)=> {
             
             let index = +item[1] + 1;
-            this.cohort = item[0];
-            
+            if(this.cohort == null){
+                this.cohort = item[0];
+            }
+
             this.statWrapper.append('div').append('text').text('Cohort ' + index);
             this.statWrapper.append('div').append('text').text(item[0].length);
 
             this.getAverage(this.cohort);
-            this.interpolate(this.cohort);
+            //this.interpolate(this.cohort);
         });
         events.on('clear_cohorts', ()=>{
             this.statWrapper.selectAll('div').remove();
@@ -62,6 +74,10 @@ export class CohortStat{
         //console.log(cohort);
         let oneval = [];
         let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+
         cohort.forEach(patient => {
             if(patient.value.length == 1){
                 if(patient.value[0].diff > Math.abs(90)){
@@ -69,13 +85,16 @@ export class CohortStat{
                 }
               
                 oneval.push(patient.key);
-            patient.value.forEach(value => {
-                console.log(value.diff);
-                if(value.diff == 0){
-                    console.log(value);
-                }
-            });
+
+            }
+            if(patient.b != undefined){
+                console.log(patient.b);
+                patient.scorespan = [patient.b];
+                patient.value.forEach(value => {
+                    if(value.diff > 0 && value.diff < 30){console.log(value.SCORE)};
+                });
                 
+
             }
             
         });
@@ -85,7 +104,7 @@ export class CohortStat{
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score for than 90 days from code: '+ outofrange.length);
     }
 
-    private interpolate(cohort) {
+    private async interpolate(cohort) {
 
 
         cohort.forEach(pat => {
@@ -110,8 +129,8 @@ export class CohortStat{
 
                     let slope = (y2 - y1) / (x2 - x1);
                     b = Y - (slope * X);
-                    pat.slope = slope;
-                    pat.b = +b;
+                    
+                    return pat.b = +b, pat.slope = slope;
                }
 
                // console.log(pat);
@@ -120,12 +139,12 @@ export class CohortStat{
                    // value.slope = slope;
                    // value.relScore = value.ogScore - b;
                 });
-
+                return pat;
             }//else{ console.log('no window');}
 
         });
 
-        console.log(cohort);
+        return cohort;
 
     }
 
