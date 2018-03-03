@@ -55,7 +55,7 @@ export class TimelineKeeper {
 //1252 days is the max number of days for the patients
         this.timeScale = scaleLinear()
             .domain([-150, 1251])
-            .range([10, 700]).clamp(true);
+            .range([0, 700]).clamp(true);
 
         this.$node.append('div').classed('day_line', true);
        // this.drawQueryBox();
@@ -71,13 +71,13 @@ export class TimelineKeeper {
             });
     
         events.on('cpt_mapped', (evt, item)=> {
-             this.timeScale.domain([0, this.maxDay]);
+             this.timeScale.domain([-10, this.maxDay]);
              this.filteredCPT = item;
         });
 
         events.on('selected_cpt_change', (evt, item) => {
             console.log(item);
-            this.timeScale.domain([0, this.maxDay]);
+            this.timeScale.domain([-10, this.maxDay]);
             this.filteredCPT = item;
            // this.drawOrders(item);
         });
@@ -123,6 +123,10 @@ export class TimelineKeeper {
 
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
                           .attr('height', 70).attr('width', 710);
+        timelineSVG.append('g')
+                        .attr('class', '.xAxisMini')
+                        .attr('transform', () => `translate(30,50)`)
+                        .call(axisBottom(this.timeScale));
 
         let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
 
@@ -135,7 +139,7 @@ export class TimelineKeeper {
         let that = this;
 
         this.brush = brushX()
-        .extent([[10, 10], [700, 30]])
+        .extent([[0, 0], [700, 30]])
         .handleSize(0)
         .on("end", () => {
             if (event.selection === null) {
@@ -144,14 +148,14 @@ export class TimelineKeeper {
             } else {
               let start = this.timeScale.invert(event.selection[0]);
               let end = this.timeScale.invert(event.selection[1]);
-          
-            
+                console.log(start);
+            /*
               timelineSVG//.select('.context')
               .append('g')
               .attr('class', '.xAxisMini')
               .attr('transform', () => `translate(30,50)`)
               .call(axisBottom(this.timeScale));
-
+*/
               events.fire('domain updated', [start, end]);
             }
         
@@ -159,7 +163,7 @@ export class TimelineKeeper {
 
 
         slider.call(this.brush)
-         .call(this.brush.move, [this.timeScale(-30), this.timeScale(180)]);
+         .call(this.brush.move, [this.timeScale(-30), this.timeScale(50)]);
       
 
      // -----

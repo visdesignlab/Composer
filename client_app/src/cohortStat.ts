@@ -37,12 +37,19 @@ export class CohortStat{
     }
 
     private attachListener(){
+        events.on('filter_aggregate', (evt, item) => {
+            //console.log(item);
+            item.forEach(pat => {
+               // console.log(pat);
+                pat.value.forEach(value => {
+                    if(value.diff > 0 && value.diff < 30){console.log(value)};
+                });
+            });
+
+        });
 
         events.on('cohort_interpolated', (evt, item)=>{
 
-        
-            //this.interpolate(item).then(value=> console.log(value));
-            console.log(item);
             this.cohort = item;
 
         });
@@ -58,7 +65,7 @@ export class CohortStat{
             this.statWrapper.append('div').append('text').text(item[0].length);
 
             this.getAverage(this.cohort);
-            //this.interpolate(this.cohort);
+           
         });
         events.on('clear_cohorts', ()=>{
             this.statWrapper.selectAll('div').remove();
@@ -71,7 +78,7 @@ export class CohortStat{
     }
 
     private getAverage(cohort) {
-        //console.log(cohort);
+       
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -94,69 +101,25 @@ export class CohortStat{
                 if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
                 if(patient.b <= 29){bottomStart.push(patient)};
                 patient.scorespan = [patient.b];
+             /*
                 patient.value.forEach(value => {
                     if(value.diff > 0 && value.diff < 30){console.log(value.SCORE)};
-                });
+                });*/
                 
 
             }
-            
+
         });
         
         this.statWrapper.append('div').append('input') .attr('type', 'button')
-        .attr('value', 'Aggregate').on('click', () =>events.fire('aggregate', bottomStart));
+        .attr('value', 'Filter Aggregate').on('click', () =>events.fire('filter_aggregate', bottomStart));
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score : '+ oneval.length);
-        this.statWrapper.append('div').append('text').text('Num of Patients with 1 score for than 90 days from code: '+ outofrange.length);
+        this.statWrapper.append('div').append('text').text('Num of Patients with 1 score for > 90 days from code: '+ outofrange.length);
         this.statWrapper.append('div').append('text').text('Average interpolated score at 0 day: ' + d3.mean(barray));
         this.statWrapper.append('div').append('text').text('Top Starting Percentile (>=43): ' + topStart.length + ' patients');
         this.statWrapper.append('div').append('text').text('Top Starting Percentile (<43, >29): ' + middleStart.length + ' patients');
         this.statWrapper.append('div').append('text').text('Top Starting Percentile (<=29): ' + bottomStart.length + ' patients');
     }
-
-    private async interpolate(cohort) {
-
-
-        cohort.forEach(pat => {
-            if(pat.window != null && pat.window != undefined) {
-                let b;
-                //console.log(pat.window.neg[0]);
-               if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
-                   //console.log('zero value yo');
-                   //let b;
-                   if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
-                   if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
-               }else{
-                    let x1 = pat.window.neg[0];
-                    let x2 = pat.window.pos[0];
-                    let y1 = pat.window.neg[1];
-                    let y2 = pat.window.pos[1];
-                    let X;
-                    let Y;
-
-                    if (x1 < x2){X = x1; Y = y1}
-                    else {X = x2; Y = y2};
-
-                    let slope = (y2 - y1) / (x2 - x1);
-                    b = Y - (slope * X);
-                    
-                    return pat.b = +b, pat.slope = slope;
-               }
-
-               // console.log(pat);
-                pat.value.forEach((value) => {
-                    value.b = b;
-                   // value.slope = slope;
-                   // value.relScore = value.ogScore - b;
-                });
-                return pat;
-            }//else{ console.log('no window');}
-
-        });
-
-        return cohort;
-
-    }
-
 
 }
 

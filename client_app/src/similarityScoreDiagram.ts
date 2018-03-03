@@ -69,11 +69,7 @@ export class similarityScoreDiagram {
     private scaleRelative = false;
 
     constructor(parent: Element, diagram, cohortData, max, min) {
-        //this.cohortProInfo = cohortData;
-       // this.maxDay = max;
-        //this.minDay = min;
 
-      
        // console.log('test   '+cohortData);
         this.diagram = diagram;
         this.$node = select(parent)
@@ -193,7 +189,7 @@ export class similarityScoreDiagram {
      */
     private attachListener() {
 
-        events.on('aggregate', (evt, item)=> {
+        events.on('filter_aggregate', (evt, item)=> {
             console.log(item);
             this.cohortProInfo = item;
             this.clearDiagram();
@@ -488,7 +484,6 @@ export class similarityScoreDiagram {
                         .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
                         .attr('stroke', 'red');
 
-               // zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
             }
 
             let lineCount = this.cohortProInfo.length;
