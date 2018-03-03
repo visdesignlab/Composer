@@ -71,7 +71,7 @@ export class App {
           // query box
     queryBox.create(main.node());
 
-    const parallelView = main.append('div').classed('parallel_view', true);
+   // const parallelView = main.append('div').classed('parallel_view', true);
     const populationView = main.append('div').classed('population_view', true);
     const timeline = main.append('div').classed('timeline_view', true)
     const plots = main.append('div').classed('plot_view', true);
@@ -86,7 +86,7 @@ export class App {
 
     const cpt = main.append('Div').classed('cptDiv', true);
    // cptBreak.create(cpt.node());
-    this.$node.select('.cptDiv').classed('hidden', true);
+   // this.$node.select('.cptDiv').classed('hidden', true);
 
     //const cstat = main.append('Div').classed('cohort_stat_view', true);
     cohortStat.create(main.node());
@@ -103,7 +103,7 @@ export class App {
     events.on('parallel', () => {
 
     //parallel coord plot 
-    parallel.create(parallelView.node(), data);
+   // parallel.create(parallelView.node(), data);
 
     });
 
@@ -112,8 +112,8 @@ export class App {
            // console.log('works!');
             //this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
            // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
-            this.$node.select('.main').select('.rectDiv').classed('hidden', false);
-            this.$node.select('.main').select('.cptDiv').classed('hidden', true);
+           // this.$node.select('.main').select('.rectDiv').classed('hidden', false);
+           // this.$node.select('.main').select('.cptDiv').classed('hidden', true);
 
         });
 
@@ -122,8 +122,8 @@ export class App {
                      // console.log('works!');
                       this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
                      // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
-                      this.$node.select('.main').select('.cptDiv').classed('hidden', false);
-                      this.$node.select('.main').select('.rectDiv').classed('hidden', false);
+                     // this.$node.select('.main').select('.cptDiv').classed('hidden', false);
+                    //  this.$node.select('.main').select('.rectDiv').classed('hidden', false);
           
                   });
 
