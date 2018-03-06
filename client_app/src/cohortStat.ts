@@ -110,9 +110,25 @@ export class CohortStat{
             }
 
         });
-        
-        this.statWrapper.append('div').append('input') .attr('type', 'button')
-        .attr('value', 'Filter Aggregate').on('click', () =>events.fire('filter_aggregate', bottomStart));
+        this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
+        .attr('value', 'bottom').on('click', () =>{});
+        this.statWrapper.append('label').attr('for', 'sample1').text('bottom');
+        this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample2')
+        .attr('value', 'middle').on('click', () =>console.log(this));
+        this.statWrapper.append('label').attr('for', 'sample2').text('middle');
+        this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample3')
+        .attr('value', 'top').on('click', () =>console.log(this));
+        this.statWrapper.append('label').attr('for', 'sample1').text('top');
+        this.statWrapper.append('div').append('input').attr('type', 'submit')
+        .attr('value', 'Filter Aggregate').on('click', () =>{
+            let checked = document.querySelector('input[name="sample"]:checked');
+            console.log(checked['value']);
+            let selected;
+            if(checked['value'] == 'bottom'){selected = bottomStart;}
+            if(checked['value'] == 'middle'){selected = middleStart;}
+            if(checked['value'] == 'top'){selected = topStart;}
+            events.fire('filter_aggregate', selected)});
+    
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score : '+ oneval.length);
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score for > 90 days from code: '+ outofrange.length);
         this.statWrapper.append('div').append('text').text('Average interpolated score at 0 day: ' + d3.mean(barray));
