@@ -46,6 +46,7 @@ export class similarityScoreDiagram {
     private setOrderScale = dataCalc.setOrderScale;
     private getClassAssignment = dataCalc.getClassAssignment;
     private orderHierarchy = dataCalc.orderHierarchy;
+    private clicked;
 
     private maxDay;
     private minDay = 0;
@@ -544,8 +545,16 @@ export class similarityScoreDiagram {
                     let neg = d[0].window.neg[0];
                     let pos = d[0].window.pos[0];
                     events.fire('line_clicked', d);
+                    this.clicked = true;
                     this.addPromisDots(d);
-
+                })
+                .on('mouseover', (d)=> {
+                    console.log('mouse on');
+                    this.addPromisDots(d);
+                })
+                .on('mouseout', (d)=> {
+                    console.log('mouse off');
+                    this.removeDots();
                 });
 
                let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
@@ -557,21 +566,26 @@ export class similarityScoreDiagram {
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
         }
 
-    private addPromisDots (d){
+    private addPromisDots (d) {
 
-        let promisData = d;
+            let promisData = d;
 
-        let promisRects = this.svg.select('#similar_score').selectAll('g').append('g')
-        .selectAll('circle').data(promisData);
-        promisRects.enter().append('circle').attr('cx', (d, i)=> this.timeScale(d.diff))
-        .attr('cy', (d)=> {
-            let score; 
-            score = d.SCORE;
-            return this.scoreScale(score);
-        }).attr('r', 5).attr('fill', '#21618C');
+            let promisRects = this.svg.select('#similar_score').selectAll('g').append('g')
+            .selectAll('circle').data(promisData);
+            promisRects.enter().append('circle').attr('class', 'hoverdots').attr('cx', (d, i)=> this.timeScale(d.diff))
+            .attr('cy', (d)=> {
+                let score; 
+                score = d.SCORE;
+                return this.scoreScale(score);
+            }).attr('r', 5).attr('fill', '#21618C');
+    
+            promisRects.append('circle').attr('cx', ()=> this.timeScale(0))
+            .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
 
-        promisRects.append('circle').attr('cx', ()=> this.timeScale(0))
-        .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
+    }
+
+    private removeDots (){
+        selectAll('.hoverdots').remove();
     }
 
         /**
