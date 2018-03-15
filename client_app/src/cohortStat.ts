@@ -31,7 +31,7 @@ export class CohortStat{
 
         this.$node = select(parent);
         let statView = this.$node.append('div').classed('cohort_stat_view', true);
-       
+
         this.statWrapper = statView.append('div').classed('cohortStatWrapper', true);
         this.attachListener();
     }
@@ -63,7 +63,7 @@ export class CohortStat{
 
             this.statWrapper.append('div').append('text').text('Cohort ' + index);
             this.statWrapper.append('div').append('text').text(item[0].length);
-
+            //console.log(this.cohort);
             this.getAverage(this.cohort);
            
         });
@@ -110,6 +110,7 @@ export class CohortStat{
             }
 
         });
+        console.log(bottomStart);
         this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
         .attr('value', 'bottom').on('click', () =>{});
         this.statWrapper.append('label').attr('for', 'sample1').text('bottom');
