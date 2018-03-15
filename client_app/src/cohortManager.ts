@@ -89,6 +89,7 @@ export class CohortManager {
 
             events.fire('selected_cohort_change', this.selectedCohort);
             events.fire('selected_cpt_change', this.selectedCPT);
+            events.fire('selected_stat_change', [this.selectedCohort, index]);
 
           });
 
@@ -116,6 +117,7 @@ export class CohortManager {
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('new_cohort_added', this.selectedCohort);
              events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
+             events.fire('add_to_cohort_stat', [this.cohortfilterarray, this.cohortkeeperarray]);
 
           });
 

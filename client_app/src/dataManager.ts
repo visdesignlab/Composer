@@ -101,7 +101,7 @@ export class DataManager {
         });
 
         events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
-            //console.log(item);
+            
             this.proTable = item;
             this.getDataObjects('pro_object', this.proTable);
         });
@@ -124,7 +124,7 @@ export class DataManager {
 
         events.on('PROMIS_TEST', (evt, item)=> {
           //  this.proTable = item;
-           // console.log(this.proTable);
+           
            // this.getDataObjects('pro_object', this.proTable);
         });
 
@@ -160,13 +160,13 @@ export class DataManager {
 
         events.on('new_cohort_added', (evt, item)=> {
             this.filteredPatPromis = item;
-           // console.log(this.totalCptObjects);
+          
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
             this.filteredPatPromis = item;
-            //console.log(this.filteredPatPromis);
+           
                 });
 
         events.on('filtered_CPT', (evt, item) => {
@@ -196,27 +196,26 @@ export class DataManager {
 
           let filter = demoObjects;
           sidebarFilter.forEach( (d)=> {
-           console.log(d);
            let parent = d.attributeName;
            let choice = d.checkedOptions;
            if(parent != 'BMI' || 'CCI' || 'AGE') {
 
                 if (parent == 'DM_CODE') {
-                    console.log('dm code');
+                   
                         filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
                 }else{ 
-                        console.log('other');
+                       
                         if (choice.length === 1){
                             filter = filter.filter(d => d[parent] == choice);
                         }else if(choice.length === 2){
                             filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
-                            console.log(filter);
+                       
                         }else if(choice.length === 2){
                             filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
-                            console.log(filter);
+                           
                         }else if(choice.length === 3){
                             filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
-                            console.log(filter);
+
                         }
                 }
            }
@@ -224,15 +223,14 @@ export class DataManager {
 
                 filter = filter.filter(d => +d[parent] > choice[0] && +d[parent] < choice[1]);
            }
-  
+
          });
             filter.forEach((element) => {
-               // console.log(element['CCI']);
                 this.cohortIdArray.push(element.ID);
             });
 
            //this is a test, manual array for filter
-        
+
            events.fire('cohort_filtered_demo', [filter.length, sidebarFilter]);//should I maybe use the array instead?
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
@@ -344,7 +342,7 @@ export class DataManager {
 
      //uses Phovea to access PRO data and draw table
    private async getCPT(cohortIdArray, cptObject) {
-        console.log(cptObject);
+
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
         if (cohortIdArray != null) {
@@ -379,8 +377,6 @@ export class DataManager {
      */
     //you need the promis objects and the cpt objects
     private mapCPT(patProInfo, CPTobjects) {
-
-        console.log(CPTobjects);
 
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);

@@ -26,8 +26,9 @@ export class CohortStat{
     private $node;
     private statWrapper;
     private cohort;
+    private index;
 
-    constructor(parent: Element){
+    constructor(parent: Element, cohort, index){
 
         this.$node = select(parent);
         let statView = this.$node.append('div').classed('cohort_stat_view', true);
@@ -37,15 +38,16 @@ export class CohortStat{
     }
 
     private attachListener(){
-        events.on('filter_aggregate', (evt, item) => {
-            //console.log(item);
-            item.forEach(pat => {
-               // console.log(pat);
-                pat.value.forEach(value => {
-                    if(value.diff > 0 && value.diff < 30){console.log(value)};
-                });
-            });
 
+        events.on('selected_stat_change', (evt, item) => {
+            this.statWrapper.selectAll('div').remove();
+            //console.log(item);
+            this.cohort = item[0];
+            this.index = +item[1] + 1;
+            this.statWrapper.append('div').append('text').text('Cohort ' + this.index);
+            this.statWrapper.append('div').append('text').text(item[0].length);
+            this.getAverage(this.cohort);
+            this.buildStatBox();
         });
 
         events.on('cohort_interpolated', (evt, item)=>{
@@ -56,14 +58,14 @@ export class CohortStat{
 
         events.on('cohort_stats', (evt, item)=> {
             
-            let index = +item[1] + 1;
+            this.index = +item[1] + 1;
             if(this.cohort == null){
                 this.cohort = item[0];
             }
 
-            this.statWrapper.append('div').append('text').text('Cohort ' + index);
+            this.statWrapper.append('div').append('text').text('Cohort ' + this.index);
             this.statWrapper.append('div').append('text').text(item[0].length);
-            //console.log(this.cohort);
+            
             this.getAverage(this.cohort);
            
         });
@@ -110,7 +112,7 @@ export class CohortStat{
             }
 
         });
-        console.log(bottomStart);
+       
         this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
         .attr('value', 'bottom').on('click', () =>{});
         this.statWrapper.append('label').attr('for', 'sample1').text('bottom');
@@ -123,7 +125,7 @@ export class CohortStat{
         this.statWrapper.append('div').append('input').attr('type', 'submit')
         .attr('value', 'Filter Aggregate').on('click', () =>{
             let checked = document.querySelector('input[name="sample"]:checked');
-            console.log(checked['value']);
+           
             let selected;
             if(checked['value'] == 'bottom'){selected = bottomStart;}
             if(checked['value'] == 'middle'){selected = middleStart;}
@@ -138,8 +140,13 @@ export class CohortStat{
         this.statWrapper.append('div').append('text').text('Top Starting Percentile (<=29): ' + bottomStart.length + ' patients');
     }
 
+    private buildStatBox()  {
+        console.log(this.cohort);
+        console.log(this.index);
+    }
+
 }
 
-export function create(parent:Element) {
-    return new CohortStat(parent);
+export function create(parent:Element, cohort, index) {
+    return new CohortStat(parent, cohort, index);
   }

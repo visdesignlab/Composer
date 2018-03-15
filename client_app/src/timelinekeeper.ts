@@ -58,55 +58,50 @@ export class TimelineKeeper {
             .range([0, 700]).clamp(true);
 
         this.$node.append('div').classed('day_line', true);
-       // this.drawQueryBox();
 
         this.attachListener();
-        
-    }
+
+    };
 
     private attachListener() {
 
         events.on('timeline_max_set', (evt, item) =>{
             this.maxDay = item;
             });
-    
+
         events.on('cpt_mapped', (evt, item)=> {
              this.timeScale.domain([-10, this.maxDay]);
              this.filteredCPT = item;
         });
 
         events.on('selected_cpt_change', (evt, item) => {
-            console.log(item);
+
             this.timeScale.domain([-10, this.maxDay]);
             this.filteredCPT = item;
-           // this.drawOrders(item);
         });
 
         events.on('filteredPatients', (evt, item)=>{
             this.filteredPromis = item;
-           
         });
+
         events.on('population demo loaded', (evt, item)=> {
             this.populationDemo = item;
             this.showStats();
         });
 
         events.on('pro_object_filtered', (evt, item)=> {
-
            this.filteredPromis = item;
         });
 
         events.on('selected_cohort_change', (evt, item)=> {
-
             this.selectedcohort = item;
-
          });
 
         events.on('timeline_max_set', (evt, item)=> {
-
             this.maxDay = item;
             select('.day_line').select('.maxDay').text(this.maxDay + " Days");
         });
+
         events.on('filteredPatients', (evt, item)=> this.filteredPromis = item);
 
         events.on('score_scale_changed', ()=> {
@@ -158,13 +153,13 @@ export class TimelineKeeper {
 */
               events.fire('domain updated', [start, end]);
             }
-        
+
           });
 
 
         slider.call(this.brush)
          .call(this.brush.move, [this.timeScale(-30), this.timeScale(50)]);
-      
+
 
      // -----
     }
