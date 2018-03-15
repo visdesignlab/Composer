@@ -444,8 +444,6 @@ export class similarityScoreDiagram {
         //return newCohort;
     }
 
-    
-
     private changeScale(cohort) {
        // this.scaleRelative = true;
         if(this.scaleRelative)  {
@@ -534,26 +532,35 @@ export class similarityScoreDiagram {
                 .each(function (d) {
                     let currGroup = select(this)
                         .append('path')
-                        .attr('class', 'proLine')
+                        .attr('class', d[0]['PAT_ID'])
+                        .classed('proLine', true)
                         .attr("clip-path","url(#clip)")
                         .attr('stroke-width', that.lineScale(lineCount))
                         .attr('stroke-opacity', that.lineScale(lineCount))
                         .attr('d', lineFunc);
                 })
                 .on('click', (d) => {
-
+                    console.log(document.getElementsByClassName(d[0].PAT_ID));
+                    let selected = document.getElementsByClassName(d[0].PAT_ID);
+                    selected[0].classList.add('selected');
                     let neg = d[0].window.neg[0];
                     let pos = d[0].window.pos[0];
                     events.fire('line_clicked', d);
-                    this.clicked = true;
-                    this.addPromisDots(d);
+                   if(!this.clicked) { 
+                   // console.log('clicked!!');
+                    this.addPromisDotsClick(d); }
+                   else if(this.clicked) {  
+                       selectAll('.clickdots').remove();
+                       this.clicked = false;
+                      // console.log('clicked off');
+                    };
                 })
                 .on('mouseover', (d)=> {
-                    console.log('mouse on');
-                    this.addPromisDots(d);
+                   // console.log('mouse on');
+                    this.addPromisDotsHover(d);
                 })
                 .on('mouseout', (d)=> {
-                    console.log('mouse off');
+                   // console.log('mouse off');
                     this.removeDots();
                 });
 
@@ -566,23 +573,50 @@ export class similarityScoreDiagram {
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
         }
 
-    private addPromisDots (d) {
+    private addPromisDotsHover (d) {
 
             let promisData = d;
 
-            let promisRects = this.svg.select('#similar_score').selectAll('g').append('g')
+            let promisRect = this.svg.select('#similar_score');
+            let dots = promisRect.selectAll('g').append('g')
             .selectAll('circle').data(promisData);
-            promisRects.enter().append('circle').attr('class', 'hoverdots').attr('cx', (d, i)=> this.timeScale(d.diff))
+            dots.enter().append('circle').attr('class', 'hoverdots')
+            .attr('clip-path','url(#clip)')
+            .attr('cx', (d, i)=> this.timeScale(d.diff))
             .attr('cy', (d)=> {
                 let score; 
                 score = d.SCORE;
                 return this.scoreScale(score);
             }).attr('r', 5).attr('fill', '#21618C');
     
-            promisRects.append('circle').attr('cx', ()=> this.timeScale(0))
+            dots.append('circle').attr('cx', ()=> this.timeScale(0))
             .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
 
     }
+
+    private addPromisDotsClick (d) {
+
+        let promisData = d;
+        console.log(d);
+
+        let promisRect = this.svg.select('#similar_score');
+        let dots = promisRect.selectAll('g').append('g')
+        .selectAll('circle').data(promisData);
+        dots.enter().append('circle').attr('class', 'clickdots')
+        .attr('clip-path','url(#clip)')
+        .attr('cx', (d, i)=> this.timeScale(d.diff))
+        .attr('cy', (d)=> {
+            let score; 
+            score = d.SCORE;
+            return this.scoreScale(score);
+        }).attr('r', 5).attr('fill', '#FF5733');
+
+        //dots.append('circle').attr('cx', ()=> this.timeScale(0))
+       // .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
+
+        this.clicked = true;
+
+}
 
     private removeDots (){
         selectAll('.hoverdots').remove();

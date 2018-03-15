@@ -60,11 +60,11 @@ export class DataManager {
         */
 
         this.loadData('Demo_Revise');
-        this.loadData('DEMO_TEST');
+        //this.loadData('DEMO_TEST');
         this.loadData('PROMIS_Scores');
         this.loadData('ICD_codes');
         this.loadData('CPT_codes');
-        this.loadData('PROMIS_TEST');
+       // this.loadData('PROMIS_TEST');
 
         this.attachListener();
 

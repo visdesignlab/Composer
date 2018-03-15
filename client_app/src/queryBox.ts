@@ -116,8 +116,7 @@ export class QueryBox {
                 let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
                 let cohortCount = cohortBox.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
                 let cohortfilter;
-                
-                
+
                 cohortfilter = filters[i].demo.forEach(element => {
                                                 cohortBox.append('text').text(element.attributeName + ': ')
                                                 element.checkedOptions.forEach(op => {
@@ -161,7 +160,7 @@ export class QueryBox {
             }
     }
 
-    private drawQueryBox (){
+    private drawQueryBox () {
 
         let form = this.$node.append('form');
     

@@ -39,6 +39,11 @@
     // stroke-opacity: 0.3;
 }
 
+.selected {
+    stroke: #FF5733;
+    stroke-width: 3px;
+}
+
 .grid line {
     stroke: #979797;
     stroke-opacity: 0.5; //adjusted the stroke opacity to the horizontal grid lines for more subtlety 
