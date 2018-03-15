@@ -71,10 +71,9 @@ export class QueryBox {
        });
 
        events.on('selected_cpt_change', (evt, item) => {
-          // console.log(item);
-           //this.timeScale.domain([0, this.maxDay]);
+
            this.filteredCPT = item;
-          // this.drawOrders(item);
+
        });
 
 

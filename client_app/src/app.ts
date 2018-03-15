@@ -89,7 +89,7 @@ export class App {
    // this.$node.select('.cptDiv').classed('hidden', true);
 
     //const cstat = main.append('Div').classed('cohort_stat_view', true);
-    cohortStat.create(main.node());
+    //cohortStat.create(main.node());
    // cptBreak.create(cpt.node());
    // this.$node.select('.cohort_stat_view');//.classed('hidden', true);
       // PROMIS diagrams
@@ -100,22 +100,10 @@ export class App {
      
     this.setBusy(false);
 
-    events.on('parallel', () => {
-
-    //parallel coord plot 
-   // parallel.create(parallelView.node(), data);
-
+    events.on('add_to_cohort_stat',(evt, item)=> {
+      console.log('when does this happen');
+      cohortStat.create(main.node(), item[0], item[1]);
     });
-
-    events.on('show_orders', () => {
-
-           // console.log('works!');
-            //this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
-           // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', false);
-           // this.$node.select('.main').select('.rectDiv').classed('hidden', false);
-           // this.$node.select('.main').select('.cptDiv').classed('hidden', true);
-
-        });
 
     events.on('show_cpt', () => {
           
