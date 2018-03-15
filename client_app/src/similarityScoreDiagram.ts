@@ -540,20 +540,28 @@ export class similarityScoreDiagram {
                         .attr('d', lineFunc);
                 })
                 .on('click', (d) => {
-                    console.log(document.getElementsByClassName(d[0].PAT_ID));
+                   
                     let selected = document.getElementsByClassName(d[0].PAT_ID);
-                    selected[0].classList.add('selected');
+                    let line = selected[0];
+
+                    if(line.classList.contains('selected')){
+                        console.log('selected');
+                        line.classList.remove('selected');
+                        let dots = document.getElementsByClassName(d[0].PAT_ID + ' clickdots');
+                        for (var i = dots.length; i--; ) {
+                            dots[i].remove();
+                         }
+                       //let dots = document.querySelectorAll('.'+ d[0].PAT_ID + ' clickdots');
+                      
+                    }else {
+                        console.log('remove');
+                        line.classList.add('selected');
+                        this.addPromisDotsClick(d);
+                };
+                 // selected[0].classList.add('selected');
                     let neg = d[0].window.neg[0];
                     let pos = d[0].window.pos[0];
                     events.fire('line_clicked', d);
-                   if(!this.clicked) { 
-                   // console.log('clicked!!');
-                    this.addPromisDotsClick(d); }
-                   else if(this.clicked) {  
-                       selectAll('.clickdots').remove();
-                       this.clicked = false;
-                      // console.log('clicked off');
-                    };
                 })
                 .on('mouseover', (d)=> {
                    // console.log('mouse on');
@@ -602,7 +610,8 @@ export class similarityScoreDiagram {
         let promisRect = this.svg.select('#similar_score');
         let dots = promisRect.selectAll('g').append('g')
         .selectAll('circle').data(promisData);
-        dots.enter().append('circle').attr('class', 'clickdots')
+        dots.enter().append('circle').attr('class', d[0].PAT_ID)
+        .classed('clickdots', true)
         .attr('clip-path','url(#clip)')
         .attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> {

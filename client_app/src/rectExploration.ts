@@ -137,7 +137,7 @@ export class rectExploration {
     
     context.append('g')
     .attr('class', 'brush')
-    .call(this.brush)
+    .call(this.brush);
     
     
   this.attachListener();
