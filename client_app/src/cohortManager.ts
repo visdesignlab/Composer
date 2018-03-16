@@ -141,6 +141,11 @@ export class CohortManager {
             events.fire('send_cohort', this.selectedCohort);
           });
 
+          events.on('send_stats', () => {
+            console.log('stats sending');
+            events.fire('make_stat_node', [this.selectedCohort, this.cohortIndex]);
+          });
+
           events.on('cohort_interpolated', (evt, item)=> {
             this.cohortkeeperarray[this.cohortIndex] = item;
             this.selectedCohort = item;

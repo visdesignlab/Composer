@@ -38,8 +38,8 @@ export class CohortStat{
         this.$node = select(parent);
         let statView = this.$node.append('div').classed('cohort_stat_view', true);
         this.statWrapper = statView.append('div').classed('cohortStatWrapper', true);
-        this.statWrapper.append('div').append('text').text('Cohort ' + number);
-        this.statWrapper.append('div').append('text').text(this.cohort.length);
+       // this.statWrapper.append('div').append('text').text('Cohort ' + number);
+       // this.statWrapper.append('div').append('text').text(this.cohort.length);
         this.getAverage(this.cohort);
         this.buildStatBox();
        // this.attachListener();
