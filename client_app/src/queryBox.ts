@@ -30,23 +30,6 @@ export class QueryBox {
             .classed('queryDiv', true);
 
         const self = this;
-        const form = this.$node.append('form');
-        this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 50);
-
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Clear Cohorts')
-            .on('click', () => {
-                events.fire('clear_cohorts');
-                this.cohortKeeper.selectAll('div').remove();
-            });
-
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Show Stats')
-            .on('click', () => events.fire('show_distributions'));
-
-        form.append('br');
 
         this.drawQueryBox();
         this.attachListener();
@@ -104,11 +87,26 @@ export class QueryBox {
             filters.forEach((cohort, i) => {
                 //console.log(item[1][i].length);
                 let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
+                let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
                 let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
                 let cohortCount = cohortBox.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
                 let cohortfilter;
-
+                let label = document.getElementsByClassName('cohort ' + i);
+                let statView = select(label[0]).append('div').classed('stat_view', true).classed('hidden', true);
+                let labelhide = true;
+                cohortarrow.on('click', ()=> { 
+                    if(labelhide){ 
+                        statView.classed('hidden', false); 
+                        labelhide = false;
+                    }else{
+                            statView.classed('hidden', true);
+                            labelhide = true;
+                        }
+                    
+                    console.log(select(label[0]));
+                });
                 cohortfilter = filters[i].demo.forEach(element => {
+                                                
                                                 cohortBox.append('text').text(element.attributeName + ': ')
                                                 element.checkedOptions.forEach(op => {
                                                     cohortBox.append('text').text(op + ', ');
@@ -119,19 +117,16 @@ export class QueryBox {
 
                 });
 
-               
 
                 if(filters[i].cpt != 0){
 
                     filters[i].cpt.forEach(code => {cohortBox.append('text').text(' CPT: '+ code);
-                        
+
                 })};
 
                 counter = counter + 1;
-            
+
                 cohortlabel.on('click', ()=> {
-                    console.log(cohort);
-                    console.log(i);
                     this.selected = i;
                     events.fire('cohort_selected', [cohort, i]);
 
@@ -153,7 +148,21 @@ export class QueryBox {
 
     private drawQueryBox () {
 
-        let form = this.$node.append('form');
+       // let form = this.$node.append('form');
+        const form = this.$node.append('form');
+        this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 50);
+        form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Clear Cohorts')
+            .on('click', () => {
+                events.fire('clear_cohorts');
+                this.cohortKeeper.selectAll('div').remove();
+            });
+
+        form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Show Stats')
+            .on('click', () => events.fire('show_distributions'));
         let aggDiv = this.$node.append('div').classed('aggRadio', true);
     
         form.append('input')

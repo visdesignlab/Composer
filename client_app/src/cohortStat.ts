@@ -50,7 +50,7 @@ export class CohortStat{
     }
 
     private getAverage(cohort) {
-        console.log(cohort);
+        
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -80,8 +80,8 @@ export class CohortStat{
 
         });
     
-        this.statWrapper.append('div').append('text').text('Num of Patients with 1 score : '+ oneval.length);
-        this.statWrapper.append('div').append('text').text('Num of Patients with 1 score for > 90 days from code: '+ outofrange.length);
+        this.statWrapper.append('div').append('text').text('Patients with 1 score : '+ oneval.length);
+        this.statWrapper.append('div').append('text').text('Patients with 1 score for > 90 days from code: '+ outofrange.length);
         this.statWrapper.append('div').append('text').text('Average interpolated score at 0 day: ' + d3.mean(barray));
         this.statWrapper.append('div').append('text').text('Top Starting Percentile (>=43): ' + topStart.length + ' patients');
         this.statWrapper.append('div').append('text').text('Top Starting Percentile (<43, >29): ' + middleStart.length + ' patients');
