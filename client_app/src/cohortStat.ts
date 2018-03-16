@@ -75,7 +75,7 @@ export class CohortStat{
                 patient.scorespan = [patient.b];
 
             }else{
-                console.log(patient);
+               // console.log(patient);
             }
 
         });
@@ -89,8 +89,8 @@ export class CohortStat{
     }
 
     private buildStatBox()  {
-        console.log(this.cohort);
-        console.log(this.index);
+       // console.log(this.cohort);
+       // console.log(this.index);
     }
 
 }

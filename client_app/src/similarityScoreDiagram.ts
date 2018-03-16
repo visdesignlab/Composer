@@ -74,7 +74,6 @@ export class similarityScoreDiagram {
 
         const that = this;
 
-       // console.log('test   '+cohortData);
         this.diagram = diagram;
         this.$node = select(parent)
             .append('div')
@@ -211,7 +210,7 @@ export class similarityScoreDiagram {
     private attachListener() {
 
         events.on('score_domain_change', (evt, item)=>{
-            console.log(item);
+           
             this.scoreScale.domain(item);
             this.clearDiagram();
             this.drawPromisChart();
@@ -219,7 +218,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('filter_aggregate', (evt, item)=> {
-            console.log(item);
+           
             this.cohortProInfo = item;
             this.clearDiagram();
             this.drawPromisChart();
@@ -431,9 +430,9 @@ export class similarityScoreDiagram {
      cohort.forEach(pat => {
             if(pat.window != null && pat.window != undefined) {
                 let b;
-                //console.log(pat.window.neg[0]);
+               
                if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
-                   //console.log('zero value yo');
+                
                    //let b;
                    if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
                    if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
@@ -454,7 +453,7 @@ export class similarityScoreDiagram {
                     pat.b = +b;
                }
 
-               // console.log(pat);
+            
                 pat.value.forEach((value) => {
                     value.b = b;
                    // value.slope = slope;
@@ -466,7 +465,7 @@ export class similarityScoreDiagram {
 
         });
         this.cohortProInfo = cohort;
-        console.log(cohort);
+       
         events.fire('cohort_interpolated', cohort);
         this.changeScale(cohort);
         //return newCohort;
@@ -528,8 +527,6 @@ export class similarityScoreDiagram {
             // time scale
             this.timeScale.domain([this.minDay, this.maxDay]);
 
-            console.log(this.scoreScale.domain());
-
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
 
@@ -575,30 +572,30 @@ export class similarityScoreDiagram {
                     let line = selected[0];
 
                     if(line.classList.contains('selected')){
-                        console.log('selected');
+                       
                         line.classList.remove('selected');
                         let dots = document.getElementsByClassName(d[0].PAT_ID + ' clickdots');
                         for (var i = dots.length; i--; ) {
                             dots[i].remove();
                          }
                        //let dots = document.querySelectorAll('.'+ d[0].PAT_ID + ' clickdots');
+                       events.fire('line_unclicked', d);
                       
                     }else {
-                        console.log('remove');
+                        
                         line.classList.add('selected');
                         this.addPromisDotsClick(d);
+                        events.fire('line_clicked', d);
                 };
-                 // selected[0].classList.add('selected');
-                    let neg = d[0].window.neg[0];
-                    let pos = d[0].window.pos[0];
-                    events.fire('line_clicked', d);
+              
+                    
                 })
                 .on('mouseover', (d)=> {
-                   // console.log('mouse on');
+                  
                     this.addPromisDotsHover(d);
                 })
                 .on('mouseout', (d)=> {
-                   // console.log('mouse off');
+                 
                     this.removeDots();
                 });
 
@@ -635,7 +632,6 @@ export class similarityScoreDiagram {
     private addPromisDotsClick (d) {
 
         let promisData = d;
-        console.log(d);
 
         let promisRect = this.svg.select('#similar_score');
         let dots = promisRect.selectAll('g').append('g')
