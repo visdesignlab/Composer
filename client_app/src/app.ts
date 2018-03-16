@@ -93,14 +93,14 @@ export class App {
         remove[i].remove();
      }
     });
-
+/*
     events.on('cohort_stat_array',(evt, item)=> {
       item.forEach((c, i) => {
         cohortStat.create(main.node(), c, i);
       });
-    });
+    });*/
 
-    events.on('clear_cohorts', () => { 
+    events.on('clear_cohorts', () => {
 
       selectAll('.cohort_stat_view').remove();
 
