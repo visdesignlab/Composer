@@ -88,6 +88,7 @@ export class similarityScoreDiagram {
             this.interpolate(this.cohortProInfo);
             this.zeroEvent = this.targetOrder;
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
+            events.fire('send_stats');
             });
 
         this.$node.append('input')
