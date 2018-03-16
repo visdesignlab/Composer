@@ -32,8 +32,12 @@ export class individualStats {
     private attachListener () {
         events.on('line_clicked', (evt, item)=> {
             console.log(item);
-            this.statWin.selectAll('div').remove();
+          //  this.statWin.selectAll('div').remove();
             this.drawOrderWin(item);
+        });
+        events.on('line_unclicked', (evt, item)=>{
+            console.log('item');
+            this.statWin.select('.'+item[0].PAT_ID).remove();
         });
 
     }
@@ -41,12 +45,13 @@ export class individualStats {
     private drawOrderWin(orders){
 
         let statArray = [];
-        this.statWin.append('div').append('text').text('ID :   '+ orders[0].PAT_ID).append('br');
-        this.statWin.append('br').append('br');
+        let patBox = this.statWin.append('div').attr('class', orders[0].PAT_ID).classed('patBox', true);
+        patBox.append('div').append('text').text('ID :   '+ orders[0].PAT_ID).append('br');
+        patBox.append('br').append('br');
 
 
         orders.forEach((d, i) => {
-            let div = this.statWin.append('div').classed('order' + (i + 1) + " ' ", true);
+            let div = patBox.append('div').classed('order' + (i + 1) + " ' ", true);
     
             div.append('text').text('Date :   '+ d.ASSESSMENT_START_DTM);
             div.append('br');
