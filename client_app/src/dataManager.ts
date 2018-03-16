@@ -60,11 +60,9 @@ export class DataManager {
         */
 
         this.loadData('Demo_Revise');
-        //this.loadData('DEMO_TEST');
         this.loadData('PROMIS_Scores');
         this.loadData('ICD_codes');
         this.loadData('CPT_codes');
-       // this.loadData('PROMIS_TEST');
 
         this.attachListener();
 
@@ -126,6 +124,10 @@ export class DataManager {
           //  this.proTable = item;
            
            // this.getDataObjects('pro_object', this.proTable);
+        });
+
+        events.on('filter_cohort_agg_test', (evt, item)=> {
+            this.getQuant_test(item[0], item[1]);
         });
 
         /* 
@@ -235,6 +237,47 @@ export class DataManager {
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
 
+       private getQuant_test(cohort, quant) {
+
+        console.log(cohort);
+        console.log(quant);
+
+        let oneval = [];
+        let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+        let barray = [];
+
+        cohort.forEach(patient => {
+            if(patient.value.length == 1){
+                if(patient.value[0].diff > Math.abs(90)){
+                    outofrange.push(patient);
+                }
+
+                oneval.push(patient.key);
+
+            }
+            if(patient.b != undefined) {
+                barray.push(patient.b);
+                if(patient.b >= 43){topStart.push(patient)};
+                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
+                if(patient.b <= 29){bottomStart.push(patient)};
+                patient.scorespan = [patient.b];
+
+            }else{
+                //console.log(patient);
+            }
+            let selected;
+            if(quant == 'bottom'){ selected = bottomStart };
+            if(quant == 'middle'){ selected = middleStart };
+            if(quant == 'top'){ selected = topStart };
+
+            events.fire('filter_aggregate', selected);
+        });
+
+
+    }
        public async mapDemoData() {
 
             let that = this;

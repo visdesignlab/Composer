@@ -48,15 +48,7 @@ export class QueryBox {
 
         form.append('br');
 
-         //test button to create parallel when I want to
-         /*
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Parallel Coordinate')
-            .on('click', () => events.fire('parallel'));
-        */
         this.drawQueryBox();
-
         this.attachListener();
     }
 
@@ -104,7 +96,7 @@ export class QueryBox {
 
     private drawCohortLabels(filterKeeper, cohorts) {
         
-                    this.cohortKeeper.selectAll('div').remove();
+            this.cohortKeeper.selectAll('div').remove();
             let counter = -1;
             let nodeArray = [];
             let filters = filterKeeper;
@@ -124,8 +116,7 @@ export class QueryBox {
                                                 cohortBox.append('text').text(element.checkedOptions.forEach(op => {
                                                     return op + ',';
                                                 }));
-                
-                //cohortBox.append('text').text(cohort[i].length);
+
                 });
 
                
@@ -137,7 +128,7 @@ export class QueryBox {
                 })};
 
                 counter = counter + 1;
-                //label.data(item[i]);
+            
                 cohortlabel.on('click', ()=> {
                     console.log(cohort);
                     console.log(i);
@@ -151,8 +142,9 @@ export class QueryBox {
                 let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
                 let picked = cohortLabels[counter];
                 picked.classList.add('selected');
+
             }else{
-                console.log(this.selected);
+
                 let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
                 let picked = cohortLabels[this.selected];
                 picked.classList.add('selected');
@@ -162,28 +154,14 @@ export class QueryBox {
     private drawQueryBox () {
 
         let form = this.$node.append('form');
+        let aggDiv = this.$node.append('div').classed('aggRadio', true);
     
         form.append('input')
                 .attr('type', 'text')
                 .attr('placeholder', 'Search Order Name')
                 .attr('id', 'order_search')
                 .attr('value');
-    /*
-        form.append('input')
-                .attr('type', 'button')
-                .attr('value', 'search for event')
-                .on('click', () => {
-                    this.searchByEvent();
-                    //this.cptchecker();
-                });
-        form.append('input')
-                .attr('type', 'button')
-                .attr('value', 'search for codes')
-                .on('click', () => {
-                    this.searchByEvent();
-                    this.cptchecker();
-                });*/
-    
+
         form.append('input')
                 .attr('type', 'button')
                 .attr('value', 'Filter by Code')
@@ -196,6 +174,22 @@ export class QueryBox {
                   let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
                   events.fire('filter_by_code', this.targetOrder);
         });
+
+        ///radio aggregation
+        aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
+        .attr('value', 'bottom').on('click', () =>{});
+        aggDiv.append('label').attr('for', 'sample1').text('bottom');
+        aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample2')
+        .attr('value', 'middle').on('click', () =>console.log(this));
+        aggDiv.append('label').attr('for', 'sample2').text('middle');
+        aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample3')
+        .attr('value', 'top').on('click', () =>console.log(this));
+        aggDiv.append('label').attr('for', 'sample1').text('top');
+        aggDiv.append('div').append('input').attr('type', 'submit')
+        .attr('value', 'Filter Aggregate').on('click', () =>{
+            let checked = document.querySelector('input[name="sample"]:checked');
+            let selected = checked['value'];
+            events.fire('filter_aggregate_test', selected); });
     }
     
         private cptchecker() {
@@ -264,27 +258,6 @@ export class QueryBox {
      * getting the similar patients info and firing events to update the vis
      * @returns {Promise<void>}
      */
-
-    /**
-     * firing event to update the vis for info of a patient
-     */
-    private updateAllInfo() {
-        const value = (<HTMLInputElement>document.getElementById('text_pat_id')).value;
-        if (!isNaN(+value) && value) {
-            const url = `/data_api/getPatInfo/${value}/${this.dataset}`;
-            this.setBusy(true);
-            this.getData(url).then((args) => {
-
-                // caught by svgTable and similarityScoreDiagram
-                events.fire('update_all_info', [value, args]);
-
-                this.setBusy(false)
-            });
-
-        } else {
-            console.log('Not a Number');
-        }
-    }
 
     /**
      * get Data by API

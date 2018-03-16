@@ -144,13 +144,7 @@ export class TimelineKeeper {
               let start = this.timeScale.invert(event.selection[0]);
               let end = this.timeScale.invert(event.selection[1]);
                 console.log(start);
-            /*
-              timelineSVG//.select('.context')
-              .append('g')
-              .attr('class', '.xAxisMini')
-              .attr('transform', () => `translate(30,50)`)
-              .call(axisBottom(this.timeScale));
-*/
+
               events.fire('domain updated', [start, end]);
             }
 
