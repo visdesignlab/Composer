@@ -68,8 +68,11 @@ export class similarityScoreDiagram {
     private lineOpacity;
     private eventDayBool;
     private scaleRelative = false;
+    private yBrushSelection = false;
 
     constructor(parent: Element, diagram, cohortData, max, min) {
+
+        const that = this;
 
        // console.log('test   '+cohortData);
         this.diagram = diagram;
@@ -141,15 +144,31 @@ export class similarityScoreDiagram {
         this.brush = brushY()
             .extent([[0, 0], [this.sliderWidth - 2, this.scoreScale.range()[1]]])
             .on("end", () => {
-                let start = event.selection[0];
-                let end = event.selection[1];
-
-                this.updateSlider(start, end)
+                let start = that.scoreScale.invert(event.selection[0]);
+                let end = that.scoreScale.invert(event.selection[1]);
+                
+                //let start = this.timeScale.invert(event.selection[0]);
+               // let end = this.timeScale.invert(event.selection[1]);
+                events.fire('score_domain_change', [+start, +end]);
+                //this.updateSlider(start, end)
             });
-
+ 
         slider.call(this.brush)
-            .call(this.brush.move, this.scoreScale.range());
+              .call(this.brush.move, this.scoreScale.range());
 
+        slider.on('click', () => {
+                if(this.yBrushSelection == true) {
+                    if(this.scaleRelative == true ){
+                        this.scoreScale.domain([30, -30]);
+                    }else{ this.scoreScale.domain([80, 0]);}
+                   
+                    slider.call(this.brush)
+                    .call(this.brush.move, this.scoreScale.range());
+                    this.clearDiagram();
+                    this.drawPromisChart();
+                    this.yBrushSelection = false;
+                }
+            })
         // -----
 
         scoreGroup.append('text')
@@ -190,6 +209,14 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
+
+        events.on('score_domain_change', (evt, item)=>{
+            console.log(item);
+            this.scoreScale.domain(item);
+            this.clearDiagram();
+            this.drawPromisChart();
+            this.yBrushSelection = true;
+        });
 
         events.on('filter_aggregate', (evt, item)=> {
             console.log(item);
@@ -501,6 +528,8 @@ export class similarityScoreDiagram {
             // time scale
             this.timeScale.domain([this.minDay, this.maxDay]);
 
+            console.log(this.scoreScale.domain());
+
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
 
@@ -519,7 +548,7 @@ export class similarityScoreDiagram {
            medScoreGroup.append("clipPath").attr('id', 'clip')
            .append('rect')
            .attr('width', 850)
-           .attr('height', this.height);
+           .attr('height', this.height - 20);
 
             let that = this;
             medScoreGroup.selectAll('.line_group')

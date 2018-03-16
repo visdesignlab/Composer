@@ -168,11 +168,12 @@ export class QueryBox {
                 events.fire('clear_cohorts');
                 this.cohortKeeper.selectAll('div').remove();
             });
-
+/*
         form.append('input')
             .attr('type', 'button')
             .attr('value', 'Show Stats')
             .on('click', () => events.fire('show_distributions'));
+            */
         let aggDiv = this.$node.append('div').classed('aggRadio', true);
     
         form.append('input')
