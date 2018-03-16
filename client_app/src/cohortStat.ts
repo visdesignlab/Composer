@@ -30,57 +30,27 @@ export class CohortStat{
 
     constructor(parent: Element, cohort, index){
 
+        this.cohort = cohort;
+        this.index = index;
+        let number = index + 1;
+       
+
         this.$node = select(parent);
         let statView = this.$node.append('div').classed('cohort_stat_view', true);
-
         this.statWrapper = statView.append('div').classed('cohortStatWrapper', true);
-        this.attachListener();
+        this.statWrapper.append('div').append('text').text('Cohort ' + number);
+        this.statWrapper.append('div').append('text').text(this.cohort.length);
+        this.getAverage(this.cohort);
+        this.buildStatBox();
+       // this.attachListener();
     }
 
     private attachListener(){
 
-        events.on('selected_stat_change', (evt, item) => {
-            this.statWrapper.selectAll('div').remove();
-            //console.log(item);
-            this.cohort = item[0];
-            this.index = +item[1] + 1;
-            this.statWrapper.append('div').append('text').text('Cohort ' + this.index);
-            this.statWrapper.append('div').append('text').text(item[0].length);
-            this.getAverage(this.cohort);
-            this.buildStatBox();
-        });
-
-        events.on('cohort_interpolated', (evt, item)=>{
-
-            this.cohort = item;
-
-        });
-
-        events.on('cohort_stats', (evt, item)=> {
-            
-            this.index = +item[1] + 1;
-            if(this.cohort == null){
-                this.cohort = item[0];
-            }
-
-            this.statWrapper.append('div').append('text').text('Cohort ' + this.index);
-            this.statWrapper.append('div').append('text').text(item[0].length);
-            
-            this.getAverage(this.cohort);
-           
-        });
-        events.on('clear_cohorts', ()=>{
-            this.statWrapper.selectAll('div').remove();
-        });
-
-        events.on('cohort_selected', ()=> {
-            this.statWrapper.selectAll('div').remove();
-        });
-
     }
 
     private getAverage(cohort) {
-       
+        console.log(cohort);
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -93,7 +63,7 @@ export class CohortStat{
                 if(patient.value[0].diff > Math.abs(90)){
                     outofrange.push(patient);
                 }
-              
+
                 oneval.push(patient.key);
 
             }
@@ -103,34 +73,12 @@ export class CohortStat{
                 if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
                 if(patient.b <= 29){bottomStart.push(patient)};
                 patient.scorespan = [patient.b];
-             /*
-                patient.value.forEach(value => {
-                    if(value.diff > 0 && value.diff < 30){console.log(value.SCORE)};
-                });*/
-                
 
+            }else{
+                console.log(patient);
             }
 
         });
-       
-        this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
-        .attr('value', 'bottom').on('click', () =>{});
-        this.statWrapper.append('label').attr('for', 'sample1').text('bottom');
-        this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample2')
-        .attr('value', 'middle').on('click', () =>console.log(this));
-        this.statWrapper.append('label').attr('for', 'sample2').text('middle');
-        this.statWrapper.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample3')
-        .attr('value', 'top').on('click', () =>console.log(this));
-        this.statWrapper.append('label').attr('for', 'sample1').text('top');
-        this.statWrapper.append('div').append('input').attr('type', 'submit')
-        .attr('value', 'Filter Aggregate').on('click', () =>{
-            let checked = document.querySelector('input[name="sample"]:checked');
-           
-            let selected;
-            if(checked['value'] == 'bottom'){selected = bottomStart;}
-            if(checked['value'] == 'middle'){selected = middleStart;}
-            if(checked['value'] == 'top'){selected = topStart;}
-            events.fire('filter_aggregate', selected)});
     
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score : '+ oneval.length);
         this.statWrapper.append('div').append('text').text('Num of Patients with 1 score for > 90 days from code: '+ outofrange.length);

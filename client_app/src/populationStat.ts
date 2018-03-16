@@ -66,14 +66,6 @@ export class populationStat {
 
         this.$node.append('div').classed('day_line', true);
 
-       // const dgmPromisPhysicalDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-       // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
-
-        //const promis_stats = this.$node.append('div').classed('promis_stats', true).append('svg');
-
-      //  const distributions = this.$node.append('div').classed('distributions', true);
-      //  distributionDiagram.create(distributions.node());
-
         this.attachListener();
         
     }

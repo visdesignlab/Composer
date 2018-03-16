@@ -23,6 +23,7 @@ import { individualStats } from './individualStats';
 import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
 import * as cohortStat from './cohortStat';
+import { selectAll } from 'd3';
 
 
 /**
@@ -76,69 +77,55 @@ export class App {
     const timeline = main.append('div').classed('timeline_view', true)
     const plots = main.append('div').classed('plot_view', true);
 
-    // population distributions, initial visualization for all of the data
-    //populationStat.create(populationView.node());
     timelineKeeper.create(timeline.node());
     PlotKeeper.create(plots.node());
 
     inStat.create(main.node());
 
-
     const cpt = main.append('Div').classed('cptDiv', true);
-   // cptBreak.create(cpt.node());
-   // this.$node.select('.cptDiv').classed('hidden', true);
 
-    //const cstat = main.append('Div').classed('cohort_stat_view', true);
-    //cohortStat.create(main.node());
-   // cptBreak.create(cpt.node());
-   // this.$node.select('.cohort_stat_view');//.classed('hidden', true);
-      // PROMIS diagrams
-   // const dgmPromisPhysicalDiv = main.append('Div').classed('allDiagramDiv', true);
-   // similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.2 - Physical Function');
-     //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'Oswestry Index (ODI)');
-     //similarityScoreDiagram.create(dgmPromisPhysicalDiv.node(), 'PROMIS Bank v1.0 - Depression');
-     
     this.setBusy(false);
 
-    events.on('add_to_cohort_stat',(evt, item)=> {
-      console.log('when does this happen');
-      cohortStat.create(main.node(), item[0], item[1]);
+    events.on('cohort_made', (evt, item)=>{
+      
+      let remove = document.querySelectorAll('.cohort_stat_view');
+      for (var i = remove.length; i--; ) {
+        remove[i].remove();
+     }
     });
 
-    events.on('show_cpt', () => {
-          
-                     // console.log('works!');
-                      this.$node.select('.main').select('.allDiagramDiv').classed('hidden', true);
-                     // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
-                     // this.$node.select('.main').select('.cptDiv').classed('hidden', false);
-                    //  this.$node.select('.main').select('.rectDiv').classed('hidden', false);
-          
-                  });
+    events.on('cohort_stat_array',(evt, item)=> {
+      item.forEach((c, i) => {
+        cohortStat.create(main.node(), c, i);
+      });
+    });
+
+    events.on('clear_cohorts', () => { 
+
+      selectAll('.cohort_stat_view').remove();
+
+    });
 
     events.on('load_cpt', () => {
-          
-      // console.log('works!');
+
        this.$node.select('.main').select('.distributions').classed('hidden', true);
-      // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
        this.$node.select('.main').select('.cptDiv').classed('hidden', false);
        this.$node.select('.main').select('.rectDiv').classed('hidden', false);
 
    });
 
         events.on('show_distributions', ()=> {
+
           this.$node.select('.main').select('.distributions').classed('hidden', false);
-          //this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
-          this.$node.select('.main').select('.cptDiv').classed('hidden', true);
-          this.$node.select('.main').select('.rectDiv').classed('hidden', true);
+
         });
-        
+
           // item: pat_id, DATA
         events.on('update_hierarchy', () => {  // called in query box
 
             this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', false);
-           // this.$node.select('.main').select('.orderBreakdownDiv').classed('hidden', true);
             this.$node.select('.main').select('.rectDiv').classed('hidden', true);
-           // console.log('remove pat hierarchy');
+        
 
         });
       
