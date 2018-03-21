@@ -25,6 +25,7 @@ import * as codeDict from './cptDictionary';
 export class CohortStat{
     private $node;
     private statWrapper;
+    private statView;
     private cohort;
     private index;
 
@@ -35,9 +36,9 @@ export class CohortStat{
         let number = index + 1;
        
 
-        this.$node = select(parent);
-        let statView = this.$node.append('div').classed('cohort_stat_view', true);
-        this.statWrapper = statView.append('div').classed('cohortStatWrapper', true);
+        this.$node = select(parent).attr('id', index);
+        this.statView = this.$node.append('div').classed('cohort_stat_view', true);
+        this.statWrapper = this.statView.append('div').classed('cohortStatWrapper' + index, true);
        // this.statWrapper.append('div').append('text').text('Cohort ' + number);
        // this.statWrapper.append('div').append('text').text(this.cohort.length);
         this.getPromisCount(this.cohort);
@@ -50,7 +51,9 @@ export class CohortStat{
 
         events.on('calculate_agg', (evt,item)=> {
             console.log('agg calc!');
-            this.getAverage(this.cohort);
+           // console.log(this.$node);
+            this.statWrapper.select('.statsAfterEvent').remove();
+            this.getAverage(item);
         });
        
     }
@@ -66,6 +69,7 @@ export class CohortStat{
 
         cohort.forEach(patient => {
             if(patient.value.length == 1){
+
                 if(patient.value[0].diff > Math.abs(90)){
                     outofrange.push(patient);
                 }
@@ -79,8 +83,11 @@ export class CohortStat{
 
     }
 
-    private getAverage(cohort) {
-        
+    private getAverage(selected) {
+        let index = selected[1];
+        let cohort = selected[0];
+        let statAfterEvent = this.statWrapper.append('div').classed('statsAfterEvent', true);
+      
        // let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -104,11 +111,11 @@ export class CohortStat{
         });
     
  
-        this.statWrapper.append('div').append('text').text('Patients with 1 score for > 90 days from code: '+ outofrange.length);
-        this.statWrapper.append('div').append('text').text('Average interpolated score at 0 day: ' + d3.mean(barray));
-        this.statWrapper.append('div').append('text').text('Top Starting Percentile (>=43): ' + topStart.length + ' patients');
-        this.statWrapper.append('div').append('text').text('Top Starting Percentile (<43, >29): ' + middleStart.length + ' patients');
-        this.statWrapper.append('div').append('text').text('Top Starting Percentile (<=29): ' + bottomStart.length + ' patients');
+        statAfterEvent.append('div').append('text').text('Patients with 1 score for > 90 days from code: '+ outofrange.length);
+        statAfterEvent.append('div').append('text').text('Average interpolated score at 0 day: ' + d3.mean(barray));
+        statAfterEvent.append('div').append('text').text('Top Starting Percentile (>=43): ' + topStart.length + ' patients');
+        statAfterEvent.append('div').append('text').text('Top Starting Percentile (<43, >29): ' + middleStart.length + ' patients');
+        statAfterEvent.append('div').append('text').text('Top Starting Percentile (<=29): ' + bottomStart.length + ' patients');
     }
 
     private buildStatBox()  {

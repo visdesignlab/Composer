@@ -249,9 +249,7 @@ export class SideBar {
                           that.filters = [];
                           filterList = [];
                           that.bmiRange = null;
-                       
                           that.cciRange = null;
-                       
                           that.ageRange = null;
 
                           that.$node.select('#BMI-Brush').call(that.bmiBrush)
@@ -260,8 +258,6 @@ export class SideBar {
                           .call(that.cciBrush.move, null);
                           that.$node.select('#AGE-Brush').call(that.ageBrush)
                           .call(that.ageBrush.move, null);
-                        
-                      
 
                           parentFilter.classed('parent', false);
                           form.selectAll('li').classed('hidden', true);
@@ -444,8 +440,6 @@ export class SideBar {
     } else {
       let start = CCIScale.invert(event.selection[0]);
       let end = CCIScale.invert(event.selection[1]);
-      console.log(Math.floor(start), start);
-      console.log(Math.ceil(end), end);
       let Dom1 = Math.floor(start);
       let Dom2 = Math.ceil(end);
       this.cciRange = [Dom1, Dom2];
@@ -459,8 +453,7 @@ export class SideBar {
                     } else {
                       let start = AGEScale.invert(event.selection[0]);
                       let end = AGEScale.invert(event.selection[1]);
-                      console.log(Math.floor((start+1)/10)*10, start);
-                      console.log(Math.ceil((end+1)/10)*10, end);
+
                       let Dom1 = Math.floor((start+1)/10)*10;
                       let Dom2 = Math.ceil((end+1)/10)*10;
                       this.ageRange = [Dom1, Dom2];
