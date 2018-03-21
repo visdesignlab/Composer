@@ -77,16 +77,16 @@ export class QueryBox {
         });
 
         events.on('add_to_cohort_bar', (evt, item)=> {
-          
-            this.drawCohortLabels(item[0], item[1]);
-          
+
+            this.drawCohortLabels(item[0], item[1]);//.then(console.log(item[0]));
+
         });
         events.on('update_filters', (evt, item)=> {
-            this.drawCohortLabels(item[0], item[1]);
+            this.drawCohortLabels(item[0], item[1]);//.then(events.fire('send_stats'));
         });
     }
 
-    private drawCohortLabels(filterKeeper, cohorts) {
+    private async drawCohortLabels(filterKeeper, cohorts) {
         
             this.cohortKeeper.selectAll('div').remove();
             let counter = -1;
@@ -102,6 +102,8 @@ export class QueryBox {
                 let cohortfilter;
                 let label = document.getElementsByClassName('cohort ' + i);
                 let statView = select(label[0]).append('div').classed('stat_view', true).classed('hidden', true);
+                let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
+                cohortStat.create(view, cohorts[i], i);
 
                 let labelhide = true;
                 cohortarrow.on('click', ()=> { 
@@ -154,6 +156,8 @@ export class QueryBox {
                 let picked = cohortLabels[this.selected];
                 picked.classList.add('selected');
             }
+
+
     }
 
     private drawQueryBox () {

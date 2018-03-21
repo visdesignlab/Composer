@@ -381,6 +381,8 @@ export class DataManager {
 
         if (yayornay == 'yay'){
             events.fire('filtered_patient_promis', patPromis);}
+
+       // events.fire('send_stats');//this fires before the query thing is loaded so you cant use it here
      };
 
      //uses Phovea to access PRO data and draw table

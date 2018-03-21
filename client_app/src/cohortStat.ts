@@ -40,17 +40,23 @@ export class CohortStat{
         this.statWrapper = statView.append('div').classed('cohortStatWrapper', true);
        // this.statWrapper.append('div').append('text').text('Cohort ' + number);
        // this.statWrapper.append('div').append('text').text(this.cohort.length);
-        this.getAverage(this.cohort);
+        this.getPromisCount(this.cohort);
+       // this.getAverage(this.cohort);
         this.buildStatBox();
-       // this.attachListener();
+        this.attachListener();
     }
 
     private attachListener(){
 
+        events.on('calculate_agg', (evt,item)=> {
+            console.log('agg calc!');
+            this.getAverage(this.cohort);
+        });
+       
     }
 
-    private getAverage(cohort) {
-        
+    private getPromisCount(cohort){
+
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -67,6 +73,23 @@ export class CohortStat{
                 oneval.push(patient.key);
 
             }
+        });
+
+        this.statWrapper.append('div').append('text').text('Patients with 1 score : '+ oneval.length);
+
+    }
+
+    private getAverage(cohort) {
+        
+       // let oneval = [];
+        let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+        let barray = [];
+
+        cohort.forEach(patient => {
+  
             if(patient.b != undefined){
                 barray.push(patient.b);
                 if(patient.b >= 43){topStart.push(patient)};
@@ -75,12 +98,12 @@ export class CohortStat{
                 patient.scorespan = [patient.b];
 
             }else{
-               // console.log(patient);
+            
             }
 
         });
     
-        this.statWrapper.append('div').append('text').text('Patients with 1 score : '+ oneval.length);
+ 
         this.statWrapper.append('div').append('text').text('Patients with 1 score for > 90 days from code: '+ outofrange.length);
         this.statWrapper.append('div').append('text').text('Average interpolated score at 0 day: ' + d3.mean(barray));
         this.statWrapper.append('div').append('text').text('Top Starting Percentile (>=43): ' + topStart.length + ' patients');
