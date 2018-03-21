@@ -8,10 +8,12 @@
 }
 
 .cohort-label {
-    width: 100px;
+    min-width: 50px;
+    max-width: 200px;
     height: 30px;
     display: inline-block;
     margin: auto;
+    padding-right: 16px;
     // background-color: aquamarine;
 }
 

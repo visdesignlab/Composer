@@ -229,7 +229,6 @@ export class similarityScoreDiagram {
            
             this.cohortProInfo = item[0];
             this.clearDiagram();
-            console.log(item[0]);
             this.drawPromisChart();
         });
 
@@ -238,6 +237,7 @@ export class similarityScoreDiagram {
                 this.scaleRelative = true;
                 this.interpolate(this.cohortProInfo);
                   }
+                  
             else{this.scaleRelative = false;
                 this.changeScale(this.cohortProInfo);
             };

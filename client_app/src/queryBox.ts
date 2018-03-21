@@ -117,7 +117,7 @@ export class QueryBox {
                 });
                 cohortfilter = filters[i].demo.forEach(element => {
                                                 
-                                                cohortBox.append('text').text(element.attributeName + ': ')
+                                                cohortBox.append('div').classed('cohort-label', true).append('text').text(element.attributeName + ': ')
                                                 element.checkedOptions.forEach(op => {
                                                     cohortBox.append('text').text(op + ', ');
                                                 });
@@ -129,14 +129,14 @@ export class QueryBox {
 
 
                 if(filters[i].cpt != 0){
-
-                    filters[i].cpt.forEach(code => {cohortBox.append('text').text(' CPT: '+ code);
+                    let cptBox = cohortBox.append('div').classed('cohort-label', true);
+                    filters[i].cpt.forEach(code => {cptBox.append('text').text(' CPT: '+ code);
 
                 })};
 
                 if(filters[i].minCount != null){
-
-                   cohortBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
+                    let minBox = cohortBox.append('div').classed('cohort-label', true);
+                    minBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
 
                 };
 
