@@ -64,7 +64,7 @@ export class CohortManager {
         });
 
           events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
-            let filterReq = {demo: null, cpt: [], length: null};
+            let filterReq = {demo: null, cpt: [], length: null, quantile: null, minCount: null};
             filterReq.demo = item;
             this.addCohortFilter(filterReq);
           });
@@ -127,14 +127,31 @@ export class CohortManager {
 
           });
 
-          events.on('filter_aggregate_test', (evt, item)=> {
-            console.log(item);
-            events.fire('filter_cohort_agg_test', [this.selectedCohort, item]);
+          events.on('filter_aggregate', (evt, item)=> {
+            console.log('agg filtered');
+            events.fire('filter_cohort_agg', [this.selectedCohort, item]);
         });
 
           events.on('filter_by_code', (evt, item)=> {
             this.cohortfilterarray[this.cohortIndex].cpt.push(item);
             events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
+          });
+
+          events.on('filtered_by_quant', (evt, item)=> {
+            this.cohortfilterarray[this.cohortIndex].quantile = item;
+            console.log(this.cohortfilterarray);
+          });
+
+          events.on('filtered_by_count', (evt, item)=>{
+            this.selectedCohort = item[0];
+            this.cohortkeeperarray[this.cohortIndex] = item[0];
+            this.cohortfilterarray[this.cohortIndex].minCount = item[1];
+            events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
+
+          });
+
+          events.on('filter_by_Promis_count', (evt, item)=> {
+              events.fire('filtering_Promis_count', [this.selectedCohort, item]);
           });
 
           events.on('cohort_stats', ()=>{
@@ -143,8 +160,8 @@ export class CohortManager {
 
           events.on('send_stats', () => {
             console.log('is this thing on?');
-
-            events.fire('calculate_agg', [this.selectedCohort, this.cohortIndex]);
+           // events.fire('calculate_agg', [this.selectedCohort, this.cohortIndex]);
+           events.fire('calculate_aggregate', [this.selectedCohort, this.cohortIndex]);
           });
 
           events.on('cohort_interpolated', (evt, item)=> {

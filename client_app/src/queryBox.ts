@@ -77,9 +77,7 @@ export class QueryBox {
         });
 
         events.on('add_to_cohort_bar', (evt, item)=> {
-
             this.drawCohortLabels(item[0], item[1]);//.then(console.log(item[0]));
-
         });
         events.on('update_filters', (evt, item)=> {
             this.drawCohortLabels(item[0], item[1]);//.then(events.fire('send_stats'));
@@ -136,6 +134,12 @@ export class QueryBox {
 
                 })};
 
+                if(filters[i].minCount != null){
+
+                   cohortBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
+
+                };
+
                 counter = counter + 1;
 
                 cohortlabel.on('click', ()=> {
@@ -179,6 +183,7 @@ export class QueryBox {
             .on('click', () => events.fire('show_distributions'));
             */
         let aggDiv = this.$node.append('div').classed('aggRadio', true);
+        let countPromis = this.$node.append('div').classed('countPromis', true);
     
         form.append('input')
                 .attr('type', 'text')
@@ -213,8 +218,20 @@ export class QueryBox {
         .attr('value', 'Filter Aggregate').on('click', () =>{
             let checked = document.querySelector('input[name="sample"]:checked');
             let selected = checked['value'];
-            events.fire('filter_aggregate_test', selected); });
-    }
+            events.fire('filter_aggregate', selected); });
+
+        countPromis.append('input').attr('type', 'text')
+        .attr('placeholder', 'Min Promis Score Count')
+        .attr('id', 'count_search')
+        .attr('value');
+
+        countPromis.append('input').attr('type', 'button')
+        .attr('value', 'Filter by Score Count').on('click', () =>{
+            let val = (<HTMLInputElement>document.getElementById('count_search')).value;
+            let count = +val;
+            events.fire('filter_by_Promis_count', count);
+    });
+}
     
         private cptchecker() {
             //this is where you are going to filter by category

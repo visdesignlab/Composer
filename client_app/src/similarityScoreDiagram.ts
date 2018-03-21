@@ -91,6 +91,7 @@ export class similarityScoreDiagram {
             this.zeroEvent = this.targetOrder;
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
+            
             });
 
         this.$node.append('input')
@@ -217,10 +218,18 @@ export class similarityScoreDiagram {
             this.yBrushSelection = true;
         });
 
-        events.on('filter_aggregate', (evt, item)=> {
+        events.on('filtered_by_quant', (evt, item)=> {
            
-            this.cohortProInfo = item;
+            this.cohortProInfo = item[0];
             this.clearDiagram();
+            this.drawPromisChart();
+        });
+
+        events.on('filtered_by_count', (evt, item)=> {
+           
+            this.cohortProInfo = item[0];
+            this.clearDiagram();
+            console.log(item[0]);
             this.drawPromisChart();
         });
 

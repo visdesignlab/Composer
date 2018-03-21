@@ -120,13 +120,7 @@ export class DataManager {
             this.icdTable = item;
         });
 
-        events.on('PROMIS_TEST', (evt, item)=> {
-          //  this.proTable = item;
-           
-           // this.getDataObjects('pro_object', this.proTable);
-        });
-
-        events.on('filter_cohort_agg_test', (evt, item)=> {
+        events.on('filter_cohort_agg', (evt, item)=> {
             this.getQuant_test(item[0], item[1]);
         });
 
@@ -162,13 +156,11 @@ export class DataManager {
 
         events.on('new_cohort_added', (evt, item)=> {
             this.filteredPatPromis = item;
-          
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
             this.filteredPatPromis = item;
-           
                 });
 
         events.on('filtered_CPT', (evt, item) => {
@@ -178,6 +170,10 @@ export class DataManager {
         events.on('selected_pat_array', (evt, item)=> {
             this.cohortIdArray = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
+        });
+
+        events.on('filtering_Promis_count', (evt, item)=> {
+            this.filterByPromisCount(item[0], item[1]);
         });
 
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
@@ -237,10 +233,25 @@ export class DataManager {
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
 
+       private filterByPromisCount(cohort, count) {
+    
+        let filter = [];
+
+        cohort.forEach(patient => {
+            if(patient.value.length > count){
+               // console.log(patient.value.length)
+                filter.push(patient);
+            }
+
+       });
+
+       events.fire('filtered_by_count', [filter, count]);
+    }
+
        private getQuant_test(cohort, quant) {
 
-        console.log(cohort);
-        console.log(quant);
+       // console.log(cohort);
+      //  console.log(quant);
 
         let oneval = [];
         let outofrange = [];
@@ -248,6 +259,7 @@ export class DataManager {
         let middleStart = [];
         let bottomStart = [];
         let barray = [];
+        let selected;
 
         cohort.forEach(patient => {
             if(patient.value.length == 1){
@@ -268,14 +280,14 @@ export class DataManager {
             }else{
                 //console.log(patient);
             }
-            let selected;
+            
             if(quant == 'bottom'){ selected = bottomStart };
             if(quant == 'middle'){ selected = middleStart };
             if(quant == 'top'){ selected = topStart };
 
-            events.fire('filter_aggregate', selected);
+            
         });
-
+        events.fire('filtered_by_quant', [selected, quant]);
 
     }
        public async mapDemoData() {
@@ -382,8 +394,33 @@ export class DataManager {
         if (yayornay == 'yay'){
             events.fire('filtered_patient_promis', patPromis);}
 
-       // events.fire('send_stats');//this fires before the query thing is loaded so you cant use it here
      };
+
+     private getAverage(selected) {
+
+        let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+        let barray = [];
+
+        selected.forEach(patient => {
+  
+            if(patient.b != undefined){
+                barray.push(patient.b);
+                if(patient.b >= 43){topStart.push(patient)};
+                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
+                if(patient.b <= 29){bottomStart.push(patient)};
+                patient.scorespan = [patient.b];
+
+            }else{
+            
+            }
+
+        });
+
+       console.log(topStart);
+    }
 
      //uses Phovea to access PRO data and draw table
    private async getCPT(cohortIdArray, cptObject) {
