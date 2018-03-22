@@ -130,7 +130,8 @@ export class QueryBox {
 
                 if(filters[i].cpt != 0){
                     let cptBox = cohortBox.append('div').classed('cohort-label', true);
-                    filters[i].cpt.forEach(code => {cptBox.append('text').text(' CPT: '+ code);
+                    cptBox.append('text').text('  CPT: ');
+                    filters[i].cpt.forEach(code => {cptBox.append('text').text(code + "  ");
 
                 })};
 
