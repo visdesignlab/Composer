@@ -23,6 +23,7 @@ import { individualStats } from './individualStats';
 import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
 import * as cohortStat from './cohortStat';
+import * as eventLine from './eventLine';
 import { selectAll } from 'd3';
 
 
@@ -79,6 +80,7 @@ export class App {
 
     timelineKeeper.create(timeline.node());
     PlotKeeper.create(plots.node());
+    eventLine.create(main.node(), null);
 
     inStat.create(main.node());
 
@@ -125,11 +127,9 @@ export class App {
 
             this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', false);
             this.$node.select('.main').select('.rectDiv').classed('hidden', true);
-        
 
         });
-      
-   
+
   }
 
   /**
