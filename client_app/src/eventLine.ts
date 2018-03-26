@@ -19,6 +19,7 @@ import * as codeDict from './cptDictionary';
 export class EventLine {
     private $node;
     private eventScale;
+    private circleScale;
     private filter;
 
 
@@ -27,6 +28,9 @@ export class EventLine {
     this.$node = select(parent);
     this.eventScale = scaleLinear().domain([0, 4])
             .range([0, 750]).clamp(true);
+
+    this.circleScale = scaleLinear().domain([0, 3000])
+            .range([1, 10]).clamp(true);
 
     this.attachListener();
 
@@ -37,7 +41,7 @@ export class EventLine {
 
     private attachListener() {
         events.on('update_event_line', (evt, item)=> {
-            this.filter = item;
+            this.filter = item[0];
             this.updateEvents(item);
         });
         events.on('selected_event_filter_change', (evt, item)=> {
@@ -56,6 +60,7 @@ export class EventLine {
     }
 
     private updateEvents(filters) {
+        console.log(filters);
         let that = this;
         this.$node.selectAll('.event').remove();
         console.log(filters);
@@ -65,14 +70,19 @@ export class EventLine {
 
         let eventEnter = events.enter().append('g').classed('event', true).attr('transform', translate);
 
-        eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', 5).attr('fill', 'red');
-        eventEnter.append('text').text(d => d).attr('transform', 'translate(5,20)');
+        eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('fill', 'red');
+        eventEnter.append('text').text(d => d[0]).attr('transform', 'translate(5,20)');
+        eventEnter.append('text').text(d => d[1]).attr('transform', 'translate(5,30)').attr('class', 'accent');
 
         events = eventEnter.merge(events);
        
 
         function translate(d, i) {
             return "translate(" + (75 + that.eventScale(i)) + "," + 0 + ")";
+          }
+
+          function circlesizer(d, i){
+              return that.circleScale(d[i][1]);
           }
           
     }

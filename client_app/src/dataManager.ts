@@ -571,6 +571,42 @@ export class DataManager {
         let object = await table.objects();
         events.fire(id, object);
     }
+    
+    //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
+/*
+    private searchByEvent() {
+
+        let withQuery = [];
+        let queryDate = [];
+            
+        if (this.currentlySelectedName != undefined ){
+          this.currentlySelectedName = undefined;
+        }
+  
+        const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+      
+        this.targetOrder = value;
+
+        this.filteredCPT.forEach((element) => {
+            console.log(element);
+            let elementBool;
+            element.forEach(g => {
+                if (g.value[0].includes(+value)){
+                    if(elementBool != g.key){
+                        withQuery.push(element);
+                        queryDate.push(g);
+                    }elementBool = g.key;
+                    }
+            });
+          
+        });
+
+        this.queryDataArray = withQuery;
+        this.queryDateArray = queryDate;
+
+        events.fire('query_order', value);
+        events.fire('filter_cohort_by_event', [this.queryDataArray, this.targetOrder]);
+    }*/
 
 
   }

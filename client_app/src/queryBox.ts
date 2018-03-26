@@ -131,7 +131,7 @@ export class QueryBox {
                 if(filters[i].cpt != 0){
                     let cptBox = cohortBox.append('div').classed('cohort-label', true);
                     cptBox.append('text').text('  CPT: ');
-                    filters[i].cpt.forEach(code => {cptBox.append('text').text(code + "  ");
+                    filters[i].cpt.forEach(code => {cptBox.append('text').text(code[0] + "  ");
 
                 })};
 
@@ -202,7 +202,7 @@ export class QueryBox {
                   selectAll('.unselectedOrder').classed('unselectedOrder', false);
                   events.fire('min date to cpt', this.queryDateArray);
                   let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
-                  events.fire('filter_by_code', this.targetOrder);
+                 // events.fire('filter_by_code', this.targetOrder);
         });
 
         ///radio aggregation
@@ -276,6 +276,7 @@ export class QueryBox {
             this.targetOrder = value;
     
             this.filteredCPT.forEach((element) => {
+                console.log(element);
                 let elementBool;
                 element.forEach(g => {
                     if (g.value[0].includes(+value)){

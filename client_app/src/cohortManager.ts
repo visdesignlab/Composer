@@ -119,6 +119,9 @@ export class CohortManager {
           events.on('filter_cohort_by_event', (evt, item)=> {
               this.selectedCPT = item[0];
               this.cptObjectKeeper[this.cohortIndex] = item[0];
+              this.cohortfilterarray[this.cohortIndex].cpt.push([item[1], item[0].length]);
+              events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
+              events.fire('update_event_line', this.cohortfilterarray[this.cohortIndex].cpt);
           });
 
           events.on('cpt_mapped', (evt, item)=> {
@@ -132,12 +135,6 @@ export class CohortManager {
             console.log('agg filtered');
             events.fire('filter_cohort_agg', [this.selectedCohort, item]);
         });
-
-          events.on('filter_by_code', (evt, item)=> {
-            this.cohortfilterarray[this.cohortIndex].cpt.push(item);
-            events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
-            events.fire('update_event_line', this.cohortfilterarray[this.cohortIndex].cpt);
-          });
 
           events.on('filtered_by_quant', (evt, item)=> {
             this.cohortfilterarray[this.cohortIndex].quantile = item;
