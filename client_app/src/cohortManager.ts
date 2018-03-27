@@ -125,7 +125,7 @@ export class CohortManager {
           });
 
           events.on('cpt_mapped', (evt, item)=> {
-
+            //THIS IS THE ENTIRE FILTERED CPT. NOT PER PAT.
               this.cptObjectKeeper.push(item);
               this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
 
@@ -135,6 +135,11 @@ export class CohortManager {
             console.log('agg filtered');
             events.fire('filter_cohort_agg', [this.selectedCohort, item]);
         });
+
+        events.on('filter_by_cpt', (evt, item)=> {
+            let code = item;
+           // events.fire()
+        })
 
           events.on('filtered_by_quant', (evt, item)=> {
             this.cohortfilterarray[this.cohortIndex].quantile = item;

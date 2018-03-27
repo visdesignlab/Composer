@@ -118,6 +118,7 @@ export class TimelineKeeper {
 
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
                           .attr('height', 70).attr('width', 710);
+
         timelineSVG.append('g')
                         .attr('class', '.xAxisMini')
                         .attr('transform', () => `translate(30,50)`)

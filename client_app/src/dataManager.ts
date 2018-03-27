@@ -44,6 +44,7 @@ export class DataManager {
     totalCptObjects;//CPT as objects for defined cohort
     cohortIcdObjects;//ICD objects for cohort
     filteredPatPromis;
+    patCPT;
 
     startDate;
 
@@ -148,6 +149,7 @@ export class DataManager {
             this.cohortIcdObjects = item;
         });
 
+        //Cohort Filtering
           // item: [d, parentValue]
         events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
            // this.filterRequirements.demo = item;
@@ -174,6 +176,12 @@ export class DataManager {
 
         events.on('filtering_Promis_count', (evt, item)=> {
             this.filterByPromisCount(item[0], item[1]);
+        });
+
+        events.on('filter_by_cpt', (evt, item)=> {
+           // console.log(this.filteredPatPromis);
+           console.log(this.patCPT);
+            this.searchByEvent(this.patCPT, item);
         });
 
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
@@ -233,7 +241,7 @@ export class DataManager {
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
 
-       private filterByPromisCount(cohort, count) {
+    private filterByPromisCount(cohort, count) {
     
         let filter = [];
 
@@ -248,7 +256,7 @@ export class DataManager {
        events.fire('filtered_by_count', [filter, count]);
     }
 
-       private getQuant_test(cohort, quant) {
+    private getQuant_test(cohort, quant) {
 
        // console.log(cohort);
       //  console.log(quant);
@@ -450,6 +458,7 @@ export class DataManager {
         const mapped = entries(filteredPatOrders);
 
         events.fire('filtered_CPT', mapped);
+       // this.patCPT = mapped;
 
  };
 
@@ -540,6 +549,7 @@ export class DataManager {
         });
 
         events.fire('cpt_mapped', filteredOrders);
+        this.patCPT = filteredOrders;
     }
 
     private getCohortIdArrayAfterMap (selectedData, typeofData: string)   {
@@ -571,23 +581,23 @@ export class DataManager {
         let object = await table.objects();
         events.fire(id, object);
     }
-    
+
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
-/*
-    private searchByEvent() {
+
+    private searchByEvent(cohort, value) {
 
         let withQuery = [];
         let queryDate = [];
-            
+        /*
         if (this.currentlySelectedName != undefined ){
           this.currentlySelectedName = undefined;
-        }
+        }*/
   
-        const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+       // const value = (<HTMLInputElement>document.getElementById('order_search')).value;
       
-        this.targetOrder = value;
+        //this.targetOrder = value;
 
-        this.filteredCPT.forEach((element) => {
+        cohort.forEach((element) => {
             console.log(element);
             let elementBool;
             element.forEach(g => {
@@ -601,12 +611,12 @@ export class DataManager {
           
         });
 
-        this.queryDataArray = withQuery;
-        this.queryDateArray = queryDate;
+       // this.queryDataArray = withQuery;
+       // this.queryDateArray = queryDate;
 
         events.fire('query_order', value);
-        events.fire('filter_cohort_by_event', [this.queryDataArray, this.targetOrder]);
-    }*/
+        events.fire('filter_cohort_by_event', [withQuery, value]);
+    }
 
 
   }

@@ -54,7 +54,7 @@ export class QueryBox {
 
        events.on('make_stat_node', (evt, item)=> {
            let parent = document.getElementsByClassName('cohort ' + item[1])[0];
-           console.log(parent);
+           
            let view = parent.querySelector('.stat_view');
            cohortStat.create(view, item[0], item[1]);
            //select('.cohort.' + item[1])
@@ -92,7 +92,7 @@ export class QueryBox {
             let filters = filterKeeper;
 
             filters.forEach((cohort, i) => {
-                //console.log(item[1][i].length);
+                
                 let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
                 let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
                 let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
@@ -113,7 +113,7 @@ export class QueryBox {
                             labelhide = true;
                         }
                     
-                    console.log(select(label[0]));
+                   // console.log(select(label[0]));
                 });
                 cohortfilter = filters[i].demo.forEach(element => {
                                                 
@@ -196,7 +196,9 @@ export class QueryBox {
                 .attr('type', 'button')
                 .attr('value', 'Filter by Code')
                 .on('click', () => {
-                  this.searchByEvent();
+                  const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+                  //this.searchByEvent();
+                  events.fire('filter_by_cpt', value);
                   //events.fire('filter_cohort_by_event', [this.queryDataArray, this.targetOrder]);
                   selectAll('.selectedOrder').classed('selectedOrder', false);
                   selectAll('.unselectedOrder').classed('unselectedOrder', false);
@@ -272,11 +274,11 @@ export class QueryBox {
             }
       
             const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-          
+            console.log(this.filteredCPT);
             this.targetOrder = value;
-    
+       
             this.filteredCPT.forEach((element) => {
-                console.log(element);
+               // console.log(element);
                 let elementBool;
                 element.forEach(g => {
                     if (g.value[0].includes(+value)){
