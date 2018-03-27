@@ -72,7 +72,7 @@ export class CohortManager {
           events.on('cohort_selected', (evt, item)=>{
 
             d3.select('#cohortKeeper').selectAll('.selected').classed('selected', false);
-            console.log(item[1]);
+      
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
@@ -132,7 +132,7 @@ export class CohortManager {
           });
 
           events.on('filter_aggregate', (evt, item)=> {
-            console.log('agg filtered');
+          
             events.fire('filter_cohort_agg', [this.selectedCohort, item]);
         });
 
@@ -143,7 +143,7 @@ export class CohortManager {
 
           events.on('filtered_by_quant', (evt, item)=> {
             this.cohortfilterarray[this.cohortIndex].quantile = item;
-            console.log(this.cohortfilterarray);
+          
           });
 
           events.on('filtered_by_count', (evt, item)=>{
@@ -163,7 +163,7 @@ export class CohortManager {
           });
 
           events.on('send_stats', () => {
-            console.log('is this thing on?');
+         
            // events.fire('calculate_agg', [this.selectedCohort, this.cohortIndex]);
            events.fire('calculate_aggregate', [this.selectedCohort, this.cohortIndex]);
           });
