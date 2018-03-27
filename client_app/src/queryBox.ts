@@ -70,15 +70,15 @@ export class QueryBox {
         events.on('start_date_patient', (evt, item)=> {
             this.startBool = '0 date determined by patient';
             this.startDay = item;
-            let startLabel = select('#start_date_label').text(item);//.style('color', 'red');
+            let startLabel = select('#start_date_label').text(item);
             let startLabelBool = select('#pat_or_event').text(this.startBool);
         });
 
         events.on('add_to_cohort_bar', (evt, item)=> {
-            this.drawCohortLabels(item[0], item[1]);//.then(console.log(item[0]));
+            this.drawCohortLabels(item[0], item[1]);
         });
         events.on('update_filters', (evt, item)=> {
-            this.drawCohortLabels(item[0], item[1]);//.then(events.fire('send_stats'));
+            this.drawCohortLabels(item[0], item[1]);
         });
     }
 
@@ -91,7 +91,7 @@ export class QueryBox {
             console.log(cohorts);
 
             filters.forEach((cohort, i) => {
-               
+
                 let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
                 let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
                 let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
@@ -194,11 +194,11 @@ export class QueryBox {
                   events.fire('filter_by_cpt', value);
                   selectAll('.selectedOrder').classed('selectedOrder', false);
                   selectAll('.unselectedOrder').classed('unselectedOrder', false);
-                  let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
+                  let eventLabel = select('#eventLabel').text(" " + value);
          
         });
 
-        ///radio aggregation
+    ///radio aggregation
         aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
         .attr('value', 'bottom').on('click', () =>{});
         aggDiv.append('label').attr('for', 'sample1').text('bottom');
@@ -214,6 +214,7 @@ export class QueryBox {
             let selected = checked['value'];
             events.fire('filter_aggregate', selected); });
 
+    //filter patients by a minimum score count threshold
         countPromis.append('input').attr('type', 'text')
         .attr('placeholder', 'Min Promis Score Count')
         .attr('id', 'count_search')
