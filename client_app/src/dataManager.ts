@@ -179,8 +179,7 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-           // console.log(this.filteredPatPromis);
-           console.log(this.patCPT);
+      
             this.searchByEvent(this.patCPT, item);
         });
 
@@ -247,7 +246,7 @@ export class DataManager {
 
         cohort.forEach(patient => {
             if(patient.value.length > count){
-               // console.log(patient.value.length)
+              
                 filter.push(patient);
             }
 
@@ -258,8 +257,7 @@ export class DataManager {
 
     private getQuant_test(cohort, quant) {
 
-       // console.log(cohort);
-      //  console.log(quant);
+
 
         let oneval = [];
         let outofrange = [];
@@ -427,7 +425,7 @@ export class DataManager {
 
         });
 
-       console.log(topStart);
+   
     }
 
      //uses Phovea to access PRO data and draw table
@@ -436,7 +434,7 @@ export class DataManager {
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
         if (cohortIdArray != null) {
-            console.log(cptObject);
+       
             cptObject.forEach((item) => {
                 if (cohortIdArray.indexOf(item.PAT_ID) != -1) {
                 if (filteredPatOrders[item.PAT_ID] === undefined) {
@@ -599,7 +597,7 @@ export class DataManager {
         //this.targetOrder = value;
 
         cohort.forEach((element) => {
-            console.log(element);
+
             let elementBool;
             element.forEach(g => {
                 if (g.value[0].includes(+value)){
@@ -611,9 +609,8 @@ export class DataManager {
             });
           
         });
-        console.log(queryDate);
-       // this.queryDataArray = withQuery;
-       // this.queryDateArray = queryDate;
+
+
         events.fire('min date to cpt', queryDate);
         events.fire('query_order', value);
         events.fire('filter_cohort_by_event', [withQuery, value]);

@@ -10,13 +10,11 @@ import * as cohortStat from './cohortStat';
 export class QueryBox {
 
     private $node;
-    private similarArgs;
+ 
     private dataset;
     private startDay;
     private startBool;
     private cohortKeeper;
-    private queryDateArray;
-    private queryDataArray;
     private targetOrder;
     private filteredCPT;
     private currentlySelectedName;
@@ -42,13 +40,13 @@ export class QueryBox {
     private attachListener() {
 
     events.on('cpt_mapped', (evt, item)=> {
-            //this.timeScale.domain([0, this.maxDay]);
             this.filteredCPT = item;
        });
 
        events.on('selected_cpt_change', (evt, item) => {
 
            this.filteredCPT = item;
+           console.log(item);
 
        });
 
@@ -62,7 +60,7 @@ export class QueryBox {
 
 
         events.on('update_start_event', (evt, item)=>  {
-            console.log('does this even do anything?');
+           
             let startLabel = select('#start_date_label').style('color', 'black');
             this.startBool = '0 date determined by event';
             let startLabelBool = select('#pat_or_event').text(this.startBool);
@@ -90,9 +88,10 @@ export class QueryBox {
             let counter = -1;
             let nodeArray = [];
             let filters = filterKeeper;
+            console.log(cohorts);
 
             filters.forEach((cohort, i) => {
-                
+               
                 let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
                 let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
                 let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
@@ -104,25 +103,25 @@ export class QueryBox {
                 cohortStat.create(view, cohorts[i], i);
 
                 let labelhide = true;
-                cohortarrow.on('click', ()=> { 
-                    if(labelhide){ 
-                        statView.classed('hidden', false); 
+                cohortarrow.on('click', ()=> {
+                    if(labelhide) {
+                        statView.classed('hidden', false);
                         labelhide = false;
-                    }else{
+                    }else {
                             statView.classed('hidden', true);
                             labelhide = true;
                         }
-                    
-                   // console.log(select(label[0]));
+
                 });
                 cohortfilter = filters[i].demo.forEach(element => {
-                                                
+
                                                 cohortBox.append('div').classed('cohort-label', true).append('text').text(element.attributeName + ': ')
                                                 element.checkedOptions.forEach(op => {
                                                     cohortBox.append('text').text(op + ', ');
                                                 });
                                                 cohortBox.append('text').text(element.checkedOptions.forEach(op => {
                                                     return op + ',';
+
                                                 }));
 
                 });
@@ -177,12 +176,7 @@ export class QueryBox {
                 events.fire('clear_cohorts');
                 this.cohortKeeper.selectAll('div').remove();
             });
-/*
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Show Stats')
-            .on('click', () => events.fire('show_distributions'));
-            */
+
         let aggDiv = this.$node.append('div').classed('aggRadio', true);
         let countPromis = this.$node.append('div').classed('countPromis', true);
     
@@ -197,14 +191,11 @@ export class QueryBox {
                 .attr('value', 'Filter by Code')
                 .on('click', () => {
                   const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-                  //this.searchByEvent();
                   events.fire('filter_by_cpt', value);
-                  //events.fire('filter_cohort_by_event', [this.queryDataArray, this.targetOrder]);
                   selectAll('.selectedOrder').classed('selectedOrder', false);
                   selectAll('.unselectedOrder').classed('unselectedOrder', false);
-                 // events.fire('min date to cpt', this.queryDateArray);
                   let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
-                 // events.fire('filter_by_code', this.targetOrder);
+         
         });
 
         ///radio aggregation
@@ -235,69 +226,6 @@ export class QueryBox {
             events.fire('filter_by_Promis_count', count);
     });
 }
-    
-        private cptchecker() {
-            //this is where you are going to filter by category
-            const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-            let codes = value.split(' ');
-      
-            let withQuery = [];
-            let queryDate = [];
-    
-            this.filteredCPT.forEach((element) => {
-                let elementBool;
-                element.forEach(g => {
-                    if(codes.some(r=> g.value[0].includes(+r))){
-                       
-                        if(elementBool != g.key){
-                            withQuery.push(element);
-                            queryDate.push(g);
-                        }elementBool = g.key;
-                    }
-                    });
-                });
-    
-            this.queryDataArray = withQuery;
-            this.queryDateArray = queryDate;
-    
-            events.fire('query_order', value);
-    
-        }
-
-        private searchByEvent() {
-
-            let withQuery = [];
-            let queryDate = [];
-                
-            if (this.currentlySelectedName != undefined ){
-              this.currentlySelectedName = undefined;
-            }
-      
-            const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-            console.log(this.filteredCPT);
-            this.targetOrder = value;
-       
-            this.filteredCPT.forEach((element) => {
-               // console.log(element);
-                let elementBool;
-                element.forEach(g => {
-                    if (g.value[0].includes(+value)){
-                        if(elementBool != g.key){
-                            withQuery.push(element);
-                            queryDate.push(g);
-                        }elementBool = g.key;
-                        }
-                });
-              
-            });
-    
-            this.queryDataArray = withQuery;
-            this.queryDateArray = queryDate;
-    
-            events.fire('query_order', value);
-            events.fire('filter_cohort_by_event', [this.queryDataArray, this.targetOrder]);
-        }
-
 
     /**
      * getting the similar patients info and firing events to update the vis
