@@ -436,6 +436,7 @@ export class DataManager {
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
         if (cohortIdArray != null) {
+            console.log(cptObject);
             cptObject.forEach((item) => {
                 if (cohortIdArray.indexOf(item.PAT_ID) != -1) {
                 if (filteredPatOrders[item.PAT_ID] === undefined) {
@@ -610,10 +611,10 @@ export class DataManager {
             });
           
         });
-
+        console.log(queryDate);
        // this.queryDataArray = withQuery;
        // this.queryDateArray = queryDate;
-
+        events.fire('min date to cpt', queryDate);
         events.fire('query_order', value);
         events.fire('filter_cohort_by_event', [withQuery, value]);
     }

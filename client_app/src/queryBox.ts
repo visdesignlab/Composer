@@ -202,7 +202,7 @@ export class QueryBox {
                   //events.fire('filter_cohort_by_event', [this.queryDataArray, this.targetOrder]);
                   selectAll('.selectedOrder').classed('selectedOrder', false);
                   selectAll('.unselectedOrder').classed('unselectedOrder', false);
-                  events.fire('min date to cpt', this.queryDateArray);
+                 // events.fire('min date to cpt', this.queryDateArray);
                   let eventLabel = select('#eventLabel').text(" " + this.targetOrder);
                  // events.fire('filter_by_code', this.targetOrder);
         });
