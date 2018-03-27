@@ -94,6 +94,8 @@ export class similarityScoreDiagram {
             
             });
 
+        this.$node.append('text').attr('id', 'eventLabel');
+
         this.$node.append('input')
             .attr('type', 'button')
             .attr('value', 'Change Promis Score Scale')
@@ -101,7 +103,7 @@ export class similarityScoreDiagram {
            // .on('click', () => events.fire('load_cpt'));
             .on('click', () =>events.fire('change_promis_scale'));
 
-        this.$node.append('text').attr('id', 'eventLabel');
+       
 
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
@@ -242,6 +244,11 @@ export class similarityScoreDiagram {
                 this.changeScale(this.cohortProInfo);
             };
 
+        });
+
+        events.on('event_clicked', (evt, item)=> {
+            console.log(item);
+            
         });
 
         events.on('filter_cohort_by_event', (evt, item)=> {

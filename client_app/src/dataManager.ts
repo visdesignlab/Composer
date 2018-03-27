@@ -17,6 +17,7 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalc from './dataCalculations';
+import { max } from 'd3-array';
 
 export class DataManager {
 
@@ -257,8 +258,6 @@ export class DataManager {
 
     private getQuant_test(cohort, quant) {
 
-
-
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -266,16 +265,25 @@ export class DataManager {
         let bottomStart = [];
         let barray = [];
         let selected;
+        let maxPromisCount = 1;
 
         cohort.forEach(patient => {
+
             if(patient.value.length == 1){
                 if(patient.value[0].diff > Math.abs(90)){
                     outofrange.push(patient);
                 }
-
                 oneval.push(patient.key);
+            }else {
+
+                if(patient.value.length > maxPromisCount) {
+
+                    maxPromisCount = patient.value.length;
+                    //console.log(maxPromisCount);
+                }
 
             }
+
             if(patient.b != undefined) {
                 barray.push(patient.b);
                 if(patient.b >= 43){topStart.push(patient)};
@@ -284,7 +292,7 @@ export class DataManager {
                 patient.scorespan = [patient.b];
 
             }else{
-                //console.log(patient);
+               // console.log(patient);
             }
             
             if(quant == 'bottom'){ selected = bottomStart };
@@ -293,9 +301,14 @@ export class DataManager {
 
             
         });
+
+        console.log(oneval);
+        console.log(maxPromisCount);
+
         events.fire('filtered_by_quant', [selected, quant]);
 
     }
+
        public async mapDemoData() {
 
             let that = this;
@@ -587,14 +600,6 @@ export class DataManager {
 
         let withQuery = [];
         let queryDate = [];
-        /*
-        if (this.currentlySelectedName != undefined ){
-          this.currentlySelectedName = undefined;
-        }*/
-  
-       // const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-      
-        //this.targetOrder = value;
 
         cohort.forEach((element) => {
 
