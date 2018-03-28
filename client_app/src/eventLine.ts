@@ -2,19 +2,27 @@
  * Created by Jen Rogers on 3/22/2018.
  */
 import * as ajax from 'phovea_core/src/ajax';
-import {BaseType, select, selectAll,event} from 'd3-selection';
-import {nest,values,keys,map,entries} from 'd3-collection';
+import {BaseType, select, selectAll, event} from 'd3-selection';
+import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
-import {scaleLinear,scaleTime,scaleOrdinal} from 'd3-scale';
-import {line,curveMonotoneX} from 'd3-shape';
+import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
+import {line, curveMonotoneX, curveLinear} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
-import {axisBottom,axisLeft} from 'd3-axis';
+import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
-import * as dataCalc from './dataCalculations';
+import * as d3 from 'd3';
+//import {Constants} from './constants';
 import {transition} from 'd3-transition';
+import {brush, brushY} from 'd3-brush';
+import * as dataCalc from './dataCalculations';
+import * as dataManager from './dataManager';
+import {ITable, asTable} from 'phovea_core/src/table';
+import {IAnyVector, INumericalVector} from 'phovea_core/src/vector';
+import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
+import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
+import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
-import * as codeDict from './cptDictionary';
 
 export class EventLine {
     private $node;
@@ -63,35 +71,26 @@ export class EventLine {
         let that = this;
         this.$node.selectAll('.event').remove();
         console.log(filters);
-        let events = this.$node.select('.event_line_svg').selectAll('.event').data(filters);
+        let event = this.$node.select('.event_line_svg').selectAll('.event').data(filters);
 
-        events.exit().remove();
+        event.exit().remove();
 
-        let eventEnter = events.enter().append('g').classed('event', true).attr('transform', translate);
+        let eventEnter = event.enter().append('g').classed('event', true).attr('transform', translate);
 
         let circle = eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('fill', 'red')
-        .on('click', (d, i) => {
-            console.log(d);
-           // events.fire('event_clicked', d);
-         });
+        
         eventEnter.append('text').text(d => d[0]).attr('transform', 'translate(5,20)');
         eventEnter.append('text').text(d => d[1]).attr('transform', 'translate(5,30)').attr('class', 'accent');
 
-        events = eventEnter.merge(events);
-       /*
-        circle.on('click', (d, i) => {
-        
-           events.fire('event_clicked', d);
-        });*/
+        event = eventEnter.merge(event);
+        event.on('click', circleclick);
 
         function translate(d, i) {
             return "translate(" + (75 + that.eventScale(i)) + "," + 0 + ")";
           }
 
-          function circlesizer(d, i){
-              return that.circleScale(d[i][1]);
-          }
-          
+          function circleclick(d){ events.fire('event_clicked', d[0]); }
+
     }
 }
 

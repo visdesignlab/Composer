@@ -180,7 +180,6 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-      
             this.searchByEvent(this.patCPT, item);
         });
 
@@ -597,9 +596,10 @@ export class DataManager {
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
 
     private searchByEvent(cohort, value) {
-
+        //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
+        console.log(cohort);
 
         cohort.forEach((element) => {
 
