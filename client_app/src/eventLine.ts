@@ -35,7 +35,6 @@ export class EventLine {
     this.attachListener();
 
     this.drawLine();
-   // this.updateEvents([2, 5, 6]);
 
     }
 
@@ -70,15 +69,20 @@ export class EventLine {
 
         let eventEnter = events.enter().append('g').classed('event', true).attr('transform', translate);
 
-        let circle = eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('fill', 'red');
+        let circle = eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('fill', 'red')
+        .on('click', (d, i) => {
+            console.log(d);
+           // events.fire('event_clicked', d);
+         });
         eventEnter.append('text').text(d => d[0]).attr('transform', 'translate(5,20)');
         eventEnter.append('text').text(d => d[1]).attr('transform', 'translate(5,30)').attr('class', 'accent');
 
         events = eventEnter.merge(events);
-       
-        circle.on('click', d => {
-            event.fire('event_clicked', d[0]);
-        });
+       /*
+        circle.on('click', (d, i) => {
+        
+           events.fire('event_clicked', d);
+        });*/
 
         function translate(d, i) {
             return "translate(" + (75 + that.eventScale(i)) + "," + 0 + ")";
