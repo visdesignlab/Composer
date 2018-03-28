@@ -248,6 +248,9 @@ export class similarityScoreDiagram {
 
         events.on('event_clicked', (evt, item)=> {
             console.log(item);
+            this.targetOrder = item;
+            this.$node.select('#eventLabel').text(this.targetOrder);
+           
             
         });
 
