@@ -46,7 +46,7 @@ export class QueryBox {
        events.on('selected_cpt_change', (evt, item) => {
 
            this.filteredCPT = item;
-           console.log(item);
+           
 
        });
 
@@ -88,7 +88,7 @@ export class QueryBox {
             let counter = -1;
             let nodeArray = [];
             let filters = filterKeeper;
-            console.log(cohorts);
+           
 
             filters.forEach((cohort, i) => {
 

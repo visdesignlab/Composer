@@ -38,7 +38,7 @@ export class EventLine {
             .range([0, 750]).clamp(true);
 
     this.circleScale = scaleLinear().domain([0, 3000])
-            .range([1, 10]).clamp(true);
+            .range([1, 15]).clamp(true);
 
     this.attachListener();
 
@@ -67,23 +67,28 @@ export class EventLine {
     }
 
     private updateEvents(filters) {
-        console.log(filters);
+
         let that = this;
         this.$node.selectAll('.event').remove();
-        console.log(filters);
-        let event = this.$node.select('.event_line_svg').selectAll('.event').data(filters);
 
-        event.exit().remove();
+        if(filters != null){
 
-        let eventEnter = event.enter().append('g').classed('event', true).attr('transform', translate);
+            let eventcode = this.$node.select('.event_line_svg').selectAll('.event').data(filters);
+    
+            eventcode.exit().remove();
+    
+            let eventEnter = eventcode.enter().append('g').classed('event', true).attr('transform', translate);
+    
+            let circle = eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('fill', 'red')
+            
+            eventEnter.append('text').text(d => d[0]).attr('transform', 'translate(5,20)');
+            eventEnter.append('text').text(d => d[1]).attr('transform', 'translate(5,30)').attr('class', 'accent');
+    
+            eventcode = eventEnter.merge(eventcode);
+            eventcode.on('click', circleclick);
 
-        let circle = eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('fill', 'red')
-        
-        eventEnter.append('text').text(d => d[0]).attr('transform', 'translate(5,20)');
-        eventEnter.append('text').text(d => d[1]).attr('transform', 'translate(5,30)').attr('class', 'accent');
-
-        event = eventEnter.merge(event);
-        event.on('click', circleclick);
+    
+        }
 
         function translate(d, i) {
             return "translate(" + (75 + that.eventScale(i)) + "," + 0 + ")";
@@ -91,7 +96,8 @@ export class EventLine {
 
           function circleclick(d){ events.fire('event_clicked', d[0]); }
 
-    }
+        }
+       
 }
 
 export function create(parent:Element, cohort) {

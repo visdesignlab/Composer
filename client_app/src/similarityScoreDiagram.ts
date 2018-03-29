@@ -53,6 +53,7 @@ export class similarityScoreDiagram {
 
     private zeroEvent = 'First Promis Score';
     private targetOrder;
+    private codeArray;
 
    filteredOrders = {
        medGroup : [],
@@ -91,7 +92,7 @@ export class similarityScoreDiagram {
             this.zeroEvent = this.targetOrder;
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
-            
+
             });
 
         this.$node.append('text').attr('id', 'eventLabel');
@@ -102,8 +103,6 @@ export class similarityScoreDiagram {
            // .on('click', () => events.fire('show_cpt'));
            // .on('click', () => events.fire('load_cpt'));
             .on('click', () =>events.fire('change_promis_scale'));
-
-       
 
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
@@ -286,6 +285,13 @@ export class similarityScoreDiagram {
             this.getDays(null);
 
                     });
+        
+        events.on('selected_event_filter_change', (evt, item)=> {
+
+            console.log(item);
+            this.codeArray = item;
+
+        });
 
         events.on('min date to cpt', (evt, item)=> {
             console.log(item);
