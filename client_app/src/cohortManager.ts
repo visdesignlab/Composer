@@ -51,7 +51,39 @@ export class CohortManager {
             this.removeCohortFilterArray();
             this.selectedCohort = this.allPatientPromis;
             events.fire('selected_cohort_change', this.selectedCohort);
+            events.fire('selected_event_filter_change', []);
         });
+
+        events.on('cohort_selected', (evt, item)=>{
+
+            d3.select('#cohortKeeper').selectAll('.selected').classed('selected', false);
+            console.log('hey!');
+            let cohort = item[0];
+            let index = item[1];
+            this.cohortIndex = index;
+            this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
+            this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
+            this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
+            let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
+            selectedLabel[0].classList.add('selected');
+
+            events.fire('selected_cohort_change', this.selectedCohort);
+            events.fire('selected_cpt_change', this.selectedCPT);
+            events.fire('selected_stat_change', [this.selectedCohort, index]);
+            events.fire('selected_event_filter_change', this.selectedFilter.cpt);
+          });
+
+
+        events.on('cohort_stats', ()=>{
+            events.fire('send_cohort', this.selectedCohort);
+          });
+
+          events.on('cpt_mapped', (evt, item)=> {
+            //THIS IS THE ENTIRE FILTERED CPT. NOT PER PAT.
+              this.cptObjectKeeper.push(item);
+              this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
+
+          });
 
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
             this.cohortkeeperarray[this.cohortIndex] = item;
@@ -69,25 +101,7 @@ export class CohortManager {
             this.addCohortFilter(filterReq);
           });
 
-          events.on('cohort_selected', (evt, item)=>{
-
-            d3.select('#cohortKeeper').selectAll('.selected').classed('selected', false);
-      
-            let cohort = item[0];
-            let index = item[1];
-            this.cohortIndex = index;
-            this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
-            this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
-            this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
-            let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
-            selectedLabel[0].classList.add('selected');
-
-            events.fire('selected_cohort_change', this.selectedCohort);
-            events.fire('selected_cpt_change', this.selectedCPT);
-            events.fire('selected_stat_change', [this.selectedCohort, index]);
-            events.fire('selected_event_filter_change', this.selectedFilter.cpt);
-          });
-
+         
           events.on('mapped_cpt_filtered', (evt, item)=>{
 
               this.selectedCPT = item;
@@ -113,22 +127,22 @@ export class CohortManager {
              events.fire('new_cohort_added', this.selectedCohort);
              events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
+             events.fire('selected_event_filter_change', []);
 
           });
 
           events.on('filter_cohort_by_event', (evt, item)=> {
               this.selectedCPT = item[0];
               this.cptObjectKeeper[this.cohortIndex] = item[0];
+
               this.cohortfilterarray[this.cohortIndex].cpt.push([item[1], item[0].length]);
+
+              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
+
               events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
               events.fire('update_event_line', this.cohortfilterarray[this.cohortIndex].cpt);
-          });
-
-          events.on('cpt_mapped', (evt, item)=> {
-            //THIS IS THE ENTIRE FILTERED CPT. NOT PER PAT.
-              this.cptObjectKeeper.push(item);
-              this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
-
+              //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
+              events.fire('selected_event_filter_change', this.selectedFilter.cpt);
           });
 
           events.on('filter_aggregate', (evt, item)=> {
@@ -156,10 +170,6 @@ export class CohortManager {
 
           events.on('filter_by_Promis_count', (evt, item)=> {
               events.fire('filtering_Promis_count', [this.selectedCohort, item]);
-          });
-
-          events.on('cohort_stats', ()=>{
-            events.fire('send_cohort', this.selectedCohort);
           });
 
           events.on('send_stats', () => {
