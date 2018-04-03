@@ -103,11 +103,6 @@ export class EventLine {
               selectAll('.event_circle').classed('selected_circle', false);
 
               let circ = select(this).select('.event_circle').classed('selected_circle', true);
-              
-              console.log(circ);
-
-              
-              //console.log(select(this).select('.event_circle').node());
 
               events.fire('event_clicked', d[0]); }
 

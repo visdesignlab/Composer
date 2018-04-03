@@ -141,7 +141,7 @@ export class DataManager {
         });
 
         events.on('cpt_object', (evt, item)=> {
-            
+            console.log('cpt loaded');
             this.totalCptObjects = item;
             //this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
         });
@@ -158,20 +158,25 @@ export class DataManager {
           });
 
         events.on('new_cohort_added', (evt, item)=> {
-            this.filteredPatPromis = item;
-            this.getCPT(this.cohortIdArray, this.totalCptObjects);
+           // this.filteredPatPromis = item;
+           // this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
+            console.log('fired!');
             this.filteredPatPromis = item;
+            this.getCPT(this.cohortIdArray, this.totalCptObjects);
                 });
 
         events.on('filtered_CPT', (evt, item) => {
+          
             this.mapCPT(this.filteredPatPromis, item);
+
           });
 
         events.on('selected_pat_array', (evt, item)=> {
             this.cohortIdArray = item;
+            console.log('selected pat array firing');
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
@@ -443,6 +448,8 @@ export class DataManager {
      //uses Phovea to access PRO data and draw table
    private async getCPT(cohortIdArray, cptObject) {
 
+        console.log(cptObject);
+
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
         if (cohortIdArray != null) {
@@ -479,6 +486,7 @@ export class DataManager {
      */
     //you need the promis objects and the cpt objects
     private mapCPT(patProInfo, CPTobjects) {
+        //console.log(CPTobjects);
 
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
@@ -510,10 +518,15 @@ export class DataManager {
 
         const self = this;
 
+
               // ----- add diff days to the data
         let filteredOrders = [];
+        
 
         CPTobjects.forEach((g) => {
+
+       // console.log(g.minPromis);
+    
 
                 //g.array = [];
         let minDate = g.minPromis;//changed min date for cpt to min date of promis score
@@ -526,7 +539,7 @@ export class DataManager {
             try {
                 d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
                 } catch (TypeError) {
-                        console.log('error');
+                       // console.log('error');
                         d.diff = -1;
                       }
                 if(d['CPT_1'] !== 0){ d.array.push(d['CPT_1']);   };
@@ -558,6 +571,7 @@ export class DataManager {
         filteredOrders.push(filter);
 
         });
+
 
         events.fire('cpt_mapped', filteredOrders);
         this.patCPT = filteredOrders;
