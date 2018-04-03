@@ -79,13 +79,18 @@ export class EventLine {
     
             let eventEnter = eventcode.enter().append('g').classed('event', true).attr('transform', translate);
     
-            let circle = eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('fill', 'red')
+            let circle = eventEnter.append('circle').attr('cx', 5).attr('cy', 10).attr('r', d=> this.circleScale(d[1])).attr('class', 'event_circle');
             
             eventEnter.append('text').text(d => d[0]).attr('transform', 'translate(5,20)');
             eventEnter.append('text').text(d => d[1]).attr('transform', 'translate(5,30)').attr('class', 'accent');
     
             eventcode = eventEnter.merge(eventcode);
             eventcode.on('click', circleclick);
+
+            let classCirc = selectAll('.event_circle').nodes();
+
+            select(classCirc[classCirc.length -1]).classed('selected_circle', true);
+
 
     
         }
@@ -94,7 +99,17 @@ export class EventLine {
             return "translate(" + (75 + that.eventScale(i)) + "," + 0 + ")";
           }
 
-          function circleclick(d){ events.fire('event_clicked', d[0]); }
+          function circleclick(d){ 
+              selectAll('.event_circle').classed('selected_circle', false);
+
+              let circ = select(this).select('.event_circle').classed('selected_circle', true);
+              
+              console.log(circ);
+
+              
+              //console.log(select(this).select('.event_circle').node());
+
+              events.fire('event_clicked', d[0]); }
 
         }
        
