@@ -216,20 +216,21 @@ export class similarityScoreDiagram {
         });
 
         events.on('filtered_by_quant', (evt, item)=> {
-           
+            console.log('filtered by quant');
             this.cohortProInfo = item[0];
             this.clearDiagram();
             this.drawPromisChart();
         });
 
         events.on('filtered_by_count', (evt, item)=> {
-           
+            console.log('filtered by count');
             this.cohortProInfo = item[0];
             this.clearDiagram();
             this.drawPromisChart();
         });
 
         events.on('change_promis_scale', ()=>{
+        
             if(!this.scaleRelative){
                 this.scaleRelative = true;
                 this.interpolate(this.cohortProInfo);
@@ -257,10 +258,10 @@ export class similarityScoreDiagram {
 
             this.maxDay = item[1];
             this.minDay = item[0];
-            console.log('this is firing');
+            
 
             if(this.cohortProInfo != undefined){
-
+                console.log('domain updated firing');
                 this.clearDiagram();
                 this.drawPromisChart();
             }
@@ -269,7 +270,7 @@ export class similarityScoreDiagram {
 
         events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
            // console.log('this is doing it?');
-            this.cohortProInfo = item;
+           // this.cohortProInfo = item;
            // this.clearDiagram();
            // this.getDays(null);
 
@@ -523,6 +524,7 @@ export class similarityScoreDiagram {
      */
     private drawPromisChart() {
             console.log('trying to draw');
+            console.log(this.cohortProInfo);
             if(this.scaleRelative){
 
                 const medScoreGroup = this.svg.select('#similar_score');
