@@ -160,10 +160,15 @@ export class DataManager {
         events.on('new_cohort_added', (evt, item)=> {
            // this.filteredPatPromis = item;
            // this.getCPT(this.cohortIdArray, this.totalCptObjects);
+           //this is where you will filter and map the cpt
+           
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
             console.log('fired!');
+            //change this back to added and selected. 
+            //when selected, the index changes. no need to map the cpt
+            
             this.filteredPatPromis = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
                 });
@@ -448,8 +453,6 @@ export class DataManager {
      //uses Phovea to access PRO data and draw table
    private async getCPT(cohortIdArray, cptObject) {
 
-        console.log(cptObject);
-
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
         if (cohortIdArray != null) {
@@ -485,9 +488,9 @@ export class DataManager {
      * @param ordersInfo
      */
     //you need the promis objects and the cpt objects
+    //you should only have to do this once??
     private mapCPT(patProInfo, CPTobjects) {
-        //console.log(CPTobjects);
-
+        
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
 
@@ -524,9 +527,6 @@ export class DataManager {
         
 
         CPTobjects.forEach((g) => {
-
-       // console.log(g.minPromis);
-    
 
                 //g.array = [];
         let minDate = g.minPromis;//changed min date for cpt to min date of promis score
@@ -571,7 +571,8 @@ export class DataManager {
         filteredOrders.push(filter);
 
         });
-
+        console.log(CPTobjects);
+        console.log(filteredOrders);
 
         events.fire('cpt_mapped', filteredOrders);
         this.patCPT = filteredOrders;
@@ -613,7 +614,6 @@ export class DataManager {
         //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
-        console.log(cohort);
 
         cohort.forEach((element) => {
 
