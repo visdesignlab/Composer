@@ -105,7 +105,7 @@ export class EventLine {
               let circ = select(this).select('.event_circle').classed('selected_circle', true);
 
               events.fire('event_clicked', d[0]);
-              events.fire('event_test', d[0]);
+             // events.fire('event_clicked', d[0]);
              // events.fire('filter_by_cpt', d[0]);
             }
 
