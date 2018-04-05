@@ -161,7 +161,13 @@ export class DataManager {
            // this.filteredPatPromis = item;
            // this.getCPT(this.cohortIdArray, this.totalCptObjects);
            //this is where you will filter and map the cpt
-           
+
+        });
+
+        events.on('filtered_patient_promis', (evt, item)=> {
+            console.log('filtering cpt');
+            this.getCPT(this.cohortIdArray, this.totalCptObjects).then(d=> this.mapCPT(this.filteredPatPromis, d));
+
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
@@ -205,19 +211,20 @@ export class DataManager {
     }
 
 //pulled from parallel coord
+//this hapens when demo button it pushed
     private demoFilter(sidebarFilter, demoObjects) {
 
-         this.cohortIdArray = [];
+        this.cohortIdArray = [];
 
-          let filter = demoObjects;
-          sidebarFilter.forEach( (d)=> {
-           let parent = d.attributeName;
-           let choice = d.checkedOptions;
-           if(parent != 'BMI' || 'CCI' || 'AGE') {
+        let filter = demoObjects;
+        sidebarFilter.forEach( (d)=> {
+        let parent = d.attributeName;
+        let choice = d.checkedOptions;
+        if(parent != 'BMI' || 'CCI' || 'AGE') {
 
-                if (parent == 'DM_CODE') {
+            if (parent == 'DM_CODE') {
                    
-                        filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
+                    filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
                 }else{ 
                        
                         if (choice.length === 1){
@@ -246,7 +253,7 @@ export class DataManager {
 
            //this is a test, manual array for filter
 
-           events.fire('cohort_filtered_demo', [filter.length, sidebarFilter]);//should I maybe use the array instead?
+           //events.fire('cohort_filtered_demo', [filter.length, sidebarFilter]);//should I maybe use the array instead?
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }
 
@@ -413,7 +420,7 @@ export class DataManager {
                 max_date: this.findMaxDate(d.value),
             }
         });
-        if (yayornay !== 'yay'){
+        if (yayornay == 'nay'){
             events.fire('got_promis_scores', patPromis);
         };
 
@@ -477,8 +484,8 @@ export class DataManager {
     }
 
         const mapped = entries(filteredPatOrders);
-
-        events.fire('filtered_CPT', mapped);
+        return mapped;
+       // events.fire('filtered_CPT', mapped);
        // this.patCPT = mapped;
 
  };
@@ -490,7 +497,7 @@ export class DataManager {
     //you need the promis objects and the cpt objects
     //you should only have to do this once??
     private mapCPT(patProInfo, CPTobjects) {
-        
+        console.log('this thing on?');
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
 
@@ -539,7 +546,7 @@ export class DataManager {
             try {
                 d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
                 } catch (TypeError) {
-                       // console.log('error');
+                        console.log('error');
                         d.diff = -1;
                       }
                 if(d['CPT_1'] !== 0){ d.array.push(d['CPT_1']);   };
