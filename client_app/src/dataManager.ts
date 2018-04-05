@@ -147,6 +147,7 @@ export class DataManager {
                 });
 
         events.on('selected_pat_array', (evt, item)=> {
+            console.log('does this do anything?');
             this.cohortIdArray = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
@@ -157,14 +158,14 @@ export class DataManager {
 
         events.on('filter_by_cpt', (evt, item)=> {
             this.searchByEvent(this.patCPT, item).then((d)=> {
-                events.fire('min date to cpt', d[1]);
+                this.addMinDay(d[1]);
                 events.fire('filter_cohort_by_event', [d[0], item]);
             });
         });
 
         events.on('event_test', (evt, item)=> {
            this.searchByEvent(this.patCPT, item).then((d)=> {
-            events.fire('min date to cpt', d[1]);
+            this.addMinDay(d[1]);
            });
         });
 
@@ -180,6 +181,26 @@ export class DataManager {
 
           });
     }
+
+    private addMinDay(eventArray) {
+
+       // let cohort = this.cohortProInfo;
+       let cohort = this.filteredPatPromis;
+       
+        for(var i= 0;  i< cohort.length; i++) {
+            var keyA = cohort[i].key;
+            for(var j = 0; j< eventArray.length; j++) {
+              var keyB = eventArray[j].key;
+              if(keyA == keyB) {
+                cohort[i].CPTtime = eventArray[j].time;
+              }
+            }
+          }
+       //   this.cohortProInfo = cohort;
+         // this.filteredPatPromis = cohort;
+
+          events.fire('min_day_added', cohort);
+}
 
 //pulled from parallel coord
 //this hapens when demo button it pushed

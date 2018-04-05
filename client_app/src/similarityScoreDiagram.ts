@@ -106,6 +106,14 @@ export class similarityScoreDiagram {
            // .on('click', () => events.fire('load_cpt'));
             .on('click', () =>events.fire('change_promis_scale'));
 
+        this.$node.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Aggregate')
+            .on('click', () => {
+               this.frequencyTest();
+    
+                });
+
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
@@ -228,12 +236,13 @@ export class similarityScoreDiagram {
         });
 
         events.on('change_promis_scale', ()=>{
-        
+
             if(!this.scaleRelative){
                 this.scaleRelative = true;
                 this.interpolate(this.cohortProInfo);
+
                   }
-                  
+
             else{this.scaleRelative = false;
                 this.changeScale(this.cohortProInfo);
             };
@@ -241,11 +250,11 @@ export class similarityScoreDiagram {
         });
 
         events.on('event_clicked', (evt, item)=> {
-           
+
             this.targetOrder = item;
             this.$node.select('#eventLabel').text(this.targetOrder);
-           
-            
+
+
         });
 
         events.on('filter_cohort_by_event', (evt, item)=> {
@@ -280,31 +289,15 @@ export class similarityScoreDiagram {
 
         });
 
-        events.on('min date to cpt', (evt, item)=> {
-            
-            this.addMinDay(item);
+        events.on('min_day_added', (evt, item)=> {
+       
+          this.cohortProInfo = item;
 
         });
 
     }
 
-    private addMinDay(eventArray) {
-
-        let cohort = this.cohortProInfo;
-        for(var i= 0;  i< cohort.length; i++) {
-            var keyA = cohort[i].key;
-            for(var j = 0; j< eventArray.length; j++) {
-              var keyB = eventArray[j].key;
-              if(keyA == keyB) {
-                cohort[i].CPTtime = eventArray[j].time;
-              }
-            }
-          }
-          this.cohortProInfo = cohort;
-          events.fire('the hell does this do?');
-}
-
-    private getDays (date) {
+    private getDays(date) {
 
       if(this.cohortProInfo != null)  {
 
@@ -555,7 +548,6 @@ export class similarityScoreDiagram {
                 .call(axisLeft(this.scoreScale));
             // -------  define line function
             const lineFunc = line()
-                //.curve(curveMonotoneX)
                 .curve(curveLinear)
                 .x((d) => { return this.timeScale(+d['diff']); })
                 .y((d) => { return this.scoreScale(+d['SCORE']); });
@@ -588,35 +580,32 @@ export class similarityScoreDiagram {
                         .attr('d', lineFunc);
                 })
                 .on('click', (d) => {
-                   
+
                     let selected = document.getElementsByClassName(d[0].PAT_ID);
                     let line = selected[0];
 
                     if(line.classList.contains('selected')){
-                       
+
                         line.classList.remove('selected');
                         let dots = document.getElementsByClassName(d[0].PAT_ID + ' clickdots');
                         for (var i = dots.length; i--; ) {
                             dots[i].remove();
                          }
-                       //let dots = document.querySelectorAll('.'+ d[0].PAT_ID + ' clickdots');
+              
                        events.fire('line_unclicked', d);
-                      
+
                     }else {
-                        
+
                         line.classList.add('selected');
                         this.addPromisDotsClick(d);
                         events.fire('line_clicked', d);
                 };
-              
-                    
+
                 })
                 .on('mouseover', (d)=> {
-                  
                     this.addPromisDotsHover(d);
                 })
                 .on('mouseout', (d)=> {
-                 
                     this.removeDots();
                 });
 
@@ -718,6 +707,13 @@ export class similarityScoreDiagram {
         this.svg.select('#pat_orders').selectAll('line,g').remove();
         this.svg.select('#similar_orders').selectAll('g').remove();
         this.svg.select('.zeroLine').remove();
+    }
+
+    private frequencyTest(){
+        this.svg.select('#similar_score').selectAll('.line_group');
+        console.log(this.cohortProInfo);
+
+
     }
 
 
