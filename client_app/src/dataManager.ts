@@ -178,12 +178,12 @@ export class DataManager {
             this.filteredPatPromis = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
                 });
-
+/*
         events.on('filtered_CPT', (evt, item) => {
           
             this.mapCPT(this.filteredPatPromis, item);
 
-          });
+          });*/
 
         events.on('selected_pat_array', (evt, item)=> {
             this.cohortIdArray = item;
@@ -485,8 +485,6 @@ export class DataManager {
 
         const mapped = entries(filteredPatOrders);
         return mapped;
-       // events.fire('filtered_CPT', mapped);
-       // this.patCPT = mapped;
 
  };
 
@@ -497,7 +495,7 @@ export class DataManager {
     //you need the promis objects and the cpt objects
     //you should only have to do this once??
     private mapCPT(patProInfo, CPTobjects) {
-        console.log('this thing on?');
+       
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
 
@@ -638,7 +636,7 @@ export class DataManager {
 
 
         events.fire('min date to cpt', queryDate);
-        events.fire('query_order', value);
+        //events.fire('query_order', value);
         events.fire('filter_cohort_by_event', [withQuery, value]);
     }
 

@@ -92,7 +92,8 @@ export class CohortManager {
         });
 
         events.on('got_promis_scores', (evt, item)=> {
-            this.allPatientPromis = item;
+            
+            //this.allPatientPromis = item;
         });
 
           events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar

@@ -268,14 +268,6 @@ export class similarityScoreDiagram {
 
         });
 
-        events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
-           // console.log('this is doing it?');
-           // this.cohortProInfo = item;
-           // this.clearDiagram();
-           // this.getDays(null);
-
-                    });
-
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
 
             this.cohortProInfo = item;
@@ -312,6 +304,7 @@ export class similarityScoreDiagram {
             }
           }
           this.cohortProInfo = cohort;
+          events.fire('the hell does this do?');
 }
 
     private getDays (date) {
