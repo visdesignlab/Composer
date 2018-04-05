@@ -85,12 +85,12 @@ export class similarityScoreDiagram {
         .attr('type', 'button')
         .attr('value', 'Update Start Day to Event')
         .on('click', () => {
+            this.zeroEvent = this.targetOrder;
             this.clearDiagram();
             this.getDays(this.cohortProInfo);
             this.eventDayBool = true;
             this.getBaselines(null);
             this.interpolate(this.cohortProInfo);
-            this.zeroEvent = this.targetOrder;
             console.log(this.targetOrder);
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
@@ -149,11 +149,9 @@ export class similarityScoreDiagram {
             .on("end", () => {
                 let start = that.scoreScale.invert(event.selection[0]);
                 let end = that.scoreScale.invert(event.selection[1]);
-                
-                //let start = this.timeScale.invert(event.selection[0]);
-               // let end = this.timeScale.invert(event.selection[1]);
+
                 events.fire('score_domain_change', [+start, +end]);
-                //this.updateSlider(start, end)
+               
             });
  
         slider.call(this.brush)
@@ -208,7 +206,7 @@ export class similarityScoreDiagram {
     private attachListener() {
 
         events.on('score_domain_change', (evt, item)=>{
-           console.log('score domain change');
+            console.log('score domain change');
             this.scoreScale.domain(item);
             this.clearDiagram();
             this.drawPromisChart();
@@ -243,7 +241,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('event_clicked', (evt, item)=> {
-           // console.log(item);
+           
             this.targetOrder = item;
             this.$node.select('#eventLabel').text(this.targetOrder);
            
@@ -278,13 +276,12 @@ export class similarityScoreDiagram {
         
         events.on('selected_event_filter_change', (evt, item)=> {
 
-            console.log(item);
             this.codeArray = item;
 
         });
 
         events.on('min date to cpt', (evt, item)=> {
-            //console.log(item);
+            
             this.addMinDay(item);
 
         });
@@ -309,48 +306,53 @@ export class similarityScoreDiagram {
 
     private getDays (date) {
 
-         // ----- add diff days to the data
-        console.log(this.cohortProInfo);
-        let maxDiff = 0;// this sets the score scale max.
-         //need to make this dynamic. 
-        let diffArray = [];
-        if (this.cohortProInfo != null) {
+      if(this.cohortProInfo != null)  {
 
-            this.cohortProInfo.forEach((g) => {
+ // ----- add diff days to the data
+          
+            let maxDiff = 0;// this sets the score scale max.
+            //need to make this dynamic. 
+            let diffArray = [];
+            if (this.cohortProInfo != null) {
 
-                let  minDate;
+                this.cohortProInfo.forEach((g) => {
 
-                if(g.CPTtime != undefined && date != null ) {
-                    minDate = this.parseTime(g.CPTtime, null);
-                }else minDate = g.min_date;
-               //these have already been parsed
-               let maxDate = g.max_date;
+                    let  minDate;
 
-                        g.value.forEach((d) => {
-                        try {
-                        d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                        maxDiff = d.diff > maxDiff ? d.diff : maxDiff
-                        }
-                        catch (TypeError) {
-                        d.diff = -1;
-                        }
-                        });
+                    if(g.CPTtime != undefined && date != null ) {
+                        minDate = this.parseTime(g.CPTtime, null);
+                    }else minDate = g.min_date;
+                //these have already been parsed
+                let maxDate = g.max_date;
 
-                        g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
-                        diffArray.push(g.days + 1);
+                            g.value.forEach((d) => {
+                            try {
+                            d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                            maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+                            }
+                            catch (TypeError) {
+                            d.diff = -1;
+                            }
+                            });
 
-                        g.value.sort((a, b) => ascending(a.diff, b.diff));
+                            g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+                            diffArray.push(g.days + 1);
 
-                        });
-        }else{console.log('error'); }
+                            g.value.sort((a, b) => ascending(a.diff, b.diff));
 
-        diffArray.sort((a, b) => ascending(a, b));
-    
-        events.fire('timeline_max_set', max(diffArray));
-        events.fire('day_dist', this.cohortProInfo);
-        if(this.maxDay != undefined){
-            this.drawPromisChart();
+                            });
+            }else{console.log('error'); }
+
+            diffArray.sort((a, b) => ascending(a, b));
+            events.fire('timeline_max_set', max(diffArray));
+            events.fire('day_dist', this.cohortProInfo);
+            if(this.maxDay != undefined){
+                this.drawPromisChart();
+            }
+
+
         }
+
     }
 
     private async getBaselines(pat)  {
@@ -413,7 +415,8 @@ export class similarityScoreDiagram {
                         absMin = +value.diff;
                             };
                 }else {
-                    console.log('absMin zero ' + absMin);}
+
+                }
 
                 if(value.diff == absMin) {baseline = value.SCORE; };
                 if(value.diff == negMin) {baseStart = value.SCORE; };
@@ -479,7 +482,7 @@ export class similarityScoreDiagram {
 
                 });
 
-            }//else{ console.log('no window');}
+            }
 
         });
         this.cohortProInfo = cohort;
@@ -516,8 +519,7 @@ export class similarityScoreDiagram {
      * @param args
      */
     private drawPromisChart() {
-            console.log('trying to draw');
-            console.log(this.cohortProInfo);
+
             if(this.scaleRelative){
 
                 const medScoreGroup = this.svg.select('#similar_score');

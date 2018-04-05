@@ -29,11 +29,6 @@ export class DataManager {
 
     //tables for all patient data
     demoTable : ITable;
-    orderTable : ITable;
-    proTable : ITable;
-    proTableSample : ITable;
-    cptTable : ITable;
-    icdTable : ITable;
 
     //defined cohort info
     cohortIdArray;
@@ -61,10 +56,10 @@ export class DataManager {
         // GET THE GIVEN TABLE BY TABLE ID AS ARG
         */
 
-        this.loadData('Demo_Revise');
-        this.loadData('PROMIS_Scores');
+        this.loadData('Demo_Revise').then((d)=> this.getDataObjects('demo_object', d));
+        this.loadData('PROMIS_Scores').then((d)=>  this.getDataObjects('pro_object', d));
         this.loadData('ICD_codes');
-        this.loadData('CPT_codes');
+        this.loadData('CPT_codes').then((d)=>  this.getDataObjects('cpt_object', d));
 
         this.attachListener();
 
@@ -97,29 +92,12 @@ export class DataManager {
             this.mapDemoData().then(value => {
                events.fire('population demo loaded', value);
             });
-            this.getDataObjects('demo_object', this.demoTable);
-        });
-
-        events.on('PROMIS_Scores', (evt, item) => {//picked up in similarity score diagram
-            
-            this.proTable = item;
-            this.getDataObjects('pro_object', this.proTable);
-        });
-
-        events.on('CPT_codes', (evt, item)=> {
-            this.cptTable = item;
-            events.fire('load_cpt');
-        });
-
-        events.on('load_cpt', ()=> {
-            //this is called from cpt button
-            //loads the cpt objects form the table for all patients
-            this.getDataObjects('cpt_object', this.cptTable);
+           // this.getDataObjects('demo_object', item);
         });
 
         events.on('ICD_codes', (evt, item)=> {
 
-            this.icdTable = item;
+           // this.icdTable = item;
         });
 
         events.on('filter_cohort_agg', (evt, item)=> {
@@ -134,10 +112,6 @@ export class DataManager {
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
             this.totalProObjects = item;
             this.mapPromisScores(null, item);
-        });
-
-        events.on('got_promis_scores', (evt, item)=> {
-           // this.getCPT(null, this.totalCptObjects, this.filteredPatPromis);
         });
 
         events.on('cpt_object', (evt, item)=> {
@@ -157,37 +131,24 @@ export class DataManager {
             this.demoFilter(item, this.totalDemoObjects);
           });
 
-        events.on('new_cohort_added', (evt, item)=> {
-           // this.filteredPatPromis = item;
-           // this.getCPT(this.cohortIdArray, this.totalCptObjects);
-           //this is where you will filter and map the cpt
-
-        });
-
         events.on('filtered_patient_promis', (evt, item)=> {
-            console.log('filtering cpt');
+          
             this.getCPT(this.cohortIdArray, this.totalCptObjects).then(d=> this.mapCPT(this.filteredPatPromis, d));
 
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-            console.log('fired!');
+          
             //change this back to added and selected. 
             //when selected, the index changes. no need to map the cpt
             
             this.filteredPatPromis = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
                 });
-/*
-        events.on('filtered_CPT', (evt, item) => {
-          
-            this.mapCPT(this.filteredPatPromis, item);
-
-          });*/
 
         events.on('selected_pat_array', (evt, item)=> {
             this.cohortIdArray = item;
-            console.log('selected pat array firing');
+           
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
@@ -198,6 +159,12 @@ export class DataManager {
         events.on('filter_by_cpt', (evt, item)=> {
             this.searchByEvent(this.patCPT, item);
         });
+
+        events.on('event_test', (evt, item)=> {
+           this.searchByEventTest(this.patCPT, item);
+        });
+
+
 
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
             let parent = item[0];
@@ -295,7 +262,6 @@ export class DataManager {
                 if(patient.value.length > maxPromisCount) {
 
                     maxPromisCount = patient.value.length;
-                    //console.log(maxPromisCount);
                 }
 
             }
@@ -308,7 +274,6 @@ export class DataManager {
                 patient.scorespan = [patient.b];
 
             }else{
-               // console.log(patient);
             }
             
             if(quant == 'bottom'){ selected = bottomStart };
@@ -318,8 +283,6 @@ export class DataManager {
             
         });
 
-        console.log(oneval);
-        console.log(maxPromisCount);
 
         events.fire('filtered_by_quant', [selected, quant]);
 
@@ -576,8 +539,6 @@ export class DataManager {
         filteredOrders.push(filter);
 
         });
-        console.log(CPTobjects);
-        console.log(filteredOrders);
 
         events.fire('cpt_mapped', filteredOrders);
         this.patCPT = filteredOrders;
@@ -606,11 +567,13 @@ export class DataManager {
     public async loadData(id: string) { //loads the tables from Phovea
        let table = <ITable> await getById(id);
        events.fire(id, table);//sends the id string to the getDataObjects
+       return table;
     }
 
     public async getDataObjects(id: string, table: ITable) {
         let object = await table.objects();
         events.fire(id, object);
+        return object;
     }
 
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
@@ -619,6 +582,7 @@ export class DataManager {
         //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
+
 
         cohort.forEach((element) => {
 
@@ -634,12 +598,37 @@ export class DataManager {
           
         });
 
+        
 
+        console.log(queryDate);
+       // return [queryDate, value];
         events.fire('min date to cpt', queryDate);
         //events.fire('query_order', value);
         events.fire('filter_cohort_by_event', [withQuery, value]);
     }
 
+    private searchByEventTest(cohort, value) {
+        //change the code to a code array make it sequence specific
+        let withQuery = [];
+        let queryDate = [];
+
+
+        cohort.forEach((element) => {
+
+            let elementBool;
+            element.forEach(g => {
+                if (g.value[0].includes(+value)){
+                    if(elementBool != g.key){
+                        withQuery.push(element);
+                        queryDate.push(g);
+                    }elementBool = g.key;
+                    }
+            });
+          
+        });
+
+        events.fire('min date to cpt', queryDate);
+    }
 
   }
 
