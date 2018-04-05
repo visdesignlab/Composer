@@ -49,8 +49,8 @@ export class CohortManager {
 
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
-            this.selectedCohort = this.allPatientPromis;
-            events.fire('selected_cohort_change', this.selectedCohort);
+          //  this.selectedCohort = this.allPatientPromis;
+            events.fire('selected_cohort_change', null);
             events.fire('selected_event_filter_change', []);
         });
 
