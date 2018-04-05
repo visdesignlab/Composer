@@ -148,7 +148,6 @@ export class DataManager {
 
         events.on('selected_pat_array', (evt, item)=> {
             this.cohortIdArray = item;
-           
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
@@ -157,11 +156,16 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-            this.searchByEvent(this.patCPT, item);
+            this.searchByEvent(this.patCPT, item).then((d)=> {
+                events.fire('min date to cpt', d[1]);
+                events.fire('filter_cohort_by_event', [d[0], item]);
+            });
         });
 
         events.on('event_test', (evt, item)=> {
-           this.searchByEventTest(this.patCPT, item);
+           this.searchByEvent(this.patCPT, item).then((d)=> {
+            events.fire('min date to cpt', d[1]);
+           });
         });
 
 
@@ -578,7 +582,7 @@ export class DataManager {
 
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
 
-    private searchByEvent(cohort, value) {
+    private async searchByEvent(cohort, value) {
         //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
@@ -595,39 +599,9 @@ export class DataManager {
                     }elementBool = g.key;
                     }
             });
-          
         });
 
-        
-
-        console.log(queryDate);
-       // return [queryDate, value];
-        events.fire('min date to cpt', queryDate);
-        //events.fire('query_order', value);
-        events.fire('filter_cohort_by_event', [withQuery, value]);
-    }
-
-    private searchByEventTest(cohort, value) {
-        //change the code to a code array make it sequence specific
-        let withQuery = [];
-        let queryDate = [];
-
-
-        cohort.forEach((element) => {
-
-            let elementBool;
-            element.forEach(g => {
-                if (g.value[0].includes(+value)){
-                    if(elementBool != g.key){
-                        withQuery.push(element);
-                        queryDate.push(g);
-                    }elementBool = g.key;
-                    }
-            });
-          
-        });
-
-        events.fire('min date to cpt', queryDate);
+        return [withQuery, queryDate];
     }
 
   }
