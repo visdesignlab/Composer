@@ -24,6 +24,7 @@ import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/
 import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
+import { stringify } from 'querystring';
 
 
 export const filteredOrders = this.filteredOrders;
@@ -111,7 +112,6 @@ export class similarityScoreDiagram {
             .attr('value', 'Aggregate')
             .on('click', () => {
                this.frequencyTest();
-    
                 });
 
         this.svg = this.$node.append('svg')
@@ -591,7 +591,7 @@ export class similarityScoreDiagram {
                         for (var i = dots.length; i--; ) {
                             dots[i].remove();
                          }
-              
+
                        events.fire('line_unclicked', d);
 
                     }else {
@@ -663,7 +663,7 @@ export class similarityScoreDiagram {
 
 }
 
-    private removeDots (){
+    private removeDots () {
         selectAll('.hoverdots').remove();
     }
 
@@ -711,9 +711,83 @@ export class similarityScoreDiagram {
 
     private frequencyTest(){
         this.svg.select('#similar_score').selectAll('.line_group');
-        console.log(this.cohortProInfo);
+        //console.log(this.cohortProInfo);
+        let cohort = this.cohortProInfo.filter(d=> d.value.length > 1);
+       
+        let maxDay = 0;
+        cohort.forEach(pat => {
+          if(pat.days > maxDay){ maxDay = pat.days;}
+        });
+
+        let bins = Math.floor(maxDay/10);
+   
+
+        cohort.forEach(pat => {
+            pat.bins = new Array(bins).fill(null);
+
+            for (let i = 1; i < pat.value.length; i++) {
+
+                if(pat.value[i] != undefined){
+
+                        let x1 = pat.value[i-1].diff;
+                        let x2 = pat.value[i].diff;
+                        let y1 = pat.value[i-1].SCORE;
+                        let y2 = pat.value[i].SCORE;
+
+                        pat.value[i].calc = [[x1, y1],[x2, y2]];
+
+                        let slope = (y2 - y1) / (x2 - x1);
+
+                        pat.value[i].slope = slope;
+                        pat.value[i].b = y1 - (slope * x1);
+
+                //    }
+                }
+
+            }
+
+            let first = pat.value.filter(d=> d.diff == 0);
+            pat.bins[0] = first[0].SCORE;
+            for (let i = 1; i < pat.bins.length; i++) {
+
+              //  if(pat.value[i] != undefined){
+                    pat.bins[i] = {};
+                    let x = (i*10);
+                   // pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
+                    let top = pat.value.find((v)=> v.diff > x);
+                    pat.bins[i] = null;
+                    if(top != undefined){
+                      //  pat.bins[i].slope = top.slope;
+                      //  pat.bins[i].b = top.b;
+                     pat.bins[i] = (top.slope * x) + top.b};
+            }
+        });
+
+       this.drawAgg(cohort);
 
 
+    }
+
+    private drawAgg(cohort){
+        console.log(cohort);
+
+        let yval = cohort.map((d)=> {
+        
+        let bin = d.bins;
+        let means = new Array(bin.length).fill(0);
+        bin.forEach((b, i) => {
+             if(b != null){
+                 b = +b;
+                 means[i] = means[i] + b;
+             }
+         });
+
+
+        return means;
+        });
+
+
+        console.log(yval);
     }
 
 
