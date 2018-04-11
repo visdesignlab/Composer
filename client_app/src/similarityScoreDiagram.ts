@@ -766,6 +766,7 @@ export class similarityScoreDiagram {
        this.drawAgg(cohort);
 
 
+
     }
 
     private drawAgg(cohort){
@@ -774,24 +775,84 @@ export class similarityScoreDiagram {
         let yval = cohort.map((d)=> {
         
         let bin = d.bins;
-        let means = new Array(bin.length).fill(0);
-        bin.forEach((b, i) => {
-             if(b != null){
-                 b = +b;
-                 means[i] = means[i] + b;
-             }
-         });
-
-
-        return means;
+    
+        return bin;
         });
 
+        let means = [];
+        let devs = [];
+        for(let i = 0; i < yval[0].length; i++){
+            let mean = d3.mean(yval.map(d => d[i]));
+            let dev =  d3.deviation(yval.map(d => d[i]));
+            means.push(mean);
+            devs.push(dev);
+        }
+       // [d3.mean(yval.map(d => d[0])), d3.mean(yval.map(d => d[1])), ];
+        let topdev = [];
+        let botdev = [];
+        
+        means.forEach((d, i)=> {
+          
+            devs.forEach((j, i)=> {
+                let num = d + j;
+                let numbot = d - j;
+                topdev.push(num);
+                botdev.push(numbot);
+            });
+        });
 
-        console.log(yval);
+        console.log(topdev);
+
+        let lineCount = this.cohortProInfo.length;
+
+        let data = means;
+        // -----  set domains and axis
+        // time scale
+        this.timeScale.domain([this.minDay, this.maxDay]);
+
+        this.svg.select('.xAxis')
+            .call(axisBottom(this.timeScale));
+
+        this.svg.select('.yAxis')
+            .call(axisLeft(this.scoreScale));
+        // -------  define line function
+        const lineFunc = line()
+            .curve(curveLinear)
+            .x((d, i) => { return this.timeScale(i* 10); })
+            .y((d) => { return this.scoreScale(+d); });
+
+        // ------- draw
+        const medScoreGroup = this.svg.select('#similar_score');
+
+        let that = this;
+        medScoreGroup
+            .append('path')
+            .classed('avLine', true)
+            .data([data])
+            .attr('d', lineFunc)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
+            medScoreGroup
+            .append('path')
+            .classed('stLine', true)
+            .data([topdev])
+            .attr('d', lineFunc)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
+            medScoreGroup
+            .append('path')
+            .classed('stLine', true)
+            .data([botdev])
+            .attr('d', lineFunc)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
     }
 
-
-    
     /**
      * Get the data via API
      * @param URL

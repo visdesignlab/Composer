@@ -38,6 +38,18 @@
     stroke-width: 2px;
 }
 
+.avLine {
+    stroke: #FF5733;
+    stroke-width: 3px;
+    fill: none;
+}
+
+.stLine {
+    stroke: #FF5733;
+    stroke-width: 1px;
+    fill: none;
+}
+
 .proLine {
     fill: none;
     stroke: #21618C;
@@ -48,6 +60,7 @@
 .selected {
     stroke: #FF5733;
     stroke-width: 3px;
+    fill: none;
 }
 
 .grid line {
