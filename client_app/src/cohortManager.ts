@@ -71,6 +71,7 @@ export class CohortManager {
             events.fire('selected_cpt_change', this.selectedCPT);
             events.fire('selected_stat_change', [this.selectedCohort, index]);
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
+           
           });
 
 
@@ -100,6 +101,7 @@ export class CohortManager {
             let filterReq = {demo: null, cpt: [], length: null, quantile: null, minCount: null};
             filterReq.demo = item;
             this.addCohortFilter(filterReq);
+            
           });
 
          
@@ -113,7 +115,6 @@ export class CohortManager {
 
           events.on('cpt_mapped', (evt, item)=>{
               this.cptObjectKeeper[this.cohortIndex] = item;
-              console.log(this.cptObjectKeeper);
           });
 
           events.on('show_distributions', ()=> {
