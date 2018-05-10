@@ -439,6 +439,7 @@ export class similarityScoreDiagram {
         
 
     }
+    //estimates 
     private interpolate(cohort) {
 
      cohort.forEach(pat => {
@@ -467,7 +468,6 @@ export class similarityScoreDiagram {
                     pat.b = +b;
                }
 
-            
                 pat.value.forEach((value) => {
                     value.b = b;
                    // value.slope = slope;
@@ -707,27 +707,33 @@ export class similarityScoreDiagram {
         this.svg.select('#pat_orders').selectAll('line,g').remove();
         this.svg.select('#similar_orders').selectAll('g').remove();
         this.svg.select('.zeroLine').remove();
+        let aggline =  this.svg.select('#similar_score');
+        aggline.select('.avLine').remove();
+        aggline.selectAll('.stLine').remove();
     }
 
+    // creates bin array for each patient scores and calulates slope for each bin
+    //TODO : get rid of test in name and global variables?
     private frequencyTest(){
+
         this.svg.select('#similar_score').selectAll('.line_group');
-        //console.log(this.cohortProInfo);
+        
         let cohort = this.cohortProInfo.filter(d=> d.value.length > 1);
-       
+
+
         let maxDay = 0;
         cohort.forEach(pat => {
           if(pat.days > maxDay){ maxDay = pat.days;}
         });
 
         let bins = Math.floor(maxDay/10);
-   
 
         cohort.forEach(pat => {
             pat.bins = new Array(bins).fill(null);
 
             for (let i = 1; i < pat.value.length; i++) {
 
-                if(pat.value[i] != undefined){
+                if(pat.value[i] != undefined) {
 
                         let x1 = pat.value[i-1].diff;
                         let x2 = pat.value[i].diff;
@@ -740,35 +746,38 @@ export class similarityScoreDiagram {
 
                         pat.value[i].slope = slope;
                         pat.value[i].b = y1 - (slope * x1);
-
-                //    }
                 }
 
             }
 
             let first = pat.value.filter(d=> d.diff == 0);
-            pat.bins[0] = first[0].SCORE;
-            for (let i = 1; i < pat.bins.length; i++) {
+            console.log(first);
+            //console.log(pat.bins);
+            if(first.length != 0){
 
-              //  if(pat.value[i] != undefined){
-                    pat.bins[i] = {};
-                    let x = (i*10);
-                   // pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
-                    let top = pat.value.find((v)=> v.diff > x);
-                    pat.bins[i] = null;
-                    if(top != undefined){
-                      //  pat.bins[i].slope = top.slope;
-                      //  pat.bins[i].b = top.b;
-                     pat.bins[i] = (top.slope * x) + top.b};
+                pat.bins[0] = first[0].SCORE;
+                for (let i = 1; i < pat.bins.length; i++) {
+    
+                  //  if(pat.value[i] != undefined){
+                        pat.bins[i] = {};
+                        let x = (i*10);
+                       // pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
+                        let top = pat.value.find((v)=> v.diff > x);
+                        pat.bins[i] = null;
+                        if(top != undefined){
+                          //  pat.bins[i].slope = top.slope;
+                          //  pat.bins[i].b = top.b;
+                         pat.bins[i] = (top.slope * x) + top.b};
+                }
             }
+    
         });
 
        this.drawAgg(cohort);
 
-
-
     }
 
+    //draws the lines for the mean and standard deviation for the PROMIS scores
     private drawAgg(cohort){
         console.log(cohort);
 
