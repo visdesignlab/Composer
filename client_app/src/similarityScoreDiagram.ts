@@ -720,6 +720,76 @@ export class similarityScoreDiagram {
         
         let cohort = this.cohortProInfo.filter(d=> d.value.length > 1);
 
+        let negdiff = 0;
+        let posdiff = 0;
+
+        //get the extreme diff values for each side of the zero event
+        cohort.forEach(pat => {
+
+            let patDiffArray = pat.value.map(d=> +d.diff);
+            let patneg = d3.min(patDiffArray);
+            let patpos = d3.max(patDiffArray);
+
+            if(patneg < negdiff) {negdiff = patneg;  };
+            if(patpos > posdiff) {posdiff = patpos;  };
+   
+        });
+        negdiff = Math.round(negdiff / 10) * 10;
+        posdiff = Math.round(posdiff / 10) * 10;
+        //get diff of days between maxneg diff and maxpos diff
+        let daydiff = posdiff - negdiff;
+        let bincount = Math.floor(daydiff/10);
+        let bins = [];//new Array(bincount).fill({'x': null, 'y': null});
+
+        bins.push({'x': negdiff, 'y': null});
+        for (let i = 1; i < bincount; i++) {
+           let diffplus = negdiff + (i * 10);
+           bins.push({'x': diffplus, 'y': null});
+        }
+
+        cohort.forEach(pat=> {
+            let patbins = Object.assign([], bins);
+            console.log(patbins);
+            let patstart = pat.value[0].diff;
+            patstart = Math.floor(patstart / 10)* 10;
+
+            let index = pat.value.length;
+
+            let first = patbins.find((v)=> v.x == patstart);
+            
+            first.y = pat.value[0].SCORE;
+            console.log(pat.bins);
+
+            for (let i = 1; i < pat.value.length; i++) {
+
+                if(pat.value[i] != undefined) {
+
+                        let x1 = pat.value[i-1].diff;
+                        let x2 = pat.value[i].diff;
+                        let y1 = pat.value[i-1].SCORE;
+                        let y2 = pat.value[i].SCORE;
+
+                        pat.value[i].calc = [[x1, y1],[x2, y2]];
+
+                        let slope = (y2 - y1) / (x2 - x1);
+
+                        pat.value[i].slope = slope;
+                        pat.value[i].b = y1 - (slope * x1);
+                }
+            }
+
+        });
+
+        console.log(cohort);
+
+    }
+/*
+    private frequencyTest(){
+
+        this.svg.select('#similar_score').selectAll('.line_group');
+        
+        let cohort = this.cohortProInfo.filter(d=> d.value.length > 1);
+
 
         let maxDay = 0;
         cohort.forEach(pat => {
@@ -749,12 +819,18 @@ export class similarityScoreDiagram {
                 }
 
             }
+            
+            let min = pat.value[0].diff;
 
-            let first = pat.value.filter(d=> d.diff == 0);
+           // let first = pat.value.filter(d=> d.diff == 0);
+            let first = pat.value.filter(d=> d.diff == min);
+
             console.log(first);
-            //console.log(pat.bins);
-            if(first.length != 0){
+            //console.log(first2);
 
+            if(first.length != 0){
+                console.log(pat.bins);
+                let binarray = [first[0].diff, first[0].SCORE];
                 pat.bins[0] = first[0].SCORE;
                 for (let i = 1; i < pat.bins.length; i++) {
     
@@ -767,7 +843,8 @@ export class similarityScoreDiagram {
                         if(top != undefined){
                           //  pat.bins[i].slope = top.slope;
                           //  pat.bins[i].b = top.b;
-                         pat.bins[i] = (top.slope * x) + top.b};
+                         pat.bins[i] = (top.slope * x) + top.b;
+                         };
                 }
             }
     
@@ -775,7 +852,7 @@ export class similarityScoreDiagram {
 
        this.drawAgg(cohort);
 
-    }
+    }*/
 
     //draws the lines for the mean and standard deviation for the PROMIS scores
     private drawAgg(cohort){
@@ -784,6 +861,7 @@ export class similarityScoreDiagram {
         let yval = cohort.map((d)=> {
         
         let bin = d.bins;
+        console.log(d.bins);
     
         return bin;
         });
@@ -799,9 +877,9 @@ export class similarityScoreDiagram {
        // [d3.mean(yval.map(d => d[0])), d3.mean(yval.map(d => d[1])), ];
         let topdev = [];
         let botdev = [];
-        
+
         means.forEach((d, i)=> {
-          
+
             devs.forEach((j, i)=> {
                 let num = d + j;
                 let numbot = d - j;
