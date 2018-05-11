@@ -147,7 +147,7 @@ export class DataManager {
                 });
 
         events.on('selected_pat_array', (evt, item)=> {
-            console.log('does this do anything?');
+    
             this.cohortIdArray = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
