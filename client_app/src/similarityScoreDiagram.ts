@@ -7,7 +7,7 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
-import {line, curveMonotoneX, curveLinear} from 'd3-shape';
+import {area, line, curveMonotoneX, curveLinear} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
@@ -350,7 +350,6 @@ export class similarityScoreDiagram {
 
     private async getBaselines(pat)  {
 
-
         this.cohortProInfo.forEach(patient => {
             let negative = 0;
             let positive = 0;
@@ -432,8 +431,6 @@ export class similarityScoreDiagram {
              }
 
          });
-
-        // if(patient.window != null){ consPole.log(patient); }
 
         });
         
@@ -770,7 +767,7 @@ export class similarityScoreDiagram {
             
             let patstart = pat.value[0].diff;
             patstart = Math.ceil(patstart / 10)* 10;
-            let patend = pat.value[pat.value.length - 1].diff;
+            let patend = pat.value[pat.value.length-1].diff;
             patend = Math.ceil(patend/10)* 10;
           
             let first = pat.bins.find((v)=> v.x == patstart);
@@ -783,7 +780,7 @@ export class similarityScoreDiagram {
 
             if(last != undefined){
         
-                last.y = pat.value[pat.value.length - 1].SCORE; }
+                last.y = pat.value[pat.value.length-1].SCORE; }
 
 
             for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
@@ -827,10 +824,9 @@ export class similarityScoreDiagram {
             means.push([x, mean]);
             devs.push(dev);
         }
-       // [d3.mean(yval.map(d => d[0])), d3.mean(yval.map(d => d[1])), ];
-        //let topdev = [];
+  
         let botdev = means.map((d, i)=> {
-            let y = d[1] - devs[1];
+            let y = d[1] - devs[i];
             let x = d[0];
 
             return [x, y];
@@ -838,12 +834,39 @@ export class similarityScoreDiagram {
 
         let topdev = means.map((d, i)=> {
             
-           let y = d[1] + devs[1];
+           let y = d[1] + devs[i];
            let x = d[0];
 
            return [x, y];
         
         });
+
+        //console.log(devs);
+
+        let quart = means.map((d, i)=> {
+            
+            let x = d[0];
+            let y1 = d[1] + devs[i];
+            let y2 = d[1] - devs[i];
+ 
+            return [x, y1, y2];
+         
+         });
+
+         quart[0] = [means[0][0], quart[1][1], quart[1][2]];
+         let quart2 = [];
+         quart.forEach(d=> {
+            
+           let q =  d.filter(Boolean);
+            quart2.push(q);
+        });
+
+         botdev[0] = [means[0][0], botdev[1][1]];
+         topdev[0] = [means[0][0], topdev[1][1]];
+
+         console.log(quart2);
+         console.log(botdev);
+         console.log(topdev);
 
         let lineCount = this.cohortProInfo.length;
 
@@ -863,10 +886,31 @@ export class similarityScoreDiagram {
             .x((d, i) => { return this.timeScale(+d[0]); })
             .y((d) => { return this.scoreScale(+d[1]); });
 
+        // -------- line function for quartiles 
+        
+        const drawPaths = area()
+              //.interpolate('basis')
+              .x(d => { return this.timeScale(+d[0]); })
+              //.y0(d => { return this.scoreScale(+d[2]); })
+              .y(d => { return this.scoreScale(+d[1]); });
+        
+
         // ------- draw
         const medScoreGroup = this.svg.select('#similar_score');
 
         let that = this;
+
+        medScoreGroup
+            .append('path')
+            .classed('qLine', true)
+            .attr('clip-path','url(#clip)')
+            .data([quart2])
+            .attr('d', drawPaths)
+            .attr('fill', 'red')
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
         medScoreGroup
             .append('path')
             .classed('avLine', true)
