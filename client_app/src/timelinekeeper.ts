@@ -54,7 +54,7 @@ export class TimelineKeeper {
         this.$node = select(parent);
 //1252 days is the max number of days for the patients
         this.timeScale = scaleLinear()
-            .domain([-150, 1251])
+            .domain([-300, 1251])
             .range([0, 700]).clamp(true);
 
         this.$node.append('div').classed('day_line', true);
@@ -70,13 +70,13 @@ export class TimelineKeeper {
             });
 
         events.on('cpt_mapped', (evt, item)=> {
-             this.timeScale.domain([-10, this.maxDay]);
+            // this.timeScale.domain([-10, this.maxDay]);
              this.filteredCPT = item;
         });
 
         events.on('selected_cpt_change', (evt, item) => {
 
-            this.timeScale.domain([-10, this.maxDay]);
+           // this.timeScale.domain([-10, this.maxDay]);
             this.filteredCPT = item;
         });
 

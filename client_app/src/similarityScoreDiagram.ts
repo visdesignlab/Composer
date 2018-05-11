@@ -92,7 +92,7 @@ export class similarityScoreDiagram {
             this.eventDayBool = true;
             this.getBaselines(null);
             this.interpolate(this.cohortProInfo);
-            console.log(this.targetOrder);
+
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
 
@@ -214,7 +214,7 @@ export class similarityScoreDiagram {
     private attachListener() {
 
         events.on('score_domain_change', (evt, item)=>{
-            console.log('score domain change');
+
             this.scoreScale.domain(item);
             this.clearDiagram();
             this.drawPromisChart();
@@ -222,14 +222,14 @@ export class similarityScoreDiagram {
         });
 
         events.on('filtered_by_quant', (evt, item)=> {
-            console.log('filtered by quant');
+
             this.cohortProInfo = item[0];
             this.clearDiagram();
             this.drawPromisChart();
         });
 
         events.on('filtered_by_count', (evt, item)=> {
-            console.log('filtered by count');
+
             this.cohortProInfo = item[0];
             this.clearDiagram();
             this.drawPromisChart();
@@ -268,7 +268,7 @@ export class similarityScoreDiagram {
             
 
             if(this.cohortProInfo != undefined){
-                console.log('domain updated firing');
+
                 this.clearDiagram();
                 this.drawPromisChart();
             }
@@ -656,8 +656,7 @@ export class similarityScoreDiagram {
             return this.scoreScale(score);
         }).attr('r', 5).attr('fill', '#FF5733');
 
-        //dots.append('circle').attr('cx', ()=> this.timeScale(0))
-       // .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
+
 
         this.clicked = true;
 
@@ -799,7 +798,6 @@ export class similarityScoreDiagram {
                          pat.bins[i].y = (top.slope * x) + top.b;
                      
                          };
-
             }
 
 
@@ -818,8 +816,6 @@ export class similarityScoreDiagram {
     
         return bin;
         });
-
-        console.log(patbin);
 
         let means = [];
         let devs = [];
@@ -849,9 +845,6 @@ export class similarityScoreDiagram {
         
         });
 
-        console.log(topdev);
-
-
         let lineCount = this.cohortProInfo.length;
 
         let data = means;
@@ -877,6 +870,7 @@ export class similarityScoreDiagram {
         medScoreGroup
             .append('path')
             .classed('avLine', true)
+            .attr('clip-path','url(#clip)')
             .data([data])
             .attr('d', lineFunc)
             .attr('transform', () => {
@@ -886,6 +880,7 @@ export class similarityScoreDiagram {
             medScoreGroup
             .append('path')
             .classed('stLine', true)
+            .attr('clip-path','url(#clip)')
             .data([topdev])
             .attr('d', lineFunc)
             .attr('transform', () => {
@@ -895,6 +890,7 @@ export class similarityScoreDiagram {
             medScoreGroup
             .append('path')
             .classed('stLine', true)
+            .attr('clip-path','url(#clip)')
             .data([botdev])
             .attr('d', lineFunc)
             .attr('transform', () => {
