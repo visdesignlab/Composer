@@ -841,8 +841,6 @@ export class similarityScoreDiagram {
         
         });
 
-        //console.log(devs);
-
         let quart = means.map((d, i)=> {
             
             let x = d[0];
@@ -853,20 +851,52 @@ export class similarityScoreDiagram {
          
          });
 
-         quart[0] = [means[0][0], quart[1][1], quart[1][2]];
-         let quart2 = [];
+        quart[0] = [means[0][0], quart[1][1], quart[1][2]];
+        let quart2 = [];
+         
          quart.forEach(d=> {
-            
-           let q =  d.filter(Boolean);
-            quart2.push(q);
+            let arr = [];
+            d.forEach(q=> {
+                //let val = [];
+                if (isNaN(q)) {
+                   arr.push(45);
+                  }else{arr.push(q)}
+            });
+            quart2.push(arr);
         });
 
          botdev[0] = [means[0][0], botdev[1][1]];
+         let botdev2 = [];
+         
+         botdev.forEach(d=> {
+            let arr = [];
+            d.forEach(q=> {
+                //let val = [];
+                if (isNaN(q)) {
+                   arr.push(45);
+                  }else{arr.push(q)}
+            });
+            botdev2.push(arr);
+        });
+
          topdev[0] = [means[0][0], topdev[1][1]];
 
+         let topdev2 = [];
+         
+         topdev.forEach(d=> {
+            let arr = [];
+            d.forEach(q=> {
+                //let val = [];
+                if (isNaN(q)) {
+                   arr.push(45);
+                  }else{arr.push(q)}
+            });
+            topdev2.push(arr);
+        });
+
          console.log(quart2);
-         console.log(botdev);
-         console.log(topdev);
+         console.log(botdev2);
+         console.log(topdev2);
 
         let lineCount = this.cohortProInfo.length;
 
@@ -891,8 +921,8 @@ export class similarityScoreDiagram {
         const drawPaths = area()
               //.interpolate('basis')
               .x(d => { return this.timeScale(+d[0]); })
-              //.y0(d => { return this.scoreScale(+d[2]); })
-              .y(d => { return this.scoreScale(+d[1]); });
+              .y0(d => { return this.scoreScale(+d[2]); })
+              .y1(d => { return this.scoreScale(+d[1]); });
         
 
         // ------- draw
@@ -925,7 +955,7 @@ export class similarityScoreDiagram {
             .append('path')
             .classed('stLine', true)
             .attr('clip-path','url(#clip)')
-            .data([topdev])
+            .data([topdev2])
             .attr('d', lineFunc)
             .attr('transform', () => {
                 return `translate(${this.margin.x},${this.margin.y})`;
@@ -935,7 +965,7 @@ export class similarityScoreDiagram {
             .append('path')
             .classed('stLine', true)
             .attr('clip-path','url(#clip)')
-            .data([botdev])
+            .data([botdev2])
             .attr('d', lineFunc)
             .attr('transform', () => {
                 return `translate(${this.margin.x},${this.margin.y})`;
