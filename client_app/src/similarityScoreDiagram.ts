@@ -706,6 +706,7 @@ export class similarityScoreDiagram {
         let aggline =  this.svg.select('#similar_score');
         aggline.select('.avLine').remove();
         aggline.selectAll('.stLine').remove();
+        aggline.selectAll('.qLine').remove();
     }
 
     // creates bin array for each patient scores and calulates slope for each bin
@@ -894,10 +895,6 @@ export class similarityScoreDiagram {
             topdev2.push(arr);
         });
 
-         console.log(quart2);
-         console.log(botdev2);
-         console.log(topdev2);
-
         let lineCount = this.cohortProInfo.length;
 
         let data = means;
@@ -919,7 +916,6 @@ export class similarityScoreDiagram {
         // -------- line function for quartiles 
         
         const drawPaths = area()
-              //.interpolate('basis')
               .x(d => { return this.timeScale(+d[0]); })
               .y0(d => { return this.scoreScale(+d[2]); })
               .y1(d => { return this.scoreScale(+d[1]); });
@@ -936,7 +932,6 @@ export class similarityScoreDiagram {
             .attr('clip-path','url(#clip)')
             .data([quart2])
             .attr('d', drawPaths)
-            .attr('fill', 'red')
             .attr('transform', () => {
                 return `translate(${this.margin.x},${this.margin.y})`;
             });
