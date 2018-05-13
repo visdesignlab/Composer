@@ -6,6 +6,7 @@ import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll} from 'd3-selection';
 import * as events from 'phovea_core/src/event';
 import * as cohortStat from './cohortStat';
+import * as dict from './cptDictionary';
 
 export class QueryBox {
 
@@ -19,6 +20,7 @@ export class QueryBox {
     private filteredCPT;
     private currentlySelectedName;
     private selected;
+    private dictionary;
 
     constructor(parent: Element) {
 
@@ -30,8 +32,16 @@ export class QueryBox {
 
         const self = this;
 
+        this.dictionary = new dict.CPTDictionary();
+
+        console.log(this.dictionary);
+        console.log(this.dictionary.codeDict);
+        console.log(this.dictionary.codeDict['PT'].value);
+        console.log(this.dictionary.codeDict.contains('PT'));
+
         this.drawQueryBox();
         this.attachListener();
+
     }
 
     /**
