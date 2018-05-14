@@ -1,5 +1,5 @@
 /**
- * Created by saharmehrpour on 3/8/17.
+ * Created by Jen Rogers on 5/14/17.
  */
 
 import * as ajax from 'phovea_core/src/ajax';
@@ -8,10 +8,9 @@ import * as events from 'phovea_core/src/event';
 import * as cohortStat from './cohortStat';
 import * as dict from './cptDictionary';
 
-export class QueryBox {
+export class CodeSidebar {
 
     private $node;
- 
     private dataset;
     private startDay;
     private startBool;
@@ -91,95 +90,9 @@ export class QueryBox {
             let startLabelBool = select('#pat_or_event').text(this.startBool);
         });
 
-        events.on('update_filters', (evt, item)=> {
-            this.drawCohortLabels(item[0], item[1]);
-        });
-
-
     }
 
-    private async drawCohortLabels(filterKeeper, cohorts) {
-        
-            this.cohortKeeper.selectAll('div').remove();
-            let counter = -1;
-            let nodeArray = [];
-            let filters = filterKeeper;
-           
-
-            filters.forEach((cohort, i) => {
-
-                let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
-                let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
-                let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
-                let cohortCount = cohortBox.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
-                let cohortfilter;
-                let label = document.getElementsByClassName('cohort ' + i);
-                let statView = select(label[0]).append('div').classed('stat_view', true).classed('hidden', true);
-                let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
-                cohortStat.create(view, cohorts[i], i);
-
-                let labelhide = true;
-                cohortarrow.on('click', ()=> {
-                    if(labelhide) {
-                        statView.classed('hidden', false);
-                        labelhide = false;
-                    }else {
-                            statView.classed('hidden', true);
-                            labelhide = true;
-                        }
-
-                });
-                cohortfilter = filters[i].demo.forEach(element => {
-
-                                                cohortBox.append('div').classed('cohort-label', true).append('text').text(element.attributeName + ': ')
-                                                element.checkedOptions.forEach(op => {
-                                                    cohortBox.append('text').text(op + ', ');
-                                                });
-                                                cohortBox.append('text').text(element.checkedOptions.forEach(op => {
-                                                    return op + ',';
-
-                                                }));
-
-                });
-
-
-                if(filters[i].cpt != 0){
-                    let cptBox = cohortBox.append('div').classed('cohort-label', true);
-                    cptBox.append('text').text('  CPT: ');
-                    filters[i].cpt.forEach(code => {cptBox.append('text').text(code[0] + "  ");
-
-                })};
-
-                if(filters[i].minCount != null){
-                    let minBox = cohortBox.append('div').classed('cohort-label', true);
-                    minBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
-
-                };
-
-                counter = counter + 1;
-
-                cohortlabel.on('click', ()=> {
-                    this.selected = i;
-                    events.fire('cohort_selected', [cohort, i]);
-
-                });
-            });
-            if(this.selected == undefined){
-
-                let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
-                let picked = cohortLabels[counter];
-                picked.classList.add('selected');
-
-            }else{
-
-                let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
-                let picked = cohortLabels[this.selected];
-                picked.classList.add('selected');
-            }
-
-
-    }
-
+   
     private drawQueryBox () {
 
         const form = this.$node.append('form');
@@ -263,5 +176,5 @@ export class QueryBox {
 }
 
 export function create(parent: Element) {
-    return new QueryBox(parent);
+    return new CodeSidebar(parent);
 }

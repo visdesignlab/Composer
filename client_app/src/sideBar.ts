@@ -17,6 +17,7 @@ import {axisBottom} from 'd3-axis';
 import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
 import { all } from 'phovea_core/src/range';
 import {brushX} from 'd3-brush';
+import * as cohortStat from './cohortStat';
 
 export class SideBar {
 
@@ -97,12 +98,19 @@ export class SideBar {
         this.drawCohortLabels(item[0], item[1]);
       });
 
-      events.on('cpt_mapped', (evt, item)=> {
-       // this.filteredCPT = item;
-      });
-
       events.on('clear_cohorts', (evt, item)=> {
         this.cohortKeeper.selectAll('div').remove();
+});
+
+events.on('make_stat_node', (evt, item)=> {
+  let parent = document.getElementsByClassName('cohort ' + item[1])[0];
+  let view = parent.querySelector('.stat_view');
+  cohortStat.create(view, item[0], item[1]);
+  select('.cohort.' + item[1])
+});
+
+events.on('update_filters', (evt, item)=> {
+   this.drawCohortLabels(item[0], item[1]);
 });
       }
 
@@ -226,7 +234,7 @@ export class SideBar {
 
     const form = this.$node.select('#cohortDiv').append('form');
 
-    this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 40);
+    this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 35);
     let createCohortButton = form.insert('input').attr('type', 'button').attr('value', 'Create Cohort');
     let deletecohortButton = form.insert('input').attr('type', 'button').attr('value', 'Clear Cohorts');
 
@@ -248,7 +256,6 @@ export class SideBar {
     let counter = -1;
     let nodeArray = [];
     let filters = filterKeeper;
-   
 
     filters.forEach((cohort, i) => {
 
@@ -259,8 +266,8 @@ export class SideBar {
         let cohortfilter;
         let label = document.getElementsByClassName('cohort ' + i);
         let statView = select(label[0]).append('div').classed('stat_view', true).classed('hidden', true);
-      //  let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
-      //  cohortStat.create(view, cohorts[i], i);
+        let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
+        cohortStat.create(view, cohorts[i], i);
 
         let labelhide = true;
         cohortarrow.on('click', ()=> {
