@@ -64,7 +64,7 @@ export class similarityScoreDiagram {
 
     height = 400;
     width = 600;
-    promisDimension = {height: 500, width: 750};
+    promisDimension = {height: 500, width: 700};
     margin = {x: 80, y: 40};
     private sliderWidth = 10;
     private lineScale;

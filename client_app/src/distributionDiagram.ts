@@ -35,7 +35,7 @@ export class distributionDiagram {
     private populationDemo;
 
 
-    private distributionDimension = {height: 150, width: 200};
+    private distributionDimension = {height: 150, width: 160};
 
     constructor(parent: Element) {
 
