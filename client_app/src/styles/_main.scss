@@ -21,23 +21,27 @@
 
 .main {
     float: left;
-    padding-left: 10px;
-    width: 80%;
+    padding-left: 1%;
+    padding-right: 1%;
+    width: 55%;
     margin-top: 50px;
 }
 
 .sideBar {
     float: left;
-    width: 20%;
+    width: 15%;
     padding: 10px;
-    margin-top: 50px;
+    margin-top: 40px;
 }
 
-#sideBar {
+.stat_sidebar_view {
+    display: inline-block;
     float: left;
-    width: 23%;
-    padding: 20px;
-    margin-top: 50px;
+    width: 15%;
+    height: 100%;
+    margin-top: 40px;
+    border: .5px solid rgb(121, 107, 107);
+    border-radius: 2px;
 }
 
 .label {

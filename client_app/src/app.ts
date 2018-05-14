@@ -77,10 +77,12 @@ export class App {
     const populationView = main.append('div').classed('population_view', true);
     const timeline = main.append('div').classed('timeline_view', true)
     const plots = main.append('div').classed('plot_view', true);
+    const statBar = this.$node.append('div').classed('stat_sidebar_view', true);
 
     timelineKeeper.create(timeline.node());
     PlotKeeper.create(plots.node());
     eventLine.create(main.node(), null);
+    distributionDiagram.create(statBar.node());
 
     inStat.create(main.node());
 
@@ -88,49 +90,51 @@ export class App {
 
     this.setBusy(false);
 
-    events.on('cohort_made', (evt, item)=>{
-      
-      let remove = document.querySelectorAll('.cohort_stat_view');
-      for (var i = remove.length; i--; ) {
-        remove[i].remove();
-     }
-    });
-/*
-    events.on('cohort_stat_array',(evt, item)=> {
-      item.forEach((c, i) => {
-        cohortStat.create(main.node(), c, i);
-      });
-    });*/
+    this.attachListener();
 
-    events.on('clear_cohorts', () => {
 
-      selectAll('.cohort_stat_view').remove();
-
-    });
-
-    events.on('load_cpt', () => {
-
-       this.$node.select('.main').select('.distributions').classed('hidden', true);
-       this.$node.select('.main').select('.cptDiv').classed('hidden', false);
-       this.$node.select('.main').select('.rectDiv').classed('hidden', false);
-
-   });
-
-        events.on('show_distributions', ()=> {
-
-          this.$node.select('.main').select('.distributions').classed('hidden', false);
-
-        });
-
-          // item: pat_id, DATA
-        events.on('update_hierarchy', () => {  // called in query box
-
-            this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', false);
-            this.$node.select('.main').select('.rectDiv').classed('hidden', true);
-
-        });
 
   }
+
+  private attachListener() {
+  
+    events.on('cohort_made', (evt, item)=>{
+        
+        let remove = document.querySelectorAll('.cohort_stat_view');
+        for (var i = remove.length; i--; ) {
+          remove[i].remove();
+       }
+      });
+  
+      events.on('clear_cohorts', () => {
+  
+        selectAll('.cohort_stat_view').remove();
+  
+      });
+  
+      events.on('load_cpt', () => {
+  
+         this.$node.select('.main').select('.distributions').classed('hidden', true);
+         this.$node.select('.main').select('.cptDiv').classed('hidden', false);
+         this.$node.select('.main').select('.rectDiv').classed('hidden', false);
+  
+     });
+  
+      events.on('show_distributions', ()=> {
+  
+      this.$node.select('.main').select('.distributions').classed('hidden', false);
+  
+      });
+  
+            // item: pat_id, DATA
+      events.on('update_hierarchy', () => {  // called in query box
+  
+          this.$node.select('.main').select('.allDiagramDiv').select('.scoreGroup').classed('hidden', false);
+          this.$node.select('.main').select('.rectDiv').classed('hidden', true);
+  
+          });
+        
+        }
 
   /**
    * Show or hide the application loading indicator

@@ -36,8 +36,8 @@ export class QueryBox {
 
         console.log(this.dictionary);
         console.log(this.dictionary.codeDict);
-        console.log(this.dictionary.codeDict['PT'].value);
-        console.log(this.dictionary.codeDict.contains('PT'));
+        console.log(this.dictionary.codeDict.PT);
+        
 
         this.drawQueryBox();
         this.attachListener();
@@ -49,20 +49,27 @@ export class QueryBox {
      */
     private attachListener() {
 
-    events.on('cpt_mapped', (evt, item)=> {
-            this.filteredCPT = item;
-       });
+        events.on('add_to_cohort_bar', (evt, item)=> {
+               // this.drawCohortLabels(item[0], item[1]);
+            });
 
-       events.on('selected_cpt_change', (evt, item) => {
+        events.on('cpt_mapped', (evt, item)=> {
+                this.filteredCPT = item;
+        });
+
+        events.on('clear_cohorts', (evt, item)=> {
+            this.cohortKeeper.selectAll('div').remove();
+        });
+
+        events.on('selected_cpt_change', (evt, item) => {
 
            this.filteredCPT = item;
            
 
        });
 
-       events.on('make_stat_node', (evt, item)=> {
+        events.on('make_stat_node', (evt, item)=> {
            let parent = document.getElementsByClassName('cohort ' + item[1])[0];
-           
            let view = parent.querySelector('.stat_view');
            cohortStat.create(view, item[0], item[1]);
            //select('.cohort.' + item[1])
@@ -84,12 +91,11 @@ export class QueryBox {
             let startLabelBool = select('#pat_or_event').text(this.startBool);
         });
 
-        events.on('add_to_cohort_bar', (evt, item)=> {
-            this.drawCohortLabels(item[0], item[1]);
-        });
         events.on('update_filters', (evt, item)=> {
             this.drawCohortLabels(item[0], item[1]);
         });
+
+
     }
 
     private async drawCohortLabels(filterKeeper, cohorts) {
@@ -178,14 +184,7 @@ export class QueryBox {
 
        // let form = this.$node.append('form');
         const form = this.$node.append('form');
-        this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 50);
-        form.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Clear Cohorts')
-            .on('click', () => {
-                events.fire('clear_cohorts');
-                this.cohortKeeper.selectAll('div').remove();
-            });
+       // this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 50);
 
         let aggDiv = this.$node.append('div').classed('aggRadio', true);
         let countPromis = this.$node.append('div').classed('countPromis', true);

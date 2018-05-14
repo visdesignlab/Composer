@@ -35,6 +35,10 @@ export class SideBar {
   private bmiBrush;
   private cciBrush;
   private ageBrush;
+  private distributionHeader;
+  private demoform;
+  private cohortKeeper;
+  private selected;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -48,19 +52,19 @@ export class SideBar {
 
       ];
 
-      private distributionHeader;
+ 
       
   constructor(parent: Element) {
     
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
+    this.$node.append('div').attr('id', 'cohortDiv');
     this.$node.append('div').attr('id', 'filterDiv');
-   // const distributions = this.$node.append('div').classed('distributions', true);
-   // demoGraph.create(distributions.node());
-    this.xScale = scaleLinear();//.rangeRound([0, 200]);
+    this.xScale = scaleLinear();
     this.yScale = scaleLinear().range([0, 30]);
     this.svgWidth = 180;
     this.svgHeight = 50;
+    
   
     this.attachListener();
   }
@@ -88,11 +92,30 @@ export class SideBar {
         this.distribute(item);
 
        });
+
+       events.on('add_to_cohort_bar', (evt, item)=> {
+        this.drawCohortLabels(item[0], item[1]);
+      });
+
+      events.on('cpt_mapped', (evt, item)=> {
+       // this.filteredCPT = item;
+      });
+
+      events.on('clear_cohorts', (evt, item)=> {
+        this.cohortKeeper.selectAll('div').remove();
+});
       }
 
   async init() {
 
-    this.filters = [];
+    this.buildCohortLabel();
+    this.buildDemoFilter();
+
+          }
+
+  private buildDemoFilter() {
+
+   // this.filters = [];
     this.bmiRange = null;
     this.cciRange = null;
     this.ageRange = null;
@@ -100,16 +123,16 @@ export class SideBar {
     let parents = [];
     let that = this;
 
-    let form = this.$node.select('#filterDiv').append('form');
+    let miniLabel = this.$node.select('#filterDiv').append('div').classed('miniLabel', true);
+    miniLabel.append('text').text('Demographic Filters');
 
-    let filterButton = form.insert('input').attr('type', 'button').attr('value', 'Create Cohort');
+    this.demoform = this.$node.select('#filterDiv').append('form');
 
-    let labels = form.append('div').classed('labelWrapper', true).selectAll('.labelDiv')
+    let labels = this.demoform.append('div').classed('labelWrapper', true).selectAll('.labelDiv')
         .data(this.header);
 
-    let distLabel = form.append('div').classed('distributionWrapper', true);
-   // this.drawDistribution('BMI');
-
+    let distLabel = this.demoform.append('div').classed('distributionWrapper', true);
+ 
     let labelsEnter = labels
         .enter()
         .append('div').classed('labelDiv', true);
@@ -194,76 +217,183 @@ export class SideBar {
           filterGroup.classed(parentValue, true);
         });
 
-        let filterList = [];
-        that.filters = [];
+  }
+
+  private buildCohortLabel () {
+
+    let that = this;
 
 
-       filterButton.on('click', function(d){
+    const form = this.$node.select('#cohortDiv').append('form');
 
-                          //console.log(that.bmiRange);
-                          let parentFilter = form.selectAll('ul.parent');
+    this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 40);
+    let createCohortButton = form.insert('input').attr('type', 'button').attr('value', 'Create Cohort');
+    let deletecohortButton = form.insert('input').attr('type', 'button').attr('value', 'Clear Cohorts');
 
-                          parentFilter.each(function (element) {
+    createCohortButton.on('click', function(d){
+      that.filterDemo();
+      });
 
-                                 let filter = {
-                                     attributeName:(this).attributes[0].value,
-                                     checkedOptions: []
-                                    };
-
-                          let children = select(this).selectAll('li').selectAll('input');
+    deletecohortButton.on('click', () => {
+      console.log('thisthing on?');
+      events.fire('clear_cohorts');
+  });
 
 
-                          children.nodes().forEach(d => {
-                                 if(select(d).property('checked')){
-                                    filter.checkedOptions.push(d['value']);
-                                    d['checked'] = false;
-                                  }
-                              });
+  }
 
-                          filterList.push(filter);
-                          });
+  private async drawCohortLabels(filterKeeper, cohorts) {
+        
+    this.cohortKeeper.selectAll('div').remove();
+    let counter = -1;
+    let nodeArray = [];
+    let filters = filterKeeper;
+   
 
-                          if(that.bmiRange != null){
-                            let filter = {
-                              attributeName: 'BMI',
-                              checkedOptions: that.bmiRange,
-                             };
-                            filterList.push(filter);
-                          }
-                          if(that.cciRange != null){
-                            let filter = {
-                              attributeName: 'CCI',
-                              checkedOptions: that.cciRange,
-                             };
-                            filterList.push(filter);
-                          }
-                          if(that.ageRange != null){
-                            let filter = {
-                              attributeName: 'AGE',
-                              checkedOptions: that.ageRange,
-                             };
-                            filterList.push(filter);
-                          }
-                          events.fire('cohort_made');
-                          events.fire('demo_filter_button_pushed', filterList);
-                          that.filters = [];
-                          filterList = [];
-                          that.bmiRange = null;
-                          that.cciRange = null;
-                          that.ageRange = null;
+    filters.forEach((cohort, i) => {
 
-                          that.$node.select('#BMI-Brush').call(that.bmiBrush)
-                          .call(that.bmiBrush.move, null);
-                          that.$node.select('#CCI-Brush').call(that.cciBrush)
-                          .call(that.cciBrush.move, null);
-                          that.$node.select('#AGE-Brush').call(that.ageBrush)
-                          .call(that.ageBrush.move, null);
+        let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
+        let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
+        let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
+        let cohortCount = cohortBox.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
+        let cohortfilter;
+        let label = document.getElementsByClassName('cohort ' + i);
+        let statView = select(label[0]).append('div').classed('stat_view', true).classed('hidden', true);
+      //  let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
+      //  cohortStat.create(view, cohorts[i], i);
 
-                          parentFilter.classed('parent', false);
-                          form.selectAll('li').classed('hidden', true);
-                          });
+        let labelhide = true;
+        cohortarrow.on('click', ()=> {
+            if(labelhide) {
+                statView.classed('hidden', false);
+                labelhide = false;
+            }else {
+                    statView.classed('hidden', true);
+                    labelhide = true;
+                }
 
-          }
+        });
+        cohortfilter = filters[i].demo.forEach(element => {
+
+                                        statView.append('div').classed('cohort-label', true).append('text').text(element.attributeName + ': ')
+                                        element.checkedOptions.forEach(op => {
+                                          statView.append('text').text(op + ', ');
+                                        });
+                                        statView.append('text').text(element.checkedOptions.forEach(op => {
+                                            return op + ',';
+
+                                        }));
+
+        });
+
+
+        if(filters[i].cpt != 0){
+            let cptBox = statView.append('div').classed('cohort-label', true);
+            cptBox.append('text').text('  CPT: ');
+            filters[i].cpt.forEach(code => {cptBox.append('text').text(code[0] + "  ");
+
+        })};
+
+        if(filters[i].minCount != null){
+            let minBox = statView.append('div').classed('cohort-label', true);
+            minBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
+
+        };
+
+        counter = counter + 1;
+
+        cohortlabel.on('click', ()=> {
+            this.selected = i;
+            events.fire('cohort_selected', [cohort, i]);
+
+        });
+    });
+    if(this.selected == undefined){
+
+        let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+        let picked = cohortLabels[counter];
+        picked.classList.add('selected');
+
+    }else{
+
+        let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+        let picked = cohortLabels[this.selected];
+        picked.classList.add('selected');
+    }
+
+
+}
+
+
+  private filterDemo(){
+
+    let that = this;
+    let filterList = [];
+    that.filters = [];
+
+         //console.log(that.bmiRange);
+         let parentFilter = this.demoform.selectAll('ul.parent');
+
+         parentFilter.each(function (element) {
+   
+                let filter = {
+                    attributeName:(this).attributes[0].value,
+                    checkedOptions: []
+                   };
+   
+         let children = select(this).selectAll('li').selectAll('input');
+   
+   
+         children.nodes().forEach(d => {
+                if(select(d).property('checked')){
+                   filter.checkedOptions.push(d['value']);
+                   d['checked'] = false;
+                 }
+             });
+   
+         filterList.push(filter);
+         });
+   
+         if(that.bmiRange != null){
+           let filter = {
+             attributeName: 'BMI',
+             checkedOptions: that.bmiRange,
+            };
+           filterList.push(filter);
+         }
+         if(that.cciRange != null){
+           let filter = {
+             attributeName: 'CCI',
+             checkedOptions: that.cciRange,
+            };
+           filterList.push(filter);
+         }
+         if(that.ageRange != null){
+           let filter = {
+             attributeName: 'AGE',
+             checkedOptions: that.ageRange,
+            };
+           filterList.push(filter);
+         }
+         events.fire('cohort_made');
+         events.fire('demo_filter_button_pushed', filterList);
+         that.filters = [];
+         filterList = [];
+         that.bmiRange = null;
+         that.cciRange = null;
+         that.ageRange = null;
+   
+         that.$node.select('#BMI-Brush').call(that.bmiBrush)
+         .call(that.bmiBrush.move, null);
+         that.$node.select('#CCI-Brush').call(that.cciBrush)
+         .call(that.cciBrush.move, null);
+         that.$node.select('#AGE-Brush').call(that.ageBrush)
+         .call(that.ageBrush.move, null);
+   
+         parentFilter.classed('parent', false);
+         this.demoform.selectAll('li').classed('hidden', true);
+
+  }
 
   private histogrammer(data, type, ticks){
 
