@@ -24,6 +24,7 @@ import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
 import * as cohortStat from './cohortStat';
 import * as eventLine from './eventLine';
+import * as codeside from './codeSidebar';
 import { selectAll } from 'd3';
 
 
@@ -71,7 +72,7 @@ export class App {
     const main = this.$node.append('div').classed('main', true);
 
           // query box
-    queryBox.create(main.node());
+   // queryBox.create(main.node());
 
    // const parallelView = main.append('div').classed('parallel_view', true);
     const populationView = main.append('div').classed('population_view', true);
@@ -82,7 +83,7 @@ export class App {
     timelineKeeper.create(timeline.node());
     PlotKeeper.create(plots.node());
     eventLine.create(main.node(), null);
-    distributionDiagram.create(statBar.node());
+    codeside.create(statBar.node());
 
     inStat.create(main.node());
 
