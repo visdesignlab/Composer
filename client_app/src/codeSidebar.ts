@@ -25,20 +25,17 @@ export class CodeSidebar {
 
         this.dataset = 'selected';
 
-        this.$node = select(parent)
-            .append('div')
-            .classed('queryDiv', true);
+        this.$node = select(parent).append('div').classed('sidebarDiv', true);
+
+        let scoreFilter = this.$node.append('div').classed('scoreDiv', true);
+        let orderFilter = this.$node.append('div').classed('orderDiv', true);
 
         const self = this;
 
-        this.dictionary = new dict.CPTDictionary();
+        this.dictionary = new dict.CPTDictionary().codeDict;
 
-        console.log(this.dictionary);
-        console.log(this.dictionary.codeDict);
-        console.log(this.dictionary.codeDict.PT);
-        
-
-        this.drawQueryBox();
+        this.drawScoreFilterBox(scoreFilter);
+        this.drawOrderFilterBox(orderFilter);
         this.attachListener();
 
     }
@@ -48,16 +45,8 @@ export class CodeSidebar {
      */
     private attachListener() {
 
-        events.on('add_to_cohort_bar', (evt, item)=> {
-               // this.drawCohortLabels(item[0], item[1]);
-            });
-
         events.on('cpt_mapped', (evt, item)=> {
                 this.filteredCPT = item;
-        });
-
-        events.on('clear_cohorts', (evt, item)=> {
-            this.cohortKeeper.selectAll('div').remove();
         });
 
         events.on('selected_cpt_change', (evt, item) => {
@@ -92,63 +81,104 @@ export class CodeSidebar {
 
     }
 
+    private searchDictionary(value){
+      
+        for(let prop in this.dictionary){
+            
+            if (prop == value){
+                console.log(this.dictionary[prop]);
+                this.orderSearchBar(this.dictionary[prop]);
+            }
+        }
+
+    }
+
    
-    private drawQueryBox () {
+    private drawScoreFilterBox (div) {
 
-        const form = this.$node.append('form');
-       // this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 50);
+        const form = div.append('form');
+        let scoreFilterLabel = form.append('text').text('Score Filters');
 
-        let aggDiv = this.$node.append('div').classed('aggRadio', true);
-        let countPromis = this.$node.append('div').classed('countPromis', true);
+        let aggDiv = div.append('div').classed('aggRadio', true);
+        let countPromis = div.append('div').classed('countPromis', true);
+
+            ///radio aggregation
+            aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
+            .attr('value', 'bottom').on('click', () =>{});
+            aggDiv.append('label').attr('for', 'sample1').text('bottom');
+            aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample2')
+            .attr('value', 'middle').on('click', () =>console.log(this));
+            aggDiv.append('label').attr('for', 'sample2').text('middle');
+            aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample3')
+            .attr('value', 'top').on('click', () =>console.log(this));
+            aggDiv.append('label').attr('for', 'sample1').text('top');
+            aggDiv.append('div').append('input').attr('type', 'submit')
+            .attr('value', 'Filter Aggregate').on('click', () =>{
+                let checked = document.querySelector('input[name="sample"]:checked');
+                let selected = checked['value'];
+                events.fire('filter_aggregate', selected); });
     
-        form.append('input')
-                .attr('type', 'text')
-                .attr('placeholder', 'Search Order Name')
-                .attr('id', 'order_search')
-                .attr('value');
-
-        form.append('input')
-                .attr('type', 'button')
-                .attr('value', 'Filter by Code')
-                .on('click', () => {
-                  const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-                  events.fire('filter_by_cpt', value);
-                  selectAll('.selectedOrder').classed('selectedOrder', false);
-                  selectAll('.unselectedOrder').classed('unselectedOrder', false);
-                  let eventLabel = select('#eventLabel').text(" " + value);
-         
+        //filter patients by a minimum score count threshold
+            countPromis.append('input').attr('type', 'text')
+            .attr('placeholder', 'Min Promis Score Count')
+            .attr('id', 'count_search')
+            .attr('value');
+    
+            countPromis.append('input').attr('type', 'button')
+            .attr('value', 'Filter by Score Count').on('click', () =>{
+                let val = (<HTMLInputElement>document.getElementById('count_search')).value;
+                let count = +val;
+                events.fire('filter_by_Promis_count', count);
         });
 
-    ///radio aggregation
-        aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
-        .attr('value', 'bottom').on('click', () =>{});
-        aggDiv.append('label').attr('for', 'sample1').text('bottom');
-        aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample2')
-        .attr('value', 'middle').on('click', () =>console.log(this));
-        aggDiv.append('label').attr('for', 'sample2').text('middle');
-        aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample3')
-        .attr('value', 'top').on('click', () =>console.log(this));
-        aggDiv.append('label').attr('for', 'sample1').text('top');
-        aggDiv.append('div').append('input').attr('type', 'submit')
-        .attr('value', 'Filter Aggregate').on('click', () =>{
-            let checked = document.querySelector('input[name="sample"]:checked');
-            let selected = checked['value'];
-            events.fire('filter_aggregate', selected); });
-
-    //filter patients by a minimum score count threshold
-        countPromis.append('input').attr('type', 'text')
-        .attr('placeholder', 'Min Promis Score Count')
-        .attr('id', 'count_search')
-        .attr('value');
-
-        countPromis.append('input').attr('type', 'button')
-        .attr('value', 'Filter by Score Count').on('click', () =>{
-            let val = (<HTMLInputElement>document.getElementById('count_search')).value;
-            let count = +val;
-            events.fire('filter_by_Promis_count', count);
-    });
 }
 
+private drawOrderFilterBox (div) {
+
+    const form = div.append('form');
+   
+
+    let orderFilterLabel = form.append('text').text('Order Filters');
+
+    form.append('input')
+            .attr('type', 'text')
+            .attr('placeholder', 'Search Order Name')
+            .attr('id', 'order_search')
+            .attr('value');
+
+    form.append('input')
+            .attr('type', 'button')
+            .attr('value', 'Filter by Code')
+            .on('click', () => {
+              const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+              //events.fire('filter_by_cpt', value);
+              selectAll('.selectedOrder').classed('selectedOrder', false);
+              selectAll('.unselectedOrder').classed('unselectedOrder', false);
+              let eventLabel = select('#eventLabel').text(" " + value);
+              //console.log(typeof(value));
+
+              function hasNumber(myString) {
+                return /\d/.test(myString);
+              }
+
+              if(!hasNumber(value)){ this.searchDictionary(value);
+                }else{events.fire('filter_by_cpt', value);}
+
+             // console.log(hasNumber(value));
+     
+    });
+
+}
+private orderSearchBar(order){
+
+    const box = select('.orderDiv').append('div');
+
+    for(let prop in order){
+        box.append('div').append('text').text(prop);
+    }
+
+            
+}
     /**
      * getting the similar patients info and firing events to update the vis
      * @returns {Promise<void>}
