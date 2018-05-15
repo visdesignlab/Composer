@@ -82,12 +82,24 @@ export class CodeSidebar {
     }
 
     private searchDictionary(value){
-      
+
         for(let prop in this.dictionary){
             
             if (prop == value){
-                console.log(this.dictionary[prop]);
-                this.orderSearchBar(this.dictionary[prop]);
+                let orderarray = [];
+                for(let p in this.dictionary[prop]){
+                    let order = {'key': p, 'value' : this.dictionary[prop][p]};
+                    orderarray.push(order);
+                }
+                this.orderSearchBar(orderarray);
+            }else{
+                for(let p in this.dictionary[prop]){
+                    //console.log(p);
+                    if(p == value){
+                        let order = {'key': p, 'value': this.dictionary[prop][p]};
+                        this.orderSearchBar(order);
+                    }
+                }
             }
         }
 
@@ -146,16 +158,11 @@ private drawOrderFilterBox (div) {
             .attr('id', 'order_search')
             .attr('value');
 
-    form.append('input')
+            form.append('input')
             .attr('type', 'button')
-            .attr('value', 'Filter by Code')
+            .attr('value', 'Search Codes')
             .on('click', () => {
               const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-              //events.fire('filter_by_cpt', value);
-              selectAll('.selectedOrder').classed('selectedOrder', false);
-              selectAll('.unselectedOrder').classed('unselectedOrder', false);
-              let eventLabel = select('#eventLabel').text(" " + value);
-              //console.log(typeof(value));
 
               function hasNumber(myString) {
                 return /\d/.test(myString);
@@ -163,19 +170,81 @@ private drawOrderFilterBox (div) {
 
               if(!hasNumber(value)){ this.searchDictionary(value);
                 }else{events.fire('filter_by_cpt', value);}
-
-             // console.log(hasNumber(value));
      
     });
+
+   
 
 }
 private orderSearchBar(order){
 
     const box = select('.orderDiv').append('div');
+    let props = [];
 
-    for(let prop in order){
-        box.append('div').append('text').text(prop);
-    }
+    let orderFilters = box.selectAll('.orderFilters').data(order);
+
+    let orderEnter = orderFilters.enter().append('div').classed('orderFilters', true);
+
+    orderFilters.exit().remove();
+
+    orderFilters = orderEnter.merge(orderFilters);
+
+    let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', (d) => d['value']).attr('checked', true);
+    let ordertext = orderFilters.append('text').text(d => d['key']);
+
+    ordercheck.on('click', (d)=>{ console.log(d);})
+
+    box.append('input')
+    .attr('type', 'button')
+    .attr('value', 'Filter by Code')
+    .on('click', () => {
+
+    let checkNodes = ordercheck.nodes();
+    let checkedarray = [];
+
+    checkNodes.forEach(n => {
+        if(n['checked']){
+            checkedarray.push(n['value']);
+        }
+    });
+
+    console.log(checkedarray);
+
+    let fixed = [];
+    checkedarray.forEach(ch=> {
+        if (ch.indexOf(',') > -1) { 
+            let fix = ch.split(',');
+            fix.forEach(f => {
+                fixed.push(f);
+                console.log(f);
+            });
+        }else{fixed.push(ch); };
+    });
+
+    console.log(fixed);
+    events.fire('filter_by_cpt', fixed);
+   
+
+    
+
+    /*
+      const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+
+      selectAll('.selectedOrder').classed('selectedOrder', false);
+      selectAll('.unselectedOrder').classed('unselectedOrder', false);
+      let eventLabel = select('#eventLabel').text(" " + value);
+
+      function hasNumber(myString) {
+        return /\d/.test(myString);
+      }
+
+      if(!hasNumber(value)){ this.searchDictionary(value);
+        }else{events.fire('filter_by_cpt', value);}
+
+     // console.log(hasNumber(value));
+     */
+
+});
 
             
 }

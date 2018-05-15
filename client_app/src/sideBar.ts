@@ -72,7 +72,7 @@ export class SideBar {
 
   private attachListener () {
     
-       events.on('filter_counted', (evt, item) => {//this get the count from the group
+      events.on('filter_counted', (evt, item) => {//this get the count from the group
 
          let allCount = item[0];
          let popCount = item[1];
@@ -87,31 +87,31 @@ export class SideBar {
 
        });
 
-       events.on('population demo loaded', (evt, item)=> {
+      events.on('population demo loaded', (evt, item)=> {
 
         this.populationDemo = item;
         this.distribute(item);
 
        });
 
-       events.on('add_to_cohort_bar', (evt, item)=> {
+      events.on('add_to_cohort_bar', (evt, item)=> {
         this.drawCohortLabels(item[0], item[1]);
       });
 
       events.on('clear_cohorts', (evt, item)=> {
         this.cohortKeeper.selectAll('div').remove();
-});
+      });
 
-events.on('make_stat_node', (evt, item)=> {
-  let parent = document.getElementsByClassName('cohort ' + item[1])[0];
-  let view = parent.querySelector('.stat_view');
-  cohortStat.create(view, item[0], item[1]);
-  select('.cohort.' + item[1])
-});
+      events.on('make_stat_node', (evt, item)=> {
+        let parent = document.getElementsByClassName('cohort ' + item[1])[0];
+        let view = parent.querySelector('.stat_view');
+        cohortStat.create(view, item[0], item[1]);
+        select('.cohort.' + item[1])
+      });
 
-events.on('update_filters', (evt, item)=> {
-   this.drawCohortLabels(item[0], item[1]);
-});
+      events.on('update_filters', (evt, item)=> {
+        this.drawCohortLabels(item[0], item[1]);
+      });
       }
 
   async init() {
@@ -230,7 +230,6 @@ events.on('update_filters', (evt, item)=> {
   private buildCohortLabel () {
 
     let that = this;
-
 
     const form = this.$node.select('#cohortDiv').append('form');
 

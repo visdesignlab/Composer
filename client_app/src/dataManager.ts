@@ -608,12 +608,11 @@ export class DataManager {
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
 
     private async searchByEvent(cohort, value) {
+
+        console.log(value);
         //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
-
-        console.log(value);
-
 
         cohort.forEach((element) => {
 
