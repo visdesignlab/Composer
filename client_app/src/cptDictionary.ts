@@ -24,17 +24,17 @@ export class CPTDictionary {
 
         'PT' : {
             'physical therapy evaluation' : [97001, 97002],//combined eval and re eval. this should potentially be separate?
-            'theraputic excercises' : 97110,
-            'manual therapy' : 97140,
-            'theraputic activities': 97530,
-            'self-care': 97535,
-            'home management training': 97535,
-            'neuromuscular re-education': 97112,
-            'aquatic therapy': 97113,
-            'physical performance test': 97750,
-            'physical performance measurement': 97750,
-            'Extremity muscle testing': 95831,
-            'trunk muscle testing': 95831
+            'theraputic excercises' : [97110],
+            'manual therapy' : [97140],
+            'theraputic activities': [97530],
+            'self-care': [97535],
+            'home management training': [97535],
+            'neuromuscular re-education': [97112],
+            'aquatic therapy': [97113],
+            'physical performance test': [97750],
+            'physical performance measurement': [97750],
+            'Extremity muscle testing': [95831],
+            'trunk muscle testing': [95831]
         },
 
         'injection' : {
@@ -45,7 +45,7 @@ export class CPTDictionary {
         },
 
         'surgery' : {
-            'surgery': 63030,
+            'surgery': [63030],
         }
     }
 
