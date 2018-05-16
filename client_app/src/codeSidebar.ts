@@ -215,7 +215,7 @@ private orderSearchBar(order){
 
     orderFilters = orderEnter.merge(orderFilters);
    
-    let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', (d) => d['value']).attr('checked', true);
+    let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', d => d['value']).attr('checked', true);
     let ordertext = orderFilters.append('text').text(d => d['key']);
 
     console.log(ordertext);
@@ -246,13 +246,14 @@ private orderSearchBar(order){
     let checkNodes = ordercheck.nodes();
     let checkedarray = [];
 
+    console.log(checkNodes);
+
     checkNodes.forEach(n => {
         if(n['checked']){
             checkedarray.push(n['value']);
+            console.log(n['key']);
         }
     });
-
-    console.log(checkedarray);
 
     let fixed = [];
     checkedarray.forEach(ch=> {
@@ -268,26 +269,6 @@ private orderSearchBar(order){
     console.log(fixed);
     events.fire('filter_by_cpt', fixed);
     select('.orderDiv').select('div').remove();
-   
-
-    
-
-    /*
-      const value = (<HTMLInputElement>document.getElementById('order_search')).value;
-
-      selectAll('.selectedOrder').classed('selectedOrder', false);
-      selectAll('.unselectedOrder').classed('unselectedOrder', false);
-      let eventLabel = select('#eventLabel').text(" " + value);
-
-      function hasNumber(myString) {
-        return /\d/.test(myString);
-      }
-
-      if(!hasNumber(value)){ this.searchDictionary(value);
-        }else{events.fire('filter_by_cpt', value);}
-
-     // console.log(hasNumber(value));
-     */
 
 });
 
