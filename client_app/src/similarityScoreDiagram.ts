@@ -281,6 +281,10 @@ export class similarityScoreDiagram {
             this.clearDiagram();
             this.getDays(null);
 
+            if(this.scaleRelative){
+                this.scaleRelative = false;
+                this.interpolate(this.cohortProInfo);
+                  }
                     });
         
         events.on('selected_event_filter_change', (evt, item)=> {

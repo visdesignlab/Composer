@@ -3,10 +3,12 @@
  */
 
 import * as ajax from 'phovea_core/src/ajax';
-import {select, selectAll} from 'd3-selection';
+//import {select, selectAll} from 'd3-selection';
 import * as events from 'phovea_core/src/event';
+import {BaseType, select, selectAll, event} from 'd3-selection';
 import * as cohortStat from './cohortStat';
 import * as dict from './cptDictionary';
+import {transition} from 'd3-transition';
 
 export class CodeSidebar {
 
@@ -52,6 +54,8 @@ export class CodeSidebar {
         events.on('selected_cpt_change', (evt, item) => {
 
            this.filteredCPT = item;
+           select('.orderDiv').select('div').remove();
+
            
 
        });
@@ -81,27 +85,42 @@ export class CodeSidebar {
 
     }
 
-    private searchDictionary(value){
+    private searchDictionary(value, type){
 
-        for(let prop in this.dictionary){
+        if(type == 'dict'){
+            for(let prop in this.dictionary){
             
-            if (prop == value){
-                let orderarray = [];
-                for(let p in this.dictionary[prop]){
-                    let order = {'key': p, 'value' : this.dictionary[prop][p]};
-                    orderarray.push(order);
-                }
-                this.orderSearchBar(orderarray);
-            }else{
-                for(let p in this.dictionary[prop]){
-                    //console.log(p);
-                    if(p == value){
-                        let order = {'key': p, 'value': this.dictionary[prop][p]};
-                        this.orderSearchBar(order);
+                if (prop == value){
+                    let orderarray = [];
+                    for(let p in this.dictionary[prop]){
+                        let order = {'key': p, 'value' : this.dictionary[prop][p]};
+                        orderarray.push(order);
+                    }
+                    this.orderSearchBar(orderarray);
+                }else{
+                    for(let p in this.dictionary[prop]){
+                        //console.log(p);
+                        if(p == value){
+                            let order = {'key': p, 'value': this.dictionary[prop][p]};
+                            this.orderSearchBar([order]);
+                        }
                     }
                 }
             }
-        }
+        }else if(type == 'code'){
+
+            for(let prop in this.dictionary){
+            
+                    for(let p in this.dictionary[prop]){
+                      // 
+                        if(this.dictionary[prop][p].includes(+value)){
+                            console.log(this.dictionary[prop][p]);
+                            let order = {'key': p, 'value': value};
+                            this.orderSearchBar([order]);
+                        }
+                    }
+                }
+            }
 
     }
 
@@ -168,8 +187,11 @@ private drawOrderFilterBox (div) {
                 return /\d/.test(myString);
               }
 
-              if(!hasNumber(value)){ this.searchDictionary(value);
-                }else{events.fire('filter_by_cpt', value);}
+              if(!hasNumber(value)){ this.searchDictionary(value, 'dict');
+                }else{
+                    //events.fire('filter_by_cpt', [value]);
+                    this.searchDictionary(value, 'code');
+                }
      
     });
 
@@ -177,6 +199,10 @@ private drawOrderFilterBox (div) {
 
 }
 private orderSearchBar(order){
+
+    select('.orderDiv').select('div').remove();
+
+    console.log(order);
 
     const box = select('.orderDiv').append('div');
     let props = [];
@@ -188,9 +214,27 @@ private orderSearchBar(order){
     orderFilters.exit().remove();
 
     orderFilters = orderEnter.merge(orderFilters);
-
+   
     let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', (d) => d['value']).attr('checked', true);
     let ordertext = orderFilters.append('text').text(d => d['key']);
+
+    console.log(ordertext);
+    ordertext.on("mouseover", (d) => {
+        let t = transition('t').duration(500);
+        select(".tooltip")
+          .html(() => {
+            return this.renderOrdersTooltip(d);
+          })
+          .transition(t)
+          .style("opacity", 1)
+          .style("left", `${event.pageX + 10}px`)
+          .style("top", `${event.pageY + 10}px`);
+      })
+      .on("mouseout", () => {
+        let t = transition('t').duration(500);
+        select(".tooltip").transition(t)
+        .style("opacity", 0);
+      });
 
     ordercheck.on('click', (d)=>{ console.log(d);})
 
@@ -223,6 +267,7 @@ private orderSearchBar(order){
 
     console.log(fixed);
     events.fire('filter_by_cpt', fixed);
+    select('.orderDiv').select('div').remove();
    
 
     
@@ -247,6 +292,13 @@ private orderSearchBar(order){
 });
 
             
+}
+
+private renderOrdersTooltip(tooltip_data) {
+
+    let text = "<strong style='color:darkslateblue'>" + tooltip_data['value'] + "</strong></br>";
+  
+    return text;
 }
     /**
      * getting the similar patients info and firing events to update the vis

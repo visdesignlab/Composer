@@ -3,7 +3,7 @@
  */
 import * as ajax from 'phovea_core/src/ajax';
 import {BaseType, select, selectAll,event} from 'd3-selection';
-import {nest,values,keys,map,entries} from 'd3-collection'
+import {nest,values,keys,map,entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear,scaleTime,scaleOrdinal} from 'd3-scale';
 import {line,curveMonotoneX} from 'd3-shape';
