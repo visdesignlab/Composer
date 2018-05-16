@@ -614,6 +614,26 @@ export class DataManager {
         let withQuery = [];
         let queryDate = [];
 
+       cohort.forEach((element) => {
+
+        let elementBool;
+        element.forEach(g => {
+            value.forEach(v => {
+
+                if (g.value[0].includes(+v)){
+                    if(elementBool != g.key){
+                        withQuery.push(element);
+                        queryDate.push(g);
+                    }elementBool = g.key;
+                    }
+
+            });
+            
+        });
+    });
+        
+        /*
+
         cohort.forEach((element) => {
 
             let elementBool;
@@ -625,8 +645,8 @@ export class DataManager {
                     }elementBool = g.key;
                     }
             });
-        });
-
+        });*/
+        console.log(withQuery);
         return [withQuery, queryDate];
     }
 
