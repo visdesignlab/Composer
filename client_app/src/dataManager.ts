@@ -141,6 +141,7 @@ export class DataManager {
           
             //change this back to added and selected. 
             //when selected, the index changes. no need to map the cpt
+            console.log('selected cohort change fired');
             
             this.filteredPatPromis = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
