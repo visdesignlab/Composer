@@ -241,11 +241,14 @@ private drawOrderSearchBar(order){
 
     let checkNodes = ordercheck.nodes();
     let checkedarray = [];
+    let cptFilterArray = [];
 
-    checkNodes.forEach(n => {
+    checkNodes.forEach((n, i) => {
         if(n['checked']){
             checkedarray.push(n['value']);
-           
+           console.log(order[i]);
+           // Maybe make the 2 arrays use this array?
+           cptFilterArray.push(order[i]);
         }
     });
 
@@ -260,6 +263,7 @@ private drawOrderSearchBar(order){
     });
 
     events.fire('filter_by_cpt', fixed);
+    events.fire('add_cpt_to filterArray', cptFilterArray);
     select('.orderDiv').select('div').remove();
 
 });
@@ -274,11 +278,24 @@ private DrawfilterDescriptionBox(cohort){
 
     let filter = cohort[1];
     for(let dis in filter){
-        console.log(filter[dis]);
+        
         if(filter[dis] != null && filter[dis].length !=0 ){
-            box.append('div').append('text').text(dis);
+            box.append('div').append('text').text(dis + ":  ");
             for(let d in filter[dis]){
                 console.log(d);
+                filter[dis].forEach(attr => {
+                    console.log(attr);
+                    if(dis == 'demo'){
+                        box.append('div').append('text').text(attr.attributeName + ' : ' + attr.checkedOptions );
+                    }
+                    if(dis == 'cpt'){
+                        let cptdiv = box.append('div');
+                       attr.forEach(a => {
+                           console.log(a);
+                        let cpttext = cptdiv.append('text').text(a.key + ", ");
+                       });
+                    }
+                });
             }
         }
        
