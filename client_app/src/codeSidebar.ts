@@ -18,7 +18,7 @@ export class CodeSidebar {
     private startBool;
     private cohortKeeper;
     private targetOrder;
-    private filteredCPT;
+    private selectedCohort;
     private currentlySelectedName;
     private selected;
     private dictionary;
@@ -31,6 +31,7 @@ export class CodeSidebar {
 
         let scoreFilter = this.$node.append('div').classed('scoreDiv', true);
         let orderFilter = this.$node.append('div').classed('orderDiv', true);
+        let filterDescription = this.$node.append('div').classed('descriptionDiv', true);
 
         const self = this;
 
@@ -47,17 +48,16 @@ export class CodeSidebar {
      */
     private attachListener() {
 
-        events.on('cpt_mapped', (evt, item)=> {
-                this.filteredCPT = item;
-        });
+       events.on('selected_cohort_change', (evt, item)=> {
 
-        events.on('selected_cpt_change', (evt, item) => {
+        select('.orderDiv').select('div').remove();
+    
+       });
 
-           this.filteredCPT = item;
-           select('.orderDiv').select('div').remove();
-
-           
-
+       events.on('update_cohort_description', (evt, item)=> {
+           console.log('update_cohort_description');
+           console.log(item);
+           this.DrawfilterDescriptionBox(item);
        });
 
         events.on('make_stat_node', (evt, item)=> {
@@ -66,7 +66,6 @@ export class CodeSidebar {
            cohortStat.create(view, item[0], item[1]);
            //select('.cohort.' + item[1])
        });
-
 
         events.on('update_start_event', (evt, item)=>  {
            
@@ -96,13 +95,13 @@ export class CodeSidebar {
                         let order = {'key': p, 'value' : this.dictionary[prop][p]};
                         orderarray.push(order);
                     }
-                    this.orderSearchBar(orderarray);
+                    this.drawOrderSearchBar(orderarray);
                 }else{
                     for(let p in this.dictionary[prop]){
-                        //console.log(p);
+                        
                         if(p == value){
                             let order = {'key': p, 'value': this.dictionary[prop][p]};
-                            this.orderSearchBar([order]);
+                            this.drawOrderSearchBar([order]);
                         }
                     }
                 }
@@ -114,9 +113,9 @@ export class CodeSidebar {
                     for(let p in this.dictionary[prop]){
                       // 
                         if(this.dictionary[prop][p].includes(+value)){
-                            console.log(this.dictionary[prop][p]);
+                            
                             let order = {'key': p, 'value': value};
-                            this.orderSearchBar([order]);
+                            this.drawOrderSearchBar([order]);
                         }
                     }
                 }
@@ -198,11 +197,9 @@ private drawOrderFilterBox (div) {
    
 
 }
-private orderSearchBar(order){
+private drawOrderSearchBar(order){
 
     select('.orderDiv').select('div').remove();
-
-    console.log(order);
 
     const box = select('.orderDiv').append('div');
     let props = [];
@@ -218,7 +215,6 @@ private orderSearchBar(order){
     let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', d => d['value']).attr('checked', true);
     let ordertext = orderFilters.append('text').text(d => d['key']);
 
-    console.log(ordertext);
     ordertext.on("mouseover", (d) => {
         let t = transition('t').duration(500);
         select(".tooltip")
@@ -246,12 +242,10 @@ private orderSearchBar(order){
     let checkNodes = ordercheck.nodes();
     let checkedarray = [];
 
-    console.log(checkNodes);
-
     checkNodes.forEach(n => {
         if(n['checked']){
             checkedarray.push(n['value']);
-            console.log(n['key']);
+           
         }
     });
 
@@ -261,18 +255,35 @@ private orderSearchBar(order){
             let fix = ch.split(',');
             fix.forEach(f => {
                 fixed.push(f);
-                console.log(f);
             });
         }else{fixed.push(ch); };
     });
 
-    console.log(fixed);
     events.fire('filter_by_cpt', fixed);
     select('.orderDiv').select('div').remove();
 
 });
+          
+}
 
-            
+private DrawfilterDescriptionBox(cohort){
+  
+    select('.descriptionDiv').select('div').remove();
+    const box = select('.descriptionDiv').append('div');
+    box.append('text').text(cohort[0].length + ' Patients');
+
+    let filter = cohort[1];
+    for(let dis in filter){
+        console.log(filter[dis]);
+        if(filter[dis] != null && filter[dis].length !=0 ){
+            box.append('div').append('text').text(dis);
+            for(let d in filter[dis]){
+                console.log(d);
+            }
+        }
+       
+    }
+
 }
 
 private renderOrdersTooltip(tooltip_data) {

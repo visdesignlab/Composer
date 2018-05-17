@@ -57,7 +57,7 @@ export class CohortManager {
         events.on('cohort_selected', (evt, item)=>{
 
             d3.select('#cohortKeeper').selectAll('.selected').classed('selected', false);
-            console.log('hey!');
+ 
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
@@ -71,7 +71,9 @@ export class CohortManager {
             events.fire('selected_cpt_change', this.selectedCPT);
             events.fire('selected_stat_change', [this.selectedCohort, index]);
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
-           
+            console.log('cohort selected');
+            events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
+
           });
 
 
@@ -90,11 +92,6 @@ export class CohortManager {
             this.cohortkeeperarray[this.cohortIndex] = item;
             this.selectedCohort = item;
             events.fire('selected_cohort_change', this.selectedCohort);
-        });
-
-        events.on('got_promis_scores', (evt, item)=> {
-            
-            //this.allPatientPromis = item;
         });
 
           events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
@@ -135,6 +132,7 @@ export class CohortManager {
              events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
              events.fire('selected_event_filter_change', []);
+             events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
 
           });
 
@@ -147,6 +145,7 @@ export class CohortManager {
               this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
               events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
+              events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
               events.fire('update_event_line', this.cohortfilterarray[this.cohortIndex].cpt);
               //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
               events.fire('selected_event_filter_change', this.selectedFilter.cpt);
@@ -172,7 +171,7 @@ export class CohortManager {
             this.cohortkeeperarray[this.cohortIndex] = item[0];
             this.cohortfilterarray[this.cohortIndex].minCount = item[1];
             events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
-
+            events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
           });
 
           events.on('filter_by_Promis_count', (evt, item)=> {
