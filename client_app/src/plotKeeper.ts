@@ -40,8 +40,7 @@ export class PlotKeeper {
 
         this.$node = select(parent);
 
-        this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-        similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.cohortData, this.maxDay, this.minDay);
+       this.buildPlot(this.cohortData);
         
         this.attachListener();
     }
@@ -75,6 +74,13 @@ export class PlotKeeper {
            // this.getDays(null);
            // events.fire('change_promis_scale');
                 });
+    }
+
+    private buildPlot(cohort) {
+
+        this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
+        similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, this.maxDay, this.minDay);
+
     }
 }
 
