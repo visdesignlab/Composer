@@ -5,15 +5,20 @@
 .allDiagramDiv {
     // clear: left;
     width: 700px;
+    // height: 500px;
     float: left;
 }
 
 //container div for the line graph?
 .diagramDiv {
     float: left;
-    padding-right: 100px;
-    //added max-height to div to move boxs closer together
-    //min-height: 530px;
+    padding-right: 50px;
+    width: 700px;
+    height: 450px;
+}
+
+.diagramDiv svg {
+    // height: 430px;
 }
 
 .scoreLine {

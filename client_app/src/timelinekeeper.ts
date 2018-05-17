@@ -32,33 +32,29 @@ export class TimelineKeeper {
 
     private $node;
     private brush;
-    private icdObjects;
-    private cptObjects;
     private populationDemo;
-    private populationPromis;
-    private filteredPromis;
+
     private parseTime = dataCalc.parseTime;
     private findMinDate = dataCalc.findMinDate;
     private findMaxDate = dataCalc.findMaxDate;
     private maxDay;
     private timeScale;
     private timeScaleMini;
-    private selectedcohort;
     private queryDateArray;
     private queryDataArray;
-    private targetOrder;
-    private filteredCPT;
+    private margin;
+    
 
     constructor(parent: Element) {
 
         this.$node = select(parent);
+        this.margin = 50;
 //1252 days is the max number of days for the patients
         this.timeScale = scaleLinear()
             .domain([-300, 1251])
-            .range([0, 700]).clamp(true);
+            .range([0, 640]).clamp(true);
 
         this.$node.append('div').classed('day_line', true);
-
         this.attachListener();
 
     };
@@ -69,40 +65,15 @@ export class TimelineKeeper {
             this.maxDay = item;
             });
 
-        events.on('cpt_mapped', (evt, item)=> {
-            // this.timeScale.domain([-10, this.maxDay]);
-             this.filteredCPT = item;
-        });
-
-        events.on('selected_cpt_change', (evt, item) => {
-
-           // this.timeScale.domain([-10, this.maxDay]);
-            this.filteredCPT = item;
-        });
-
-        events.on('filteredPatients', (evt, item)=>{
-            this.filteredPromis = item;
-        });
-
         events.on('population demo loaded', (evt, item)=> {
             this.populationDemo = item;
-            this.showStats();
+            this.drawTimeline();
         });
-
-        events.on('pro_object_filtered', (evt, item)=> {
-           this.filteredPromis = item;
-        });
-
-        events.on('selected_cohort_change', (evt, item)=> {
-            this.selectedcohort = item;
-         });
 
         events.on('timeline_max_set', (evt, item)=> {
             this.maxDay = item;
             select('.day_line').select('.maxDay').text(this.maxDay + " Days");
         });
-
-        events.on('filteredPatients', (evt, item)=> this.filteredPromis = item);
 
         events.on('score_scale_changed', ()=> {
             select('.slider').call(this.brush).transition()
@@ -110,42 +81,37 @@ export class TimelineKeeper {
         });
     }
 
-    private showStats () {
+    private drawTimeline() {
 
         let timeline = this.$node.select('.day_line');
-
-        let timelineMin = timeline.append('text').text('0 Days');
-
-        let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
-                          .attr('height', 70).attr('width', 710);
+       // let timelineMin = timeline.append('text').text('0 Days');
+        let timelineSVG = timeline.append('svg').classed('day_line_svg', true);
+                          
 
         timelineSVG.append('g')
                         .attr('class', '.xAxisMini')
-                        .attr('transform', () => `translate(30,50)`)
+                        .attr('transform', () => `translate(75, 0)`)
                         .call(axisBottom(this.timeScale));
 
-        let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
+      //  let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
 
          // ----- SLIDER
 
         let slider = timelineSVG.append('g')
          .attr('class', 'slider')
-         .attr('transform', `translate(20,20)`);
+         .attr('transform', `translate(75, 0)`);
 
         let that = this;
 
         this.brush = brushX()
-        .extent([[0, 0], [700, 30]])
+        .extent([[0, 0], [670, 20]])
         .handleSize(0)
         .on("end", () => {
             if (event.selection === null) {
-              //this.setOrderScale();
-             
+
             } else {
               let start = this.timeScale.invert(event.selection[0]);
               let end = this.timeScale.invert(event.selection[1]);
-                console.log(start);
-
               events.fire('domain updated', [start, end]);
             }
 

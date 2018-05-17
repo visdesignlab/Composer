@@ -37,11 +37,8 @@ export class similarityScoreDiagram {
     private scoreScale;
     private svg;
     private brush;
-
-    private targetProInfo;
     private cohortProInfo;
     private targetOrderInfo;
-    private cohortOrderInfo;
     private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
     private parseTime = dataCalc.parseTime;
     private setOrderScale = dataCalc.setOrderScale;
@@ -62,9 +59,9 @@ export class similarityScoreDiagram {
        proGroup : [],
    };
 
-    height = 400;
+    height = 460;
     width = 600;
-    promisDimension = {height: 500, width: 700};
+    promisDimension = {height: 460, width: 700};
     margin = {x: 80, y: 40};
     private sliderWidth = 10;
     private lineScale;
@@ -82,37 +79,7 @@ export class similarityScoreDiagram {
             .append('div')
             .classed('diagramDiv', true);
 
-        this.$node.append('input')
-        .attr('type', 'button')
-        .attr('value', 'Update Start Day to Event')
-        .on('click', () => {
-            this.zeroEvent = this.targetOrder;
-            this.clearDiagram();
-            this.getDays(this.cohortProInfo);
-            this.eventDayBool = true;
-            this.getBaselines(null);
-            this.interpolate(this.cohortProInfo);
-
-            this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
-            events.fire('send_stats');
-
-            });
-
-        this.$node.append('text').attr('id', 'eventLabel');
-
-        this.$node.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Change Promis Score Scale')
-           // .on('click', () => events.fire('show_cpt'));
-           // .on('click', () => events.fire('load_cpt'));
-            .on('click', () =>events.fire('change_promis_scale'));
-
-        this.$node.append('input')
-            .attr('type', 'button')
-            .attr('value', 'Aggregate')
-            .on('click', () => {
-               this.frequencyTest();
-                });
+       // this.drawEventButtons();
 
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
@@ -122,7 +89,7 @@ export class similarityScoreDiagram {
 
         // scales
         this.timeScale = scaleLinear()
-            .range([0, this.promisDimension.width - this.margin.x]);
+            .range([0, this.promisDimension.width]);
             //.clamp(true);
 
         this.scoreScale = scaleLinear()
@@ -213,27 +180,7 @@ export class similarityScoreDiagram {
      */
     private attachListener() {
 
-        events.on('score_domain_change', (evt, item)=>{
-
-            this.scoreScale.domain(item);
-            this.clearDiagram();
-            this.drawPromisChart();
-            this.yBrushSelection = true;
-        });
-
-        events.on('filtered_by_quant', (evt, item)=> {
-
-            this.cohortProInfo = item[0];
-            this.clearDiagram();
-            this.drawPromisChart();
-        });
-
-        events.on('filtered_by_count', (evt, item)=> {
-
-            this.cohortProInfo = item[0];
-            this.clearDiagram();
-            this.drawPromisChart();
-        });
+        events.on('aggregate_button_clicked', ()=> this.frequencyTest());
 
         events.on('change_promis_scale', ()=>{
 
@@ -249,12 +196,40 @@ export class similarityScoreDiagram {
 
         });
 
-        events.on('event_clicked', (evt, item)=> {
+        events.on('score_domain_change', (evt, item)=>{
+            this.scoreScale.domain(item);
+            this.clearDiagram();
+            this.drawPromisChart();
+            this.yBrushSelection = true;
+        });
 
+        events.on('filtered_by_quant', (evt, item)=> {
+            this.cohortProInfo = item[0];
+            this.clearDiagram();
+            this.drawPromisChart();
+        });
+
+        events.on('filtered_by_count', (evt, item)=> {
+            this.cohortProInfo = item[0];
+            this.clearDiagram();
+            this.drawPromisChart();
+        });
+
+        events.on('event_clicked', (evt, item)=> {
             this.targetOrder = item;
             this.$node.select('#eventLabel').text(this.targetOrder);
+        });
 
+        events.on('update_start_button_clicked', ()=>{
+            this.zeroEvent = this.targetOrder;
+            this.clearDiagram();
+            this.getDays(this.cohortProInfo);
+            this.eventDayBool = true;
+            this.getBaselines(null);
+            this.interpolate(this.cohortProInfo);
 
+            this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
+            events.fire('send_stats');
         });
 
         events.on('filter_cohort_by_event', (evt, item)=> {
@@ -346,8 +321,6 @@ export class similarityScoreDiagram {
             if(this.maxDay != undefined){
                 this.drawPromisChart();
             }
-
-
         }
 
     }
@@ -521,7 +494,7 @@ export class similarityScoreDiagram {
                 .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
                 zeroLine.append('line')
-                        .attr('x1', 0).attr('x2', 675)
+                        .attr('x1', 0).attr('x2', 670)
                         .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
                         .attr('stroke', 'red');
 
@@ -615,7 +588,7 @@ export class similarityScoreDiagram {
 
                zeroLine.append('line')//.attr('class', 'myLine')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
-                    .attr('y1', 0).attr('y2', 400).attr('stroke-width', .5).attr('stroke', 'red');
+                    .attr('y1', 0).attr('y2', 350).attr('stroke-width', .5).attr('stroke', 'red');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
         }
 
@@ -716,6 +689,8 @@ export class similarityScoreDiagram {
     // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
     private frequencyTest(){
+
+        console.log('this thing on???');
 
         this.svg.select('#similar_score').selectAll('.line_group');
         

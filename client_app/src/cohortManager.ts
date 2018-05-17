@@ -3,15 +3,7 @@
  * cohortkeeper to keep all those cohorts.
  */
 import * as ajax from 'phovea_core/src/ajax';
-import {ITable, asTable} from 'phovea_core/src/table';
-import {IAnyVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
-import {tsv} from 'd3-request';
-import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
-import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
-import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
-import {asVector} from 'phovea_core/src/vector/Vector';
-import {argFilter} from 'phovea_core/src/';
 import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
@@ -32,6 +24,7 @@ export class CohortManager {
     selectedCPT;
     cptCodes;
     codes;
+    cohortCompareArray = [];
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -46,6 +39,11 @@ export class CohortManager {
     }
 
     private attachListener(){
+
+        events.on('add_cohort_plot', (evt, item)=> {
+            this.cohortCompareArray.push(this.cohortkeeperarray[item]);
+            events.fire('add_another_plot', this.cohortCompareArray);
+        });
 
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
