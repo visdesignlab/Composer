@@ -141,8 +141,7 @@ export class DataManager {
           
             //change this back to added and selected. 
             //when selected, the index changes. no need to map the cpt
-            console.log('selected cohort change fired');
-            
+
             this.filteredPatPromis = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
                 });
@@ -161,6 +160,7 @@ export class DataManager {
             this.searchByEvent(this.patCPT, item).then((d)=> {
                 this.addMinDay(d[1]);
                 events.fire('filter_cohort_by_event', [d[0], item]);
+               
             });
         });
 

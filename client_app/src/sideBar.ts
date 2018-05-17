@@ -261,9 +261,14 @@ export class SideBar {
         let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
         let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
         let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
+
         let eyeSvg = cohortBox.append('svg').classed('eye', true);
         let eye = eyeSvg.append('circle').attr('cx', 10).attr('cy', 9).attr('r', 5);
-        eyeSvg.on('click', ()=> console.log('test'));
+        eyeSvg.on('click', ()=> {
+          console.log(i);
+          events.fire('add_cohort_plot', i);
+        });
+
         let cohortfilter;
         let label = document.getElementsByClassName('cohort ' + i);
         let statView = select(label[0]).append('div').classed('stat_view', true).classed('hidden', true);
