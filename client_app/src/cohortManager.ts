@@ -136,11 +136,18 @@ export class CohortManager {
 
           });
 
+          events.on('add_cpt_to filterArray', (evt, item)=>{
+            console.log(item);
+            this.cohortfilterarray[this.cohortIndex].cpt.push(item);
+          });
+
           events.on('filter_cohort_by_event', (evt, item)=> {
               this.selectedCPT = item[0];
               this.cptObjectKeeper[this.cohortIndex] = item[0];
 
-              this.cohortfilterarray[this.cohortIndex].cpt.push([item[1], item[0].length]);
+              //do I want to keep the patient count available for the filter?
+
+             // this.cohortfilterarray[this.cohortIndex].cpt.push([item[1], item[0].length]);
 
               this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
