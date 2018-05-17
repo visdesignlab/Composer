@@ -3,15 +3,11 @@
  */
 
 import {select} from 'd3-selection';
-//import * as printLogs from './printLogs';
-//import * as svgTable from './svgTable';
-import * as queryBox from './queryBox';
 import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
-//import * as patOrderBreakdown from './patOrderBreakdown';
 import * as parallel from './parallel';
 import * as dataManager from './dataManager';
 import * as cohortManager from './cohortManager';
@@ -71,18 +67,15 @@ export class App {
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
 
-          // query box
-   // queryBox.create(main.node());
-
    // const parallelView = main.append('div').classed('parallel_view', true);
     const populationView = main.append('div').classed('population_view', true);
-    const timeline = main.append('div').classed('timeline_view', true)
     const plots = main.append('div').classed('plot_view', true);
+    const timeline = main.append('div').classed('timeline_view', true);
     const statBar = this.$node.append('div').classed('stat_sidebar_view', true);
 
-    timelineKeeper.create(timeline.node());
     PlotKeeper.create(plots.node());
-    eventLine.create(main.node(), null);
+    timelineKeeper.create(timeline.node());
+    //eventLine.create(main.node(), null);
     codeside.create(statBar.node());
 
     inStat.create(main.node());
@@ -92,8 +85,6 @@ export class App {
     this.setBusy(false);
 
     this.attachListener();
-
-
 
   }
 
