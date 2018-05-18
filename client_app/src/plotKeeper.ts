@@ -17,6 +17,7 @@ import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
+import * as timelineKeeper from './timelinekeeper';
 
 export class PlotKeeper {
 
@@ -31,6 +32,8 @@ export class PlotKeeper {
         this.$node = select(parent);
         this.drawEventButtons();
         this.buildPlot(this.cohortData);
+        const timeline = this.$node.append('div').classed('timeline_view', true);
+        timelineKeeper.create(timeline.node());
         this.attachListener();
     }
 

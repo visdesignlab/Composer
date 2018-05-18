@@ -70,7 +70,7 @@ export class DataManager {
         let startDateSelection = d3.select('#start_date').select('text');
 
         events.on('filter_cohort_by_event', (evt, item)=> {
-
+            console.log(item);
             let idArray = this.getCohortIdArrayAfterMap(item[0], 'cpt');
             let filteredPromis = this.filterMappedPromisByArray(idArray, this.filteredPatPromis);
             events.fire('selected_promis_filtered', filteredPromis);
@@ -157,8 +157,9 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-            this.searchByEvent(this.patCPT, item).then((d)=> {
+            this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.addMinDay(d[1]);
+                console.log(d);
                 events.fire('filter_cohort_by_event', [d[0], item]);
                
             });
@@ -603,14 +604,13 @@ export class DataManager {
     }
 
     private async searchDictionary(value) {
-        console.log(value);
+   
     }
 
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
 
     private async searchByEvent(cohort, value) {
 
-        console.log(value);
         //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
@@ -632,22 +632,7 @@ export class DataManager {
             
         });
     });
-        
-        /*
 
-        cohort.forEach((element) => {
-
-            let elementBool;
-            element.forEach(g => {
-                if (g.value[0].includes(+value)){
-                    if(elementBool != g.key){
-                        withQuery.push(element);
-                        queryDate.push(g);
-                    }elementBool = g.key;
-                    }
-            });
-        });*/
-        console.log(withQuery);
         return [withQuery, queryDate];
     }
 

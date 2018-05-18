@@ -24,7 +24,7 @@ import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 
-export class EventLine {
+export class EventLine2 {
     private $node;
     private eventScale;
     private circleScale;
@@ -99,13 +99,11 @@ export class EventLine {
           }
 
           function circleclick(d){ 
+              
               selectAll('.event_circle').classed('selected_circle', false);
-
               let circ = select(this).select('.event_circle').classed('selected_circle', true);
-
               events.fire('event_clicked', d[0]);
-             // events.fire('event_clicked', d[0]);
-             // events.fire('filter_by_cpt', d[0]);
+           
             }
 
         }
@@ -113,5 +111,5 @@ export class EventLine {
 }
 
 export function create(parent:Element, cohort) {
-    return new EventLine(parent, cohort);
+    return new EventLine2(parent, cohort);
   }
