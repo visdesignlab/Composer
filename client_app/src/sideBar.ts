@@ -65,7 +65,7 @@ export class SideBar {
     this.xScale = scaleLinear();
     this.yScale = scaleLinear().range([0, 30]);
     this.svgWidth = 170;
-    this.svgHeight = 50;
+    this.svgHeight = 40;
     
   
     this.attachListener();
@@ -107,7 +107,7 @@ export class SideBar {
         let parent = document.getElementsByClassName('cohort ' + item[1])[0];
         let view = parent.querySelector('.stat_view');
         cohortStat.create(view, item[0], item[1]);
-        select('.cohort.' + item[1])
+        select('.cohort.' + item[1]);
       });
 
       events.on('update_filters', (evt, item)=> {
@@ -501,7 +501,7 @@ export class SideBar {
 
     barGroupsALL
     .attr("transform", (d, i) => {
-        return "translate(" +  i * this.svgWidth/d.binCount + ",0)";
+        return "translate(" +  ((i * this.svgWidth/d.binCount) + 4) + ",0)";
     });
     barEnterALL.append("rect");
 
@@ -562,18 +562,18 @@ export class SideBar {
     let label = ul.append('label').attr('value', (d=>d.key)).text(function(d) {return d.label;});
     let distFilter = distDiagrams.append('div').classed('distFilter', true).attr('width', this.svgWidth);
 
-    let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true).classed('hidden', true);
+    let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true);//.classed('hidden', true);
     let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', '95%');//.classed('hidden', true)
-    let svg_rect_group = distFilter_svg.append('g').attr('transform', 'translate(5, 0)').attr('width', '95%');
+    let svg_rect_group = distFilter_svg.append('g').attr('width', '95%');
     let rect_label_group = distFilter_svg.append('g');
 
-    rect_label_group.append('text').text(d=> d.value[0].x0).attr('transform', 'translate(1, 30)');
-    rect_label_group.append('text').text(d=> d.value[d.value.length-1].x1).attr('transform', 'translate('+ (this.svgWidth - 15) +', 30)');
+    rect_label_group.append('text').text(d=> d.value[0].x0).attr('transform', 'translate(0, 20)');
+    rect_label_group.append('text').text(d=> d.value[d.value.length-1].x1).attr('transform', 'translate('+ (this.svgWidth - 15) +', 20)');
     console.log(data);
   
-    let rects = svg_rect_group.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 20)
-    .attr('opacity', (d)=> (distScale(d['length'] + 20)))
-    .attr('x', (d, i)=> i * this.svgWidth/d.binCount);
+    let rects = svg_rect_group.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 15)
+    .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+    .attr('x', (d, i)=> (i * this.svgWidth/d.binCount) + 5);
 
    
     //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);

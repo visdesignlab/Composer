@@ -49,10 +49,13 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
-
         select('.orderDiv').select('div').remove();
     
        });
+
+       events.on('send_filter_to_codebar', (evt, item)=> {
+           console.log(item);
+       })
 
        events.on('update_cohort_description', (evt, item)=> {
            console.log('update_cohort_description');
@@ -262,7 +265,7 @@ private drawOrderSearchBar(order){
         }else{fixed.push(ch); };
     });
 
-    events.fire('filter_by_cpt', fixed);
+    events.fire('filter_by_cpt', [fixed, cptFilterArray]);
     events.fire('add_cpt_to filterArray', cptFilterArray);
     select('.orderDiv').select('div').remove();
 

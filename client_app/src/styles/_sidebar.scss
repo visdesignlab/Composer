@@ -43,9 +43,15 @@ ul {
     width: 100%;
 }
 
+.distFilter svg {
+    padding: 0px;
+    margin: 0;
+}
+
 .distFilter_svg {
-    height: 40px;
+    height: 25px;
     width: 95%;
+    margin: 0px;
 }
 
 .distFilter_svg text {
