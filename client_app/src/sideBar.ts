@@ -243,7 +243,6 @@ export class SideBar {
       });
 
     deletecohortButton.on('click', () => {
-      console.log('thisthing on?');
       events.fire('clear_cohorts');
   });
 
@@ -266,7 +265,7 @@ export class SideBar {
         let eyeSvg = cohortBox.append('svg').classed('eye', true);
         let eye = eyeSvg.append('circle').attr('cx', 10).attr('cy', 9).attr('r', 5);
         eyeSvg.on('click', ()=> {
-          console.log(i);
+        
           events.fire('add_cohort_plot', i);
         });
 
@@ -288,32 +287,45 @@ export class SideBar {
                 }
 
         });
-        cohortfilter = filters[i].demo.forEach(element => {
 
-                                        statView.append('div').classed('cohort-label', true).append('text').text(element.attributeName + ': ')
-                                        element.checkedOptions.forEach(op => {
-                                          statView.append('text').text(op + ', ');
-                                        });
-                                        statView.append('text').text(element.checkedOptions.forEach(op => {
-                                            return op + ',';
+   
+        cohortfilter = filters[i].forEach(element => {
 
-                                        }));
+         if(element[0] == 'demographic' && element[1].length != 0){
 
-        });
+          
+           element[1].forEach(attr => {
+            statView.append('div').classed('cohort-label', true).append('text').text(attr.attributeName + ': ');
+            attr.checkedOptions.forEach(op => {
+              statView.append('text').text(op + ', ');
+            });
+            statView.append('text').text(attr.checkedOptions.forEach(op => {
+                return op + ',';
+  
+            }));
+           });
 
+         }
+         if(element[0] == 'cpt' && element[1].length != 0){
 
-        if(filters[i].cpt != 0){
-            let cptBox = statView.append('div').classed('cohort-label', true);
-            cptBox.append('text').text('  CPT: ');
-            filters[i].cpt.forEach(code => {cptBox.append('text').text(code[0] + "  ");
+          let cptBox = statView.append('div').classed('cohort-label', true);
+          cptBox.append('text').text('  CPT: ');
+          filters[i].cpt.forEach(code => {cptBox.append('text').text(code[0] + "  ");
 
-        })};
+           });
+         }
+         if(element[0] == 'min_count' && element[1].length != 0){
 
-        if(filters[i].minCount != null){
-            let minBox = statView.append('div').classed('cohort-label', true);
+          let minBox = statView.append('div').classed('cohort-label', true);
             minBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
+         }
 
-        };
+         if(element[0] == 'min_count' && element[1].length != 0){
+
+          let minBox = statView.append('div').classed('cohort-label', true);
+            minBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
+         }
+        });
 
         counter = counter + 1;
 
@@ -322,7 +334,9 @@ export class SideBar {
             events.fire('cohort_selected', [cohort, i]);
 
         });
+        
     });
+    
     if(this.selected == undefined){
 
         let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
@@ -346,7 +360,7 @@ export class SideBar {
     let filterList = [];
     that.filters = [];
 
-         //console.log(that.bmiRange);
+        
          let parentFilter = this.demoform.selectAll('ul.parent');
 
          parentFilter.each(function (element) {
@@ -418,7 +432,7 @@ export class SideBar {
 
     let maxValue = max(mapped);
 
-   //console.log(maxValue);
+  
 
  // if (type == 'BMI') mapped = mapped.filter(d => d > 0);
     let x = this.xScale.domain([0, maxValue]).nice();
@@ -472,7 +486,7 @@ export class SideBar {
     {'key': 'CCI', 'label': 'CCI', 'value': binCCI, 'scale': this.xScale.domain([0, binCCI[0].binCount])},
     {'key': 'AGE', 'label': 'Age', 'value': binAGE, 'scale': this.xScale.domain([0, binAGE[0].binCount])}
     ];
-   // console.log(this.distributionHeader);
+
     this.drawDistributionBands(this.distributionHeader);
     this.drawHistogram(binBMI, 'BMI');
     this.drawHistogram(binCCI, 'CCI');
@@ -486,7 +500,7 @@ export class SideBar {
         return d['frequency'] + .1;
     })]);
 
-   // console.log(histobins);
+  
 
     //////////////bar groups for all data////////////////////////////////
     let barGroupsALL = this.$node.select('.distributionWrapper').select('.' +type).selectAll('.barALL')
@@ -569,8 +583,7 @@ export class SideBar {
 
     rect_label_group.append('text').text(d=> d.value[0].x0).attr('transform', 'translate(0, 20)');
     rect_label_group.append('text').text(d=> d.value[d.value.length-1].x1).attr('transform', 'translate('+ (this.svgWidth - 15) +', 20)');
-    console.log(data);
-  
+
     let rects = svg_rect_group.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 15)
     .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
     .attr('x', (d, i)=> (i * this.svgWidth/d.binCount) + 5);

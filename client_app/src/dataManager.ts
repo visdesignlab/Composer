@@ -126,8 +126,9 @@ export class DataManager {
 
         //Cohort Filtering
           // item: [d, parentValue]
+          //this is passed from sidebar
         events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
-           // this.filterRequirements.demo = item;
+            
             this.demoFilter(item, this.totalDemoObjects);
           });
 
@@ -160,6 +161,7 @@ export class DataManager {
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.addMinDay(d[1]);
                 console.log(d);
+                console.log(item);
                 events.fire('filter_cohort_by_event', [d[0], item]);
                
             });
@@ -246,7 +248,7 @@ export class DataManager {
             });
 
            //this is a test, manual array for filter
-
+            events.fire('add_demo_to_filter_array', [sidebarFilter, this.cohortIdArray.length])
            //events.fire('cohort_filtered_demo', [filter.length, sidebarFilter]);//should I maybe use the array instead?
            this.mapPromisScores(this.cohortIdArray, this.totalProObjects);
        }

@@ -9,6 +9,7 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import * as cohortStat from './cohortStat';
 import * as dict from './cptDictionary';
 import {transition} from 'd3-transition';
+import { scaleLinear } from 'd3-scale';
 
 export class CodeSidebar {
 
@@ -54,13 +55,12 @@ export class CodeSidebar {
        });
 
        events.on('send_filter_to_codebar', (evt, item)=> {
-           console.log(item);
-       })
+        this.DrawfilterDescriptionBox(item);
+       });
 
        events.on('update_cohort_description', (evt, item)=> {
-           console.log('update_cohort_description');
-           console.log(item);
-           this.DrawfilterDescriptionBox(item);
+   
+           //this.DrawfilterDescriptionBox(item);
        });
 
         events.on('make_stat_node', (evt, item)=> {
@@ -249,7 +249,7 @@ private drawOrderSearchBar(order){
     checkNodes.forEach((n, i) => {
         if(n['checked']){
             checkedarray.push(n['value']);
-           console.log(order[i]);
+         
            // Maybe make the 2 arrays use this array?
            cptFilterArray.push(order[i]);
         }
@@ -273,36 +273,28 @@ private drawOrderSearchBar(order){
           
 }
 
-private DrawfilterDescriptionBox(cohort){
+private DrawfilterDescriptionBox(filter){
+
+    let rectScale = scaleLinear().domain([0, 6790]).range([0, 200]);
   
+    console.log(filter);
+
     select('.descriptionDiv').select('div').remove();
     const box = select('.descriptionDiv').append('div');
-    box.append('text').text(cohort[0].length + ' Patients');
+    box.append('text').text(filter[0].length + ' Filters');
 
-    let filter = cohort[1];
-    for(let dis in filter){
-        
-        if(filter[dis] != null && filter[dis].length !=0 ){
-            box.append('div').append('text').text(dis + ":  ");
-            for(let d in filter[dis]){
-                console.log(d);
-                filter[dis].forEach(attr => {
-                    console.log(attr);
-                    if(dis == 'demo'){
-                        box.append('div').append('text').text(attr.attributeName + ' : ' + attr.checkedOptions );
-                    }
-                    if(dis == 'cpt'){
-                        let cptdiv = box.append('div');
-                       attr.forEach(a => {
-                           console.log(a);
-                        let cpttext = cptdiv.append('text').text(a.key + ", ");
-                       });
-                    }
-                });
-            }
-        }
-       
-    }
+   // let filter = cohort[1];
+    filter.forEach((fil, i) => {
+       let stage = box.append('div').classed('filter_stage', true);
+        let stageSvg = stage.append('svg').classed('filter_stage_svg', true);
+    
+        let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2]));
+        if(fil[0] == 'demographic') {rect.attr('fill', 'red');}
+        if(fil[0] == 'CPT') {rect.attr('fill', 'blue');}
+        let text = stageSvg.append('g').attr('transform', 'translate(0, 12)');
+        text.append('text').text((i + 1) + ': ' );
+        if(fil[0] == 'CPT') {text.append('text').text(fil[1][1].key).attr('transform', 'translate(5, 0)');}
+    });
 
 }
 
