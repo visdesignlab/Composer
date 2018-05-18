@@ -92,14 +92,15 @@ export class CohortManager {
             events.fire('selected_cohort_change', this.selectedCohort);
         });
 
-          events.on('demo_filter_button_pushed', (evt, item) => { // called in sidebar
-            let filterReq = {demo: null, cpt: [], length: null, quantile: null, minCount: null};
-            filterReq.demo = item;
+          events.on('add_demo_to_filter_array', (evt, item) => { // called in sidebar
+           // let filterReq = {demo: null, cpt: [], length: null, quantile: null, minCount: null};
+           // filterReq.demo = item;
+            let filterReq = [];
+            filterReq.push(['demographic', item[0], item[1]]);
             this.addCohortFilter(filterReq);
             
           });
 
-         
           events.on('mapped_cpt_filtered', (evt, item)=>{
 
               this.selectedCPT = item;
@@ -126,7 +127,7 @@ export class CohortManager {
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
              events.fire('selected_cohort_change', this.selectedCohort);
-            // events.fire('new_cohort_added', this.selectedCohort);
+           
              events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
              events.fire('selected_event_filter_change', []);
@@ -134,9 +135,9 @@ export class CohortManager {
 
           });
 
-          events.on('add_cpt_to filterArray', (evt, item)=>{
+          events.on('add_cpt_to_filterArray', (evt, item)=>{
             console.log(item);
-            this.cohortfilterarray[this.cohortIndex].cpt.push(item);
+            this.cohortfilterarray[this.cohortIndex].push(item);
           });
 
           events.on('filter_cohort_by_event', (evt, item)=> {
@@ -145,15 +146,17 @@ export class CohortManager {
 
               //do I want to keep the patient count available for the filter?
 
-             // this.cohortfilterarray[this.cohortIndex].cpt.push([item[1], item[0].length]);
+              this.cohortfilterarray[this.cohortIndex].push(['CPT', item[1], item[0].length]);
+              console.log(this.cohortfilterarray);
 
               this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
               events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
               events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-              events.fire('update_event_line', this.cohortfilterarray[this.cohortIndex].cpt);
+              //events.fire('update_event_line', this.cohortfilterarray[this.cohortIndex]);
               //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
               events.fire('selected_event_filter_change', this.selectedFilter.cpt);
+              events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
           events.on('filter_aggregate', (evt, item)=> {
@@ -197,6 +200,7 @@ export class CohortManager {
 
     }
 
+    //adds a cohort filter to the cohort filter array for the cohorts
     private addCohortFilter (filter) {
 
         this.cohortfilterarray.push(filter);
