@@ -18,6 +18,7 @@ import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array'
 import { all } from 'phovea_core/src/range';
 import {brushX} from 'd3-brush';
 import * as cohortStat from './cohortStat';
+import {transition} from 'd3-transition';
 
 export class SideBar {
 
@@ -63,7 +64,7 @@ export class SideBar {
     this.$node.append('div').attr('id', 'filterDiv');
     this.xScale = scaleLinear();
     this.yScale = scaleLinear().range([0, 30]);
-    this.svgWidth = 180;
+    this.svgWidth = 170;
     this.svgHeight = 50;
     
   
@@ -427,9 +428,6 @@ export class SideBar {
     .thresholds(x.ticks(ticks))
     (mapped);
 
-    //return bins;
-    //console.log(data);
-
     let histogramData = bins.map(function (d) {
       totalPatients -= d.length;
       return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, name: type};
@@ -519,6 +517,23 @@ export class SideBar {
         return this.yScale(d.frequency);
    });
 
+  barGroupsALL.on("mouseover", (d) => {
+    let t = transition('t').duration(500);
+    select(".tooltip")
+      .html(() => {
+        return this.renderOrdersTooltip(d);
+      })
+      .transition(t)
+      .style("opacity", 1)
+      .style("left", `${event.pageX + 10}px`)
+      .style("top", `${event.pageY + 10}px`);
+  })
+  .on("mouseout", () => {
+    let t = transition('t').duration(500);
+    select(".tooltip").transition(t)
+    .style("opacity", 0);
+  });
+
 
   }
 
@@ -545,14 +560,22 @@ export class SideBar {
     this.$node.selectAll('.distLabel').attr('height', '30');
     let ul = distDiagrams.append('ul');
     let label = ul.append('label').attr('value', (d=>d.key)).text(function(d) {return d.label;});
-    let distFilter = distDiagrams.append('g').classed('distFilter', true).attr('width', this.svgWidth);
+    let distFilter = distDiagrams.append('div').classed('distFilter', true).attr('width', this.svgWidth);
 
     let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true).classed('hidden', true);
-    let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', this.svgWidth);//.classed('hidden', true)
+    let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', '95%');//.classed('hidden', true)
+    let svg_rect_group = distFilter_svg.append('g').attr('transform', 'translate(5, 0)').attr('width', '95%');
+    let rect_label_group = distFilter_svg.append('g');
+
+    rect_label_group.append('text').text(d=> d.value[0].x0).attr('transform', 'translate(1, 30)');
+    rect_label_group.append('text').text(d=> d.value[d.value.length-1].x1).attr('transform', 'translate('+ (this.svgWidth - 15) +', 30)');
+    console.log(data);
   
-    let rects = distFilter_svg.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 20)
-    .attr('opacity', (d)=> distScale(d['length']))
+    let rects = svg_rect_group.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 20)
+    .attr('opacity', (d)=> (distScale(d['length'] + 20)))
     .attr('x', (d, i)=> i * this.svgWidth/d.binCount);
+
+   
     //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);
 
     let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
@@ -624,7 +647,16 @@ export class SideBar {
 
   }
 
+  private renderOrdersTooltip(tooltip_data) {
+
+    let text = "<strong style='color:darkslateblue'>" + tooltip_data.x0 + ' - ' + tooltip_data.x1 + ': ' +  tooltip_data.length + "</strong></br>";
+
+    return text;
+}
+
  }
+
+ 
 
 export function create(parent:Element) {
   return new SideBar(parent);
