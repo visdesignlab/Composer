@@ -170,6 +170,11 @@ export class CohortManager {
             events.fire('filter_cohort_agg', [this.selectedCohort, item]);
         });
 
+        events.on('separate_aggregate', (evt, item)=> {
+          console.log('step one');
+            events.fire('separate_cohort_agg', this.selectedCohort);
+        });
+
         events.on('filter_by_cpt', (evt, item)=> {
             let code = item;
            // events.fire()

@@ -104,6 +104,11 @@ export class DataManager {
             this.getQuant_test(item[0], item[1]);
         });
 
+        events.on('separate_cohort_agg', (evt, item)=> {
+            console.log('step 2?');
+            this.getQuant_Separate(item);
+        });
+
         /* 
         // THESE SET VARIABLES TO OBJECTS AND SEND OBJECTS TO VIEWS
         */
@@ -156,6 +161,7 @@ export class DataManager {
         events.on('filtering_Promis_count', (evt, item)=> {
             this.filterByPromisCount(item[0], item[1]);
         });
+
 
         events.on('filter_by_cpt', (evt, item)=> {
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
@@ -317,6 +323,50 @@ export class DataManager {
 
     }
 
+    private getQuant_Separate(cohort) {
+
+        let oneval = [];
+        let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+        let barray = [];
+        let selected;
+        let maxPromisCount = 1;
+
+        cohort.forEach(patient => {
+
+            if(patient.value.length == 1){
+                if(patient.value[0].diff > Math.abs(90)){
+                    outofrange.push(patient);
+                }
+                oneval.push(patient.key);
+            }else {
+
+                if(patient.value.length > maxPromisCount) {
+
+                    maxPromisCount = patient.value.length;
+                }
+
+            }
+
+            if(patient.b != undefined) {
+                barray.push(patient.b);
+                if(patient.b >= 43){topStart.push(patient)};
+                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
+                if(patient.b <= 29){bottomStart.push(patient)};
+                patient.scorespan = [patient.b];
+
+            }
+            
+        });
+
+        console.log('is this on?')
+        events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
+
+    }
+
+
        public async mapDemoData() {
 
             let that = this;
@@ -382,7 +432,7 @@ export class DataManager {
 
             proObjects.forEach((d) => {
 
-                if (cohortIdArray.indexOf(d.PAT_ID) != -1) {
+                if (cohortIdArray.indexOf(d.PAT_ID) !== -1) {
                         if (filteredPatOrders[d.PAT_ID] == undefined) {
                             filteredPatOrders[d.PAT_ID] = [];
                             }

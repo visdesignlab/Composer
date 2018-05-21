@@ -67,6 +67,27 @@
     // stroke-opacity: 0.3;
 }
 
+.top {
+    fill: none;
+    stroke: red;
+    // stroke-width: .5px; //changed the stoke of the similar lines to add more emphasis on the selected patient
+    // stroke-opacity: 0.3;
+}
+
+.middle {
+    fill: none;
+    stroke: blue;
+    // stroke-width: .5px; //changed the stoke of the similar lines to add more emphasis on the selected patient
+    // stroke-opacity: 0.3;
+}
+
+.bottom {
+    fill: none;
+    stroke: green;
+    // stroke-width: .5px; //changed the stoke of the similar lines to add more emphasis on the selected patient
+    // stroke-opacity: 0.3;
+}
+
 .selected {
     stroke: #FF5733;
     stroke-width: 3px;
