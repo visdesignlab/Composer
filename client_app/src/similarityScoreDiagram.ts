@@ -141,6 +141,7 @@ export class similarityScoreDiagram {
                     slider.call(this.brush)
                     .call(this.brush.move, this.scoreScale.range());
                     this.clearDiagram();
+                    this.clearAggDiagram();
                     this.drawPromisChart(this.cohortProInfo, null);
                     this.yBrushSelection = false;
                 }
@@ -204,6 +205,10 @@ export class similarityScoreDiagram {
 
         });
 
+        events.on('clear_clumpin', ()=>{
+            this.clearAggDiagram();
+        });
+
         events.on('score_domain_change', (evt, item)=>{
             this.scoreScale.domain(item);
             this.clearDiagram();
@@ -219,6 +224,7 @@ export class similarityScoreDiagram {
 
         events.on('separated_by_quant', (evt, item)=> {
             this.clearDiagram();
+            this.clearAggDiagram();
             this.drawPromisChart(item[0], 'top');
             this.drawPromisChart(item[1], 'middle');
             this.drawPromisChart(item[2], 'bottom');
@@ -227,6 +233,7 @@ export class similarityScoreDiagram {
         events.on('filtered_by_count', (evt, item)=> {
             this.cohortProInfo = item[0];
             this.clearDiagram();
+            this.clearAggDiagram();
             this.drawPromisChart(this.cohortProInfo, 'proLine');
         });
 
@@ -238,6 +245,7 @@ export class similarityScoreDiagram {
         events.on('update_start_button_clicked', ()=>{
             this.zeroEvent = this.targetOrder;
             this.clearDiagram();
+            this.clearAggDiagram();
             this.getDays(this.cohortProInfo);
             this.eventDayBool = true;
             this.getBaselines(null);
@@ -260,6 +268,7 @@ export class similarityScoreDiagram {
             if(this.cohortProInfo != undefined){
 
                 this.clearDiagram();
+                this.clearAggDiagram();
                 this.drawPromisChart(this.cohortProInfo, 'proLine');
             }
 
@@ -269,6 +278,7 @@ export class similarityScoreDiagram {
 
             this.cohortProInfo = item;
             this.clearDiagram();
+            this.clearAggDiagram();
             this.getDays(null);
 
             if(this.scaleRelative){
@@ -493,6 +503,7 @@ export class similarityScoreDiagram {
             });
         };
         this.clearDiagram();
+        this.clearAggDiagram();
         this.drawPromisChart(this.cohortProInfo, 'proLine');
 
     }
@@ -696,10 +707,27 @@ export class similarityScoreDiagram {
         this.svg.select('#pat_orders').selectAll('line,g').remove();
         this.svg.select('#similar_orders').selectAll('g').remove();
         this.svg.select('.zeroLine').remove();
+    }
+
+        /**
+     * clear the diagram
+     */
+    private clearAggDiagram() {
+
         let aggline =  this.svg.select('#similar_score');
         aggline.select('.avLine').remove();
-        aggline.selectAll('.stLine').remove();
-        aggline.selectAll('.qLine').remove();
+        aggline.select('.avLine_all').remove();
+        aggline.select('.avLine_top').remove();
+        aggline.select('.avLine_middle').remove();
+        aggline.select('.avLine_bottom').remove();
+        aggline.selectAll('.stLine_all').remove();
+        aggline.selectAll('.stLine_top').remove();
+        aggline.selectAll('.stLine_middle').remove();
+        aggline.selectAll('.stLine_bottom').remove();
+        aggline.selectAll('.qLine_all').remove();
+        aggline.selectAll('.qLine_top').remove();
+        aggline.selectAll('.qLine_middle').remove();
+        aggline.selectAll('.qLine_bottom').remove();
     }
 
     // creates bin array for each patient scores and calulates slope for each bin

@@ -91,7 +91,9 @@ export class PlotKeeper {
         this.$node.append('input')
             .attr('type', 'button')
             .attr('value', 'Aggregate')
-            .on('click', () => events.fire('aggregate_button_clicked'));
+            .on('click', () => {
+                events.fire('aggregate_button_clicked');
+            });
 
     }
 

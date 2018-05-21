@@ -26,6 +26,7 @@ export class CohortManager {
     codes;
     cohortCompareArray = [];
     seperatedBool;
+    clumpedBool;
     seperatedCohortArray = [];
 
     //attempting to set up structure to hold filters
@@ -38,6 +39,7 @@ export class CohortManager {
     constructor() {
         this.codes = codeDict.create();
         this.seperatedBool = false;
+        this.clumpedBool = false;
         this.attachListener();
     }
 
@@ -49,10 +51,19 @@ export class CohortManager {
         });
 
         events.on('aggregate_button_clicked', ()=> {
-            if(this.seperatedBool){
-                events.fire('draw_aggs', this.seperatedCohortArray);
-            }else{ events.fire('draw_aggs', null); }
-        })
+            if(this.clumpedBool){
+                events.fire('clear_clumpin');
+                console.log('clear the clumpin');
+                this.clumpedBool = false;
+            }else{
+
+                if(this.seperatedBool){
+                    events.fire('draw_aggs', this.seperatedCohortArray);
+                }else{ events.fire('draw_aggs', null); }
+                this.clumpedBool = true;
+            }
+           
+        });
 
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
