@@ -151,7 +151,10 @@ export class CodeSidebar {
                 let selected = checked['value'];
                 events.fire('filter_aggregate', selected); });
     
-        //filter patients by a minimum score count threshold
+            aggDiv.append('div').append('input').attr('type', 'submit')
+                .attr('value', 'Separate Aggregate').on('click', () =>{
+                    events.fire('separate_aggregate'); });
+                //filter patients by a minimum score count threshold
             countPromis.append('input').attr('type', 'text')
             .attr('placeholder', 'Min Promis Score Count')
             .attr('id', 'count_search')

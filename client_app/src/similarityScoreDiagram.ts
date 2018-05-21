@@ -141,7 +141,7 @@ export class similarityScoreDiagram {
                     slider.call(this.brush)
                     .call(this.brush.move, this.scoreScale.range());
                     this.clearDiagram();
-                    this.drawPromisChart();
+                    this.drawPromisChart(this.cohortProInfo, null);
                     this.yBrushSelection = false;
                 }
             })
@@ -199,20 +199,29 @@ export class similarityScoreDiagram {
         events.on('score_domain_change', (evt, item)=>{
             this.scoreScale.domain(item);
             this.clearDiagram();
-            this.drawPromisChart();
+            this.drawPromisChart(this.cohortProInfo, null);
             this.yBrushSelection = true;
         });
 
         events.on('filtered_by_quant', (evt, item)=> {
             this.cohortProInfo = item[0];
             this.clearDiagram();
-            this.drawPromisChart();
+            this.drawPromisChart(this.cohortProInfo, 'proLine');
+        });
+
+        events.on('separated_by_quant', (evt, item)=> {
+           // this.cohortProInfo = item[0];
+           console.log('seperateing!!')
+            this.clearDiagram();
+            this.drawPromisChart(item[0], 'top');
+            this.drawPromisChart(item[1], 'middle');
+            this.drawPromisChart(item[2], 'bottom');
         });
 
         events.on('filtered_by_count', (evt, item)=> {
             this.cohortProInfo = item[0];
             this.clearDiagram();
-            this.drawPromisChart();
+            this.drawPromisChart(this.cohortProInfo, 'proLine');
         });
 
         events.on('event_clicked', (evt, item)=> {
@@ -245,7 +254,7 @@ export class similarityScoreDiagram {
             if(this.cohortProInfo != undefined){
 
                 this.clearDiagram();
-                this.drawPromisChart();
+                this.drawPromisChart(this.cohortProInfo, 'proLine');
             }
 
         });
@@ -302,7 +311,7 @@ export class similarityScoreDiagram {
                             d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
                             maxDiff = d.diff > maxDiff ? d.diff : maxDiff
                             }
-                            catch (TypeError) {
+                            catch (typeError) {
                             d.diff = -1;
                             }
                             });
@@ -319,7 +328,7 @@ export class similarityScoreDiagram {
             events.fire('timeline_max_set', max(diffArray));
             events.fire('day_dist', this.cohortProInfo);
             if(this.maxDay != undefined){
-                this.drawPromisChart();
+                this.drawPromisChart(this.cohortProInfo, 'proLine');
             }
         }
 
@@ -478,14 +487,16 @@ export class similarityScoreDiagram {
             });
         };
         this.clearDiagram();
-        this.drawPromisChart();
+        this.drawPromisChart(this.cohortProInfo, 'proLine');
 
     }
     /**
      * Draw the diagram with the given data from getSimilarRows
      * @param args
      */
-    private drawPromisChart() {
+    private drawPromisChart(cohort, clump) {
+
+        console.log(cohort);
 
             if(this.scaleRelative){
 
@@ -500,9 +511,9 @@ export class similarityScoreDiagram {
 
             }
 
-            let lineCount = this.cohortProInfo.length;
+            let lineCount = cohort.length;
 
-            let similarData = this.cohortProInfo.map((d) => {
+            let similarData = cohort.map((d) => {
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram;
             });
@@ -547,11 +558,12 @@ export class similarityScoreDiagram {
                     let currGroup = select(this)
                         .append('path')
                         .attr('class', d[0]['PAT_ID'])
-                        .classed('proLine', true)
+                        .classed(clump, true)
                         .attr("clip-path","url(#clip)")
                         .attr('stroke-width', that.lineScale(lineCount))
                         .attr('stroke-opacity', that.lineScale(lineCount))
                         .attr('d', lineFunc);
+                   // if(clump != null){currGroup.classed(clump, true)}
                 })
                 .on('click', (d) => {
 
