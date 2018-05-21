@@ -134,6 +134,7 @@ export class CodeSidebar {
         let aggDiv = div.append('div').classed('aggDiv', true);
             aggDiv.append('div').append('input').attr('type', 'submit')
                 .attr('value', 'Separate Aggregate').on('click', () =>{
+                    select('.checkDiv').remove();
                     events.fire('separate_aggregate');
                       ///radio aggregation
                     let checkDiv = aggDiv.append('div').classed('checkDiv', true);
@@ -298,7 +299,7 @@ private drawOrderSearchBar(order){
 
 private DrawfilterDescriptionBox(filter){
 
-    let rectScale = scaleLinear().domain([0, 6000]).range([0, 160]).clamp(true);
+    let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
   
     console.log(filter);
 
@@ -313,7 +314,7 @@ private DrawfilterDescriptionBox(filter){
        let stage = box.append('div').classed('filter_stage', true);
         let stageSvg = stage.append('svg').classed('filter_stage_svg', true);
     
-        let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2])).attr('transform', 'translate(10, 0)');
+        let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2])).attr('transform', 'translate(12, 0)');
         if(fil[0] == 'demographic') {
             rect.attr('fill', '#D5F5E3');}
         if(fil[0] == 'CPT') {
@@ -335,7 +336,7 @@ private DrawfilterDescriptionBox(filter){
             console.log(fil[1]);
             text.append('text').text('CPT').attr('transform', 'translate(15, 0)');}
 
-        text.append('text').text(fil[2]).attr('transform', 'translate('+ 160 +', 0)');
+        text.append('text').text(fil[2]).attr('transform', 'translate(170, 0)');
     });
 
 }
