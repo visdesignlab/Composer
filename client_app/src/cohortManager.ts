@@ -25,6 +25,8 @@ export class CohortManager {
     cptCodes;
     codes;
     cohortCompareArray = [];
+    seperatedBool;
+    seperatedCohortArray = [];
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -35,6 +37,7 @@ export class CohortManager {
 
     constructor() {
         this.codes = codeDict.create();
+        this.seperatedBool = false;
         this.attachListener();
     }
 
@@ -44,6 +47,12 @@ export class CohortManager {
             this.cohortCompareArray.push(this.cohortkeeperarray[item]);
             events.fire('add_another_plot', this.cohortCompareArray);
         });
+
+        events.on('aggregate_button_clicked', ()=> {
+            if(this.seperatedBool){
+                events.fire('draw_aggs', this.seperatedCohortArray);
+            }else{ events.fire('draw_aggs', null); }
+        })
 
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
@@ -69,7 +78,6 @@ export class CohortManager {
             events.fire('selected_cpt_change', this.selectedCPT);
             events.fire('selected_stat_change', [this.selectedCohort, index]);
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
-            console.log('cohort selected');
             events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
             events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
 
@@ -87,6 +95,11 @@ export class CohortManager {
 
           });
 
+          events.on('separated_by_quant', (evt, item)=> {
+            this.seperatedCohortArray = item;
+            this.seperatedBool = true;
+          });
+
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
             this.cohortkeeperarray[this.cohortIndex] = item;
             this.selectedCohort = item;
@@ -94,14 +107,10 @@ export class CohortManager {
         });
 
           events.on('add_demo_to_filter_array', (evt, item) => { // called in sidebar
-           // let filterReq = {demo: null, cpt: [], length: null, quantile: null, minCount: null};
-           // filterReq.demo = item;
-            console.log('add demo to filter array');
+
             let filterReq = ['demographic', item[0], item[1]];
             this.addCohortFilter(filterReq);
-            console.log(this.cohortIndex);
            
-            
           });
 
           events.on('mapped_cpt_filtered', (evt, item)=>{
@@ -123,11 +132,8 @@ export class CohortManager {
           });
 
           events.on('filtered_patient_promis', (evt, item) => {
-            console.log('filteredPROMIS');
              this.cohortkeeperarray.push(item);
-             //move this to demo filter added
-             //this.cohortIndex = this.cohortkeeperarray.length - 1;
-             console.log(this.cohortIndex);
+ 
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
@@ -160,8 +166,7 @@ export class CohortManager {
               events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
          
               //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
-             
-              console.log(this.cohortfilterarray[this.cohortIndex]);
+
               events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
@@ -171,7 +176,7 @@ export class CohortManager {
         });
 
         events.on('separate_aggregate', (evt, item)=> {
-          console.log('step one');
+
             events.fire('separate_cohort_agg', this.selectedCohort);
         });
 
@@ -214,12 +219,9 @@ export class CohortManager {
     //adds a cohort filter to the cohort filter array for the cohorts
     //this is going to set the index because it fires first 
     private addCohortFilter (filter) {
-        console.log('cohort_added');
-        
+
         this.cohortfilterarray.push([filter]);
         this.cohortIndex = this.cohortfilterarray.length - 1;
-        console.log(this.cohortfilterarray);
-        console.log(this.cohortIndex);
        // this.cohortfilterarray[this.cohortIndex] = [];
        // this.cohortfilterarray[this.cohortIndex].push(filter);
         events.fire('cohort_added', this.cohortfilterarray);

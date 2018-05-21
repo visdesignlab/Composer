@@ -179,8 +179,16 @@ export class similarityScoreDiagram {
      * Attach listeners
      */
     private attachListener() {
+        //this is in plotkeeper
+        events.on('draw_aggs', (evt, item)=> {
+            if(item != null){
+                console.log(item);
+                this.frequencyTest(item[0], 'top');
+                this.frequencyTest(item[1], 'middle');
+                this.frequencyTest(item[2], 'bottom');
 
-        events.on('aggregate_button_clicked', ()=> this.frequencyTest());
+            }else {  this.frequencyTest(this.cohortProInfo, 'all'); }
+           });
 
         events.on('change_promis_scale', ()=>{
 
@@ -494,8 +502,6 @@ export class similarityScoreDiagram {
      */
     private drawPromisChart(cohort, clump) {
 
-            console.log(cohort);
-
             if(this.scaleRelative){
 
                 const medScoreGroup = this.svg.select('#similar_score');
@@ -561,7 +567,7 @@ export class similarityScoreDiagram {
                         .attr('stroke-width', that.lineScale(lineCount))
                         .attr('stroke-opacity', that.lineScale(lineCount))
                         .attr('d', lineFunc);
-                   // if(clump != null){currGroup.classed(clump, true)}
+      
                 })
                 .on('click', (d) => {
 
@@ -698,9 +704,103 @@ export class similarityScoreDiagram {
 
     // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
-    private frequencyTest(){
+    private frequencyTest(cohort, clump){
 
-        console.log('this thing on???');
+        this.svg.select('#similar_score').selectAll('.line_group');
+        
+        //let cohort = this.cohortProInfo.filter(d=> d.value.length > 1);
+        let cohortFiltered = cohort.filter(d=> d.value.length > 1);
+
+        let negdiff = 0;
+        let posdiff = 0;
+
+        //get the extreme diff values for each side of the zero event
+        cohortFiltered.forEach(pat => {
+
+            let patDiffArray = pat.value.map(d=> +d.diff);
+            let patneg = d3.min(patDiffArray);
+            let patpos = d3.max(patDiffArray);
+
+            if(patneg < negdiff) {negdiff = patneg;  };
+            if(patpos > posdiff) {posdiff = patpos;  };
+   
+        });
+        negdiff = Math.round(negdiff / 10) * 10;
+        posdiff = Math.round(posdiff / 10) * 10;
+        //get diff of days between maxneg diff and maxpos diff
+        let daydiff = posdiff - negdiff;
+        let bincount = Math.floor(daydiff/10);
+        //new Array(bincount).fill({'x': null, 'y': null});
+
+        cohortFiltered.forEach(pat=> {
+
+            for (let i = 1; i < pat.value.length; i++) {
+
+                if(pat.value[i] != undefined) {
+
+                        let x1 = pat.value[i-1].diff;
+                        let x2 = pat.value[i].diff;
+                        let y1 = pat.value[i-1].SCORE;
+                        let y2 = pat.value[i].SCORE;
+
+                        pat.value[i].calc = [[x1, y1],[x2, y2]];
+
+                        let slope = (y2 - y1) / (x2 - x1);
+
+                        pat.value[i].slope = slope;
+                        pat.value[i].b = y1 - (slope * x1);
+                }
+            }
+
+            pat.bins = [];
+
+            pat.bins.push({'x': negdiff, 'y': null});
+            for (let i = 1; i < bincount; i++) {
+               let diffplus = negdiff + (i * 10);
+               pat.bins.push({'x': diffplus, 'y': null});
+            }
+            
+            let patstart = pat.value[0].diff;
+            patstart = Math.ceil(patstart / 10)* 10;
+            let patend = pat.value[pat.value.length-1].diff;
+            patend = Math.ceil(patend/10)* 10;
+          
+            let first = pat.bins.find((v)=> v.x == patstart);
+            let last = pat.bins.find((v)=> v.x == patend);
+
+            if(first != undefined){
+    
+                const startIndex = pat.bins.indexOf(first);
+                first.y = pat.value[0].SCORE; }
+
+            if(last != undefined){
+        
+                last.y = pat.value[pat.value.length-1].SCORE; }
+
+
+            for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
+              
+                let x = pat.bins[i].x;
+              
+                    pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
+                        let top = pat.value.find((v)=> v.diff > x);
+                
+                        if(top != undefined){
+                  
+                         pat.bins[i].y = (top.slope * x) + top.b;
+                     
+                         };
+            }
+
+
+        });
+
+        this.drawAgg(cohortFiltered, clump);
+
+    }
+
+    /*
+ private frequency(){
 
         this.svg.select('#similar_score').selectAll('.line_group');
         
@@ -793,9 +893,12 @@ export class similarityScoreDiagram {
         this.drawAgg(cohort);
 
     }
+    */
 
     //draws the lines for the mean and standard deviation for the PROMIS scores
-    private drawAgg(cohort){
+    private drawAgg(cohort, clump){
+
+        console.log(cohort);
        
         let patbin = cohort.map((d)=> {
         
@@ -884,7 +987,7 @@ export class similarityScoreDiagram {
             topdev2.push(arr);
         });
 
-        let lineCount = this.cohortProInfo.length;
+        let lineCount = cohort.length;
 
         let data = means;
         // -----  set domains and axis
@@ -917,7 +1020,7 @@ export class similarityScoreDiagram {
 
         medScoreGroup
             .append('path')
-            .classed('qLine', true)
+            .classed('qLine_' + clump, true)
             .attr('clip-path','url(#clip)')
             .data([quart2])
             .attr('d', drawPaths)
@@ -927,7 +1030,7 @@ export class similarityScoreDiagram {
 
         medScoreGroup
             .append('path')
-            .classed('avLine', true)
+            .classed('avLine_' + clump, true)
             .attr('clip-path','url(#clip)')
             .data([data])
             .attr('d', lineFunc)
@@ -937,7 +1040,7 @@ export class similarityScoreDiagram {
 
             medScoreGroup
             .append('path')
-            .classed('stLine', true)
+            .classed('stLine_' + clump, true)
             .attr('clip-path','url(#clip)')
             .data([topdev2])
             .attr('d', lineFunc)
@@ -947,7 +1050,7 @@ export class similarityScoreDiagram {
 
             medScoreGroup
             .append('path')
-            .classed('stLine', true)
+            .classed('stLine_' + clump, true)
             .attr('clip-path','url(#clip)')
             .data([botdev2])
             .attr('d', lineFunc)

@@ -134,7 +134,7 @@ export class CodeSidebar {
         let aggDiv = div.append('div').classed('aggDiv', true);
             aggDiv.append('div').append('input').attr('type', 'submit')
                 .attr('value', 'Separate Aggregate').on('click', () =>{
-                    events.fire('separate_aggregate'); 
+                    events.fire('separate_aggregate');
                       ///radio aggregation
                     let checkDiv = aggDiv.append('div').classed('checkDiv', true);
                     let tCheck = checkDiv.append('div');
@@ -150,7 +150,7 @@ export class CodeSidebar {
                         }
         
                     })
-                    tCheck.append('label').attr('for', 'sampleT').text('top').style('fill', 'red');
+                    tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#27AE60');
 
                     let mCheck = checkDiv.append('div');
                     mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
@@ -162,7 +162,7 @@ export class CodeSidebar {
                             p.classed('hidden', true);
                         }
                     });
-                    mCheck.append('label').attr('for', 'sampleM').text('middle').style('fill', 'blue');
+                    mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F1C40F');
 
                     let bCheck = checkDiv.append('div');
                     bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
@@ -174,7 +174,7 @@ export class CodeSidebar {
                             p.classed('hidden', true);
                         }
                     });
-                    bCheck.append('label').attr('for', 'sampleB').text('bottom').style('fill', 'green');
+                    bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#D35400');
                 });
                 //filter patients by a minimum score count threshold
             countPromis.append('input').attr('type', 'text')

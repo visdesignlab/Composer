@@ -43,20 +43,71 @@
     stroke-width: 2px;
 }
 
-.avLine {
+.avLine_all {
     stroke: #FF5733;
     stroke-width: 3px;
     fill: none;
 }
 
-.stLine {
+.avLine_top {
+    stroke: #27AE60;
+    stroke-width: 3px;
+    fill: none;
+}
+
+.avLine_middle {
+    stroke: #F1C40F;
+    stroke-width: 3px;
+    fill: none;
+}
+
+.avLine_bottom {
+    stroke: #D35400;
+    stroke-width: 3px;
+    fill: none;
+}
+
+.stLine_all {
     stroke: #FF5733;
     stroke-width: 1px;
     fill: none;
 }
 
-.qLine {
+.stLine_top {
+    stroke: #27AE60;
+    stroke-width: 1px;
+    fill: none;
+}
+
+.stLine_middle {
+    stroke: #F1C40F;
+    stroke-width: 1px;
+    fill: none;
+}
+
+.stLine_bottom {
+    stroke: #D35400;
+    stroke-width: 1px;
+    fill: none;
+}
+
+.qLine_all {
     fill: #FF5733;
+    opacity: .5;
+}
+
+.qLine_top {
+    fill: #27AE60;
+    opacity: .5;
+}
+
+.qLine_middle {
+    fill: #F1C40F;
+    opacity: .5;
+}
+
+.qLine_bottom {
+    fill: #D35400;
     opacity: .5;
 }
 
@@ -67,19 +118,17 @@
 
 .top {
     fill: none;
-    stroke: red;
+    stroke: #27AE60;
 }
 
 .middle {
     fill: none;
-    stroke: blue;
-    // stroke-width: .5px; //changed the stoke of the similar lines to add more emphasis on the selected patient
-    // stroke-opacity: 0.3;
+    stroke: #F1C40F;
 }
 
 .bottom {
     fill: none;
-    stroke: green;
+    stroke: #D35400;
 }
 
 .selected {
