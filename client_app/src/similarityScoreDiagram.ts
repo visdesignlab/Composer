@@ -210,8 +210,6 @@ export class similarityScoreDiagram {
         });
 
         events.on('separated_by_quant', (evt, item)=> {
-           // this.cohortProInfo = item[0];
-           console.log('seperateing!!')
             this.clearDiagram();
             this.drawPromisChart(item[0], 'top');
             this.drawPromisChart(item[1], 'middle');
@@ -496,7 +494,7 @@ export class similarityScoreDiagram {
      */
     private drawPromisChart(cohort, clump) {
 
-        console.log(cohort);
+            console.log(cohort);
 
             if(this.scaleRelative){
 
@@ -546,11 +544,11 @@ export class similarityScoreDiagram {
            .attr('height', this.height - 20);
 
             let that = this;
-            medScoreGroup.selectAll('.line_group')
+            medScoreGroup.selectAll('.line_group' + clump)
                 .data(similarData)
                 .enter()
                 .append('g')
-                .classed('line_group', true)
+                .classed('line_group' + clump, true)
                 .attr('transform', () => {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 })
