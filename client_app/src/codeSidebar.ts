@@ -9,7 +9,7 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import * as cohortStat from './cohortStat';
 import * as dict from './cptDictionary';
 import {transition} from 'd3-transition';
-import { scaleLinear } from 'd3-scale';
+import { scaleLinear, scaleLog } from 'd3-scale';
 
 export class CodeSidebar {
 
@@ -89,7 +89,7 @@ export class CodeSidebar {
 
     private searchDictionary(value, type){
 
-        if(type == 'dict'){
+        if(type == 'dict') {
             for(let prop in this.dictionary){
             
                 if (prop == value){
@@ -130,7 +130,7 @@ export class CodeSidebar {
     private drawScoreFilterBox (div) {
 
         const form = div.append('form');
-        let scoreFilterLabel = form.append('text').text('Score Filters');
+        let scoreFilterLabel = form.append('div').classed('divLabel', true).append('text').text('Score Filters');
 
         let aggDiv = div.append('div').classed('aggRadio', true);
         let countPromis = div.append('div').classed('countPromis', true);
@@ -169,9 +169,8 @@ export class CodeSidebar {
 private drawOrderFilterBox (div) {
 
     const form = div.append('form');
-   
 
-    let orderFilterLabel = form.append('text').text('Order Filters');
+    let orderFilterLabel = form.append('div').classed('divLabel', true).append('text').text('Order Filters');
 
     form.append('input')
             .attr('type', 'text')
@@ -191,7 +190,6 @@ private drawOrderFilterBox (div) {
 
               if(!hasNumber(value)){ this.searchDictionary(value, 'dict');
                 }else{
-                    //events.fire('filter_by_cpt', [value]);
                     this.searchDictionary(value, 'code');
                 }
      
@@ -275,25 +273,44 @@ private drawOrderSearchBar(order){
 
 private DrawfilterDescriptionBox(filter){
 
-    let rectScale = scaleLinear().domain([0, 6790]).range([0, 200]);
+    let rectScale = scaleLinear().domain([0, 6000]).range([0, 160]).clamp(true);
   
     console.log(filter);
 
     select('.descriptionDiv').select('div').remove();
     const box = select('.descriptionDiv').append('div');
-    box.append('text').text(filter[0].length + ' Filters');
+    let label = box.append('div').classed('divLabel', true).append('text').text('Filter Layers');
+  
 
    // let filter = cohort[1];
     filter.forEach((fil, i) => {
+       
        let stage = box.append('div').classed('filter_stage', true);
         let stageSvg = stage.append('svg').classed('filter_stage_svg', true);
     
-        let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2]));
-        if(fil[0] == 'demographic') {rect.attr('fill', 'red');}
-        if(fil[0] == 'CPT') {rect.attr('fill', 'blue');}
+        let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2])).attr('transform', 'translate(10, 0)');
+        if(fil[0] == 'demographic') {
+            rect.attr('fill', '#D5F5E3');}
+        if(fil[0] == 'CPT') {
+            rect.attr('fill', '#D2B4DE');}
+
         let text = stageSvg.append('g').attr('transform', 'translate(0, 12)');
         text.append('text').text((i + 1) + ': ' );
-        if(fil[0] == 'CPT') {text.append('text').text(fil[1][1].key).attr('transform', 'translate(5, 0)');}
+
+        if(fil[0] == 'demographic'){
+            if(fil[1].length != 0){
+                //fil[1].forEach((attr, i) => {
+                  //  console.log(attr.attributeName);
+                    text.append('text').text('Demo').attr('transform', 'translate(15, 0)');
+              //  });//
+               }
+            else{ text.append('text').text('all patients').attr('transform', 'translate(15, 0)'); }
+            }
+        if(fil[0] == 'CPT') {
+            console.log(fil[1]);
+            text.append('text').text('CPT').attr('transform', 'translate(15, 0)');}
+
+        text.append('text').text(fil[2]).attr('transform', 'translate('+ 160 +', 0)');
     });
 
 }
