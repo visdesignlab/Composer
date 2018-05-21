@@ -71,6 +71,7 @@ export class CohortManager {
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
             console.log('cohort selected');
             events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
+            events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
 
           });
 
@@ -95,21 +96,24 @@ export class CohortManager {
           events.on('add_demo_to_filter_array', (evt, item) => { // called in sidebar
            // let filterReq = {demo: null, cpt: [], length: null, quantile: null, minCount: null};
            // filterReq.demo = item;
-            let filterReq = [];
-            filterReq.push(['demographic', item[0], item[1]]);
+            console.log('add demo to filter array');
+            let filterReq = ['demographic', item[0], item[1]];
             this.addCohortFilter(filterReq);
+            console.log(this.cohortIndex);
+           
             
           });
 
           events.on('mapped_cpt_filtered', (evt, item)=>{
-
+    
               this.selectedCPT = item;
               //THIS IS JACKED UP WHY IS IT JACKED UP
-              this.cptObjectKeeper[this.cohortIndex - 1] = item;
+             // this.cptObjectKeeper[this.cohortIndex - 1] = item;
 
           });
 
           events.on('cpt_mapped', (evt, item)=>{
+        
               this.cptObjectKeeper[this.cohortIndex] = item;
           });
 
@@ -119,10 +123,11 @@ export class CohortManager {
           });
 
           events.on('filtered_patient_promis', (evt, item) => {
-
+            console.log('filteredPROMIS');
              this.cohortkeeperarray.push(item);
-             this.cohortIndex = this.cohortkeeperarray.length - 1;
-
+             //move this to demo filter added
+             //this.cohortIndex = this.cohortkeeperarray.length - 1;
+             console.log(this.cohortIndex);
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
@@ -132,11 +137,12 @@ export class CohortManager {
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
              events.fire('selected_event_filter_change', []);
              events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
+             events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
 
           });
 
           events.on('add_cpt_to_filterArray', (evt, item)=>{
-            console.log(item);
+           
             this.cohortfilterarray[this.cohortIndex].push(item);
           });
 
@@ -147,15 +153,15 @@ export class CohortManager {
               //do I want to keep the patient count available for the filter?
 
               this.cohortfilterarray[this.cohortIndex].push(['CPT', item[1], item[0].length]);
-              console.log(this.cohortfilterarray);
-
-              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
-
+        
+             // this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
+               
               events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
               events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-              //events.fire('update_event_line', this.cohortfilterarray[this.cohortIndex]);
+         
               //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
-              events.fire('selected_event_filter_change', this.selectedFilter.cpt);
+             
+              console.log(this.cohortfilterarray[this.cohortIndex]);
               events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
@@ -179,7 +185,7 @@ export class CohortManager {
             this.cohortkeeperarray[this.cohortIndex] = item[0];
             this.cohortfilterarray[this.cohortIndex].minCount = item[1];
             events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
-            events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
+           // events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
           });
 
           events.on('filter_by_Promis_count', (evt, item)=> {
@@ -201,9 +207,16 @@ export class CohortManager {
     }
 
     //adds a cohort filter to the cohort filter array for the cohorts
+    //this is going to set the index because it fires first 
     private addCohortFilter (filter) {
-
-        this.cohortfilterarray.push(filter);
+        console.log('cohort_added');
+        
+        this.cohortfilterarray.push([filter]);
+        this.cohortIndex = this.cohortfilterarray.length - 1;
+        console.log(this.cohortfilterarray);
+        console.log(this.cohortIndex);
+       // this.cohortfilterarray[this.cohortIndex] = [];
+       // this.cohortfilterarray[this.cohortIndex].push(filter);
         events.fire('cohort_added', this.cohortfilterarray);
     }
 

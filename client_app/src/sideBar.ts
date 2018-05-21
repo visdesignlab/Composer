@@ -133,7 +133,7 @@ export class SideBar {
     let that = this;
 
     let miniLabel = this.$node.select('#filterDiv').append('div').classed('miniLabel', true);
-    miniLabel.append('text').text('Demographic Filters');
+    miniLabel.append('div').classed('divLabel', true).append('text').text('Demographic Filters');
 
     this.demoform = this.$node.select('#filterDiv').append('form');
 
