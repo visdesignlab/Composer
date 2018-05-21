@@ -358,10 +358,8 @@ export class DataManager {
                 patient.scorespan = [patient.b];
 
             }
-            
         });
 
-        console.log('is this on?')
         events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
 
     }

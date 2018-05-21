@@ -51,16 +51,12 @@ export class CodeSidebar {
 
        events.on('selected_cohort_change', (evt, item)=> {
         select('.orderDiv').select('div').remove();
+        select('.checkDiv').remove();
     
        });
 
        events.on('send_filter_to_codebar', (evt, item)=> {
         this.DrawfilterDescriptionBox(item);
-       });
-
-       events.on('update_cohort_description', (evt, item)=> {
-   
-           //this.DrawfilterDescriptionBox(item);
        });
 
         events.on('make_stat_node', (evt, item)=> {
@@ -132,28 +128,54 @@ export class CodeSidebar {
         const form = div.append('form');
         let scoreFilterLabel = form.append('div').classed('divLabel', true).append('text').text('Score Filters');
 
-        let aggDiv = div.append('div').classed('aggRadio', true);
+        
         let countPromis = div.append('div').classed('countPromis', true);
 
-            ///radio aggregation
-            aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample1')
-            .attr('value', 'bottom').on('click', () =>{});
-            aggDiv.append('label').attr('for', 'sample1').text('bottom');
-            aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample2')
-            .attr('value', 'middle').on('click', () =>console.log(this));
-            aggDiv.append('label').attr('for', 'sample2').text('middle');
-            aggDiv.append('input').attr('type', 'radio').attr('name', 'sample').attr('id', 'sample3')
-            .attr('value', 'top').on('click', () =>console.log(this));
-            aggDiv.append('label').attr('for', 'sample1').text('top');
-            aggDiv.append('div').append('input').attr('type', 'submit')
-            .attr('value', 'Filter Aggregate').on('click', () =>{
-                let checked = document.querySelector('input[name="sample"]:checked');
-                let selected = checked['value'];
-                events.fire('filter_aggregate', selected); });
-    
+        let aggDiv = div.append('div').classed('aggDiv', true);
             aggDiv.append('div').append('input').attr('type', 'submit')
                 .attr('value', 'Separate Aggregate').on('click', () =>{
-                    events.fire('separate_aggregate'); });
+                    events.fire('separate_aggregate'); 
+                      ///radio aggregation
+                    let checkDiv = aggDiv.append('div').classed('checkDiv', true);
+                    let tCheck = checkDiv.append('div');
+                    tCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleT').attr('checked', true)
+                    .attr('value', 'top').on('click', () => {
+
+                        let p = selectAll('.top');
+                  
+                        if(select("#sampleT").property("checked")){
+                            p.classed('hidden', false);
+                        }else{
+                            p.classed('hidden', true);
+                        }
+        
+                    })
+                    tCheck.append('label').attr('for', 'sampleT').text('top').style('fill', 'red');
+
+                    let mCheck = checkDiv.append('div');
+                    mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
+                    .attr('value', 'middle').on('click', () => {
+                        let p = selectAll('.middle');
+                        if(select("#sampleM").property("checked")){
+                            p.classed('hidden', false);
+                        }else{
+                            p.classed('hidden', true);
+                        }
+                    });
+                    mCheck.append('label').attr('for', 'sampleM').text('middle').style('fill', 'blue');
+
+                    let bCheck = checkDiv.append('div');
+                    bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
+                    .attr('value', 'bottom').on('click', () =>{
+                        let p = selectAll('.bottom');
+                        if(select("#sampleB").property("checked")){
+                            p.classed('hidden', false);
+                        }else{
+                            p.classed('hidden', true);
+                        }
+                    });
+                    bCheck.append('label').attr('for', 'sampleB').text('bottom').style('fill', 'green');
+                });
                 //filter patients by a minimum score count threshold
             countPromis.append('input').attr('type', 'text')
             .attr('placeholder', 'Min Promis Score Count')
