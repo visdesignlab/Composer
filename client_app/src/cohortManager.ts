@@ -53,7 +53,10 @@ export class CohortManager {
         events.on('aggregate_button_clicked', ()=> {
             if(this.clumpedBool){
                 events.fire('clear_clumpin');
-                console.log('clear the clumpin');
+                if(this.seperatedBool) {
+                    events.fire('draw_plot', this.seperatedCohortArray);
+                }else{ events.fire('draw_plot', null); }
+
                 this.clumpedBool = false;
             }else{
 
