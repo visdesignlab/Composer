@@ -161,9 +161,11 @@ export class DataManager {
 
 
         events.on('filter_by_cpt', (evt, item)=> {
-
+            console.log(this.patCPT);
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
+                console.log(d);
                 this.addMinDay(d[1]);
+                this.patCPT = d[0];
                 events.fire('filter_cohort_by_event', [d[0], item]);
             });
         });
@@ -176,14 +178,6 @@ export class DataManager {
             //need to go back andcleanthis up
 
         });
-
-        events.on('event_test', (evt, item)=> {
-           this.searchByEvent(this.patCPT, item).then((d)=> {
-            this.addMinDay(d[1]);
-           });
-        });
-
-
 
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
             let parent = item[0];
@@ -615,7 +609,6 @@ export class DataManager {
 
               // ----- add diff days to the data
         let filteredOrders = [];
-        
 
         CPTobjects.forEach((g) => {
 
