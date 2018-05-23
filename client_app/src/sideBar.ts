@@ -411,6 +411,7 @@ export class SideBar {
          }
       
          events.fire(eventType, filterList);
+         
          that.filters = [];
          filterList = [];
          that.bmiRange = null;
