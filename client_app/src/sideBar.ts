@@ -225,7 +225,9 @@ export class SideBar {
 
           filterGroup.classed(parentValue, true);
         });
-
+        this.demoform.append('input').attr('type', 'button').attr('value', 'Refine Cohort Demo Filter').on('click', ()=> {
+          that.filterDemo('demo_refine');
+        });
   }
 
   private buildCohortLabel () {
@@ -239,7 +241,8 @@ export class SideBar {
     let deletecohortButton = form.insert('input').attr('type', 'button').attr('value', 'Clear Cohorts');
 
     createCohortButton.on('click', function(d){
-      that.filterDemo();
+      that.filterDemo('demo_add');
+
       });
 
     deletecohortButton.on('click', () => {
@@ -351,10 +354,12 @@ export class SideBar {
     }
 
 
+
+
 }
 
 
-  private filterDemo(){
+  private filterDemo(eventType){
 
     let that = this;
     let filterList = [];
@@ -404,8 +409,8 @@ export class SideBar {
             };
            filterList.push(filter);
          }
-         events.fire('cohort_made');
-         events.fire('demo_filter_button_pushed', filterList);
+      
+         events.fire(eventType, filterList);
          that.filters = [];
          filterList = [];
          that.bmiRange = null;
@@ -588,7 +593,6 @@ export class SideBar {
     .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
     .attr('x', (d, i)=> (i * this.svgWidth/d.binCount) + 5);
 
-   
     //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);
 
     let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
@@ -607,7 +611,6 @@ export class SideBar {
       let Dom2 = Math.ceil((end+1)/10)*10;
 
       this.bmiRange = [Dom1, Dom2];
-     
     }
   });
 
