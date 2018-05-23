@@ -58,7 +58,7 @@ export class DataManager {
 
         this.loadData('Demo_Revise').then((d)=> this.getDataObjects('demo_object', d));
         this.loadData('PROMIS_Scores').then((d)=>  this.getDataObjects('pro_object', d));
-        this.loadData('ICD_codes');
+       // this.loadData('ICD_codes');
         this.loadData('CPT_codes').then((d)=>  this.getDataObjects('cpt_object', d));
 
         this.attachListener();
@@ -70,13 +70,12 @@ export class DataManager {
         let startDateSelection = d3.select('#start_date').select('text');
       
         events.on('filter_cohort_by_event', (evt, item)=> {
-            console.log(this.filteredPatPromis);
             this.getCohortIdArrayAfterMap(item[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                 events.fire('selected_promis_filtered', ob);
+               
                })
             );
-            
-       
+
         });
 
         events.on('start_date_updated', (evt, item)=> {
@@ -99,7 +98,6 @@ export class DataManager {
         });
 
         events.on('ICD_codes', (evt, item)=> {
-
            // this.icdTable = item;
         });
 
@@ -124,7 +122,6 @@ export class DataManager {
         events.on('cpt_object', (evt, item)=> {
             console.log('cpt loaded');
             this.totalCptObjects = item;
-            //this.getCPT(this.cohortIdArray, this.totalCptObjects, this.filteredPatPromis);
         });
 
         events.on('icd_object', (evt, item)=> {
@@ -145,7 +142,7 @@ export class DataManager {
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-          
+     
             //change this back to added and selected. 
             //when selected, the index changes. no need to map the cpt
             this.filteredPatPromis = item;
@@ -164,10 +161,10 @@ export class DataManager {
 
 
         events.on('filter_by_cpt', (evt, item)=> {
+
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.addMinDay(d[1]);
                 events.fire('filter_cohort_by_event', [d[0], item]);
-               
             });
         });
 
@@ -476,12 +473,15 @@ export class DataManager {
             }
         });
         if (yayornay == 'nay'){
+
             events.fire('got_promis_scores', patPromis);
+
         };
 
         this.filteredPatPromis = patPromis;
 
         if (yayornay == 'yay'){
+
             events.fire('filtered_patient_promis', patPromis);}
 
      };
@@ -669,36 +669,25 @@ export class DataManager {
 
     private async getCohortIdArrayAfterMap (selectedData, typeofData: string)   {
         let tempPatArray = [];
-
         if(typeofData == 'cpt') {
             selectedData.forEach((element) => {
                 tempPatArray.push(element[0].key);
             });
         }else if(typeofData == 'demo') {
             tempPatArray = selectedData.map(d=> +d.key);
-         
         } return tempPatArray;
     }
 
     private async filterObjectByArray (selectedIdArray, objects, obType)   {
-   
 
        if(obType == 'cpt' || obType == 'promis') { 
- 
-        let res = objects.filter((f) => selectedIdArray.includes(+f.key));
-   
-        return res;
-       }
-
-        if(obType == 'demo') {
-       
-          //  let array = selectedIdArray.map(d=> +d.key);
-            let res = objects.filter((f) => selectedIdArray.includes(f.ID));
-    
+            let res = objects.filter((f) => selectedIdArray.includes(+f.key));
             return res;
-
+       }
+        if(obType == 'demo') {
+            let res = objects.filter((f) => selectedIdArray.includes(f.ID));
+            return res;
         }else{ console.log('obType not found'); }
-
     }
 
     public async loadData(id: string) { //loads the tables from Phovea
@@ -711,10 +700,6 @@ export class DataManager {
         let object = await table.objects();
         events.fire(id, object);
         return object;
-    }
-
-    private async searchDictionary(value) {
-   
     }
 
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
