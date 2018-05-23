@@ -108,7 +108,7 @@ export class CohortManager {
               this.selectedCPT = this.cptObjectKeeper[this.cohortIndex];
 
           });
-
+//fired in sidebar. send the filter information to refine the sidebar
           events.on('demo_refine', (evt, item)=> {
             console.log(item);
             let filters = item;
@@ -139,6 +139,7 @@ export class CohortManager {
         
             let filterReq = ['demographic', item[0], item[1]];
             this.cohortfilterarray[this.cohortIndex].push(filterReq);
+            console.log(this.cohortfilterarray[this.cohortIndex]);
             events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
@@ -177,8 +178,10 @@ export class CohortManager {
           });
 
           events.on('filtered_patient_promis', (evt, item) => {
+            console.log('filtered patient promis');
+            console.log(item);
              this.cohortkeeperarray.push(item);
- 
+            
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
@@ -204,14 +207,11 @@ export class CohortManager {
               //do I want to keep the patient count available for the filter?
 
               this.cohortfilterarray[this.cohortIndex].push(['CPT', item[1], item[0].length]);
-        
-             // this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
-               
+
               events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
-              events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
          
               //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
-
+            console.log(this.cohortfilterarray);
               events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 

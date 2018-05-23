@@ -23,6 +23,7 @@ export class CodeSidebar {
     private currentlySelectedName;
     private selected;
     private dictionary;
+    private selectedCohortFilters;
 
     constructor(parent: Element) {
 
@@ -50,12 +51,15 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
+     
         select('.orderDiv').select('div').remove();
         select('.checkDiv').remove();
-    
+
        });
 
        events.on('send_filter_to_codebar', (evt, item)=> {
+        console.log(item);
+        this.selectedCohortFilters = item;
         this.DrawfilterDescriptionBox(item);
        });
 
@@ -63,7 +67,7 @@ export class CodeSidebar {
            let parent = document.getElementsByClassName('cohort ' + item[1])[0];
            let view = parent.querySelector('.stat_view');
            cohortStat.create(view, item[0], item[1]);
-           //select('.cohort.' + item[1])
+    
        });
 
         events.on('update_start_event', (evt, item)=>  {
@@ -294,7 +298,7 @@ private drawOrderSearchBar(order){
     select('.orderDiv').select('div').remove();
 
 });
-          
+
 }
 
 private DrawfilterDescriptionBox(filter){
@@ -307,7 +311,7 @@ private DrawfilterDescriptionBox(filter){
     const box = select('.descriptionDiv').append('div');
     let label = box.append('div').classed('divLabel', true).append('text').text('Filter Layers');
   
-
+    let cohortCount = box.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
    // let filter = cohort[1];
     filter.forEach((fil, i) => {
        
