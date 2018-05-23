@@ -110,9 +110,8 @@ export class CohortManager {
           });
 //fired in sidebar. send the filter information to refine the sidebar
           events.on('demo_refine', (evt, item)=> {
-            console.log(item);
+           
             let filters = item;
-            console.log(this.cohortkeeperarray[this.cohortIndex]);
             events.fire('get_selected_demo', [filters, this.cohortkeeperarray[this.cohortIndex]]);
           });
 
@@ -139,7 +138,7 @@ export class CohortManager {
         
             let filterReq = ['demographic', item[0], item[1]];
             this.cohortfilterarray[this.cohortIndex].push(filterReq);
-            console.log(this.cohortfilterarray[this.cohortIndex]);
+         
             events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
@@ -178,8 +177,7 @@ export class CohortManager {
           });
 
           events.on('filtered_patient_promis', (evt, item) => {
-            console.log('filtered patient promis');
-            console.log(item);
+         
              this.cohortkeeperarray.push(item);
             
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
@@ -208,39 +206,31 @@ export class CohortManager {
 
               this.cohortfilterarray[this.cohortIndex].push(['CPT', item[1], item[0].length]);
 
-              events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
-         
               //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
-            console.log(this.cohortfilterarray);
+             
               events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
           events.on('filter_aggregate', (evt, item)=> {
-          
             events.fire('filter_cohort_agg', [this.selectedCohort, item]);
         });
 
         events.on('separate_aggregate', (evt, item)=> {
-
             events.fire('separate_cohort_agg', this.selectedCohort);
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
             let code = item;
-           // events.fire()
-        })
+        });
 
           events.on('filtered_by_quant', (evt, item)=> {
             this.cohortfilterarray[this.cohortIndex].quantile = item;
-          
           });
 
           events.on('filtered_by_count', (evt, item)=>{
             this.selectedCohort = item[0];
             this.cohortkeeperarray[this.cohortIndex] = item[0];
             this.cohortfilterarray[this.cohortIndex].minCount = item[1];
-            events.fire('update_filters', [this.cohortfilterarray, this.cohortkeeperarray]);
-           // events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
           });
 
           events.on('filter_by_Promis_count', (evt, item)=> {
@@ -248,7 +238,6 @@ export class CohortManager {
           });
 
           events.on('send_stats', () => {
-         
            // events.fire('calculate_agg', [this.selectedCohort, this.cohortIndex]);
            events.fire('calculate_aggregate', [this.selectedCohort, this.cohortIndex]);
           });

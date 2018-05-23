@@ -1050,6 +1050,6 @@ export class similarityScoreDiagram {
 export let targetPatientOrders;
 
 
-export function create(parent: Element, diagram, cohortData,max, min) {
+export function create(parent: Element, diagram, cohortData, max, min) {
     return new similarityScoreDiagram(parent, diagram, cohortData, max, min);
 }
