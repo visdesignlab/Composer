@@ -109,6 +109,13 @@ export class CohortManager {
 
           });
 
+          events.on('demo_refine', (evt, item)=> {
+            console.log(item);
+            let filters = item;
+            console.log(this.cohortkeeperarray[this.cohortIndex]);
+            events.fire('get_selected_demo', [filters, this.cohortkeeperarray[this.cohortIndex]]);
+          });
+
           events.on('separated_by_quant', (evt, item)=> {
             this.seperatedCohortArray = item;
             this.seperatedBool = true;
@@ -121,18 +128,42 @@ export class CohortManager {
         });
 
           events.on('add_demo_to_filter_array', (evt, item) => { // called in sidebar
-
+       
             let filterReq = ['demographic', item[0], item[1]];
             this.addCohortFilter(filterReq);
            
+          });
+
+          
+          events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
+        
+            let filterReq = ['demographic', item[0], item[1]];
+            this.cohortfilterarray[this.cohortIndex].push(filterReq);
+            events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
           events.on('mapped_cpt_filtered', (evt, item)=>{
     
               this.selectedCPT = item;
               //THIS IS JACKED UP WHY IS IT JACKED UP
-             // this.cptObjectKeeper[this.cohortIndex - 1] = item;
+       
 
+          });
+
+          events.on('promis_from_demo_refiltered', (evt, item)=> {
+              
+              this.cohortkeeperarray[this.cohortIndex] = item;
+              this.selectedCohort = item;
+
+              //let filterReq = ['demographic', item[0], item[1]];
+              //this.addCohortFilter(filterReq);
+
+              events.fire('selected_cohort_change', this.selectedCohort);
+             // events.fire('selected_cpt_change', this.selectedCPT);
+             // events.fire('selected_stat_change', [this.selectedCohort, index]);
+             // events.fire('selected_event_filter_change', this.selectedFilter.cpt);
+              events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
+             // events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
           events.on('cpt_mapped', (evt, item)=>{
