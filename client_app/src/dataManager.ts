@@ -129,9 +129,13 @@ export class DataManager {
          });
 
          events.on('line_clicked', (evt, item)=> {
-            let selectedPat = item[0].PAT_ID;
-            this.filterObjectByArray([selectedPat], this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
+           // let selectedPat = item[0].PAT_ID;
+           // this.filterObjectByArray([selectedPat], this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
+
+         events.on('selected_line_array', (evt, item)=> {
+            this.filterObjectByArray(item, this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
+         })
 
         events.on('start_date_updated', (evt, item)=> {
             this.startDate = item;

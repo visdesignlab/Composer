@@ -222,7 +222,6 @@ export class similarityScoreDiagram {
                 this.drawPromisChart(item[2], 'bottom');
             }
 
-            
         });
 
         events.on('score_domain_change', (evt, item)=>{
@@ -617,6 +616,14 @@ export class similarityScoreDiagram {
                         this.addPromisDotsClick(d);
                         events.fire('line_clicked', d);
                 };
+                    let lines = this.$node.selectAll('.selected').nodes();
+                    let idarray = [];
+                  lines.forEach(element => {
+                        console.log(element.__data__[0].PAT_ID);
+                        console.log(element.__data__);
+                        idarray.push(element.__data__[0].PAT_ID);
+                    });
+                    events.fire('selected_line_array', idarray);
 
                 })
                 .on('mouseover', (d)=> {
