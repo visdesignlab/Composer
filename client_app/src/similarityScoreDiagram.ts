@@ -13,6 +13,7 @@ import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import * as d3 from 'd3';
+import * from 'd3-voronoi';
 //import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
@@ -80,7 +81,7 @@ export class similarityScoreDiagram {
             .classed('diagramDiv', true);
 
        // this.drawEventButtons();
-
+       
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
