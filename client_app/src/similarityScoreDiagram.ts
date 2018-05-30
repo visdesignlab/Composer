@@ -570,7 +570,7 @@ export class similarityScoreDiagram {
             // ------- draw
             const promisScoreGroup = this.svg.select('.scoreGroup');
 
-            promisScoreGroup.append("clipPath").attr('id', 'clip')
+            promisScoreGroup.append('clipPath').attr('id', 'clip')
             .append('rect')
             .attr('width', 850)
             .attr('height', this.height - 20);
@@ -589,16 +589,16 @@ export class similarityScoreDiagram {
                 return `translate(${this.margin.x},${this.margin.y})`;
             });
 
-            voronoiGroup.selectAll("g")
+            voronoiGroup.selectAll('g')
             .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
                 return d.values; }))))
-                .enter().append("g")
+                .enter().append('g')
                 .append('path')
-                .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; })
+                .attr('d', function(d) { return d ? 'M' + d.join('L') + 'Z' : null; })
                // .datum(function(d, i) { return d.point; })
-                .style('stroke', "#cbdcdf")
-                .style('fill', "none")
-                .style("pointer-events", "all")
+                .style('stroke', '#cbdcdf')
+                .style('fill', 'none')
+                .style('pointer-events', 'all')
                 .on('mouseover', mouseover)
                 .on('mouseout', mouseout)
                 .on('click', voronoiClicked);
@@ -606,7 +606,7 @@ export class similarityScoreDiagram {
                 let lines = promisScoreGroup.append('g').classed('lines', true)
                 .attr('transform', () => {
                    return `translate(${this.margin.x},${this.margin.y})`;
-               })   .attr("clip-path","url(#clip)")
+               })   .attr('clip-path','url(#clip)')
                     .selectAll('path')
                     .data(similarData)
                     .enter()
@@ -639,7 +639,7 @@ export class similarityScoreDiagram {
                             this.addPromisDotsClick(d);
                             events.fire('line_clicked', d);
                     };
-                        let lines = this.$node.selectAll('.selected').nodes();
+                        let lines = that.$node.selectAll('.selected').nodes();
                         let idarray = [];
                       lines.forEach(element => {
                             idarray.push(+element.__data__.key);
@@ -662,7 +662,6 @@ export class similarityScoreDiagram {
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
 
                 function mouseover(d) {
-                    console.log(d.data.pat.line);
                     let group = d.data.pat.line;
                     select(group).classed('hover-selected', true);
                   }
@@ -688,7 +687,7 @@ export class similarityScoreDiagram {
                         that.addPromisDotsClick(d.data.pat);
                         events.fire('line_clicked', d.data.pat);
                 };
-                    let lines = this.$node.select('.lines').selectAll('.selected').nodes();
+                    let lines = that.$node.select('.lines').selectAll('.selected').nodes();
                     let idarray = [];
                   lines.forEach(element => {
                         idarray.push(+element.__data__.key);
