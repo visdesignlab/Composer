@@ -163,9 +163,6 @@ export class similarityScoreDiagram {
             )
             .selectAll('text').remove();
 
-            scoreGroup.append('g')
-            .attr('id', 'similar_score');
-
         this.attachListener();
     }
 
@@ -523,8 +520,8 @@ export class similarityScoreDiagram {
 
             if(this.scaleRelative){
 
-                const medScoreGroup = this.svg.select('#similar_score');
-                let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
+                const promisScoreGroup = this.svg.select('.scoreGroup');
+                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                 .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
                 zeroLine.append('line')
@@ -571,42 +568,37 @@ export class similarityScoreDiagram {
                 .y((d) => { return this.scoreScale(+d['SCORE']); });
 
             // ------- draw
-            const medScoreGroup = this.svg.select('#similar_score');
+            const promisScoreGroup = this.svg.select('.scoreGroup');
 
-            medScoreGroup.append("clipPath").attr('id', 'clip')
+            promisScoreGroup.append("clipPath").attr('id', 'clip')
             .append('rect')
             .attr('width', 850)
             .attr('height', this.height - 20);
  
              let that = this;
-             medScoreGroup.selectAll('.line_group' + clump)
+             let lines = promisScoreGroup.append('g').classed('lines', true)
+            
+             .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            })   .attr("clip-path","url(#clip)")
+                 .selectAll('path')
                  .data(similarData)
                  .enter()
-                 .append('g')
-                 .classed('line_group' + clump, true)
-                 .attr('transform', () => {
-                     return `translate(${this.margin.x},${this.margin.y})`;
-                 })
-                 .each(function (d) {
-                     let currGroup = select(this)
-                         .append('path')
-                         .attr('class', d['key'])
-                         .classed(clump, true)
-                         .attr("clip-path","url(#clip)")
-                         .attr('stroke-width', that.lineScale(lineCount))
-                         .attr('stroke-opacity', that.lineScale(lineCount))
-                         .attr('d', (d)=> {
+                 .append('path')
+                 .attr('class', d=> d['key'])
+                 .classed(clump, true)
+                 .attr('stroke-width', that.lineScale(lineCount))
+                 .attr('stroke-opacity', that.lineScale(lineCount))
+                 .attr('d', function (d) {
                              d['line'] = this;
-                             return lineFunc(d['values'])});
+                             return lineFunc(d['values'])})
        
-                 })
                  .on('click', (d) => {
- 
-                     let selected = document.getElementsByClassName(d['key']);
-                     let line = selected[0];
- 
+                     
+                     let line = d.line;
+                
                      if(line.classList.contains('selected')){
- 
+                        console.log(line);
                          line.classList.remove('selected');
                          let dots = document.getElementsByClassName(d.key + ' clickdots');
                          for (var i = dots.length; i--; ) {
@@ -644,8 +636,8 @@ export class similarityScoreDiagram {
             console.log(similarData);
             console.log(voronoi(similarData));
 
-            var voronoiGroup = medScoreGroup.append("g")
-            .attr("class", "voronoi").classed('proLine', true)
+            var voronoiGroup = promisScoreGroup.append("g")
+            .attr("class", "voronoi")//.classed('proLine', true)
             .attr('transform', () => {
                 return `translate(${this.margin.x},${this.margin.y})`;
             });
@@ -656,12 +648,14 @@ export class similarityScoreDiagram {
                 .enter().append("g")
                 .append('path')
                 .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; })
-                //.datum(function(d, i) { return d.point; })
-              //  .style('stroke', "#2074A0")
+               // .datum(function(d, i) { return d.point; })
+                .style('stroke', "#cbdcdf")
+                .style('fill', "none")
+                .style("pointer-events", "all")
                 .on("mouseover", mouseover)
                 .on("mouseout", mouseout);
 
-               let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
+               let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
                zeroLine.append('line')//.attr('class', 'myLine')
@@ -672,18 +666,13 @@ export class similarityScoreDiagram {
                 function mouseover(d) {
                     console.log(d.data.pat.line);
                     let group = d.data.pat.line;
-                    select(group).select('path').classed('selected', true);
-                 
-                   // d.data.line.parentNode.appendChild(d.data.line);
-                  //  focus.attr("transform", "translate(" + x(d.data.date) + "," + y(d.data.value) + ")");
-                   // focus.select("text").text(d.data.city.name);
+                    select(group).classed('selected', true);
+
                   }
                 
                   function mouseout(d) {
                     let group = d.data.pat.line;
-                    select(group).select('path').classed('selected', false);
-                   
-                   // focus.attr("transform", "translate(-100,-100)");
+                    select(group).classed('selected', false);
                   }
         }
 
@@ -691,11 +680,10 @@ export class similarityScoreDiagram {
 
             let promisData = d;
 
-            let promisRect = this.svg.select('#similar_score');
-            let dots = promisRect.selectAll('g').append('g')
+            let promisRect = this.svg.select('.scoreGroup').select('.lines');
+            let dots = promisRect
             .selectAll('circle').data(promisData);
             dots.enter().append('circle').attr('class', 'hoverdots')
-            .attr('clip-path','url(#clip)')
             .attr('cx', (d, i)=> this.timeScale(d.diff))
             .attr('cy', (d)=> {
                 let score; 
@@ -712,12 +700,11 @@ export class similarityScoreDiagram {
 
         let promisData = d.values;
 
-        let promisRect = this.svg.select('#similar_score');
-        let dots = promisRect.selectAll('g').append('g')
+        let promisRect = this.svg.select('.scoreGroup').select('.lines');
+        let dots = promisRect
         .selectAll('circle').data(promisData);
         dots.enter().append('circle').attr('class', d.PAT_ID)
         .classed('clickdots', true)
-        .attr('clip-path','url(#clip)')
         .attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> {
             let score; 
@@ -745,7 +732,7 @@ export class similarityScoreDiagram {
         let lowScore = this.scoreScale.invert(end);
         let highScore = this.scoreScale.invert(start);
 
-        let med = this.svg.select('#similar_score')
+        let med = this.svg.select('.scoreGroup')
             .selectAll('path')
             .style('opacity', 0);
 
@@ -761,9 +748,10 @@ export class similarityScoreDiagram {
      */
     private clearDiagram() {
 
-        this.svg.select('#similar_score').selectAll('g').remove();
-        this.svg.select('#similar_orders').selectAll('g').remove();
-        this.svg.select('.zeroLine').remove();
+        this.svg.select('.scoreGroup').selectAll('.lines').remove();
+        this.svg.select('.scoreGroup').selectAll('.zeroLine').remove();
+        this.svg.select('.scoreGroup').selectAll('.voronoi').remove();
+        this.svg.select('.scoreGroup').selectAll('#clip').remove();
     }
 
         /**
@@ -771,7 +759,7 @@ export class similarityScoreDiagram {
      */
     private clearAggDiagram() {
 
-        let aggline =  this.svg.select('#similar_score');
+        let aggline =  this.svg.select('.scoreGroup');
         aggline.select('.avLine').remove();
         aggline.select('.avLine_all').remove();
         aggline.select('.avLine_top').remove();
@@ -1003,11 +991,11 @@ export class similarityScoreDiagram {
         
 
         // ------- draw
-        const medScoreGroup = this.svg.select('#similar_score');
+        const promisScoreGroup = this.svg.select('#similar_score');
 
         let that = this;
 
-        let group = medScoreGroup.append('g').classed(clump, true);
+        let group = promisScoreGroup.append('g').classed(clump, true);
 
             group
             .append('path')
@@ -1049,7 +1037,7 @@ export class similarityScoreDiagram {
                 return `translate(${this.margin.x},${this.margin.y})`;
             });
 
-            let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
+            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
             .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
             zeroLine.append('line')//.attr('class', 'myLine')
