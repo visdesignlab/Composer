@@ -64,7 +64,7 @@ export class individualStats {
         });
         events.on('line_unclicked', (evt, item)=>{
            // console.log('item');
-            this.statWin.select('.'+item[0].PAT_ID).remove();
+            this.statWin.select('.'+ [item.key]).remove();
         });
 
     }
@@ -72,8 +72,8 @@ export class individualStats {
     private drawOrderWin(orders){
 
         let statArray = [];
-        let patBox = this.statWin.append('div').attr('class', orders[0].PAT_ID).classed('patBox', true);
-        patBox.append('div').classed('patLabel', true).append('text').text('ID :   '+ orders[0].PAT_ID).append('br');
+        let patBox = this.statWin.append('div').attr('class', orders.key).classed('patBox', true);
+        patBox.append('div').classed('patLabel', true).append('text').text('ID :   '+ orders.key).append('br');
         patBox.append('br').append('br');
 
 
