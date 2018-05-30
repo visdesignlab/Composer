@@ -576,67 +576,14 @@ export class similarityScoreDiagram {
             .attr('height', this.height - 20);
  
              let that = this;
-             let lines = promisScoreGroup.append('g').classed('lines', true)
             
-             .attr('transform', () => {
-                return `translate(${this.margin.x},${this.margin.y})`;
-            })   .attr("clip-path","url(#clip)")
-                 .selectAll('path')
-                 .data(similarData)
-                 .enter()
-                 .append('path')
-                 .attr('class', d=> d['key'])
-                 .classed(clump, true)
-                 .attr('stroke-width', that.lineScale(lineCount))
-                 .attr('stroke-opacity', that.lineScale(lineCount))
-                 .attr('d', function (d) {
-                             d['line'] = this;
-                             return lineFunc(d['values'])})
-       
-                 .on('click', (d) => {
-                     
-                     let line = d.line;
-                
-                     if(line.classList.contains('selected')){
-                        console.log(line);
-                         line.classList.remove('selected');
-                         let dots = document.getElementsByClassName(d.key + ' clickdots');
-                         for (var i = dots.length; i--; ) {
-                             dots[i].remove();
-                          }
- 
-                        events.fire('line_unclicked', d);
- 
-                     }else {
- 
-                         line.classList.add('selected');
-                         this.addPromisDotsClick(d);
-                         events.fire('line_clicked', d);
-                 };
-                     let lines = this.$node.selectAll('.selected').nodes();
-                     let idarray = [];
-                   lines.forEach(element => {
-                         idarray.push(+element.__data__.key);
-                     });
-                     events.fire('selected_line_array', idarray);
- 
-                 })
-                 .on('mouseover', (d)=> {
-                     this.addPromisDotsHover(d);
-                 })
-                 .on('mouseout', (d)=> {
-                     this.removeDots();
-                 });
 
             let voronoi = d3Voronoi.voronoi()
             .x((d, i) => { return this.timeScale(d['diff']); })
             .y((d, i) => { return this.scoreScale(d['SCORE']); })
             .extent([[0, 0], [850, this.height]]);
-            
-            console.log(similarData);
-            console.log(voronoi(similarData));
-
-            var voronoiGroup = promisScoreGroup.append("g")
+   
+            let voronoiGroup = promisScoreGroup.append("g")
             .attr("class", "voronoi")//.classed('proLine', true)
             .attr('transform', () => {
                 return `translate(${this.margin.x},${this.margin.y})`;
@@ -652,8 +599,59 @@ export class similarityScoreDiagram {
                 .style('stroke', "#cbdcdf")
                 .style('fill', "none")
                 .style("pointer-events", "all")
-                .on("mouseover", mouseover)
-                .on("mouseout", mouseout);
+                .on('mouseover', mouseover)
+                .on('mouseout', mouseout)
+                .on('click', voronoiClicked);
+
+                let lines = promisScoreGroup.append('g').classed('lines', true)
+                .attr('transform', () => {
+                   return `translate(${this.margin.x},${this.margin.y})`;
+               })   .attr("clip-path","url(#clip)")
+                    .selectAll('path')
+                    .data(similarData)
+                    .enter()
+                    .append('path')
+                    .attr('class', d=> d['key'])
+                    .classed(clump, true)
+                    .attr('stroke-width', that.lineScale(lineCount))
+                    .attr('stroke-opacity', that.lineScale(lineCount))
+                    .attr('d', function (d) {
+                                d['line'] = this;
+                                return lineFunc(d['values'])})
+          
+                    .on('click', (d) => {
+                        
+                        let line = d.line;
+                   
+                        if(line.classList.contains('selected')){
+                           console.log(line);
+                            line.classList.remove('selected');
+                            let dots = document.getElementsByClassName(d.key + ' clickdots');
+                            for (var i = dots.length; i--; ) {
+                                dots[i].remove();
+                             }
+    
+                           events.fire('line_unclicked', d);
+    
+                        }else {
+    
+                            line.classList.add('selected');
+                            this.addPromisDotsClick(d);
+                            events.fire('line_clicked', d);
+                    };
+                        let lines = this.$node.selectAll('.selected').nodes();
+                        let idarray = [];
+                      lines.forEach(element => {
+                            idarray.push(+element.__data__.key);
+                        });
+                        events.fire('selected_line_array', idarray);
+                    })
+                    .on('mouseover', (d)=> {
+                        this.addPromisDotsHover(d);
+                    })
+                    .on('mouseout', (d)=> {
+                        this.removeDots();
+                    });
 
                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
@@ -666,13 +664,36 @@ export class similarityScoreDiagram {
                 function mouseover(d) {
                     console.log(d.data.pat.line);
                     let group = d.data.pat.line;
-                    select(group).classed('selected', true);
-
+                    select(group).classed('hover-selected', true);
                   }
                 
-                  function mouseout(d) {
+                function mouseout(d) {
                     let group = d.data.pat.line;
-                    select(group).classed('selected', false);
+                    select(group).classed('hover-selected', false);
+                  }
+
+                  function voronoiClicked(d) {
+                    let line = d.data.pat.line;
+                    console.log(d);
+                    if(line.classList.contains('selected')) {
+                        console.log(line);
+                        line.classList.remove('selected');
+                        let dots = select('.lines').selectAll('.clickdots').selectAll('.'+ d.key);//document.getElementsByClassName(d.key + 'clickdots');
+                        dots.remove();
+                       events.fire('line_unclicked', d);
+
+                    }else {
+
+                        line.classList.add('selected');
+                        that.addPromisDotsClick(d.data.pat);
+                        events.fire('line_clicked', d.data.pat);
+                };
+                    let lines = this.$node.select('.lines').selectAll('.selected').nodes();
+                    let idarray = [];
+                  lines.forEach(element => {
+                        idarray.push(+element.__data__.key);
+                    });
+                    events.fire('selected_line_array', idarray);
                   }
         }
 
@@ -697,13 +718,13 @@ export class similarityScoreDiagram {
     }
 
     private addPromisDotsClick (d) {
-
         let promisData = d.values;
-
+       
+        console.log(d)
         let promisRect = this.svg.select('.scoreGroup').select('.lines');
         let dots = promisRect
         .selectAll('circle').data(promisData);
-        dots.enter().append('circle').attr('class', d.PAT_ID)
+        dots.enter().append('circle').attr('class', d.key)
         .classed('clickdots', true)
         .attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> {
@@ -711,8 +732,6 @@ export class similarityScoreDiagram {
             score = d.SCORE;
             return this.scoreScale(score);
         }).attr('r', 5).attr('fill', '#FF5733');
-
-
 
         this.clicked = true;
 
