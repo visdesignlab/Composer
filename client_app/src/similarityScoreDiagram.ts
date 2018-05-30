@@ -13,7 +13,7 @@ import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import * as d3 from 'd3';
-import * from 'd3-voronoi';
+import * as d3Voronoi from 'd3-voronoi';
 //import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
@@ -75,6 +75,7 @@ export class similarityScoreDiagram {
 
         const that = this;
 
+
         this.diagram = diagram;
         this.$node = select(parent)
             .append('div')
@@ -103,7 +104,7 @@ export class similarityScoreDiagram {
 
         this.lineOpacity = scaleLinear()
             .domain([1, 6071])
-            .range([.8, .2])//.clamp(true);
+            .range([.8, .2]);//.clamp(true);
 
         // axis
         scoreGroup.append('g')
@@ -163,16 +164,7 @@ export class similarityScoreDiagram {
             .selectAll('text').remove();
 
             scoreGroup.append('g')
-            .attr('id', 'pat_score');
-
-            scoreGroup.append('g')
             .attr('id', 'similar_score');
-
-            this.svg.append('g')
-            .attr('id', 'pat_orders');
-
-            this.svg.append('g')
-            .attr('id', 'promis_orders');
 
         this.attachListener();
     }
@@ -544,15 +536,23 @@ export class similarityScoreDiagram {
 
             let lineCount = cohort.length;
 
-            let similarData = cohort.map((d) => {
+            let co = cohort.filter(g=> {return g.value.length > 1});
+
+            let similarData = co.map((d) => {
+            let data = {key: d.key, values: null, line: null};
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram;
             });
-
             res.sort((a, b) => ascending(a.diff, b.diff));
             res.forEach(r=> r.maxday = d.days);
-            return res;
+            res = res.map(r=> {return {'PAT_ID': r['PAT_ID'],
+                                        'diff': r['diff'],
+                                        'SCORE': r['SCORE']}
+                                    });
+            data.values = res;
+            return data;
             });
+          
             // -----  set domains and axis
             // time scale
             this.timeScale.domain([this.minDay, this.maxDay]);
@@ -571,69 +571,93 @@ export class similarityScoreDiagram {
             // ------- draw
             const medScoreGroup = this.svg.select('#similar_score');
 
-           medScoreGroup.append("clipPath").attr('id', 'clip')
-           .append('rect')
-           .attr('width', 850)
-           .attr('height', this.height - 20);
+            medScoreGroup.append("clipPath").attr('id', 'clip')
+            .append('rect')
+            .attr('width', 850)
+            .attr('height', this.height - 20);
+ 
+             let that = this;
+             medScoreGroup.selectAll('.line_group' + clump)
+                 .data(similarData)
+                 .enter()
+                 .append('g')
+                 .classed('line_group' + clump, true)
+                 .attr('transform', () => {
+                     return `translate(${this.margin.x},${this.margin.y})`;
+                 })
+                 .each(function (d) {
+                     let currGroup = select(this)
+                         .append('path')
+                         .attr('class', d['key'])
+                         .classed(clump, true)
+                         .attr("clip-path","url(#clip)")
+                         .attr('stroke-width', that.lineScale(lineCount))
+                         .attr('stroke-opacity', that.lineScale(lineCount))
+                         .attr('d', (d)=> {
+                             d['line'] = this;
+                             return lineFunc(d['values'])});
+       
+                 })
+                 .on('click', (d) => {
+ 
+                     let selected = document.getElementsByClassName(d['key']);
+                     let line = selected[0];
+ 
+                     if(line.classList.contains('selected')){
+ 
+                         line.classList.remove('selected');
+                         let dots = document.getElementsByClassName(d.key + ' clickdots');
+                         for (var i = dots.length; i--; ) {
+                             dots[i].remove();
+                          }
+ 
+                        events.fire('line_unclicked', d);
+ 
+                     }else {
+ 
+                         line.classList.add('selected');
+                         this.addPromisDotsClick(d);
+                         events.fire('line_clicked', d);
+                 };
+                     let lines = this.$node.selectAll('.selected').nodes();
+                     let idarray = [];
+                   lines.forEach(element => {
+                
+                         idarray.push(+element.__data__.key);
+                     });
+                     events.fire('selected_line_array', idarray);
+ 
+                 })
+                 .on('mouseover', (d)=> {
+                     this.addPromisDotsHover(d);
+                 })
+                 .on('mouseout', (d)=> {
+                     this.removeDots();
+                 });
 
-            let that = this;
-            medScoreGroup.selectAll('.line_group' + clump)
-                .data(similarData)
-                .enter()
-                .append('g')
-                .classed('line_group' + clump, true)
-                .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                })
-                .each(function (d) {
-                    let currGroup = select(this)
-                        .append('path')
-                        .attr('class', d[0]['PAT_ID'])
-                        .classed(clump, true)
-                        .attr("clip-path","url(#clip)")
-                        .attr('stroke-width', that.lineScale(lineCount))
-                        .attr('stroke-opacity', that.lineScale(lineCount))
-                        .attr('d', lineFunc);
-      
-                })
-                .on('click', (d) => {
+            let voronoi = d3Voronoi.voronoi()
+            .x((d, i) => { return this.timeScale(d['diff']); })
+            .y((d, i) => { return this.scoreScale(d['SCORE']); })
+            .extent([[0, 0], [850, this.height]]);
+            
+            console.log(similarData);
+            console.log(voronoi(similarData));
 
-                    let selected = document.getElementsByClassName(d[0].PAT_ID);
-                    let line = selected[0];
-
-                    if(line.classList.contains('selected')){
-
-                        line.classList.remove('selected');
-                        let dots = document.getElementsByClassName(d[0].PAT_ID + ' clickdots');
-                        for (var i = dots.length; i--; ) {
-                            dots[i].remove();
-                         }
-
-                       events.fire('line_unclicked', d);
-
-                    }else {
-
-                        line.classList.add('selected');
-                        this.addPromisDotsClick(d);
-                        events.fire('line_clicked', d);
-                };
-                    let lines = this.$node.selectAll('.selected').nodes();
-                    let idarray = [];
-                  lines.forEach(element => {
-                        console.log(element.__data__[0].PAT_ID);
-                        console.log(element.__data__);
-                        idarray.push(element.__data__[0].PAT_ID);
-                    });
-                    events.fire('selected_line_array', idarray);
-
-                })
-                .on('mouseover', (d)=> {
-                    this.addPromisDotsHover(d);
-                })
-                .on('mouseout', (d)=> {
-                    this.removeDots();
-                });
-
+            var voronoiGroup = medScoreGroup.append("g")
+            .attr("class", "voronoi").classed('proLine', true);
+/*
+            voronoiGroup.selectAll("path")
+            .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
+                return d.values; }))))
+                .enter().append("path")
+                .attr('d', function(d, i) { 
+                    return "M" + d.join("L") + "Z"; })
+              //  .datum(function(d, i) { return d.point; })
+                .style('stroke', "#2074A0");
+               // .on("mouseover", mouseover)
+              //  .on("mouseout", mouseout);
+*/
+          
                let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
@@ -666,12 +690,12 @@ export class similarityScoreDiagram {
 
     private addPromisDotsClick (d) {
 
-        let promisData = d;
+        let promisData = d.values;
 
         let promisRect = this.svg.select('#similar_score');
         let dots = promisRect.selectAll('g').append('g')
         .selectAll('circle').data(promisData);
-        dots.enter().append('circle').attr('class', d[0].PAT_ID)
+        dots.enter().append('circle').attr('class', d.PAT_ID)
         .classed('clickdots', true)
         .attr('clip-path','url(#clip)')
         .attr('cx', (d, i)=> this.timeScale(d.diff))
@@ -701,15 +725,6 @@ export class similarityScoreDiagram {
         let lowScore = this.scoreScale.invert(end);
         let highScore = this.scoreScale.invert(start);
 
-        let pro = this.svg.select('#pro_score')
-            .selectAll('path')
-            .style('opacity', 0);
-
-        pro.filter(function (d) {
-            if (!d.length) return false;
-            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
-        }).style('opacity', 1);
-
         let med = this.svg.select('#similar_score')
             .selectAll('path')
             .style('opacity', 0);
@@ -726,9 +741,7 @@ export class similarityScoreDiagram {
      */
     private clearDiagram() {
 
-        this.svg.select('#pat_score').selectAll('g').remove();
         this.svg.select('#similar_score').selectAll('g').remove();
-        this.svg.select('#pat_orders').selectAll('line,g').remove();
         this.svg.select('#similar_orders').selectAll('g').remove();
         this.svg.select('.zeroLine').remove();
     }
