@@ -545,9 +545,11 @@ export class similarityScoreDiagram {
             });
             res.sort((a, b) => ascending(a.diff, b.diff));
             res.forEach(r=> r.maxday = d.days);
-            res = res.map(r=> {return {'PAT_ID': r['PAT_ID'],
-                                        'diff': r['diff'],
-                                        'SCORE': r['SCORE']}
+            res = res.map((r, i)=> {return {PAT_ID: r['PAT_ID'],
+                                        diff: r['diff'],
+                                        SCORE: r['SCORE'],
+                                        pat : data
+                                        }
                                     });
             data.values = res;
             return data;
@@ -622,7 +624,6 @@ export class similarityScoreDiagram {
                      let lines = this.$node.selectAll('.selected').nodes();
                      let idarray = [];
                    lines.forEach(element => {
-                
                          idarray.push(+element.__data__.key);
                      });
                      events.fire('selected_line_array', idarray);
@@ -644,20 +645,22 @@ export class similarityScoreDiagram {
             console.log(voronoi(similarData));
 
             var voronoiGroup = medScoreGroup.append("g")
-            .attr("class", "voronoi").classed('proLine', true);
-/*
-            voronoiGroup.selectAll("path")
+            .attr("class", "voronoi").classed('proLine', true)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
+            voronoiGroup.selectAll("g")
             .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
                 return d.values; }))))
-                .enter().append("path")
-                .attr('d', function(d, i) { 
-                    return "M" + d.join("L") + "Z"; })
-              //  .datum(function(d, i) { return d.point; })
-                .style('stroke', "#2074A0");
-               // .on("mouseover", mouseover)
-              //  .on("mouseout", mouseout);
-*/
-          
+                .enter().append("g")
+                .append('path')
+                .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; })
+                //.datum(function(d, i) { return d.point; })
+              //  .style('stroke', "#2074A0")
+                .on("mouseover", mouseover)
+                .on("mouseout", mouseout);
+
                let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
@@ -665,6 +668,23 @@ export class similarityScoreDiagram {
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
                     .attr('y1', 0).attr('y2', 350).attr('stroke-width', .5).attr('stroke', 'red');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
+
+                function mouseover(d) {
+                    console.log(d.data.pat.line);
+                    let group = d.data.pat.line;
+                    select(group).select('path').classed('selected', true);
+                 
+                   // d.data.line.parentNode.appendChild(d.data.line);
+                  //  focus.attr("transform", "translate(" + x(d.data.date) + "," + y(d.data.value) + ")");
+                   // focus.select("text").text(d.data.city.name);
+                  }
+                
+                  function mouseout(d) {
+                    let group = d.data.pat.line;
+                    select(group).select('path').classed('selected', false);
+                   
+                   // focus.attr("transform", "translate(-100,-100)");
+                  }
         }
 
     private addPromisDotsHover (d) {
