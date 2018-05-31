@@ -173,7 +173,7 @@ export class similarityScoreDiagram {
         //this is in plotkeeper
         events.on('draw_aggs', (evt, item)=> {
             if(item != null){
-                console.log(item);
+               
                 this.clearDiagram();
                 this.frequencyTest(item[0], 'top');
                 this.frequencyTest(item[1], 'middle');
@@ -601,7 +601,7 @@ export class similarityScoreDiagram {
                 .style('pointer-events', 'all')
                 .on('mouseover', mouseover)
                 .on('mouseout', mouseout)
-                .on('click', voronoiClicked);
+                .on('click', (d)=>  voronoiClicked(d.data.pat));
 
                 let lines = promisScoreGroup.append('g').classed('lines', true)
                 .attr('transform', () => {
@@ -617,46 +617,16 @@ export class similarityScoreDiagram {
                     .attr('stroke-opacity', that.lineScale(lineCount))
                     .attr('d', function (d) {
                                 d['line'] = this;
-                                return lineFunc(d['values'])})
+                                return lineFunc(d['values']);})
           
-                    .on('click', (d) => {
-                        
-                        let line = d.line;
-                   
-                        if(line.classList.contains('selected')){
-                           console.log(line);
-                            line.classList.remove('selected');
-                            let dots = document.getElementsByClassName(d.key + ' clickdots');
-                            for (var i = dots.length; i--; ) {
-                                dots[i].remove();
-                             }
-    
-                           events.fire('line_unclicked', d);
-    
-                        }else {
-    
-                            line.classList.add('selected');
-                            this.addPromisDotsClick(d);
-                            events.fire('line_clicked', d);
-                    };
-                        let lines = that.$node.selectAll('.selected').nodes();
-                        let idarray = [];
-                      lines.forEach(element => {
-                            idarray.push(+element.__data__.key);
-                        });
-                        events.fire('selected_line_array', idarray);
-                    })
-                    .on('mouseover', (d)=> {
-                        this.addPromisDotsHover(d);
-                    })
-                    .on('mouseout', (d)=> {
-                        this.removeDots();
-                    });
+                    .on('click', function (d) { voronoiClicked(d); } )
+                    .on('mouseover', (d)=> this.addPromisDotsHover(d))
+                    .on('mouseout', (d)=> this.removeDots());
 
                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
-               zeroLine.append('line')//.attr('class', 'myLine')
+               zeroLine.append('line')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
                     .attr('y1', 0).attr('y2', 350).attr('stroke-width', .5).attr('stroke', 'red');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
@@ -672,28 +642,26 @@ export class similarityScoreDiagram {
                   }
 
                   function voronoiClicked(d) {
-                    let line = d.data.pat.line;
-                    console.log(d);
+                    let line = d.line;
                     if(line.classList.contains('selected')) {
-                        console.log(line);
                         line.classList.remove('selected');
-                        let dots = select('.lines').selectAll('.clickdots').selectAll('.'+ d.key);//document.getElementsByClassName(d.key + 'clickdots');
-                        dots.remove();
+                        let dots = document.getElementsByClassName([d.key] + '-clickdots');
+                        for (var i = dots.length; i--; ) {
+                            dots[i].remove();
+                         }
                        events.fire('line_unclicked', d);
-
                     }else {
-
                         line.classList.add('selected');
-                        that.addPromisDotsClick(d.data.pat);
-                        events.fire('line_clicked', d.data.pat);
+                        that.addPromisDotsClick(d);
+                        events.fire('line_clicked', d);
                 };
                     let lines = that.$node.select('.lines').selectAll('.selected').nodes();
                     let idarray = [];
-                  lines.forEach(element => {
-                        idarray.push(+element.__data__.key);
-                    });
-                    events.fire('selected_line_array', idarray);
-                  }
+                    lines.forEach(element => {
+                            idarray.push(+element.__data__.key);
+                        });
+                        events.fire('selected_line_array', idarray);
+                    }
         }
 
     private addPromisDotsHover (d) {
@@ -719,11 +687,10 @@ export class similarityScoreDiagram {
     private addPromisDotsClick (d) {
         let promisData = d.values;
        
-        console.log(d)
         let promisRect = this.svg.select('.scoreGroup').select('.lines');
         let dots = promisRect
         .selectAll('circle').data(promisData);
-        dots.enter().append('circle').attr('class', d.key)
+        dots.enter().append('circle').attr('class', d.key + '-clickdots')
         .classed('clickdots', true)
         .attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> {
@@ -892,8 +859,6 @@ export class similarityScoreDiagram {
 
     //draws the lines for the mean and standard deviation for the PROMIS scores
     private drawAgg(cohort, clump){
-
-        console.log(cohort);
        
         let patbin = cohort.map((d)=> {
         
