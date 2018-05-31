@@ -574,33 +574,13 @@ export class similarityScoreDiagram {
             .attr('height', this.height - 20);
  
             let that = this;
-/*
-            let voronoi = d3Voronoi.voronoi()
-            .x((d, i) => { return this.timeScale(d['diff']); })
-            .y((d, i) => { return this.scoreScale(d['SCORE']); })
-            .extent([[0, 0], [850, this.height]]);
-   
+
             let voronoiGroup = promisScoreGroup.append("g")
-            .attr("class", "voronoi")//.classed('proLine', true)
+            .attr("class", "voronoi")
             .attr('transform', () => {
                 return `translate(${this.margin.x},${this.margin.y})`;
             });
 
-            voronoiGroup.selectAll('g')
-            .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
-                return d.values; }))))
-                .enter().append('g')
-                .append('path')
-                .attr('d', function(d) { return d ? 'M' + d.join('L') + 'Z' : null; })
-               // .datum(function(d, i) { return d.point; })
-                .style('stroke', '#cbdcdf')
-                .style('fill', 'none')
-                .style('pointer-events', 'all')
-                .on('mouseover', mouseover)
-                .on('mouseout', mouseout)
-                .on('click', (d)=>  voronoiClicked(d.data.pat));
-*/
-          
                 let lines = promisScoreGroup.append('g').classed('lines', true)
                 .attr('transform', () => {
                    return `translate(${this.margin.x},${this.margin.y})`;
@@ -624,43 +604,30 @@ export class similarityScoreDiagram {
                     let fakePatArray = [];
                     lines.nodes().forEach((l, i) => {
                         let fakeArray = [];
-                       
                         for(let i = 0; i < 20; i++) {
                             let total = l.getTotalLength()/20;
                             let p = l.getPointAtLength(i * total);
                             fakeArray.push({x: p.x, y: p.y, pat: l.__data__});
                         }
-                       
                         similarData[i].fakeArray = fakeArray;
                     });
-
-                    console.log(similarData);
 
                     let voronoi = d3Voronoi.voronoi()
                     .x((d, i) => { return d.x })
                     .y((d, i) => { return d.y })
-                    .extent([[0, 0], [850, this.height]]);
-           
-                    let voronoiGroup = promisScoreGroup.append("g")
-                    .attr("class", "voronoi")//.classed('proLine', true)
-                    .attr('transform', () => {
-                        return `translate(${this.margin.x},${this.margin.y})`;
-                    });
-        
+                    .extent([[0, 0], [850, 600]]);
+
                     voronoiGroup.selectAll('g')
                     .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
                         return d.fakeArray; }))))
                         .enter().append('g')
                         .append('path')
                         .attr('d', function(d) { return d ? 'M' + d.join('L') + 'Z' : null; })
-                       // .datum(function(d, i) { return d.point; })
-                        .style('stroke', '#cbdcdf')
-                        .style('fill', 'none')
                         .style('pointer-events', 'all')
                         .on('mouseover', mouseover)
                         .on('mouseout', mouseout)
                         .on('click', (d)=>  voronoiClicked(d.data.pat));
-                  
+
                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
 
