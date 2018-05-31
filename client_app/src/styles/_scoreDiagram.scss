@@ -101,6 +101,24 @@
     stroke: #212F3D;
 }
 
+.voronoi {
+    z-index: -100;
+    position: relative;
+}
+
+.voronoi g path {
+    z-index: -100;
+    position: relative;
+    fill: none;
+    stroke-width: .5px;
+    stroke: #cbdcdf;
+}
+
+.lines {
+    z-index: 1000;
+    position: relative;
+}
+
 .top {
     fill: none;
     stroke: #2874A6;
