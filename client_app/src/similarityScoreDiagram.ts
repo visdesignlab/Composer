@@ -624,7 +624,7 @@ export class similarityScoreDiagram {
                     .on('mouseout', (d)=> this.removeDots());
 
                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
 
                zeroLine.append('line')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
@@ -656,6 +656,7 @@ export class similarityScoreDiagram {
                         events.fire('line_clicked', d);
                 };
                     let lines = that.$node.select('.lines').selectAll('.selected').nodes();
+                    console.log(lines);
                     let idarray = [];
                     lines.forEach(element => {
                             idarray.push(+element.__data__.key);
@@ -723,7 +724,7 @@ export class similarityScoreDiagram {
 
         med.filter(function (d) {
             if (!d.length) return false;
-            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
+            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
         }).style('opacity', 1);
 
     }
@@ -913,7 +914,7 @@ export class similarityScoreDiagram {
                 //let val = [];
                 if (isNaN(q)) {
                    arr.push(45);
-                  }else{arr.push(q)}
+                  }else{arr.push(q); }
             });
             quart2.push(arr);
         });
@@ -927,7 +928,7 @@ export class similarityScoreDiagram {
                 //let val = [];
                 if (isNaN(q)) {
                    arr.push(45);
-                  }else{arr.push(q)}
+                  }else{arr.push(q); }
             });
             botdev2.push(arr);
         });
@@ -942,7 +943,7 @@ export class similarityScoreDiagram {
                 //let val = [];
                 if (isNaN(q)) {
                    arr.push(45);
-                  }else{arr.push(q)}
+                  }else{arr.push(q); }
             });
             topdev2.push(arr);
         });
@@ -1021,7 +1022,7 @@ export class similarityScoreDiagram {
             });
 
             let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-            .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+            .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
 
             zeroLine.append('line')//.attr('class', 'myLine')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
