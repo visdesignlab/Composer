@@ -655,7 +655,7 @@ export class DataManager {
 
     private async filterObjectByArray (selectedIdArray, objects, obType)   {
 
-        console.log(selectedIdArray);
+       
 
         if(obType == 'cpt') { 
             let res = [];
@@ -664,7 +664,7 @@ export class DataManager {
                     res.push(pat);
                 }
             });
-            console.log(res);
+          
             return res;
        }
        if(obType == 'promis') { 
