@@ -64,7 +64,7 @@ export class individualStats {
         });
         events.on('line_unclicked', (evt, item)=>{
            // console.log('item');
-            this.statWin.select('.'+ [item.key]).remove();
+            this.statWin.select('.'+ item.key).remove();
         });
 
     }
