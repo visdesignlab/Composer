@@ -777,7 +777,7 @@ export class similarityScoreDiagram {
 
         let negdiff = 0;
         let posdiff = 0;
-
+        console.log(cohortFiltered);
         //get the extreme diff values for each side of the zero event
         cohortFiltered.forEach(pat => {
 
@@ -854,6 +854,7 @@ export class similarityScoreDiagram {
                          pat.bins[i].y = (top.slope * x) + top.b;
                      
                          };
+                         console.log(cohort);
             }
 
 
