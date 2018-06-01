@@ -869,13 +869,15 @@ export class similarityScoreDiagram {
     private drawAgg(cohort, clump){
        console.log('draw agg');
        console.log(cohort);
+      // console.log(clump);
+
         let patbin = cohort.map((d)=> {
         
         let bin = d.bins;
     
         return bin;
         });
-
+        console.log(patbin);
         let means = [];
         let devs = [];
         
@@ -983,10 +985,10 @@ export class similarityScoreDiagram {
         
 
         // ------- draw
-        const promisScoreGroup = this.svg.select('#similar_score');
+        const promisScoreGroup = this.svg.select('.scoreGroup');
 
         let that = this;
-
+       
         let group = promisScoreGroup.append('g').classed(clump, true);
 
             group
