@@ -307,7 +307,8 @@ export class similarityScoreDiagram {
     }
 
     private getDays(date) {
-
+        console.log('get days calc');
+        console.log(this.cohortProInfo);
       if(this.cohortProInfo != null)  {
 
  // ----- add diff days to the data
@@ -356,7 +357,8 @@ export class similarityScoreDiagram {
     }
 
     private async getBaselines(pat)  {
-
+        console.log('get base');
+        console.log(this.cohortProInfo);
         this.cohortProInfo.forEach(patient => {
             let negative = 0;
             let positive = 0;
@@ -445,7 +447,8 @@ export class similarityScoreDiagram {
     }
     //estimates 
     private interpolate(cohort) {
-
+        console.log('interpolate');
+        console.log(this.cohortProInfo);
      cohort.forEach(pat => {
             if(pat.window != null && pat.window != undefined) {
                 let b;
@@ -534,19 +537,19 @@ export class similarityScoreDiagram {
             let co = cohort.filter(g=> {return g.value.length > 1});
 
             let similarData = co.map((d) => {
-            let data = {key: d.key, values: null, line: null};
+            let data = {key: d.key, value: null, line: null};
             let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
             return g['FORM'] == this.diagram;
             });
             res.sort((a, b) => ascending(a.diff, b.diff));
             res.forEach(r=> r.maxday = d.days);
-            res = res.map((r, i)=> {return {PAT_ID: r['PAT_ID'],
-                                        diff: r['diff'],
-                                        SCORE: r['SCORE'],
+            res = res.map((r, i)=> {return {PAT_ID: r.PAT_ID,
+                                        diff: r.diff,
+                                        SCORE: r.SCORE,
                                         pat : data
                                         }
                                     });
-            data.values = res;
+            data.value = res;
             return data;
             });
           
@@ -595,7 +598,7 @@ export class similarityScoreDiagram {
                     .attr('stroke-opacity', that.lineScale(lineCount))
                     .attr('d', function (d) {
                                 d['line'] = this;
-                                return lineFunc(d['values']);})
+                                return lineFunc(d.value);})
           
                     .on('click', function (d) { voronoiClicked(d); } )
                     .on('mouseover', (d)=> this.addPromisDotsHover(d))
@@ -691,7 +694,7 @@ export class similarityScoreDiagram {
     }
 
     private addPromisDotsClick (d) {
-        let promisData = d.values;
+        let promisData = d.value;
        
         let promisRect = this.svg.select('.scoreGroup').select('.lines');
         let dots = promisRect
@@ -777,7 +780,7 @@ export class similarityScoreDiagram {
 
         let negdiff = 0;
         let posdiff = 0;
-        console.log(cohortFiltered);
+
         //get the extreme diff values for each side of the zero event
         cohortFiltered.forEach(pat => {
 
@@ -854,19 +857,18 @@ export class similarityScoreDiagram {
                          pat.bins[i].y = (top.slope * x) + top.b;
                      
                          };
-                         console.log(cohort);
             }
 
 
         });
-
+        console.log(cohortFiltered);
         this.drawAgg(cohortFiltered, clump);
 
     }
-
     //draws the lines for the mean and standard deviation for the PROMIS scores
     private drawAgg(cohort, clump){
-       
+       console.log('draw agg');
+       console.log(cohort);
         let patbin = cohort.map((d)=> {
         
         let bin = d.bins;
