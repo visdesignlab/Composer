@@ -749,7 +749,9 @@ export class similarityScoreDiagram {
     // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
     private frequencyTest(cohort, clump){
-
+        
+        console.log('frequency test');
+        console.log(cohort);
         this.svg.select('#similar_score').selectAll('.line_group');
         
         //let cohort = this.cohortProInfo.filter(d=> d.value.length > 1);
@@ -846,6 +848,7 @@ export class similarityScoreDiagram {
     //draws the lines for the mean and standard deviation for the PROMIS scores
     private drawAgg(cohort, clump){
 
+        console.log('draw agg');
         console.log(cohort);
        
         let patbin = cohort.map((d)=> {
