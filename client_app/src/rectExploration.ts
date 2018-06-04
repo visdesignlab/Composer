@@ -2,7 +2,7 @@
  * Created by Jen Rogers on 7/21/17.
  */
 import * as ajax from 'phovea_core/src/ajax';
-import {BaseType, select, selectAll,event} from 'd3-selection';
+import {BaseType, select, selectAll, event} from 'd3-selection';
 import {nest,values,keys,map,entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear,scaleTime,scaleOrdinal} from 'd3-scale';
@@ -251,7 +251,7 @@ export class rectExploration {
      d3.selectAll('.MEDICATION, .PROCEDURE')
      .classed('selectedOrder', d =>  d.PRIMARY_MNEMONIC == this.currentlySelectedName)
      .classed('unselectedOrder', d => this.currentlySelectedName !== undefined && d.PRIMARY_MNEMONIC !== this.currentlySelectedName);
-     
+
       this.svg.select('.xAxis')
      .call(axisBottom(this.timeScale))
 
