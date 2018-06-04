@@ -312,7 +312,7 @@ export class DataManager {
     }
 
     private getQuant_Separate(cohort) {
-
+      
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -347,7 +347,7 @@ export class DataManager {
 
             }
         });
-
+       // console.log(bottomStart);
         events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
 
     }
