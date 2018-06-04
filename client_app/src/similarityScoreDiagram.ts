@@ -13,6 +13,7 @@ import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import * as d3 from 'd3';
+import * as d3Voronoi from 'd3-voronoi';
 //import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
@@ -80,12 +81,21 @@ export class similarityScoreDiagram {
             .classed('diagramDiv', true);
 
        // this.drawEventButtons();
-
+       
         this.svg = this.$node.append('svg')
             .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
 
         let scoreGroup = this.svg.append('g').classed('scoreGroup', true);
+        let voronoiGroup = scoreGroup.append('g').classed('voronoi', true);
+/*
+        scoreGroup.append('clipPath').attr('id', 'clip')
+        .append('rect')
+        .attr('width', 850)
+        .attr('height', this.height - 20)
+        .attr('transform', 'translate(150, 0)');
+*/
+        let lineGroup = scoreGroup.append('g').classed('lines', true);
 
         // scales
         this.timeScale = scaleLinear()
@@ -102,7 +112,7 @@ export class similarityScoreDiagram {
 
         this.lineOpacity = scaleLinear()
             .domain([1, 6071])
-            .range([.8, .2])//.clamp(true);
+            .range([.8, .2]);//.clamp(true);
 
         // axis
         scoreGroup.append('g')
@@ -161,18 +171,6 @@ export class similarityScoreDiagram {
             )
             .selectAll('text').remove();
 
-            scoreGroup.append('g')
-            .attr('id', 'pat_score');
-
-            scoreGroup.append('g')
-            .attr('id', 'similar_score');
-
-            this.svg.append('g')
-            .attr('id', 'pat_orders');
-
-            this.svg.append('g')
-            .attr('id', 'promis_orders');
-
         this.attachListener();
     }
 
@@ -183,7 +181,7 @@ export class similarityScoreDiagram {
         //this is in plotkeeper
         events.on('draw_aggs', (evt, item)=> {
             if(item != null){
-                console.log(item);
+               
                 this.clearDiagram();
                 this.frequencyTest(item[0], 'top');
                 this.frequencyTest(item[1], 'middle');
@@ -222,7 +220,6 @@ export class similarityScoreDiagram {
                 this.drawPromisChart(item[2], 'bottom');
             }
 
-            
         });
 
         events.on('score_domain_change', (evt, item)=>{
@@ -241,6 +238,7 @@ export class similarityScoreDiagram {
         events.on('separated_by_quant', (evt, item)=> {
             this.clearDiagram();
             this.clearAggDiagram();
+            console.log(item[2])
             this.drawPromisChart(item[0], 'top');
             this.drawPromisChart(item[1], 'middle');
             this.drawPromisChart(item[2], 'bottom');
@@ -367,7 +365,7 @@ export class similarityScoreDiagram {
     }
 
     private async getBaselines(pat)  {
-
+     
         this.cohortProInfo.forEach(patient => {
             let negative = 0;
             let positive = 0;
@@ -485,7 +483,6 @@ export class similarityScoreDiagram {
 
                 pat.value.forEach((value) => {
                     value.b = b;
-                   // value.slope = slope;
                     value.relScore = value.ogScore - b;
 
                 });
@@ -501,7 +498,7 @@ export class similarityScoreDiagram {
     }
 
     private changeScale(cohort) {
-       // this.scaleRelative = true;
+      
         if(this.scaleRelative)  {
             this.scoreScale.domain([30, -30]);
             this.cohortProInfo.forEach(patient => {
@@ -528,31 +525,41 @@ export class similarityScoreDiagram {
      * @param args
      */
     private drawPromisChart(cohort, clump) {
-
+            console.log(clump);
             if(this.scaleRelative){
 
-                const medScoreGroup = this.svg.select('#similar_score');
-                let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
+                const promisScoreGroup = this.svg.select('.scoreGroup');
+                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                 .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
 
                 zeroLine.append('line')
                         .attr('x1', 0).attr('x2', 670)
                         .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
                         .attr('stroke', 'red');
-
             }
 
             let lineCount = cohort.length;
 
-            let similarData = cohort.map((d) => {
-            let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
-            return g['FORM'] == this.diagram;
-            });
+            let co = cohort.filter(g=> {return g.value.length > 1});
 
-            res.sort((a, b) => ascending(a.diff, b.diff));
-            res.forEach(r=> r.maxday = d.days);
-            return res;
+            let similarData = co.map((d) => {
+                let data = {key: d.key, value: null, line: null};
+                let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
+                return g['FORM'] == this.diagram;
+                });
+                res.sort((a, b) => ascending(a.diff, b.diff));
+                res.forEach(r=> r.maxday = d.days);
+                res = res.map((r, i)=> {return {
+                                            PAT_ID: r.PAT_ID,
+                                            diff: r.diff,
+                                            SCORE: r.SCORE,
+                                            pat : data
+                                            }
+                                        });
+                data.value = res;
+                return data;
             });
+          
             // -----  set domains and axis
             // time scale
             this.timeScale.domain([this.minDay, this.maxDay]);
@@ -569,81 +576,125 @@ export class similarityScoreDiagram {
                 .y((d) => { return this.scoreScale(+d['SCORE']); });
 
             // ------- draw
-            const medScoreGroup = this.svg.select('#similar_score');
+            const promisScoreGroup = this.svg.select('.scoreGroup');
 
-           medScoreGroup.append("clipPath").attr('id', 'clip')
-           .append('rect')
-           .attr('width', 850)
-           .attr('height', this.height - 20);
-
+            promisScoreGroup.append('clipPath').attr('id', 'clip')
+            .append('rect')
+            .attr('width', 850)
+            .attr('height', this.height - 20);
+ 
             let that = this;
-            medScoreGroup.selectAll('.line_group' + clump)
-                .data(similarData)
-                .enter()
-                .append('g')
-                .classed('line_group' + clump, true)
+
+            let voronoiGroup = this.svg.select('.voronoi')
                 .attr('transform', () => {
                     return `translate(${this.margin.x},${this.margin.y})`;
-                })
-                .each(function (d) {
-                    let currGroup = select(this)
-                        .append('path')
-                        .attr('class', d[0]['PAT_ID'])
-                        .classed(clump, true)
-                        .attr("clip-path","url(#clip)")
-                        .attr('stroke-width', that.lineScale(lineCount))
-                        .attr('stroke-opacity', that.lineScale(lineCount))
-                        .attr('d', lineFunc);
-      
-                })
-                .on('click', (d) => {
-
-                    let selected = document.getElementsByClassName(d[0].PAT_ID);
-                    let line = selected[0];
-
-                    if(line.classList.contains('selected')){
-
-                        line.classList.remove('selected');
-                        let dots = document.getElementsByClassName(d[0].PAT_ID + ' clickdots');
-                        for (var i = dots.length; i--; ) {
-                            dots[i].remove();
-                         }
-
-                       events.fire('line_unclicked', d);
-
-                    }else {
-
-                        line.classList.add('selected');
-                        this.addPromisDotsClick(d);
-                        events.fire('line_clicked', d);
-                };
-
-                })
-                .on('mouseover', (d)=> {
-                    this.addPromisDotsHover(d);
-                })
-                .on('mouseout', (d)=> {
-                    this.removeDots();
                 });
 
-               let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
-                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+                let lines = this.svg.select('.scoreGroup').select('.lines')
+            //let lines = promisScoreGroup.append('g').classed('lines', true)//.classed(clump, true)
+                    .attr('transform', () => {
+                    return `translate(${this.margin.x},${this.margin.y})`;
+                })   .attr('clip-path','url(#clip)')
+                     .selectAll('.'+ clump)
+                        .data(similarData)
+                        .enter()
+                        .append('path')
+                        .attr('class', d=> d['key'])
+                        .classed(clump, true)
+                        .attr('stroke-width', that.lineScale(lineCount))
+                        .attr('stroke-opacity', that.lineScale(lineCount))
+                        .attr('d', function (d) {
+                                    d['line'] = this;
+                                    return lineFunc(d.value);})
+                        .on('click', function (d) { voronoiClicked(d); } )
+                        .on('mouseover', (d)=> this.addPromisDotsHover(d))
+                        .on('mouseout', (d)=> this.removeDots());
 
-               zeroLine.append('line')//.attr('class', 'myLine')
+                if(cohort.length < 300) { 
+
+                    if(clump == 'proLine') {
+
+                        let fakePatArray = [];
+                        lines.nodes().forEach((l, i) => {
+                            let fakeArray = [];
+                            for(let i = 0; i < 20; i++) {
+                                let total = l.getTotalLength()/20;
+                                let p = l.getPointAtLength(i * total);
+                                fakeArray.push({x: p.x, y: p.y, pat: l.__data__});
+                            }
+                            similarData[i].fakeArray = fakeArray;
+                        });
+
+                        let voronoi = d3Voronoi.voronoi()
+                        .x((d, i) => { return d.x })
+                        .y((d, i) => { return d.y })
+                        .extent([[0, 0], [850, 600]]);
+
+                        voronoiGroup.selectAll('g')
+                        .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
+                            return d.fakeArray; }))))
+                            .enter().append('g')
+                            .append('path')
+                            .attr('d', function(d) { return d ? 'M' + d.join('L') + 'Z' : null; })
+                            .style('pointer-events', 'all')
+                            .on('mouseover', mouseover)
+                            .on('mouseout', mouseout)
+                            .on('click', (d)=>  voronoiClicked(d.data.pat));
+                    }
+                        
+}
+               let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
+
+               zeroLine.append('line')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
                     .attr('y1', 0).attr('y2', 350).attr('stroke-width', .5).attr('stroke', 'red');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
+
+                function mouseover(d) {
+                    let group = d.data.pat.line;
+                    select(group).classed('hover-selected', true);
+                  }
+                
+                function mouseout(d) {
+                    let group = d.data.pat.line;
+                    select(group).classed('hover-selected', false);
+                  }
+
+                  function voronoiClicked(d) {
+                    console.log('line clicked');
+                    console.log(d);
+                    let line = d.line;
+                    if(line.classList.contains('selected')) {
+                        line.classList.remove('selected');
+                        let dots = document.getElementsByClassName([d.key] + '-clickdots');
+                        for (var i = dots.length; i--; ) {
+                            dots[i].remove();
+                         }
+                       events.fire('line_unclicked', d);
+                    }else {
+                        line.classList.add('selected');
+                        that.addPromisDotsClick(d);
+                        events.fire('line_clicked', d);
+                };
+                    let lines = that.$node.select('.lines').selectAll('.selected').nodes();
+                 
+                    let idarray = [];
+                    lines.forEach(element => {
+                            idarray.push(+element.__data__.key);
+                        });
+                        events.fire('selected_line_array', idarray);
+                    }
         }
 
     private addPromisDotsHover (d) {
 
             let promisData = d;
 
-            let promisRect = this.svg.select('#similar_score');
-            let dots = promisRect.selectAll('g').append('g')
+            let promisRect = this.svg.select('.scoreGroup').select('.lines');
+            let dots = promisRect
             .selectAll('circle').data(promisData);
             dots.enter().append('circle').attr('class', 'hoverdots')
-            .attr('clip-path','url(#clip)')
             .attr('cx', (d, i)=> this.timeScale(d.diff))
             .attr('cy', (d)=> {
                 let score; 
@@ -657,23 +708,19 @@ export class similarityScoreDiagram {
     }
 
     private addPromisDotsClick (d) {
-
-        let promisData = d;
-
-        let promisRect = this.svg.select('#similar_score');
-        let dots = promisRect.selectAll('g').append('g')
+        let promisData = d.value;
+       
+        let promisRect = this.svg.select('.scoreGroup').select('.lines');
+        let dots = promisRect
         .selectAll('circle').data(promisData);
-        dots.enter().append('circle').attr('class', d[0].PAT_ID)
+        dots.enter().append('circle').attr('class', d.key + '-clickdots')
         .classed('clickdots', true)
-        .attr('clip-path','url(#clip)')
         .attr('cx', (d, i)=> this.timeScale(d.diff))
         .attr('cy', (d)=> {
             let score; 
             score = d.SCORE;
             return this.scoreScale(score);
         }).attr('r', 5).attr('fill', '#FF5733');
-
-
 
         this.clicked = true;
 
@@ -693,22 +740,13 @@ export class similarityScoreDiagram {
         let lowScore = this.scoreScale.invert(end);
         let highScore = this.scoreScale.invert(start);
 
-        let pro = this.svg.select('#pro_score')
-            .selectAll('path')
-            .style('opacity', 0);
-
-        pro.filter(function (d) {
-            if (!d.length) return false;
-            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
-        }).style('opacity', 1);
-
-        let med = this.svg.select('#similar_score')
+        let med = this.svg.select('.scoreGroup')
             .selectAll('path')
             .style('opacity', 0);
 
         med.filter(function (d) {
             if (!d.length) return false;
-            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore
+            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
         }).style('opacity', 1);
 
     }
@@ -718,11 +756,10 @@ export class similarityScoreDiagram {
      */
     private clearDiagram() {
 
-        this.svg.select('#pat_score').selectAll('g').remove();
-        this.svg.select('#similar_score').selectAll('g').remove();
-        this.svg.select('#pat_orders').selectAll('line,g').remove();
-        this.svg.select('#similar_orders').selectAll('g').remove();
-        this.svg.select('.zeroLine').remove();
+        this.svg.select('.scoreGroup').select('.lines').selectAll('*').remove();
+        this.svg.select('.scoreGroup').selectAll('.zeroLine').remove();
+        this.svg.select('.scoreGroup').select('.voronoi').selectAll('*').remove();
+        this.svg.select('.scoreGroup').selectAll('#clip').remove();
     }
 
         /**
@@ -730,7 +767,7 @@ export class similarityScoreDiagram {
      */
     private clearAggDiagram() {
 
-        let aggline =  this.svg.select('#similar_score');
+        let aggline =  this.svg.select('.scoreGroup');
         aggline.select('.avLine').remove();
         aggline.select('.avLine_all').remove();
         aggline.select('.avLine_top').remove();
@@ -749,12 +786,16 @@ export class similarityScoreDiagram {
     // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
     private frequencyTest(cohort, clump){
+<<<<<<< HEAD
         
         console.log('frequency test');
         console.log(cohort);
         this.svg.select('#similar_score').selectAll('.line_group');
         
         //let cohort = this.cohortProInfo.filter(d=> d.value.length > 1);
+=======
+
+>>>>>>> voronoi
         let cohortFiltered = cohort.filter(d=> d.value.length > 1);
 
         let negdiff = 0;
@@ -776,7 +817,6 @@ export class similarityScoreDiagram {
         //get diff of days between maxneg diff and maxpos diff
         let daydiff = posdiff - negdiff;
         let bincount = Math.floor(daydiff/10);
-        //new Array(bincount).fill({'x': null, 'y': null});
 
         cohortFiltered.forEach(pat=> {
 
@@ -834,30 +874,29 @@ export class similarityScoreDiagram {
                         if(top != undefined){
                   
                          pat.bins[i].y = (top.slope * x) + top.b;
-                     
                          };
             }
-
-
         });
-
+       
         this.drawAgg(cohortFiltered, clump);
 
     }
-
     //draws the lines for the mean and standard deviation for the PROMIS scores
     private drawAgg(cohort, clump){
 
+<<<<<<< HEAD
         console.log('draw agg');
         console.log(cohort);
        
+=======
+>>>>>>> voronoi
         let patbin = cohort.map((d)=> {
         
         let bin = d.bins;
     
         return bin;
         });
-
+ 
         let means = [];
         let devs = [];
         
@@ -904,7 +943,7 @@ export class similarityScoreDiagram {
                 //let val = [];
                 if (isNaN(q)) {
                    arr.push(45);
-                  }else{arr.push(q)}
+                  }else{arr.push(q); }
             });
             quart2.push(arr);
         });
@@ -918,7 +957,7 @@ export class similarityScoreDiagram {
                 //let val = [];
                 if (isNaN(q)) {
                    arr.push(45);
-                  }else{arr.push(q)}
+                  }else{arr.push(q); }
             });
             botdev2.push(arr);
         });
@@ -933,7 +972,7 @@ export class similarityScoreDiagram {
                 //let val = [];
                 if (isNaN(q)) {
                    arr.push(45);
-                  }else{arr.push(q)}
+                  }else{arr.push(q); }
             });
             topdev2.push(arr);
         });
@@ -965,11 +1004,16 @@ export class similarityScoreDiagram {
         
 
         // ------- draw
-        const medScoreGroup = this.svg.select('#similar_score');
+        const promisScoreGroup = this.svg.select('.scoreGroup');
+
+        promisScoreGroup.append('clipPath').attr('id', 'clip')
+        .append('rect')
+        .attr('width', 850)
+        .attr('height', this.height - 20);
 
         let that = this;
-
-        let group = medScoreGroup.append('g').classed(clump, true);
+       
+        let group = promisScoreGroup.append('g').classed(clump, true);
 
             group
             .append('path')
@@ -1011,8 +1055,8 @@ export class similarityScoreDiagram {
                 return `translate(${this.margin.x},${this.margin.y})`;
             });
 
-            let zeroLine = medScoreGroup.append('g').classed('zeroLine', true)
-            .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+            .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
 
             zeroLine.append('line')//.attr('class', 'myLine')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
@@ -1033,8 +1077,8 @@ export class similarityScoreDiagram {
     private renderOrdersTooltip(tooltip_data) {
 
         let text = "<strong style='color:darkslateblue'>" + tooltip_data['ORDER_CATALOG_TYPE'] + "</strong></br>";
-        text += "<span>" + tooltip_data['ORDER_MNEMONIC'] + "</span></br>";
-        text += "<span>" + tooltip_data['ORDER_DTM'] + "</span></br>";
+        text += '<span>' + tooltip_data['ORDER_MNEMONIC'] + '</span></br>';
+        text += '<span>' + tooltip_data['ORDER_DTM'] + '</span></br>';
         return text;
     }
 
@@ -1053,6 +1097,6 @@ export class similarityScoreDiagram {
 export let targetPatientOrders;
 
 
-export function create(parent: Element, diagram, cohortData,max, min) {
+export function create(parent: Element, diagram, cohortData, max, min) {
     return new similarityScoreDiagram(parent, diagram, cohortData, max, min);
 }

@@ -17,121 +17,130 @@
     height: 450px;
 }
 
-.diagramDiv svg {
-    // height: 430px;
-}
-
 .scoreLine {
     fill: none;
-    stroke: darkblue;
-}
-
-.scoreCircle {
-    fill: darkred;
-    stroke: none;
-}
-
-.patLine {
-    fill: none;
-    stroke: #FF5733;
-    stroke-width: 2px;
+    stroke: #212F3D;
 }
 
 .medLine {
     fill: none;
-    stroke: steelblue;
+    stroke: #212F3D;
     stroke-width: 2px;
 }
 
 .avLine_all {
-    stroke: #FF5733;
+    stroke: #212F3D;
     stroke-width: 3px;
     fill: none;
 }
 
 .avLine_top {
-    stroke: #27AE60;
+    stroke: #2874A6;
     stroke-width: 3px;
     fill: none;
 }
 
 .avLine_middle {
-    stroke: #F1C40F;
+    stroke: #F7DC6F;
     stroke-width: 3px;
     fill: none;
 }
 
 .avLine_bottom {
-    stroke: #D35400;
+    stroke: #fc8d59;
     stroke-width: 3px;
     fill: none;
 }
 
 .stLine_all {
-    stroke: #FF5733;
+    stroke: #fc8d59;
     stroke-width: 1px;
     fill: none;
 }
 
 .stLine_top {
-    stroke: #27AE60;
+    stroke: #2874A6;
     stroke-width: 1px;
     fill: none;
 }
 
 .stLine_middle {
-    stroke: #F1C40F;
+    stroke: #F7DC6F;
     stroke-width: 1px;
     fill: none;
 }
 
 .stLine_bottom {
-    stroke: #D35400;
+    stroke: #fc8d59;
     stroke-width: 1px;
     fill: none;
 }
 
 .qLine_all {
-    fill: #FF5733;
+    fill: #fc8d59;
     opacity: .5;
 }
 
 .qLine_top {
-    fill: #27AE60;
+    fill: #2874A6;
     opacity: .2;
 }
 
 .qLine_middle {
-    fill: #F1C40F;
+    fill: #F7DC6F;
     opacity: .2;
 }
 
 .qLine_bottom {
-    fill: #D35400;
+    fill: #fc8d59;
     opacity: .2;
 }
 
 .proLine {
     fill: none;
-    stroke: #21618C;
+    stroke: #212F3D;
+}
+
+.voronoi {
+    z-index: -100;
+    position: relative;
+}
+
+.voronoi g path {
+    z-index: -100;
+    position: relative;
+    fill: none;
+    stroke-width: .5px;
+    stroke: #cbdcdf;
+}
+
+.lines {
+    z-index: 1000;
+    position: relative;
 }
 
 .top {
     fill: none;
-    stroke: #27AE60;
+    stroke: #2874A6;
 }
 
 .middle {
     fill: none;
-    stroke: #F1C40F;
+    stroke: #F7DC6F;
 }
 
 .bottom {
     fill: none;
-    stroke: #D35400;
+    stroke: #fc8d59;
 }
 
 .selected {
+    stroke: #FF5733;
+    stroke-width: 3px;
+    fill: none;
+}
+
+.hover-selected {
     stroke: #FF5733;
     stroke-width: 3px;
     fill: none;

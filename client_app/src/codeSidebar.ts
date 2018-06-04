@@ -58,7 +58,7 @@ export class CodeSidebar {
        });
 
        events.on('send_filter_to_codebar', (evt, item)=> {
-        console.log(item);
+       
         this.selectedCohortFilters = item;
         this.DrawfilterDescriptionBox(item);
        });
@@ -155,7 +155,7 @@ export class CodeSidebar {
                         }
         
                     })
-                    tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#27AE60');
+                    tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
 
                     let mCheck = checkDiv.append('div');
                     mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
@@ -167,7 +167,7 @@ export class CodeSidebar {
                             p.classed('hidden', true);
                         }
                     });
-                    mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F1C40F');
+                    mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
 
                     let bCheck = checkDiv.append('div');
                     bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
@@ -179,7 +179,7 @@ export class CodeSidebar {
                             p.classed('hidden', true);
                         }
                     });
-                    bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#D35400');
+                    bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
                 });
                 //filter patients by a minimum score count threshold
             countPromis.append('input').attr('type', 'text')
@@ -305,7 +305,7 @@ private DrawfilterDescriptionBox(filter){
 
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
   
-    console.log(filter);
+
 
     select('.descriptionDiv').select('div').remove();
     const box = select('.descriptionDiv').append('div');
@@ -330,14 +330,14 @@ private DrawfilterDescriptionBox(filter){
         if(fil[0] == 'demographic'){
             if(fil[1].length != 0){
                 //fil[1].forEach((attr, i) => {
-                  //  console.log(attr.attributeName);
+         
                     text.append('text').text('Demo').attr('transform', 'translate(15, 0)');
               //  });//
                }
             else{ text.append('text').text('all patients').attr('transform', 'translate(15, 0)'); }
             }
         if(fil[0] == 'CPT') {
-            console.log(fil[1]);
+       
             text.append('text').text('CPT').attr('transform', 'translate(15, 0)');}
 
         text.append('text').text(fil[2]).attr('transform', 'translate(170, 0)');
