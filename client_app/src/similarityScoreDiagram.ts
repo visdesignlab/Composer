@@ -238,7 +238,7 @@ export class similarityScoreDiagram {
         events.on('separated_by_quant', (evt, item)=> {
             this.clearDiagram();
             this.clearAggDiagram();
-            console.log(item[2])
+           
             this.drawPromisChart(item[0], 'top');
             this.drawPromisChart(item[1], 'middle');
             this.drawPromisChart(item[2], 'bottom');
@@ -525,7 +525,7 @@ export class similarityScoreDiagram {
      * @param args
      */
     private drawPromisChart(cohort, clump) {
-            console.log(clump);
+           
             if(this.scaleRelative){
 
                 const promisScoreGroup = this.svg.select('.scoreGroup');
@@ -559,6 +559,10 @@ export class similarityScoreDiagram {
                 data.value = res;
                 return data;
             });
+
+            function vorline(d) { 
+                
+                return d ? 'M' + d.join('L') + 'Z' : null; };
           
             // -----  set domains and axis
             // time scale
@@ -590,7 +594,7 @@ export class similarityScoreDiagram {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 });
 
-                let lines = this.svg.select('.scoreGroup').select('.lines')
+                let lines = promisScoreGroup.select('.lines')
             //let lines = promisScoreGroup.append('g').classed('lines', true)//.classed(clump, true)
                     .attr('transform', () => {
                     return `translate(${this.margin.x},${this.margin.y})`;
@@ -617,9 +621,11 @@ export class similarityScoreDiagram {
                         let fakePatArray = [];
                         lines.nodes().forEach((l, i) => {
                             let fakeArray = [];
-                            for(let i = 0; i < 20; i++) {
-                                let total = l.getTotalLength()/20;
-                                let p = l.getPointAtLength(i * total);
+             
+                            let bins = Math.floor(l.getTotalLength()/25);
+
+                            for(let i = 0; i < bins; i++) {
+                                let p = l.getPointAtLength(i * 25);
                                 fakeArray.push({x: p.x, y: p.y, pat: l.__data__});
                             }
                             similarData[i].fakeArray = fakeArray;
@@ -635,13 +641,24 @@ export class similarityScoreDiagram {
                             return d.fakeArray; }))))
                             .enter().append('g')
                             .append('path')
-                            .attr('d', function(d) { return d ? 'M' + d.join('L') + 'Z' : null; })
+                            .attr('d', function(d,i){return d ? 'M' + d.join('L') + 'Z' : null;})
+                            .attr("class", function(d,i) { return "voronoi-" + i; })
                             .style('pointer-events', 'all')
                             .on('mouseover', mouseover)
                             .on('mouseout', mouseout)
                             .on('click', (d)=>  voronoiClicked(d.data.pat));
+
                     }
-                        
+                   /*
+                    promisScoreGroup.selectAll('.dots').data(similarData)
+                    .enter().append('g').classed('dots', true)
+                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+                    .selectAll('circle').data(d=> d.fakeArray)
+                    .enter().append('circle')
+                    .attr('cx', d=> d.x)
+                    .attr('cy', d=> d.y)
+                    .attr('r', 5);
+*/
 }
                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
@@ -662,8 +679,7 @@ export class similarityScoreDiagram {
                   }
 
                   function voronoiClicked(d) {
-                    console.log('line clicked');
-                    console.log(d);
+             
                     let line = d.line;
                     if(line.classList.contains('selected')) {
                         line.classList.remove('selected');
@@ -891,7 +907,7 @@ export class similarityScoreDiagram {
             means.push([x, mean]);
             devs.push(dev);
         }
-  
+
         let botdev = means.map((d, i)=> {
             let y = d[1] - devs[i];
             let x = d[0];
