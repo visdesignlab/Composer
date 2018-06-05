@@ -614,28 +614,6 @@ export class similarityScoreDiagram {
                         .on('mouseover', (d)=> this.addPromisDotsHover(d))
                         .on('mouseout', (d)=> this.removeDots());
 
-                        /*
- let lines = promisScoreGroup.select('.lines')
-            //let lines = promisScoreGroup.append('g').classed('lines', true)//.classed(clump, true)
-                    .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                })   .attr('clip-path','url(#clip)')
-                     .selectAll('.'+ clump)
-                        .data(similarData)
-                        .enter()
-                        .append('path')
-                        .attr('class', d=> d['key'])
-                        .classed(clump, true)
-                        .attr('stroke-width', that.lineScale(lineCount))
-                        .attr('stroke-opacity', that.lineScale(lineCount))
-                        .attr('d', function (d) {
-                                    d['line'] = this;
-                                    return lineFunc(d.value);})
-                        .on('click', function (d) { voronoiClicked(d); } )
-                        .on('mouseover', (d)=> this.addPromisDotsHover(d))
-                        .on('mouseout', (d)=> this.removeDots());
-                        */
-
                 if(cohort.length < 300) { 
 
                     if(clump == 'proLine') {
@@ -643,7 +621,6 @@ export class similarityScoreDiagram {
                         let fakePatArray = [];
                         lines.nodes().forEach((l, i) => {
                             let fakeArray = [];
-             
                             let bins = Math.floor(l.getTotalLength()/25);
 
                             for(let i = 0; i < bins; i++) {
@@ -656,7 +633,7 @@ export class similarityScoreDiagram {
                         let voronoi = d3Voronoi.voronoi()
                         .x((d, i) => { return d.x })
                         .y((d, i) => { return d.y })
-                        .extent([[0, 0], [850, 600]]);
+                        .extent([[0, 0], [850, 350]]);
 
                         voronoiGroup.selectAll('g')
                         .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
@@ -701,7 +678,7 @@ export class similarityScoreDiagram {
                   }
 
                   function voronoiClicked(d) {
-             
+                    console.log(d);
                     let line = d.line;
                     if(line.classList.contains('selected')) {
                         line.classList.remove('selected');

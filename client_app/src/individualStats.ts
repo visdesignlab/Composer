@@ -40,8 +40,8 @@ export class individualStats {
         this.rectBoxDimension = {'width' : 720, 'height': 200};
 
         this.timeScale = scaleLinear()
-        .range([0, this.rectBoxDimension.width])
-        .clamp(true);
+        .range([0, 630]);
+        //.clamp(true);
 
         this.rectSvg = this.rectWin.append('svg')
         .attr('width', this.rectBoxDimension.width)
@@ -92,13 +92,13 @@ export class individualStats {
 
     private drawPatRects(orders) {
     
-        this.timeScale.domain([-100, 100]);
+        this.timeScale.domain([-30, 40]);
         let patGroup = this.rectSvg.selectAll('.rect_group').data(orders);
 
         patGroup.exit().remove();
         
         let patGroupEnter = patGroup.enter()
-        .append('g').classed('rect_group', true);
+        .append('g').classed('rect_group', true).attr('width', 720);
 
         patGroup = patGroupEnter.merge(patGroup);
 
@@ -108,11 +108,12 @@ export class individualStats {
 
         let patGroupText = patGroupEnter
         .append('text').text(d=>d[0].key)
-        .attr('transform', `translate(0,10)`);
+        .attr('transform', `translate(0,12)`);
 
         let patInnerGroup = patGroupEnter.append('g')
         .classed('patInnerGroup', true)
-        .attr('transform', 'translate(70, 0)');
+        .attr('transform', 'translate(70, 0)')
+        .attr('width', 600);
 
         let rectGroup = patGroup.select('.patInnerGroup')
         .selectAll('.visitDays')
