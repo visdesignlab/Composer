@@ -599,6 +599,27 @@ export class similarityScoreDiagram {
                     .attr('transform', () => {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 })   .attr('clip-path','url(#clip)')
+                     .selectAll('g')
+                        .data(similarData)
+                        .enter().append('g').attr('class', d=> d['key'])
+                        .append('path')
+                        .attr('class', d=> d['key'])
+                        .classed(clump, true)
+                        .attr('stroke-width', that.lineScale(lineCount))
+                        .attr('stroke-opacity', that.lineScale(lineCount))
+                        .attr('d', function (d) {
+                                    d['line'] = this;
+                                    return lineFunc(d.value);})
+                        .on('click', function (d) { voronoiClicked(d); } )
+                        .on('mouseover', (d)=> this.addPromisDotsHover(d))
+                        .on('mouseout', (d)=> this.removeDots());
+
+                        /*
+ let lines = promisScoreGroup.select('.lines')
+            //let lines = promisScoreGroup.append('g').classed('lines', true)//.classed(clump, true)
+                    .attr('transform', () => {
+                    return `translate(${this.margin.x},${this.margin.y})`;
+                })   .attr('clip-path','url(#clip)')
                      .selectAll('.'+ clump)
                         .data(similarData)
                         .enter()
@@ -613,6 +634,7 @@ export class similarityScoreDiagram {
                         .on('click', function (d) { voronoiClicked(d); } )
                         .on('mouseover', (d)=> this.addPromisDotsHover(d))
                         .on('mouseout', (d)=> this.removeDots());
+                        */
 
                 if(cohort.length < 300) { 
 
@@ -724,17 +746,21 @@ export class similarityScoreDiagram {
     }
 
     private addPromisDotsClick (d) {
+
+        let n = select(d.line).node();
+        let parent = n.parentNode;
+
         let promisData = d.value;
        
-        let promisRect = this.svg.select('.scoreGroup').select('.lines');
-        let dots = promisRect
+      
+        let dots = select(parent)
         .selectAll('circle').data(promisData);
         dots.enter().append('circle').attr('class', d.key + '-clickdots')
         .classed('clickdots', true)
-        .attr('cx', (d, i)=> this.timeScale(d.diff))
+        .attr('cx', (d, i)=> this.timeScale(d['diff']))
         .attr('cy', (d)=> {
             let score; 
-            score = d.SCORE;
+            score = d['SCORE'];
             return this.scoreScale(score);
         }).attr('r', 5).attr('fill', '#FF5733');
 

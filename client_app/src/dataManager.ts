@@ -347,7 +347,7 @@ export class DataManager {
 
             }
         });
-       // console.log(bottomStart);
+      
         events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
 
     }
