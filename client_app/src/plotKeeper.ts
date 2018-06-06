@@ -42,24 +42,21 @@ export class PlotKeeper {
         let that = this;
 
         events.on('domain updated', (evt, item)=> {
-            
             this.maxDay = item[1];
             this.minDay = item[0];
         });
 
         events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
-            console.log('fired');
             this.cohortData = item;
                 });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
                 this.cohortData = item;
                     });
-    
+
         events.on('add_another_plot', (evt, item) => {  // called in parrallel on brush and 
 
             let cohort = item;
-            console.log(cohort);
 
             for(let i = 0; i < cohort.length; i++){
                 similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort[i], this.maxDay, this.minDay);

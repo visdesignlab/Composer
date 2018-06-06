@@ -113,11 +113,22 @@ export class DataManager {
 
         events.on('filter_by_cpt', (evt, item)=> {
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
-                this.addMinDay(d[1]);
+                this.addMinDay(d[0], d[1]);
                 this.patCPT = d[0];
                 events.fire('filter_cohort_by_event', [d[0], item]);
             });
         });
+
+        /*
+ events.on('filter_by_cpt', (evt, item)=> {
+            this.searchByEvent(this.patCPT, item[0]).then((d)=> {
+                this.addMinDay(d[0], d[1]);
+                this.patCPT = d[0];
+                events.fire('filter_cohort_by_event', [d[0], item]);
+            });
+        });
+        
+        */
         
         events.on('get_selected_demo', (evt, item)=> {
 
@@ -177,11 +188,11 @@ export class DataManager {
 
     }
 
-    private addMinDay(eventArray) {
+    private addMinDay(patients, eventArray) {
 
        // let cohort = this.cohortProInfo;
        let cohort = this.filteredPatPromis;
-       
+       console.log(cohort);
         for(var i= 0;  i< cohort.length; i++) {
             var keyA = cohort[i].key;
             for(var j = 0; j< eventArray.length; j++) {
@@ -692,7 +703,7 @@ export class DataManager {
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
 
     private async searchByEvent(cohort, value) {
-
+        console.log(cohort);
         //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
@@ -704,6 +715,7 @@ export class DataManager {
             value.forEach(v => {
 
                 if (g.value[0].includes(+v)){
+                    console.log(g);
                     if(elementBool != g.key){
                         withQuery.push(element);
                         queryDate.push(g);
@@ -714,7 +726,8 @@ export class DataManager {
             
         });
     });
-
+        console.log(withQuery);
+        console.log(queryDate);
         return [withQuery, queryDate];
     }
 
