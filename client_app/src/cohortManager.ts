@@ -194,7 +194,6 @@ export class CohortManager {
           });
 
           events.on('add_cpt_to_filterArray', (evt, item)=>{
-           
             this.cohortfilterarray[this.cohortIndex].push(item);
           });
 
@@ -203,7 +202,6 @@ export class CohortManager {
               this.cptObjectKeeper[this.cohortIndex] = item[0];
 
               //do I want to keep the patient count available for the filter?
-
               this.cohortfilterarray[this.cohortIndex].push(['CPT', item[1], item[0].length]);
 
               //this is sent to similarity score diagram to set the target code array to the selected cohort's cpt filters
@@ -243,6 +241,11 @@ export class CohortManager {
           });
 
           events.on('cohort_interpolated', (evt, item)=> {
+            this.cohortkeeperarray[this.cohortIndex] = item;
+            this.selectedCohort = item;
+          });
+
+          events.on('min_day_added', (evt, item)=> {
             this.cohortkeeperarray[this.cohortIndex] = item;
             this.selectedCohort = item;
           });

@@ -318,7 +318,7 @@ export class similarityScoreDiagram {
     private getDays(date) {
 
       if(this.cohortProInfo != null)  {
-
+      
  // ----- add diff days to the data
           
             let maxDiff = 0;// this sets the score scale max.
@@ -327,11 +327,11 @@ export class similarityScoreDiagram {
             if (this.cohortProInfo != null) {
 
                 this.cohortProInfo.forEach((g) => {
-
                     let  minDate;
-
+                   
                     if(g.CPTtime != undefined && date != null ) {
                         minDate = this.parseTime(g.CPTtime, null);
+                      
                     }else minDate = g.min_date;
                 //these have already been parsed
                 let maxDate = g.max_date;
@@ -339,7 +339,7 @@ export class similarityScoreDiagram {
                             g.value.forEach((d) => {
                             try {
                             d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                            maxDiff = d.diff > maxDiff ? d.diff : maxDiff
+                            maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
                             }
                             catch (typeError) {
                             d.diff = -1;
@@ -353,7 +353,7 @@ export class similarityScoreDiagram {
 
                             });
             }else{console.log('error'); }
-
+           
             diffArray.sort((a, b) => ascending(a, b));
             events.fire('timeline_max_set', max(diffArray));
             events.fire('day_dist', this.cohortProInfo);
@@ -435,7 +435,7 @@ export class similarityScoreDiagram {
          patient.value.forEach((value) => {
              if(posMin == null || negMin == null) {
                  patient.window = null;
-                 //value.SCORE = +value.SCORE - baseline;
+                
                  value.ogScore = value.SCORE;
                  value.relScore = value.SCORE - baseline;
    

@@ -97,10 +97,7 @@ export class DataManager {
         });
 
         events.on('filter_cohort_by_event', (evt, item)=> {
-            this.getCohortIdArrayAfterMap(item[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
-                events.fire('selected_promis_filtered', ob);
-               })
-            );
+                events.fire('selected_promis_filtered', this.filteredPatPromis);
         });
 
         events.on('filtered_patient_promis', (evt, item)=> {
@@ -113,22 +110,18 @@ export class DataManager {
 
         events.on('filter_by_cpt', (evt, item)=> {
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
-                this.addMinDay(d[0], d[1]);
+                //this.addMinDay(d[0], d[1]);
                 this.patCPT = d[0];
+                
+                this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
+                    events.fire('selected_promis_filtered', ob);
+                    this.filteredPatPromis = ob;
+                    this.addMinDay(ob, d[1]);
+                   })
+                );
                 events.fire('filter_cohort_by_event', [d[0], item]);
             });
         });
-
-        /*
- events.on('filter_by_cpt', (evt, item)=> {
-            this.searchByEvent(this.patCPT, item[0]).then((d)=> {
-                this.addMinDay(d[0], d[1]);
-                this.patCPT = d[0];
-                events.fire('filter_cohort_by_event', [d[0], item]);
-            });
-        });
-        
-        */
         
         events.on('get_selected_demo', (evt, item)=> {
 
@@ -191,8 +184,8 @@ export class DataManager {
     private addMinDay(patients, eventArray) {
 
        // let cohort = this.cohortProInfo;
-       let cohort = this.filteredPatPromis;
-       console.log(cohort);
+       let cohort = patients;
+   
         for(var i= 0;  i< cohort.length; i++) {
             var keyA = cohort[i].key;
             for(var j = 0; j< eventArray.length; j++) {
@@ -202,8 +195,25 @@ export class DataManager {
               }
             }
           }
- 
+
           events.fire('min_day_added', cohort);
+}
+
+private addEventDay(patients, eventArray) {
+
+    let cohort = patients;
+
+     for(var i= 0;  i< cohort.length; i++) {
+         var keyA = cohort[i].key;
+         for(var j = 0; j< eventArray.length; j++) {
+           var keyB = eventArray[j].key;
+           if(keyA == keyB) {
+             cohort[i].CPTtime = eventArray[j].time;
+           }
+         }
+       }
+
+      // events.fire('min_day_added', cohort);
 }
 
 //pulled from parallel coord
@@ -666,8 +676,6 @@ export class DataManager {
 
     private async filterObjectByArray (selectedIdArray, objects, obType)   {
 
-       
-
         if(obType == 'cpt') { 
             let res = [];
             objects.forEach(pat => {
@@ -688,6 +696,8 @@ export class DataManager {
         }else{ console.log('obType not found'); }
     }
 
+    public async 
+
     public async loadData(id: string) { //loads the tables from Phovea
        let table = <ITable> await getById(id);
        events.fire(id, table);//sends the id string to the getDataObjects
@@ -703,31 +713,30 @@ export class DataManager {
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
 
     private async searchByEvent(cohort, value) {
-        console.log(cohort);
+        
         //change the code to a code array make it sequence specific
         let withQuery = [];
         let queryDate = [];
+        let eventArray = [];
 
        cohort.forEach((element) => {
-
+        let events = [];
         let elementBool;
         element.forEach(g => {
             value.forEach(v => {
 
                 if (g.value[0].includes(+v)){
-                    console.log(g);
+                        events.push(g);
                     if(elementBool != g.key){
                         withQuery.push(element);
                         queryDate.push(g);
                     }elementBool = g.key;
                     }
-
             });
-            
         });
+        if(events.length != 0) eventArray.push(events);
     });
-        console.log(withQuery);
-        console.log(queryDate);
+       console.log(eventArray);
         return [withQuery, queryDate];
     }
 
