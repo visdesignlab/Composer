@@ -65,7 +65,6 @@ export class CohortManager {
                 }else{ events.fire('draw_aggs', null); }
                 this.clumpedBool = true;
             }
-           
         });
 
         events.on('clear_cohorts', () => {
@@ -78,7 +77,6 @@ export class CohortManager {
         events.on('cohort_selected', (evt, item)=>{
 
             d3.select('#cohortKeeper').selectAll('.selected').classed('selected', false);
- 
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
@@ -138,32 +136,20 @@ export class CohortManager {
         
             let filterReq = ['demographic', item[0], item[1]];
             this.cohortfilterarray[this.cohortIndex].push(filterReq);
-         
             events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
           });
 
           events.on('mapped_cpt_filtered', (evt, item)=>{
-    
               this.selectedCPT = item;
-              //THIS IS JACKED UP WHY IS IT JACKED UP
-       
-
           });
 
           events.on('promis_from_demo_refiltered', (evt, item)=> {
               
               this.cohortkeeperarray[this.cohortIndex] = item;
               this.selectedCohort = item;
-
-              //let filterReq = ['demographic', item[0], item[1]];
-              //this.addCohortFilter(filterReq);
-
               events.fire('selected_cohort_change', this.selectedCohort);
-             // events.fire('selected_cpt_change', this.selectedCPT);
-             // events.fire('selected_stat_change', [this.selectedCohort, index]);
-             // events.fire('selected_event_filter_change', this.selectedFilter.cpt);
               events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-             // events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
+
           });
 
           events.on('cpt_mapped', (evt, item)=>{
@@ -172,7 +158,6 @@ export class CohortManager {
           });
 
           events.on('show_distributions', ()=> {
-              //events.fire('cohort_stats', [this.selectedCohort, this.cohortIndex]);
               events.fire('cohort_stat_array', this.cohortkeeperarray);
           });
 
@@ -184,7 +169,6 @@ export class CohortManager {
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
 
              events.fire('selected_cohort_change', this.selectedCohort);
-           
              events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
              events.fire('selected_event_filter_change', []);
@@ -200,7 +184,8 @@ export class CohortManager {
           events.on('filter_cohort_by_event', (evt, item)=> {
               this.selectedCPT = item[0];
               this.cptObjectKeeper[this.cohortIndex] = item[0];
-
+              console.log('selected cpt changed');
+              console.log(this.selectedCPT);
               //do I want to keep the patient count available for the filter?
               this.cohortfilterarray[this.cohortIndex].push(['CPT', item[1], item[0].length]);
 
@@ -250,6 +235,9 @@ export class CohortManager {
             this.selectedCohort = item;
           });
 
+          events.on('update_start_button_clicked', (evt, item)=> {
+              events.fire('update_cpt_days', this.selectedCPT);
+          });
 
     }
 
