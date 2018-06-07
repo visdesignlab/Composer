@@ -155,7 +155,7 @@ export class similarityScoreDiagram {
                     this.drawPromisChart(this.cohortProInfo, null);
                     this.yBrushSelection = false;
                 }
-            })
+            });
         // -----
 
         scoreGroup.append('text')
@@ -264,7 +264,6 @@ export class similarityScoreDiagram {
             this.eventDayBool = true;
             this.getBaselines(null);
             this.interpolate(this.cohortProInfo);
-            
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
         });
@@ -274,27 +273,20 @@ export class similarityScoreDiagram {
         });
 
         events.on('domain updated', (evt, item)=> {
-
             this.maxDay = item[1];
             this.minDay = item[0];
-            
-
             if(this.cohortProInfo != undefined){
-
                 this.clearDiagram();
                 this.clearAggDiagram();
                 this.drawPromisChart(this.cohortProInfo, 'proLine');
             }
-
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-
             this.cohortProInfo = item;
             this.clearDiagram();
             this.clearAggDiagram();
             this.getDays(null);
-
             if(this.scaleRelative){
                 this.scaleRelative = false;
                 this.interpolate(this.cohortProInfo);
@@ -302,15 +294,11 @@ export class similarityScoreDiagram {
                     });
         
         events.on('selected_event_filter_change', (evt, item)=> {
-
             this.codeArray = item;
-
         });
 
         events.on('min_day_added', (evt, item)=> {
-       
-          this.cohortProInfo = item;
-
+            this.cohortProInfo = item;
         });
 
     }
@@ -335,7 +323,6 @@ export class similarityScoreDiagram {
                     }else minDate = g.min_date;
                 //these have already been parsed
                 let maxDate = g.max_date;
-
                             g.value.forEach((d) => {
                             try {
                             d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -345,7 +332,6 @@ export class similarityScoreDiagram {
                             d.diff = -1;
                             }
                             });
-
                             g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
                             diffArray.push(g.days + 1);
 
@@ -365,7 +351,6 @@ export class similarityScoreDiagram {
     }
 
     private async getBaselines(pat)  {
-     
         this.cohortProInfo.forEach(patient => {
             let negative = 0;
             let positive = 0;
@@ -472,8 +457,8 @@ export class similarityScoreDiagram {
                     let X;
                     let Y;
 
-                    if (x1 < x2){X = x1; Y = y1}
-                    else {X = x2; Y = y2};
+                    if (x1 < x2){X = x1; Y = y1;}
+                    else {X = x2; Y = y2;};
 
                     let slope = (y2 - y1) / (x2 - x1);
                     b = Y - (slope * X);
@@ -530,7 +515,7 @@ export class similarityScoreDiagram {
 
                 const promisScoreGroup = this.svg.select('.scoreGroup');
                 let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-                .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
+                .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
 
                 zeroLine.append('line')
                         .attr('x1', 0).attr('x2', 670)
@@ -540,7 +525,7 @@ export class similarityScoreDiagram {
 
             let lineCount = cohort.length;
 
-            let co = cohort.filter(g=> {return g.value.length > 1});
+            let co = cohort.filter(g=> {return g.value.length > 1; });
 
             let similarData = co.map((d) => {
                 let data = {key: d.key, value: null, line: null};
@@ -554,7 +539,7 @@ export class similarityScoreDiagram {
                                             diff: r.diff,
                                             SCORE: r.SCORE,
                                             pat : data
-                                            }
+                                            };
                                         });
                 data.value = res;
                 return data;
@@ -615,7 +600,7 @@ export class similarityScoreDiagram {
                         .on('mouseover', (d)=> this.addPromisDotsHover(d))
                         .on('mouseout', (d)=> this.removeDots());
 
-                if(cohort.length < 300) { 
+                if(cohort.length < 500) { 
 
                     if(clump == 'proLine') {
 

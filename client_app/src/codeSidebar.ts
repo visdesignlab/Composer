@@ -24,6 +24,7 @@ export class CodeSidebar {
     private selected;
     private dictionary;
     private selectedCohortFilters;
+    private filterArray;
 
     constructor(parent: Element) {
 
@@ -58,7 +59,6 @@ export class CodeSidebar {
        });
 
        events.on('send_filter_to_codebar', (evt, item)=> {
-       
         this.selectedCohortFilters = item;
         this.DrawfilterDescriptionBox(item);
        });
@@ -67,11 +67,9 @@ export class CodeSidebar {
            let parent = document.getElementsByClassName('cohort ' + item[1])[0];
            let view = parent.querySelector('.stat_view');
            cohortStat.create(view, item[0], item[1]);
-    
        });
 
         events.on('update_start_event', (evt, item)=>  {
-           
             let startLabel = select('#start_date_label').style('color', 'black');
             this.startBool = '0 date determined by event';
             let startLabelBool = select('#pat_or_event').text(this.startBool);
@@ -123,10 +121,8 @@ export class CodeSidebar {
                     }
                 }
             }
-
     }
 
-   
     private drawScoreFilterBox (div) {
 
         const form = div.append('form');
@@ -222,10 +218,7 @@ private drawOrderFilterBox (div) {
                 }else{
                     this.searchDictionary(value, 'code');
                 }
-     
     });
-
-   
 
 }
 private drawOrderSearchBar(order){
@@ -298,14 +291,11 @@ private drawOrderSearchBar(order){
     select('.orderDiv').select('div').remove();
 
 });
-
 }
 
 private DrawfilterDescriptionBox(filter){
 
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
-  
-
 
     select('.descriptionDiv').select('div').remove();
     const box = select('.descriptionDiv').append('div');
@@ -317,22 +307,20 @@ private DrawfilterDescriptionBox(filter){
        
        let stage = box.append('div').classed('filter_stage', true);
         let stageSvg = stage.append('svg').classed('filter_stage_svg', true);
-    
+
         let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2])).attr('transform', 'translate(12, 0)');
         if(fil[0] == 'demographic') {
             rect.attr('fill', '#D5F5E3');}
         if(fil[0] == 'CPT') {
-            rect.attr('fill', '#D2B4DE');}
+            rect.classed(fil[1][1][0].key, true);}
 
         let text = stageSvg.append('g').attr('transform', 'translate(0, 12)');
         text.append('text').text((i + 1) + ': ' );
 
         if(fil[0] == 'demographic'){
             if(fil[1].length != 0){
-                //fil[1].forEach((attr, i) => {
-         
+
                     text.append('text').text('Demo').attr('transform', 'translate(15, 0)');
-              //  });//
                }
             else{ text.append('text').text('all patients').attr('transform', 'translate(15, 0)'); }
             }
