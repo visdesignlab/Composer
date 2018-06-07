@@ -26,6 +26,7 @@ export class DataManager {
     private findMinDateCPT = dataCalc.findMinDateCPT;
     private findMaxDateCPT = dataCalc.findMaxDateCPT;
     private parseTime = dataCalc.parseTime;
+    private targetOrder;
 
     //tables for all patient data
     demoTable : ITable;
@@ -110,9 +111,8 @@ export class DataManager {
 
         events.on('filter_by_cpt', (evt, item)=> {
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
-                //this.addMinDay(d[0], d[1]);
                 this.patCPT = d[0];
-                
+                this.targetOrder = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
@@ -132,14 +132,9 @@ export class DataManager {
  
          });
 
-         events.on('line_clicked', (evt, item)=> {
-           // let selectedPat = item[0].PAT_ID;
-           // this.filterObjectByArray([selectedPat], this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
-         });
-
-         events.on('selected_line_array', (evt, item)=> {
+        events.on('selected_line_array', (evt, item)=> {
             this.filterObjectByArray(item, this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
-         })
+         });
 
         events.on('start_date_updated', (evt, item)=> {
             this.startDate = item;
@@ -177,6 +172,10 @@ export class DataManager {
         events.on('cpt_object', (evt, item)=> {
             console.log('cpt loaded');
             this.totalCptObjects = item;
+        });
+
+        events.on('update_cpt_days', (evt, item)=>{
+            this.updateDiff(this.targetOrder[0], item);
         });
 
     }
@@ -374,7 +373,7 @@ private addEventDay(patients, eventArray) {
     }
 
 
-       public async mapDemoData() {
+    public async mapDemoData() {
 
             let that = this;
 
@@ -426,7 +425,7 @@ private addEventDay(patients, eventArray) {
     private async mapPromisScores(cohortIdArray, proObjects, type) {
 
         proObjects = proObjects.filter((d) => {
-            return d['FORM_ID'] === 1123
+            return d['FORM_ID'] === 1123;
         });
 
         let yayornay = 'nay';
@@ -466,8 +465,8 @@ private addEventDay(patients, eventArray) {
                 key: d.key,
                 value: d.value,
                 min_date: this.findMinDate(d.value),
-                max_date: this.findMaxDate(d.value),
-            }
+                max_date: this.findMaxDate(d.value)
+            };
         });
         if (yayornay == 'nay'){
 
@@ -541,7 +540,7 @@ private addEventDay(patients, eventArray) {
  };
 
       //uses Phovea to access PRO data and draw table
-      private async getDemo(cohortIdArray, demObject) {
+    private async getDemo(cohortIdArray, demObject) {
       
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
@@ -736,8 +735,34 @@ private addEventDay(patients, eventArray) {
         });
         if(events.length != 0) eventArray.push(events);
     });
-       console.log(eventArray);
+      
         return [withQuery, queryDate];
+    }
+
+    private updateDiff(code, patCPT){
+       
+        let filArray = []
+        patCPT.forEach(pat => {
+            let fil = pat.filter(visit=> { return visit.value[0].includes(+code[0]); });
+            console.log(fil);
+            filArray.push(fil);
+            pat.eventDay = fil[0].time;
+        });
+        
+        patCPT.forEach(pat => {
+            console.log(this.parseTime(pat.eventDay, null));
+            pat.forEach(visit => {
+                visit.diff = Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24));
+                console.log( Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24)) );
+            });
+
+            console.log(patCPT);
+        });
+
+       
+        
+
+
     }
 
   }

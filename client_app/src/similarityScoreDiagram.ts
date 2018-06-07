@@ -264,7 +264,7 @@ export class similarityScoreDiagram {
             this.eventDayBool = true;
             this.getBaselines(null);
             this.interpolate(this.cohortProInfo);
-
+            
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
         });
@@ -599,9 +599,10 @@ export class similarityScoreDiagram {
                     .attr('transform', () => {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 })   .attr('clip-path','url(#clip)')
-                     .selectAll('g')
+                     .selectAll('.'+ clump)
                         .data(similarData)
                         .enter().append('g').attr('class', d=> d['key'])
+                        .classed(clump, true)
                         .append('path')
                         .attr('class', d=> d['key'])
                         .classed(clump, true)
