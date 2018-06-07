@@ -740,11 +740,14 @@ private addEventDay(patients, eventArray) {
     }
 
     private updateDiff(code, patCPT){
-       
+      
+        code = code.map(c => +c);
         let filArray = []
         patCPT.forEach(pat => {
-            let fil = pat.filter(visit=> { return visit.value[0].includes(+code[0]); });
-          
+            let fil = pat.filter(visit=> {
+                return visit.value[0].some(r => code.includes(r));
+               });
+            console.log(fil);
             filArray.push(fil);
             pat.eventDay = fil[0].time;
 

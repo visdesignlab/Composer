@@ -19,7 +19,7 @@
 
 .cpt-rect {
     fill: #212F3D;
-    opacity: .4;
+    opacity: .2;
 }
 
 .selected-cpt {
@@ -28,12 +28,20 @@
 
 .surgery {
     fill: maroon;
+    opacity: .7;
 }
 
 .PT {
-    fill: blue;
+    fill: rgb(0, 0, 255);
+    opacity: .7;
 }
 
 .injection {
-    fill: aquamarine;
+    fill: yellow;
+    opacity: .7;
+}
+
+.patInnerGroup {
+    display: inline-block;
+    position: relative;
 }
