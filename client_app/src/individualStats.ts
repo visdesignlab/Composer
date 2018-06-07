@@ -41,6 +41,7 @@ export class individualStats {
         this.rectBoxDimension = {'width' : 720, 'height': 200};
 
         this.timeScale = scaleLinear().range([0, 630]);
+        this.timeScale.domain([-30, 40]).clamp(true);
      
         this.rectSvg = this.rectWin.append('svg')
             .attr('width', this.rectBoxDimension.width)
@@ -57,10 +58,14 @@ export class individualStats {
         });
 
         events.on('send_filter_to_codebar', (evt, item)=>{
-            console.log(item.filter(d=> {return d[0] == 'CPT'}));
             this.cptFilter = item.filter(d=> {return d[0] == 'CPT'});
         });
 
+        events.on('domain updated', (evt, item)=> {
+            this.timeScale.domain(item);
+            this.rectSvg.selectAll('.rect_group').remove();
+           // this.drawPatRects(item);
+        })
     }
 
     private drawOrderWin(orders){
@@ -86,7 +91,7 @@ export class individualStats {
 
     private drawPatRects(orders) {
     
-        this.timeScale.domain([-30, 40]);
+        
         let patGroup = this.rectSvg.selectAll('.rect_group').data(orders);
 
         patGroup.exit().remove();
@@ -106,7 +111,7 @@ export class individualStats {
 
         let patInnerGroup = patGroupEnter.append('g')
         .classed('patInnerGroup', true)
-        .attr('transform', 'translate(70, 0)')
+        .attr('transform', 'translate(80, 0)')
         .attr('width', 600);
 
         let rectGroup = patGroup.select('.patInnerGroup')
@@ -159,22 +164,16 @@ export class individualStats {
                 .style("opacity", 0);
         })
         .on('click', function (d) {
-       // console.log(d);
+        console.log(d);
         let parentData = select(this.parentNode);
-       // console.log(parentData);
+        console.log(parentData);
     });
     if(this.cptFilter != undefined && this.cptFilter.length != 0){
         let selectedRects = selectAll('.cpt-rect');
-       
-        selectedRects.on('click', d=> console.log(d));
         let codes = this.cptFilter.map(c => c[1]);
-       // console.log(codes);
 
         codes.forEach(code => {
-            console.log(code);
-            console.log(selectedRects.filter(d=> code[0].includes(d.toString())));
             let selected = selectedRects.filter(d=> code[0].includes(d.toString()));
-           // selected.classed('selected-cpt', true);
             selected.classed(code[1][0].key, true);
         });
         
@@ -185,11 +184,7 @@ export class individualStats {
     private renderOrdersTooltip(tooltip_data) {
         let text
         text = tooltip_data;
-        
-        /*
-    if(tooltip_data['CPT_1'] !== 0){text = "<strong style='color:darkslateblue'>" + tooltip_data['CPT_1'] + "</strong></br>";}
-        if(tooltip_data['CPT_2'] !== 0){text += "<span>" + tooltip_data['CPT_2'] + "</span></br>"; }
-      */
+
         return text;
       }
 

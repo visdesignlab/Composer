@@ -185,7 +185,6 @@ export class CohortManager {
               this.selectedCPT = item[0];
               this.cptObjectKeeper[this.cohortIndex] = item[0];
               console.log('selected cpt changed');
-              console.log(this.selectedCPT);
               //do I want to keep the patient count available for the filter?
               this.cohortfilterarray[this.cohortIndex].push(['CPT', item[1], item[0].length]);
 
