@@ -19,8 +19,6 @@ import { individualStats } from './individualStats';
 import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
 import * as cohortStat from './cohortStat';
-import * as eventLine from './eventLine';
-import * as eventLine2 from './eventLine2';
 import * as codeside from './codeSidebar';
 import { selectAll } from 'd3';
 
@@ -78,7 +76,7 @@ export class App {
     //const timeline = plots.node().append('div').classed('timeline_view', true);
    // timelineKeeper.create(timeline.node());
 
-    eventLine.create(main.node(), null);
+    //eventLine.create(main.node(), null);
     codeside.create(statBar.node());
 
     inStat.create(main.node());

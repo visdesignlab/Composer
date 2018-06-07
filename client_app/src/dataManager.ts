@@ -744,25 +744,14 @@ private addEventDay(patients, eventArray) {
         let filArray = []
         patCPT.forEach(pat => {
             let fil = pat.filter(visit=> { return visit.value[0].includes(+code[0]); });
-            console.log(fil);
+          
             filArray.push(fil);
             pat.eventDay = fil[0].time;
-        });
-        
-        patCPT.forEach(pat => {
-            console.log(this.parseTime(pat.eventDay, null));
+
             pat.forEach(visit => {
                 visit.diff = Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24));
-                console.log( Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24)) );
             });
-
-            console.log(patCPT);
         });
-
-       
-        
-
-
     }
 
   }
