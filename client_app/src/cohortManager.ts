@@ -95,7 +95,6 @@ export class CohortManager {
 
           });
 
-
         events.on('cohort_stats', ()=>{
             events.fire('send_cohort', this.selectedCohort);
           });

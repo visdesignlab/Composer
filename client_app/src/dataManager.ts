@@ -93,6 +93,23 @@ export class DataManager {
            // this.getDataObjects('demo_object', item);
         });
 
+        events.on('event_clicked', (evt, item)=> {
+            this.searchByEvent(this.patCPT, item[0]).then((d)=> {
+                this.patCPT = d[0];
+            
+                this.targetOrder = item;
+                this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
+                    events.fire('selected_promis_filtered', ob);
+                    this.filteredPatPromis = ob;
+                
+                    this.addMinDay(ob, d[1]);
+                   })
+                );
+               
+            });
+        });
+
+
         events.on('filter_cohort_agg', (evt, item)=> {
             this.getQuant_test(item[0], item[1]);
         });
@@ -110,6 +127,7 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
+            console.log(item);
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
                 console.log(d[0]);
@@ -133,6 +151,10 @@ export class DataManager {
              //need to go back and clean this up
  
          });
+
+         events.on('revert_to_promis', () =>{
+            this.addMinDay(this.filteredPatPromis, null);
+        });
 
         events.on('selected_line_array', (evt, item)=> {
             this.filterObjectByArray(item, this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
@@ -183,20 +205,28 @@ export class DataManager {
     }
 
     private addMinDay(patients, eventArray) {
+        let cohort = patients
+        if(eventArray == null){
 
-       // let cohort = this.cohortProInfo;
-       let cohort = patients;
-   
-        for(var i= 0;  i< cohort.length; i++) {
-            var keyA = cohort[i].key;
-            for(var j = 0; j< eventArray.length; j++) {
-              var keyB = eventArray[j].key;
-              if(keyA == keyB) {
-                cohort[i].CPTtime = eventArray[j].time;
+            cohort = cohort.map(c=> c.CPTtime = c.min_date);
+
+        }else{
+
+            console.log(eventArray);
+            console.log(patients);
+
+            for(var i= 0;  i< cohort.length; i++) {
+                var keyA = cohort[i].key;
+                for(var j = 0; j< eventArray.length; j++) {
+                  var keyB = eventArray[j].key;
+                  if(keyA == keyB) {
+                    cohort[i].CPTtime = eventArray[j].time;
+                  }
+                }
               }
-            }
-          }
-
+    
+        }
+       
           events.fire('min_day_added', cohort);
 }
 
@@ -697,8 +727,6 @@ private addEventDay(patients, eventArray) {
         }else{ console.log('obType not found'); }
     }
 
-    public async 
-
     public async loadData(id: string) { //loads the tables from Phovea
        let table = <ITable> await getById(id);
        events.fire(id, table);//sends the id string to the getDataObjects
@@ -757,6 +785,26 @@ private addEventDay(patients, eventArray) {
                 visit.diff = Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24));
             });
         });
+    }
+
+    private updatePromisDiff(code, pat){
+        console.log(pat)
+        code = code.map(c => +c);
+        let filArray = []
+        pat.forEach(pat => {
+            let fil = pat.filter(visit=> {
+                return visit.value[0].some(r => code.includes(r));
+               });
+      
+            filArray.push(fil);
+            pat.eventDay = fil[0].time;
+
+            pat.forEach(visit => {
+                visit.diff = Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24));
+            });
+        });
+        console.log(pat);
+        return pat;
     }
 
   }
