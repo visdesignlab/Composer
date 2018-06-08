@@ -257,6 +257,8 @@ export class similarityScoreDiagram {
         });
 
         events.on('update_start_button_clicked', ()=>{
+            console.log('is this doing anything?');
+            console.log(this.targetOrder);
             this.zeroEvent = this.targetOrder;
             this.clearDiagram();
             this.clearAggDiagram();
