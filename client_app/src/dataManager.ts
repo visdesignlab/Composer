@@ -112,10 +112,12 @@ export class DataManager {
         events.on('filter_by_cpt', (evt, item)=> {
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
+                console.log(d[0]);
                 this.targetOrder = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
+                    console.log(d[1])
                     this.addMinDay(ob, d[1]);
                    })
                 );
@@ -747,7 +749,7 @@ private addEventDay(patients, eventArray) {
             let fil = pat.filter(visit=> {
                 return visit.value[0].some(r => code.includes(r));
                });
-            console.log(fil);
+      
             filArray.push(fil);
             pat.eventDay = fil[0].time;
 

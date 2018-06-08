@@ -171,7 +171,7 @@ export class CohortManager {
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
-             events.fire('selected_event_filter_change', []);
+             events.fire('selected_event_filter_change', this.cohortfilterarray[this.cohortIndex]);
              events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
              events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
 
@@ -235,6 +235,7 @@ export class CohortManager {
           });
 
           events.on('update_start_button_clicked', (evt, item)=> {
+              console.log(this.selectedCPT);
               events.fire('update_cpt_days', this.selectedCPT);
           });
 

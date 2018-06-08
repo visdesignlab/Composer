@@ -270,7 +270,6 @@ private drawOrderSearchBar(order){
     checkNodes.forEach((n, i) => {
         if(n['checked']){
             checkedarray.push(n['value']);
-         
            // Maybe make the 2 arrays use this array?
            cptFilterArray.push(order[i]);
         }
@@ -287,6 +286,8 @@ private drawOrderSearchBar(order){
     });
 
     events.fire('filter_by_cpt', [fixed, cptFilterArray]);
+    console.log(cptFilterArray);
+    console.log(fixed);
     events.fire('add_cpt_to filterArray', cptFilterArray);
     select('.orderDiv').select('div').remove();
 

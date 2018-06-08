@@ -1,6 +1,7 @@
-.event_line {
+.event_line_view {
     display: inline-block;
-    height: 100px;
+    margin-top: 25px;
+    height: 60px;
     width: 100%;
 }
 
@@ -16,4 +17,23 @@
 
 .selected_circle {
     fill: red;
+}
+
+.event_label {
+    height: 20px;
+    width: 80px;
+}
+
+.event_label rect {
+    height: 20px;
+    width: 80px;
+    border: .5px solid #D5D8DC;
+    border-radius: 2px;
+    fill: #D5D8DC;
+}
+
+.event_label text {
+    font-size: 9px;
+    //alignment-baseline : middle;
+    //text-anchor: middle;
 }
