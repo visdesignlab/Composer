@@ -74,7 +74,11 @@ export class EventLine {
 
         function labelClick(d){
                 console.log(d[1][0]);
-                events.fire('event_clicked', d[1][0]);
+                if(d[0] == 'demographic'){
+                    events.fire('revert_to_promis');
+                    console.log('first promis score')}else{
+                    events.fire('event_clicked', d[1]);
+                }
         }
 
         console.log(filters);
