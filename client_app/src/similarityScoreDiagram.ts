@@ -252,20 +252,31 @@ export class similarityScoreDiagram {
         });
 
         events.on('event_clicked', (evt, item)=> {
-            this.targetOrder = item;
+            this.targetOrder = item[1];
             this.$node.select('#eventLabel').text(this.targetOrder);
         });
 
         events.on('update_start_button_clicked', ()=>{
-            console.log('is this doing anything?');
             console.log(this.targetOrder);
-            this.zeroEvent = this.targetOrder;
+
             this.clearDiagram();
             this.clearAggDiagram();
-            this.getDays(this.cohortProInfo);
-            this.eventDayBool = true;
-            this.getBaselines(null);
-            this.interpolate(this.cohortProInfo);
+            if(this.targetOrder == 'First Promis Score'){
+               this.zeroEvent = this.targetOrder;
+                this.getDays(null);
+                this.eventDayBool = false;
+                this.getBaselines(null);
+                if(this.scaleRelative){
+                    this.scaleRelative = false;
+                    this.interpolate(this.cohortProInfo);
+                      }
+            }else{
+                this.zeroEvent = this.targetOrder[1][0].key;
+                this.getDays(this.cohortProInfo);
+                this.eventDayBool = true;
+                this.getBaselines(null);
+                this.interpolate(this.cohortProInfo);
+            }
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
         });
@@ -294,6 +305,10 @@ export class similarityScoreDiagram {
                 this.interpolate(this.cohortProInfo);
                   }
                     });
+
+        events.on('revert_to_promis', () =>{
+            this.targetOrder = 'First Promis Score';
+        });
         
         events.on('selected_event_filter_change', (evt, item)=> {
             this.codeArray = item;
@@ -301,6 +316,7 @@ export class similarityScoreDiagram {
 
         events.on('min_day_added', (evt, item)=> {
             this.cohortProInfo = item;
+
         });
 
     }
