@@ -152,10 +152,6 @@ export class DataManager {
  
          });
 
-         events.on('revert_to_promis', () =>{
-            this.addMinDay(this.filteredPatPromis, null);
-        });
-
         events.on('selected_line_array', (evt, item)=> {
             this.filterObjectByArray(item, this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
@@ -206,14 +202,12 @@ export class DataManager {
 
     private addMinDay(patients, eventArray) {
         let cohort = patients
+       // console.log(eventArray);
         if(eventArray == null){
 
-            cohort = cohort.map(c=> c.CPTtime = c.min_date);
+           // cohort = cohort.map(c=> c.CPTtime = c.min_date);
 
         }else{
-
-            console.log(eventArray);
-            console.log(patients);
 
             for(var i= 0;  i< cohort.length; i++) {
                 var keyA = cohort[i].key;
@@ -224,7 +218,6 @@ export class DataManager {
                   }
                 }
               }
-    
         }
        
           events.fire('min_day_added', cohort);
