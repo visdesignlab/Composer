@@ -67,6 +67,16 @@ export class CohortManager {
             }
         });
 
+        events.on('branch_cohort', ()=> {
+          
+            let branch = [];
+            let b = Object.assign({}, this.cohortkeeperarray[this.cohortIndex]);
+            branch.push(b);
+            this.cohortkeeperarray[this.cohortIndex].branch = branch;
+            console.log(this.cohortkeeperarray[this.cohortIndex]);
+
+        });
+
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
           //  this.selectedCohort = this.allPatientPromis;
