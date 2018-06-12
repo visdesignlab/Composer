@@ -96,7 +96,8 @@ export class SideBar {
        });
 
       events.on('add_to_cohort_bar', (evt, item)=> {
-        this.drawCohortLabels(item[0], item[1]);
+      //  this.drawCohortLabels(item[0], item[1]);
+        this.drawCohortLabelTest(item[0], item[1]);
       });
 
       events.on('clear_cohorts', (evt, item)=> {
@@ -111,7 +112,8 @@ export class SideBar {
       });
 
       events.on('update_filters', (evt, item)=> {
-        this.drawCohortLabels(item[0], item[1]);
+       // this.drawCohortLabels(item[0], item[1]);
+        this.drawCohortLabelTest(item[0], item[1]);
       });
       }
 
@@ -238,12 +240,18 @@ export class SideBar {
 
     this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 35);
     let createCohortButton = form.insert('input').attr('type', 'button').attr('value', 'Create Cohort');
+    let branchCohortButton = form.insert('input').attr('type', 'button').attr('value', 'Branch Cohort');
     let deletecohortButton = form.insert('input').attr('type', 'button').attr('value', 'Clear Cohorts');
 
     createCohortButton.on('click', function(d){
       that.filterDemo('demo_add');
 
       });
+
+    branchCohortButton.on('click', function(d){
+      events.fire('branch_cohort');
+  
+        });
 
     deletecohortButton.on('click', () => {
       events.fire('clear_cohorts');
@@ -253,7 +261,7 @@ export class SideBar {
   }
 
   private async drawCohortLabels(filterKeeper, cohorts) {
-        
+    
     this.cohortKeeper.selectAll('div').remove();
     let counter = -1;
     let nodeArray = [];
@@ -355,6 +363,75 @@ export class SideBar {
 
 
 
+
+}
+
+private async drawCohortLabelTest(filterKeeper, cohorts) {
+  console.log(cohorts);
+  console.log(filterKeeper);
+
+  this.cohortKeeper.selectAll('div').remove();
+  let counter = -1;
+  let nodeArray = [];
+  let filters = filterKeeper;
+
+  let cohortBox = this.cohortKeeper.selectAll('.cohort').data(cohorts);
+
+  cohortBox.exit().remove();
+
+  let cohortBoxEnter = cohortBox.enter().append('div').attr('class', (d, i)=> {return i;}).classed('cohort', true);
+
+  cohortBox = cohortBoxEnter.merge(cohortBox);
+
+  let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text((d, i)=> {return 'Cohort  '+ (i+1);} );
+
+  cohortlabel.on('click', (d, i)=> {
+    this.selected = i;
+    events.fire('cohort_selected', [d, i]);
+
+});
+  /*
+  filters.forEach((cohort, i) => {
+
+      let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
+    //  let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
+      let eyeSvg = cohortBox.append('svg').classed('eye', true);
+      let eye = eyeSvg.append('circle').attr('cx', 10).attr('cy', 9).attr('r', 5);
+      eyeSvg.on('click', ()=> {
+        events.fire('add_cohort_plot', i);
+      });
+      let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
+
+      let cohortfilter;
+      let label = document.getElementsByClassName('cohort ' + i);
+    //  let cohortCount = statView.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
+      let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
+
+
+      counter = counter + 1;
+
+      cohortlabel.on('click', ()=> {
+          this.selected = i;
+          events.fire('cohort_selected', [cohort, i]);
+
+      });
+      
+  });*/
+  
+  if(this.selected == undefined){
+     
+      console.log(cohortBox.size());
+      let cohortLabels = cohortBox.nodes();
+      let number = cohortBox.size();
+      let picked = cohortLabels[number - 1];
+      picked.classList.add('selected');
+
+  }else{
+
+      let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+      let picked = cohortLabels[this.selected];
+      picked.classList.add('selected');
+  }
 
 }
 

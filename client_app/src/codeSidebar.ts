@@ -52,7 +52,6 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
-     
         select('.orderDiv').select('div').remove();
         select('.checkDiv').remove();
 
@@ -73,7 +72,6 @@ export class CodeSidebar {
             let startLabel = select('#start_date_label').style('color', 'black');
             this.startBool = '0 date determined by event';
             let startLabelBool = select('#pat_or_event').text(this.startBool);
-
         });
 
         events.on('start_date_patient', (evt, item)=> {
@@ -128,7 +126,6 @@ export class CodeSidebar {
         const form = div.append('form');
         let scoreFilterLabel = form.append('div').classed('divLabel', true).append('text').text('Score Filters');
 
-        
         let countPromis = div.append('div').classed('countPromis', true);
 
         let aggDiv = div.append('div').classed('aggDiv', true);
@@ -286,8 +283,8 @@ private drawOrderSearchBar(order){
     });
 
     events.fire('filter_by_cpt', [fixed, cptFilterArray]);
-    console.log(cptFilterArray);
-    console.log(fixed);
+   // console.log(cptFilterArray);
+   // console.log(fixed);
     events.fire('add_cpt_to filterArray', cptFilterArray);
     select('.orderDiv').select('div').remove();
 

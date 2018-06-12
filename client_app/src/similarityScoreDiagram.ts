@@ -646,6 +646,7 @@ export class similarityScoreDiagram {
                             .append('path')
                             .attr('d', function(d,i){return d ? 'M' + d.join('L') + 'Z' : null;})
                             .attr("class", function(d,i) { return "voronoi-" + i; })
+                            .style("fill", "none")
                             .style('pointer-events', 'all')
                             .on('mouseover', mouseover)
                             .on('mouseout', mouseout)
