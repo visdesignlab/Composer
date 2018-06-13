@@ -16,8 +16,32 @@
     border-radius: 2px;
 }
 
+.branch {
+    height: 20px;
+    width: 150px;
+    padding-left: 20px;
+    position: relative;
+    display: inline-block;
+}
+
+.branch svg {
+    height: 20px;
+    width: 50px;
+    //padding-left: 2px;
+}
+
 .cohort {
     min-height: 30px;
+    max-height: 100px;
+}
+
+.cohort-label {
+    height: 20px;
+    width: 100%;
+    display: inline-block;
+    margin: auto;
+    padding-left: 2px;
+    padding-top: 2px;
 }
 
 .sideBar ul {

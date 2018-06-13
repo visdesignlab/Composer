@@ -11,6 +11,7 @@ import * as events from 'phovea_core/src/event';
 //import {Constants} from './constants';
 import * as parallel from './parallel';
 import {scaleLinear,scaleTime,scaleOrdinal, scaleBand, scaleLog} from 'd3-scale';
+import {area, line, curveMonotoneX, curveMonotoneY, curveLinear, curveBasis} from 'd3-shape';
 //importing other modules from app
 import * as demoGraph from './demoGraphs';
 import {axisBottom} from 'd3-axis';
@@ -361,14 +362,9 @@ export class SideBar {
         picked.classList.add('selected');
     }
 
-
-
-
 }
 
 private async drawCohortLabelTest(filterKeeper, cohorts) {
-  console.log(cohorts);
-  console.log(filterKeeper);
 
   this.cohortKeeper.selectAll('div').remove();
   let counter = -1;
@@ -388,39 +384,35 @@ private async drawCohortLabelTest(filterKeeper, cohorts) {
   cohortlabel.on('click', (d, i)=> {
     this.selected = i;
     events.fire('cohort_selected', [d, i]);
-
 });
-  /*
-  filters.forEach((cohort, i) => {
 
-      let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
-    //  let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
-      let eyeSvg = cohortBox.append('svg').classed('eye', true);
-      let eye = eyeSvg.append('circle').attr('cx', 10).attr('cy', 9).attr('r', 5);
-      eyeSvg.on('click', ()=> {
-        events.fire('add_cohort_plot', i);
-      });
-      let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
+const stem = line().curve(curveBasis)
+.x((d) => { return +d[0]; })
+.y((d) => { return +d[1]; });
 
-      let cohortfilter;
-      let label = document.getElementsByClassName('cohort ' + i);
-    //  let cohortCount = statView.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
-      let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
+cohortBox.nodes().forEach((cohort, i) => {
+ 
+  if(cohort.__data__.branch != undefined){
+   
+    let branch = select(cohort).selectAll('.branch').data(cohort.__data__.branch);
+    branch.exit().remove();
+    let branchEnter = branch.enter().append('div').classed('branch', true);
+    branch = branchEnter.merge(branch);
+    branch.classed(i, true);
+    let line = branch.append('svg').append('path').attr('d', stem([[5, 0], [20, 12], [48, 15]]))
+    .attr('stroke', 'black').attr('fill', 'none').attr('stroke-width', .6);
 
+    branch.append('text').text((d)=> 'C' + (i + 1) +' branch');
 
-      counter = counter + 1;
+    branch.on('click', (d, i)=> {
+      console.log(d);
 
-      cohortlabel.on('click', ()=> {
-          this.selected = i;
-          events.fire('cohort_selected', [cohort, i]);
-
-      });
-      
-  });*/
+  });
+  }
+});
   
   if(this.selected == undefined){
-     
-      console.log(cohortBox.size());
+
       let cohortLabels = cohortBox.nodes();
       let number = cohortBox.size();
       let picked = cohortLabels[number - 1];
@@ -510,12 +502,8 @@ private async drawCohortLabelTest(filterKeeper, cohorts) {
   private histogrammer(data, type, ticks){
 
     let totalPatients = data.length;
-
     let mapped = data.map((d: number)=> +d[type]);
-
     let maxValue = max(mapped);
-
-  
 
  // if (type == 'BMI') mapped = mapped.filter(d => d > 0);
     let x = this.xScale.domain([0, maxValue]).nice();
