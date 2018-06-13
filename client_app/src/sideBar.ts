@@ -228,7 +228,7 @@ export class SideBar {
 
           filterGroup.classed(parentValue, true);
         });
-        this.demoform.append('input').attr('type', 'button').attr('value', 'Refine Cohort Demo Filter').on('click', ()=> {
+        this.demoform.append('input').attr('type', 'button').attr('value', 'Refine by Demo').on('click', ()=> {
           that.filterDemo('demo_refine');
         });
   }
@@ -277,7 +277,6 @@ export class SideBar {
         let eyeSvg = cohortBox.append('svg').classed('eye', true);
         let eye = eyeSvg.append('circle').attr('cx', 10).attr('cy', 9).attr('r', 5);
         eyeSvg.on('click', ()=> {
-        
           events.fire('add_cohort_plot', i);
         });
 
@@ -400,7 +399,7 @@ cohortBox.nodes().forEach((cohort, i) => {
     branch = branchEnter.merge(branch);
     branch.classed(i, true);
     let line = branch.append('svg').append('path').attr('d', stem([[5, 0], [20, 12], [48, 15]]))
-    .attr('stroke', 'black').attr('fill', 'none').attr('stroke-width', .6);
+    .attr('stroke', '#212F3D').attr('fill', 'none').attr('stroke-width', .6);
 
     branch.append('text').text((d)=> 'C' + (i + 1) +' branch');
 
@@ -657,6 +656,7 @@ cohortBox.nodes().forEach((cohort, i) => {
 
     let rects = svg_rect_group.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 15)
     .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+    .attr('fill', '#212F3D')
     .attr('x', (d, i)=> (i * this.svgWidth/d.binCount) + 5);
 
     //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);

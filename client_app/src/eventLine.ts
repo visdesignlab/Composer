@@ -68,7 +68,7 @@ export class EventLine {
         function filText(d){
             if(d[0] == 'demographic'){return 'First Promis Score'}else{
                 let label = d[1][1];
-                return label[0].key;
+                return label[0].parent;
             }
         }
 

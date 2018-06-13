@@ -91,15 +91,17 @@ export class CodeSidebar {
                 if (prop == value){
                     let orderarray = [];
                     for(let p in this.dictionary[prop]){
-                        let order = {'key': p, 'value' : this.dictionary[prop][p]};
+                        let order = {'key': p, 'value' : this.dictionary[prop][p], 'parent': prop};
                         orderarray.push(order);
                     }
+                    console.log(orderarray);
                     this.drawOrderSearchBar(orderarray);
                 }else{
                     for(let p in this.dictionary[prop]){
                         
                         if(p == value){
-                            let order = {'key': p, 'value': this.dictionary[prop][p]};
+                            let order = {'key': p, 'value': this.dictionary[prop][p], 'parent': prop};
+                            console.log([order]);
                             this.drawOrderSearchBar([order]);
                         }
                     }
@@ -113,7 +115,7 @@ export class CodeSidebar {
                       // 
                         if(this.dictionary[prop][p].includes(+value)){
                             
-                            let order = {'key': p, 'value': value};
+                            let order = {'key': p, 'value': value, 'parent': prop};
                             this.drawOrderSearchBar([order]);
                         }
                     }
@@ -123,8 +125,9 @@ export class CodeSidebar {
 
     private drawScoreFilterBox (div) {
 
+        let scoreFilterLabel = div.append('div').classed('divLabel', true).append('text').text('Score Filters');
         const form = div.append('form');
-        let scoreFilterLabel = form.append('div').classed('divLabel', true).append('text').text('Score Filters');
+       
 
         let countPromis = div.append('div').classed('countPromis', true);
 
@@ -191,9 +194,11 @@ export class CodeSidebar {
 
 private drawOrderFilterBox (div) {
 
+    let orderFilterLabel = div.append('div').classed('divLabel', true).append('text').text('Order Filters');
+
     const form = div.append('form');
 
-    let orderFilterLabel = form.append('div').classed('divLabel', true).append('text').text('Order Filters');
+   
 
     form.append('input')
             .attr('type', 'text')
@@ -292,7 +297,7 @@ private drawOrderSearchBar(order){
 }
 
 private DrawfilterDescriptionBox(filter){
-
+    console.log(filter);
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
     select('.descriptionDiv').select('div').remove();
@@ -305,12 +310,14 @@ private DrawfilterDescriptionBox(filter){
        
        let stage = box.append('div').classed('filter_stage', true);
         let stageSvg = stage.append('svg').classed('filter_stage_svg', true);
-
+     
         let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2])).attr('transform', 'translate(12, 0)');
         if(fil[0] == 'demographic') {
-            rect.attr('fill', '#D5F5E3');}
+            rect.attr('fill', '#D5D8DC');}
         if(fil[0] == 'CPT') {
-            rect.classed(fil[1][1][0].key, true);}
+            rect.classed(fil[1][1][0].parent, true);
+        }
+           
 
         let text = stageSvg.append('g').attr('transform', 'translate(0, 12)');
         text.append('text').text((i + 1) + ': ' );
@@ -324,7 +331,7 @@ private DrawfilterDescriptionBox(filter){
             }
         if(fil[0] == 'CPT') {
        
-            text.append('text').text('CPT').attr('transform', 'translate(15, 0)');}
+            text.append('text').text(fil[1][1][0].parent).attr('transform', 'translate(15, 0)');}
 
         text.append('text').text(fil[2]).attr('transform', 'translate(170, 0)');
     });

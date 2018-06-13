@@ -24,6 +24,18 @@
     margin: 5px;
 }
 
+.orderDiv form {
+    padding: 3px;
+}
+
+.countPromis {
+    padding-left: 3px;
+}
+
+.aggDiv {
+    padding-left: 3px;
+}
+
 .filter_stage_svg {
     height: 20px;
     width: 200px;
@@ -31,7 +43,7 @@
 
 .divLabel text {
     font-size: 11px;
-    color: #212F3D;
+    color: white;
 }
 
 .divLabel {
@@ -39,16 +51,17 @@
     width: 100%;
     border: .5px solid #D5D8DC;
     border-radius: 2px;
-    background-color: #D5D8DC;
+    // background-color: #455A64;
+    background-color: #212F3D;
     padding-left: 4px;
 }
 
 .surgery {
-    fill: maroon;
+    fill: #E64A19;
 }
 
 .PT {
-    fill: rgb(81, 81, 226);
+    fill: #8BC34A;
 }
 
 .injection {
