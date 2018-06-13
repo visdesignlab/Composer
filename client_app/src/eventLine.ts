@@ -48,7 +48,7 @@ export class EventLine {
     private attachListener() {
         events.on('update_event_line', (evt, item)=> {
            console.log('update event filter line');
-           console.log(item);
+      
         });
 
         events.on('send_filter_to_codebar', (evt, item)=> {
@@ -73,7 +73,7 @@ export class EventLine {
         }
 
         function labelClick(d){
-                console.log(d[1][0]);
+       
                 if(d[0] == 'demographic'){
                     events.fire('revert_to_promis');
                     console.log('first promis score')}else{
@@ -81,7 +81,7 @@ export class EventLine {
                 }
         }
 
-        console.log(filters);
+
         let that = this;
         let svg = this.$node.select('.event_line_svg');
         

@@ -44,7 +44,7 @@ export class distributionDiagram {
             .classed('distributionDiv', true)
            // .classed('hidden', true);
 
-           this.days = this.$node.append('div').classed('distribution', true).attr('id', 'days').append('svg')
+        this.days = this.$node.append('div').classed('distribution', true).attr('id', 'days').append('svg')
            .attr('height', this.distributionDimension.height + 70)
            .attr('width', this.distributionDimension.width + 60);
 

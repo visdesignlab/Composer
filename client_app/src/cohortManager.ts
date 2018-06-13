@@ -70,10 +70,11 @@ export class CohortManager {
         events.on('branch_cohort', ()=> {
           
             let branch = [];
-            let b = Object.assign({}, this.cohortkeeperarray[this.cohortIndex]);
+            let b = Object.assign([], this.cohortkeeperarray[this.cohortIndex]);
             branch.push(b);
             this.cohortkeeperarray[this.cohortIndex].branch = branch;
             console.log(this.cohortkeeperarray[this.cohortIndex]);
+            events.fire('update_filters', [this.selectedFilter, this.cohortkeeperarray]);
 
         });
 
