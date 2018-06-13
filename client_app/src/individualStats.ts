@@ -36,8 +36,7 @@ export class individualStats {
 
         this.rectWin = this.$node.append('div').classed('patientCPTOrders', true);
         this.statWin = this.$node.append('div').classed('patientPromisOrders', true);
-       
-
+    
         this.rectBoxDimension = {'width' : 720, 'height': 200};
 
         this.timeScale = scaleLinear().range([0, 630]);
