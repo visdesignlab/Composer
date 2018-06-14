@@ -1,3 +1,18 @@
+.day_line {
+    height: 60px;
+    width: 700px;
+    display: inline-block;
+}
+
+.day_line_svg {
+    height: 50px;
+    width: 700px;
+}
+
+.day_line text {
+    font-size: 9px;
+}
+
 #eventLabel {
     padding-right: 10px;
 }
@@ -192,80 +207,4 @@
     stroke: #000;
     stroke-opacity: 0.5;
     stroke-width: 1.25px;
-}
-
-.patOrder .PROCEDURE {
-    fill: #8d8d8d;
-    stroke: #7b7b7b;
-}
-
-.patOrder .MEDICATION {
-    fill: #ddd;
-    stroke: #7b7b7b;
-}
-
-.selectedLine {
-    stroke: #800000;
-    stroke-dasharray: 5, 5;
-}
-
-.similarRect .PROCEDURE {
-    //fill: #087b03;
-    fill: #FF5733;
-    opacity: 0.5;
-}
-
-.similarRect .MEDICATION {
-    fill: #4a6ffb;
-    opacity: 0.5;
-}
-
-.PROCEDURE.selectedOrder,
-.MEDICATION.selectedOrder {
-    // fill: darkred;// !important;
-    opacity: .6;
-}
-
-.PROCEDURE.unselectedOrder,
-.MEDICATION.unselectedOrder {
-    opacity: 0.2;
-    fill: grey; // !important;
-}
-
-.patRect .PROCEDURE {
-    //fill: #087b03;
-    fill: #0da201;
-    opacity: 0.5;
-}
-
-.patRect .MEDICATION {
-    fill: #c37e45;
-    opacity: 0.5;
-}
-
-.patRect.PROCEDURE.COMPLETED {
-    fill: red;
-    opacity: 0.5;
-}
-
-.patRect.PROCEDURE.ORDERED {
-    fill: orange;
-    opacity: 0.5;
-}
-
-.MEDICATION.ORDERED,
-.MEDICATION.SENT {
-    fill: #4a6ffb;
-    opacity: 0.5;
-}
-
-.MEDICATION.COMPLETED {
-    fill: green;
-    opacity: 0.5;
-}
-
-.MEDICATION.DISCONTINUED,
-.MEDICATION.SUSPEND {
-    fill: purple;
-    opacity: 0.5;
 }

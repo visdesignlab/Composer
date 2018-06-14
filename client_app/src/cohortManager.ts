@@ -78,6 +78,10 @@ export class CohortManager {
 
         });
 
+        events.on('branch_selected', (evt, item)=> {
+            console.log(item);
+        })
+
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
           //  this.selectedCohort = this.allPatientPromis;

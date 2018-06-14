@@ -403,9 +403,8 @@ cohortBox.nodes().forEach((cohort, i) => {
 
     branch.append('text').text((d)=> 'C' + (i + 1) +' branch');
 
-    branch.on('click', (d, i)=> {
-      console.log(d);
-
+    branch.on('click', (d, j)=> {
+      events.fire('branch_selected', [i, j, d]);
   });
   }
 });
