@@ -37,14 +37,20 @@ export class individualStats {
         this.rectWin = this.$node.append('div').classed('patientCPTOrders', true);
         this.statWin = this.$node.append('div').classed('patientPromisOrders', true);
     
-        this.rectBoxDimension = {'width' : 720, 'height': 200};
+        this.rectBoxDimension = {'width' : 700, 'height': 200};
 
-        this.timeScale = scaleLinear().range([0, 630]);
-        this.timeScale.domain([-30, 40]).clamp(true);
+        this.timeScale = scaleLinear().range([25, 650]);
+        this.timeScale.domain([-30, 40]);//.clamp(true);
      
         this.rectSvg = this.rectWin.append('svg')
             .attr('width', this.rectBoxDimension.width)
             .attr('height', this.rectBoxDimension.height);
+
+            this.rectSvg.append('clipPath').attr('id', 'clip2')
+            .append('rect')
+            .attr('width', 600)
+            .attr('height', 400)
+          //  .attr('transform', 'translate(80, 0)');
 
         this.attachListener();
 
@@ -96,7 +102,7 @@ export class individualStats {
         patGroup.exit().remove();
         
         let patGroupEnter = patGroup.enter()
-        .append('g').classed('rect_group', true).attr('width', 720);
+        .append('g').classed('rect_group', true);
 
         patGroup = patGroupEnter.merge(patGroup);
 
@@ -114,6 +120,7 @@ export class individualStats {
         .attr('width', 600);
 
         let rectGroup = patGroup.select('.patInnerGroup')
+        .attr('clip-path','url(#clip2)')
         .selectAll('.visitDays')
         .data(d => d);
 

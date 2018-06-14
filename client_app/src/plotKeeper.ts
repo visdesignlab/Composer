@@ -18,6 +18,7 @@ import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as timelineKeeper from './timelinekeeper';
+import * as eventLine from './eventLine';
 
 export class PlotKeeper {
 
@@ -30,6 +31,8 @@ export class PlotKeeper {
     constructor(parent: Element) {
 
         this.$node = select(parent);
+        const eventLineView = this.$node.append('div').classed('event_line_view', true);
+        eventLine.create(eventLineView.node(), null);
         this.drawEventButtons();
         this.buildPlot(this.cohortData);
         const timeline = this.$node.append('div').classed('timeline_view', true);
@@ -77,8 +80,6 @@ export class PlotKeeper {
         .attr('type', 'button')
         .attr('value', 'Update Start Day to Event')
         .on('click', () => events.fire('update_start_button_clicked'));
-
-        this.$node.append('text').attr('id', 'eventLabel');
 
         this.$node.append('input')
             .attr('type', 'button')
