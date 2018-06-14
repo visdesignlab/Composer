@@ -49,7 +49,7 @@ export class individualStats {
             this.rectSvg.append('clipPath').attr('id', 'clip2')
             .append('rect')
             .attr('width', 600)
-            .attr('height', 400)
+            .attr('height', 1000)
           //  .attr('transform', 'translate(80, 0)');
 
         this.attachListener();
