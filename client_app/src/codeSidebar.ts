@@ -300,9 +300,10 @@ private DrawfilterDescriptionBox(filter){
     console.log(filter);
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
-    select('.descriptionDiv').select('div').remove();
-    const box = select('.descriptionDiv').append('div');
-    let label = box.append('div').classed('divLabel', true).append('text').text('Filter Layers');
+    select('.descriptionDiv').selectAll('div').remove();
+    let label = select('.descriptionDiv').append('div').classed('divLabel', true).append('text').text('Filter Layers');
+    const box = select('.descriptionDiv').append('div').classed('desc-box', true);
+   
   
     let cohortCount = box.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
    // let filter = cohort[1];
