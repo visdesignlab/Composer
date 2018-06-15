@@ -62,10 +62,19 @@ export class App {
     const side = sideBar.create(sideBarDiv.node());
     await side.init();
 
+    const header = document.querySelector('#caleydoHeader');
+    let cohortButtons = select(header)//.select('.navbar')
+    .append('div').classed('cohort-buttons', true);
+    let that = this;
+    let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').attr('value', 'Add Cohort');
+    let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').attr('value', 'Branch Cohort');
+    let clear = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').attr('value', 'Clear Cohorts');
+    create.on('click', function(d){ events.fire('create_button_down'); });
+    branch.on('click', function(d){ events.fire('branch_cohort'); });
+    clear.on('click', function(d){ events.fire('clear_cohorts'); });
+
     // main div - all div are within this div
     const main = this.$node.append('div').classed('main', true);
-    //const eventLineView = main.append('div').classed('event_line_view', true);
-   // const parallelView = main.append('div').classed('parallel_view', true);
     const populationView = main.append('div').classed('population_view', true);
     const plots = main.append('div').classed('plot_view', true);
     const statBar = this.$node.append('div').classed('stat_sidebar_view', true);

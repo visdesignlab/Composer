@@ -8,6 +8,15 @@
     z-index: 100000;
 }
 
+.btn {
+    margin: 1px;
+    padding: 3px;
+}
+
+.cohort-buttons {
+    display: inline;
+}
+
 .tooltip {
     position: absolute;
     text-align: center;
@@ -24,14 +33,14 @@
     padding-left: 1%;
     padding-right: 1%;
     width: 50%;
-    margin-top: 25px;
+    margin-top: 50px;
 }
 
 .sideBar {
     float: left;
     width: 15%;
     padding: 10px;
-    margin-top: 40px;
+    margin-top: 60px;
 }
 
 .stat_sidebar_view {

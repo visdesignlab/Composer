@@ -88,13 +88,7 @@ export class similarityScoreDiagram {
 
         let scoreGroup = this.svg.append('g').classed('scoreGroup', true);
         let voronoiGroup = scoreGroup.append('g').classed('voronoi', true);
-/*
-        scoreGroup.append('clipPath').attr('id', 'clip')
-        .append('rect')
-        .attr('width', 850)
-        .attr('height', this.height - 20)
-        .attr('transform', 'translate(150, 0)');
-*/
+
         let lineGroup = scoreGroup.append('g').classed('lines', true);
 
         // scales
@@ -653,16 +647,7 @@ export class similarityScoreDiagram {
                             .on('click', (d)=>  voronoiClicked(d.data.pat));
 
                     }
-                   /*
-                    promisScoreGroup.selectAll('.dots').data(similarData)
-                    .enter().append('g').classed('dots', true)
-                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`)
-                    .selectAll('circle').data(d=> d.fakeArray)
-                    .enter().append('circle')
-                    .attr('cx', d=> d.x)
-                    .attr('cy', d=> d.y)
-                    .attr('r', 5);
-*/
+
 }
                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
