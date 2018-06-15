@@ -13,14 +13,6 @@
     font-size: 9px;
 }
 
-.event_circle {
-    fill: grey;
-}
-
-.selected_circle {
-    fill: red;
-}
-
 .event_label {
     height: 20px;
     width: 80px;
@@ -29,11 +21,14 @@
 .event_label rect {
     height: 24px;
     width: 80px;
-    border: .5px solid #D5D8DC;
-    border-radius: 3px;
-    fill: #D5D8DC;
+    fill: #808B96;
 }
 
 .event_label text {
-    font-size: 9px;
+    font-size: 10px;
+    fill: white;
+}
+
+.selected-event rect {
+    fill: #E67E22;
 }

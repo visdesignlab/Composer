@@ -48,7 +48,6 @@ export class EventLine {
 
     private attachListener() {
         events.on('update_event_line', (evt, item)=> {
-           console.log('update event filter line');
       
         });
 
@@ -67,21 +66,24 @@ export class EventLine {
     private updateEvents(filters) {
 
         function filText(d){
-            if(d[0] == 'demographic'){return 'First Promis Score'}else{
+            if(d[0] == 'demographic'){return 'First Score'}else{
                 let label = d[1][1];
                 return label[0].parent;
             }
         }
 
         function labelClick(d){
-       
+            let rec = select(d);
+            console.log(select(d).node());
+            console.log(rec);
                 if(d[0] == 'demographic'){
                     events.fire('revert_to_promis');
-                    console.log('first promis score')}else{
+                    console.log('first promis score')
+                    }else{
+                    
                     events.fire('event_clicked', d[1]);
                 }
         }
-
 
         let that = this;
         let svg = this.$node.select('.event_line_svg');
@@ -95,9 +97,21 @@ export class EventLine {
         events = eventsEnter.merge(events);
         events.attr('transform', (d, i) => `translate(${(i * 82)}, 0)`);
        
-        let rect = events.append('rect');
-        let text = events.append('text').text(d=> filText(d)).attr('transform', 'translate(5,15)');
-        events.on('click', d=> labelClick(d));
+        let rect = events.append('rect').attr('rx', 3).attr('ry', 3);
+        let text = events.append('text').text(d=> filText(d)).attr('transform', 'translate(18,15)');
+        let eventNodes = events.nodes();
+
+        let last = eventNodes.length;
+        eventNodes[last - 1].classList.add('selected-event');
+
+        events.on('click', (d, i)=> {
+
+            events.classed('seleted-event', false);
+            let boop = events.nodes();
+            console.log(boop[i]);
+            
+            select(boop[i]).classed('selected-event', true);
+            labelClick(d)});
         }
 
         private drawEventButtons(){
