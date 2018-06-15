@@ -9,12 +9,18 @@
 }
 
 .btn {
-    margin: 1px;
-    padding: 3px;
+    // margin: 1px;
+    //  padding: 3px;
+}
+
+.btn-primary {
+    // background: #455A64;
 }
 
 .cohort-buttons {
     display: inline;
+    padding-left: 20px;
+    padding-top: 5px;
 }
 
 .tooltip {
@@ -38,9 +44,9 @@
 
 .sideBar {
     float: left;
-    width: 15%;
+    width: 210px;
     padding: 10px;
-    margin-top: 60px;
+    margin-top: 50px;
 }
 
 .stat_sidebar_view {

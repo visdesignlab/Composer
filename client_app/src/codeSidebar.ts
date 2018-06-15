@@ -52,7 +52,8 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
-        select('.orderDiv').select('div').remove();
+           console.log('when does this happen');
+        select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
 
        });
@@ -127,13 +128,41 @@ export class CodeSidebar {
 
         let scoreFilterLabel = div.append('div').classed('divLabel', true).append('text').text('Score Filters');
         const form = div.append('form');
-       
+    
+        let countPromis = form.append('div').classed('input-group', true).classed('countPromis', true);
+                        //filter patients by a minimum score count threshold
 
-        let countPromis = div.append('div').classed('countPromis', true);
+            countPromis.append('input').attr('type', 'text').classed('form-control', true)
+                        .attr('placeholder', 'Min Score Count')
+                        .attr('id', 'count_search')
+                        .attr('value');
+                
+            countPromis.append('div').classed('input-group-btn', true)
+            .append('input').attr('type', 'button').classed('btn', true).classed('btn-default', true)
+                        .attr('value', 'Filter').on('click', () =>{
+                            let val = (<HTMLInputElement>document.getElementById('count_search')).value;
+                            let count = +val;
+                            events.fire('filter_by_Promis_count', count);
+                    });
 
+                    form.append('input')
+                    .attr('type', 'button')
+                    .classed('btn', true).classed('btn-primary', true)
+                    .attr('value', 'Change Score Scale')
+                    .on('click', () =>events.fire('change_promis_scale'));
+        
+                form.append('input')
+                    .attr('type', 'button')
+                    .classed('btn', true).classed('btn-primary', true)
+                    .attr('value', 'Aggregate Scores')
+                    .on('click', () => {
+                        events.fire('aggregate_button_clicked');
+                    });
+        
         let aggDiv = div.append('div').classed('aggDiv', true);
-            aggDiv.append('div').append('input').attr('type', 'button').classed('btn', true)
-                .attr('value', 'Separate Aggregate').on('click', () =>{
+            aggDiv.append('div').append('input').attr('type', 'button')
+                .classed('btn', true).classed('btn-primary', true)
+                .attr('value', 'Separate by Quartiles').on('click', () =>{
                     select('.checkDiv').remove();
                     events.fire('separate_aggregate');
                       ///radio aggregation
@@ -177,18 +206,6 @@ export class CodeSidebar {
                     });
                     bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
                 });
-                //filter patients by a minimum score count threshold
-            countPromis.append('input').attr('type', 'text')
-            .attr('placeholder', 'Min Promis Score Count')
-            .attr('id', 'count_search')
-            .attr('value');
-    
-            countPromis.append('input').attr('type', 'button').classed('btn', true)
-            .attr('value', 'Filter by Score Count').on('click', () =>{
-                let val = (<HTMLInputElement>document.getElementById('count_search')).value;
-                let count = +val;
-                events.fire('filter_by_Promis_count', count);
-        });
 
 }
 
@@ -198,17 +215,19 @@ private drawOrderFilterBox (div) {
 
     const form = div.append('form');
 
-   
+    let ordersearch = form.append('div').classed('input-group', true);
 
-    form.append('input')
+    ordersearch.append('input').classed('form-control', true)
             .attr('type', 'text')
             .attr('placeholder', 'Search Order Name')
             .attr('id', 'order_search')
             .attr('value');
 
-            form.append('input')
-            .attr('type', 'button').classed('btn', true)
-            .attr('value', 'Search Codes')
+    ordersearch.append('div').classed('input-group-btn', true)
+            .append('input')
+            .attr('type', 'button').classed('btn', true).classed('btn-default', true)
+           // .append('i').classed('glyphicon glyphicon-search', true)
+            .attr('value', 'Search')
             .on('click', () => {
               const value = (<HTMLInputElement>document.getElementById('order_search')).value;
 
@@ -225,9 +244,9 @@ private drawOrderFilterBox (div) {
 }
 private drawOrderSearchBar(order){
 
-    select('.orderDiv').select('div').remove();
+    select('.orderDiv').select('.codes').remove();
 
-    const box = select('.orderDiv').append('div');
+    const box = select('.orderDiv').append('div').classed('codes', true);
     let props = [];
 
     let orderFilters = box.selectAll('.orderFilters').data(order);
@@ -261,7 +280,7 @@ private drawOrderSearchBar(order){
     ordercheck.on('click', (d)=>{ console.log(d);})
 
     box.append('input')
-    .attr('type', 'button').classed('btn', true)
+    .attr('type', 'button').classed('btn', true).classed('btn-default', true)
     .attr('value', 'Filter by Code')
     .on('click', () => {
 
@@ -291,7 +310,7 @@ private drawOrderSearchBar(order){
    // console.log(cptFilterArray);
    // console.log(fixed);
     events.fire('add_cpt_to filterArray', cptFilterArray);
-    select('.orderDiv').select('div').remove();
+    select('.orderDiv').select('.codes').remove();
 
 });
 }

@@ -232,7 +232,9 @@ export class SideBar {
 
           filterGroup.classed(parentValue, true);
         });
-        this.demoform.append('input').attr('type', 'button').classed('btn', true).attr('value', 'Refine by Demo').on('click', ()=> {
+        this.demoform.append('div').classed('center', true).append('input').attr('type', 'button')
+        .classed('btn', true).classed('btn-primary', true)
+        .attr('value', 'Refine by Demo').on('click', ()=> {
           that.filterDemo('demo_refine');
         });
   }

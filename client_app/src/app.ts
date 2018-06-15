@@ -63,12 +63,12 @@ export class App {
     await side.init();
 
     const header = document.querySelector('#caleydoHeader');
-    let cohortButtons = select(header)//.select('.navbar')
+    let cohortButtons = select(header).select('.navbar').select('.navbar-header')
     .append('div').classed('cohort-buttons', true);
     let that = this;
-    let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').attr('value', 'Add Cohort');
-    let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').attr('value', 'Branch Cohort');
-    let clear = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').attr('value', 'Clear Cohorts');
+    let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).attr('value', 'Add Cohort');
+    let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).attr('value', 'Branch Cohort');
+    let clear = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).attr('value', 'Clear Cohorts');
     create.on('click', function(d){ events.fire('create_button_down'); });
     branch.on('click', function(d){ events.fire('branch_cohort'); });
     clear.on('click', function(d){ events.fire('clear_cohorts'); });
