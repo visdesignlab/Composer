@@ -186,8 +186,17 @@ export class similarityScoreDiagram {
                 this.frequencyTest(this.cohortProInfo, 'all'); }
            });
 
-        events.on('change_promis_scale', ()=>{
-
+        events.on('change_promis_scale', (evt, item)=>{
+            console.log(item);
+            if(item == 'Relative Scale'){
+                this.scaleRelative = true;
+                this.interpolate(this.cohortProInfo);
+            }
+            if(item == 'Absolute Scale'){
+                this.scaleRelative = false;
+                this.changeScale(this.cohortProInfo);
+            }
+            /*
             if(!this.scaleRelative){
                 this.scaleRelative = true;
                 this.interpolate(this.cohortProInfo);
@@ -196,7 +205,7 @@ export class similarityScoreDiagram {
 
             else{this.scaleRelative = false;
                 this.changeScale(this.cohortProInfo);
-            };
+            };*/
 
         });
 
