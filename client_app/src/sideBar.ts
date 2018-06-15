@@ -90,7 +90,6 @@ export class SideBar {
        });
 
       events.on('population demo loaded', (evt, item)=> {
-
         this.populationDemo = item;
         this.distribute(item);
 
@@ -139,10 +138,13 @@ export class SideBar {
     let parents = [];
     let that = this;
 
-    let miniLabel = this.$node.select('#filterDiv').append('div').classed('miniLabel', true);
-    miniLabel.append('div').classed('divLabel', true).append('text').text('Demographic Filters');
+    let demopanel = this.$node.append('div').classed('panel', true).classed('panel-default', true);
+    let scorehead = demopanel.append('div').classed('panel-heading', true)
+    scorehead.append('text').text('Demographic Filters');
 
-    this.demoform = this.$node.select('#filterDiv').append('form');
+    let demobody = demopanel.append('div').classed('panel-body', true);
+
+    this.demoform = demobody.append('form');
 
     let labels = this.demoform.append('div').classed('labelWrapper', true).selectAll('.labelDiv')
         .data(this.header);
@@ -232,7 +234,7 @@ export class SideBar {
 
           filterGroup.classed(parentValue, true);
         });
-        this.demoform.append('div').classed('center', true).append('input').attr('type', 'button')
+        this.demoform.append('div').append('input').attr('type', 'button')
         .classed('btn', true).classed('btn-primary', true)
         .attr('value', 'Refine by Demo').on('click', ()=> {
           that.filterDemo('demo_refine');

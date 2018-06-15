@@ -3,6 +3,10 @@
     width: 230px;
 }
 
+.scale {
+    padding-top: 5px;
+}
+
 .aggDiv {
     display: block;
     width: 90px;
@@ -19,25 +23,11 @@
 {
     display: block;
     width: 220px;
-    border: .5px solid #212F3D;
-    border-radius: 2px;
     margin: 5px;
 }
 
 .scoreDiv {
     margin-top: 20px;
-}
-
-.orderDiv form {
-    padding: 3px;
-}
-
-.countPromis {
-    padding-left: 3px;
-}
-
-.aggDiv {
-    padding-left: 3px;
 }
 
 .desc-box {
@@ -57,10 +47,10 @@
 .divLabel {
     height: 20px;
     width: 100%;
-    border: .5px solid #D5D8DC;
-    border-radius: 2px;
+    //  border: .5px solid #D5D8DC;
+    //  border-radius: 2px;
     // background-color: #455A64;
-    background-color: #212F3D;
+    //  background-color: #212F3D;
     padding-left: 4px;
 }
 

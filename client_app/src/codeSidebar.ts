@@ -128,10 +128,17 @@ export class CodeSidebar {
     }
 
     private drawScoreFilterBox (div) {
+
         div.selectAll('div').remove();
         div.selectAll('form').remove();
-        let scoreFilterLabel = div.append('div').classed('divLabel', true).append('text').text('Score Filters');
-        const form = div.append('form');
+
+        let scorepanel = div.classed('panel', true).classed('panel-default', true);
+        let scorehead = scorepanel.append('div').classed('panel-heading', true)
+        scorehead.append('text').text('Score Filters');
+
+        let scorebody = scorepanel.append('div').classed('panel-body', true);
+
+        const form = scorebody.append('form');
     
         let countPromis = form.append('div').classed('input-group', true).classed('countPromis', true);
                         //filter patients by a minimum score count threshold
@@ -149,26 +156,27 @@ export class CodeSidebar {
                             events.fire('filter_by_Promis_count', count);
                     });
 
-                let scaleToggle = form.append('div').classed('btn-group', true);
-
+                let scalePanel = form.append('div').classed('scale', true);
+                    
+                let scaleToggle = scalePanel.append('div').classed('btn-group', true);
                     scaleToggle.append('button').classed('btn', true).classed('btn-primary', true)
                                 .append('text').text(this.scoreLabel);
-                    let togglebutton = scaleToggle.append('button')
+
+                let togglebutton = scaleToggle.append('button')
                                     .classed('btn', true).classed('btn-primary', true)
                                     .classed('dropdown-toggle', true)
                                     .attr('data-toggle', 'dropdown');
 
-                        togglebutton.append('span').classed('caret', true);
+                togglebutton.append('span').classed('caret', true);
 
                     let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
                     let abs = ul.append('li').append('href').append('text').text('Absolute');
                     let rel = ul.append('li').append('href').append('text').text('Relative');//.attr('value', 'Absolute');
-                   // ul.append('li').append('button').append('text').text('Relative');
+          
                     abs.on('click', () =>{
                         this.scoreLabel = 'Absolute Scale';
                         console.log(this.scoreLabel);
                         this.drawScoreFilterBox(this.scoreBox);
-
                         events.fire('change_promis_scale', this.scoreLabel)});
 
                     rel.on('click', () =>{
@@ -178,7 +186,7 @@ export class CodeSidebar {
     
                             events.fire('change_promis_scale', this.scoreLabel)});
 
-                form.append('input')
+                    form.append('input')
                     .attr('type', 'button')
                     .classed('btn', true).classed('btn-primary', true)
                     .attr('value', 'Aggregate Scores')
@@ -186,7 +194,7 @@ export class CodeSidebar {
                         events.fire('aggregate_button_clicked');
                     });
         
-        let aggDiv = div.append('div').classed('aggDiv', true);
+        let aggDiv = form.append('div').classed('aggDiv', true);
             aggDiv.append('div').append('input').attr('type', 'button')
                 .classed('btn', true).classed('btn-primary', true)
                 .attr('value', 'Separate by Quartiles').on('click', () =>{
@@ -237,16 +245,19 @@ export class CodeSidebar {
 }
 
 private drawOrderFilterBox (div) {
+    let orderpanel = div.classed('panel', true).classed('panel-default', true);
+    let scorehead = orderpanel.append('div').classed('panel-heading', true)
+    scorehead.append('text').text('Order Filters');
 
-    let orderFilterLabel = div.append('div').classed('divLabel', true).append('text').text('Order Filters');
+    let panelbody = orderpanel.append('div').classed('panel-body', true);
 
-    const form = div.append('form');
+    const form = panelbody.append('form');
 
     let ordersearch = form.append('div').classed('input-group', true);
 
     ordersearch.append('input').classed('form-control', true)
             .attr('type', 'text')
-            .attr('placeholder', 'Search Order Name')
+            .attr('placeholder', 'CPT Name/Code')
             .attr('id', 'order_search')
             .attr('value');
 
@@ -345,10 +356,9 @@ private DrawfilterDescriptionBox(filter){
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
     select('.descriptionDiv').selectAll('div').remove();
-    let label = select('.descriptionDiv').append('div').classed('divLabel', true).append('text').text('Filter Layers');
-    const box = select('.descriptionDiv').append('div').classed('desc-box', true);
+   // let label = select('.descriptionDiv').append('div').classed('divLabel', true).append('text').text('Filter Layers');
+    const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
    
-  
     let cohortCount = box.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
    // let filter = cohort[1];
     filter.forEach((fil, i) => {
