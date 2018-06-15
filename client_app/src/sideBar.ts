@@ -96,6 +96,10 @@ export class SideBar {
 
        });
 
+       events.on('create_button_down', ()=> {
+         this.filterDemo('demo_add');
+       });
+
       events.on('add_to_cohort_bar', (evt, item)=> {
       //  this.drawCohortLabels(item[0], item[1]);
         this.drawCohortLabelTest(item[0], item[1]);
@@ -228,7 +232,7 @@ export class SideBar {
 
           filterGroup.classed(parentValue, true);
         });
-        this.demoform.append('input').attr('type', 'button').attr('value', 'Refine by Demo').on('click', ()=> {
+        this.demoform.append('input').attr('type', 'button').classed('btn', true).attr('value', 'Refine by Demo').on('click', ()=> {
           that.filterDemo('demo_refine');
         });
   }
@@ -240,24 +244,6 @@ export class SideBar {
     const form = this.$node.select('#cohortDiv').append('form');
 
     this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 35);
-    let createCohortButton = form.insert('input').attr('type', 'button').attr('value', 'Create Cohort');
-    let branchCohortButton = form.insert('input').attr('type', 'button').attr('value', 'Branch Cohort');
-    let deletecohortButton = form.insert('input').attr('type', 'button').attr('value', 'Clear Cohorts');
-
-    createCohortButton.on('click', function(d){
-      that.filterDemo('demo_add');
-
-      });
-
-    branchCohortButton.on('click', function(d){
-      events.fire('branch_cohort');
-  
-        });
-
-    deletecohortButton.on('click', () => {
-      events.fire('clear_cohorts');
-  });
-
 
   }
 

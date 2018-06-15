@@ -132,7 +132,7 @@ export class CodeSidebar {
         let countPromis = div.append('div').classed('countPromis', true);
 
         let aggDiv = div.append('div').classed('aggDiv', true);
-            aggDiv.append('div').append('input').attr('type', 'submit')
+            aggDiv.append('div').append('input').attr('type', 'button').classed('btn', true)
                 .attr('value', 'Separate Aggregate').on('click', () =>{
                     select('.checkDiv').remove();
                     events.fire('separate_aggregate');
@@ -183,7 +183,7 @@ export class CodeSidebar {
             .attr('id', 'count_search')
             .attr('value');
     
-            countPromis.append('input').attr('type', 'button')
+            countPromis.append('input').attr('type', 'button').classed('btn', true)
             .attr('value', 'Filter by Score Count').on('click', () =>{
                 let val = (<HTMLInputElement>document.getElementById('count_search')).value;
                 let count = +val;
@@ -207,7 +207,7 @@ private drawOrderFilterBox (div) {
             .attr('value');
 
             form.append('input')
-            .attr('type', 'button')
+            .attr('type', 'button').classed('btn', true)
             .attr('value', 'Search Codes')
             .on('click', () => {
               const value = (<HTMLInputElement>document.getElementById('order_search')).value;
@@ -261,7 +261,7 @@ private drawOrderSearchBar(order){
     ordercheck.on('click', (d)=>{ console.log(d);})
 
     box.append('input')
-    .attr('type', 'button')
+    .attr('type', 'button').classed('btn', true)
     .attr('value', 'Filter by Code')
     .on('click', () => {
 

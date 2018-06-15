@@ -78,16 +78,19 @@ export class PlotKeeper {
 
         this.$node.append('input')
         .attr('type', 'button')
+        .classed('btn', true)
         .attr('value', 'Update Start Day to Event')
         .on('click', () => events.fire('update_start_button_clicked'));
 
         this.$node.append('input')
             .attr('type', 'button')
+            .classed('btn', true)
             .attr('value', 'Change Promis Score Scale')
             .on('click', () =>events.fire('change_promis_scale'));
 
         this.$node.append('input')
             .attr('type', 'button')
+            .classed('btn', true)
             .attr('value', 'Aggregate')
             .on('click', () => {
                 events.fire('aggregate_button_clicked');
