@@ -33,7 +33,7 @@ export class PlotKeeper {
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
-        this.drawEventButtons();
+      //  this.drawEventButtons();
         this.buildPlot(this.cohortData);
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());
@@ -74,30 +74,6 @@ export class PlotKeeper {
 
     }
 
-    private drawEventButtons(){
-        let div = this.$node.append('div').classed('event-buttons', true);
-
-        div.append('input')
-        .attr('type', 'button')
-        .classed('btn', true).classed('btn-default', true)
-        .attr('value', 'Update Start Day to Event')
-        .on('click', () => events.fire('update_start_button_clicked'));
-/*
-        div.append('input')
-            .attr('type', 'button')
-            .classed('btn', true).classed('btn-default', true)
-            .attr('value', 'Change Promis Score Scale')
-            .on('click', () =>events.fire('change_promis_scale'));
-
-        div.append('input')
-            .attr('type', 'button')
-            .classed('btn', true).classed('btn-default', true)
-            .attr('value', 'Aggregate Scores')
-            .on('click', () => {
-                events.fire('aggregate_button_clicked');
-            });
-*/
-    }
 
 }
 

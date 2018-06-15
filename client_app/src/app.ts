@@ -66,33 +66,25 @@ export class App {
     let cohortButtons = select(header).select('.navbar').select('.navbar-header')
     .append('div').classed('cohort-buttons', true);
     let that = this;
-    let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).attr('value', 'Add Cohort');
-    let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).attr('value', 'Branch Cohort');
-    let clear = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).attr('value', 'Clear Cohorts');
+    let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).classed('btn-sm', true).attr('value', 'Add Cohort');
+    let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Branch Cohort');
+    let clear = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Clear Cohorts');
     create.on('click', function(d){ events.fire('create_button_down'); });
     branch.on('click', function(d){ events.fire('branch_cohort'); });
     clear.on('click', function(d){ events.fire('clear_cohorts'); });
 
-    // main div - all div are within this div
+    // main div with child views
     const main = this.$node.append('div').classed('main', true);
-    const populationView = main.append('div').classed('population_view', true);
     const plots = main.append('div').classed('plot_view', true);
     const statBar = this.$node.append('div').classed('stat_sidebar_view', true);
   
     PlotKeeper.create(plots.node());
   
-    //const timeline = plots.node().append('div').classed('timeline_view', true);
-   // timelineKeeper.create(timeline.node());
-
-   // eventLine.create(eventLineView.node(), null);
     codeside.create(statBar.node());
-
     inStat.create(main.node());
-
     const cpt = main.append('Div').classed('cptDiv', true);
 
     this.setBusy(false);
-
     this.attachListener();
 
   }

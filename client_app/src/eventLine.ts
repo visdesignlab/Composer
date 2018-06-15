@@ -42,6 +42,7 @@ export class EventLine {
 
     this.attachListener();
     this.drawLine();
+    this.drawEventButtons();
 
     }
 
@@ -59,7 +60,7 @@ export class EventLine {
     private drawLine(){
         let eventLine = this.$node;
         let eventLineSvg = eventLine.append('svg').classed('event_line_svg', true)
-        .attr('height', 50).attr('width', 710);
+        .attr('height', 25).attr('width', 700);
 
     }
 
@@ -92,11 +93,21 @@ export class EventLine {
         let eventsEnter = events.enter().append('g').classed('event_label', true);
 
         events = eventsEnter.merge(events);
-       
         events.attr('transform', (d, i) => `translate(${(i * 82)}, 0)`);
+       
         let rect = events.append('rect');
         let text = events.append('text').text(d=> filText(d)).attr('transform', 'translate(5,15)');
         events.on('click', d=> labelClick(d));
+        }
+
+        private drawEventButtons(){
+            let div = this.$node.append('div').classed('event-buttons', true);
+    
+            div.append('input')
+            .attr('type', 'button').attr('id', 'event-start')
+            .classed('btn', true).classed('btn-default', true).classed('btn-sm', true)//.classed('disabled', true)
+            .attr('value', 'Update Start Day to Event')
+            .on('click', () => events.fire('update_start_button_clicked'));
         }
 
 }
