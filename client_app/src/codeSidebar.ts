@@ -25,14 +25,17 @@ export class CodeSidebar {
     private dictionary;
     private selectedCohortFilters;
     private filterArray;
+    private scoreLabel;
+    private scoreBox;
 
     constructor(parent: Element) {
 
         this.dataset = 'selected';
+        this.scoreLabel = 'Absolute Scale';
 
         this.$node = select(parent).append('div').classed('sidebarDiv', true);
 
-        let scoreFilter = this.$node.append('div').classed('scoreDiv', true);
+        this.scoreBox = this.$node.append('div').classed('scoreDiv', true);
         let orderFilter = this.$node.append('div').classed('orderDiv', true);
         let filterDescription = this.$node.append('div').classed('descriptionDiv', true);
 
@@ -40,7 +43,7 @@ export class CodeSidebar {
 
         this.dictionary = new dict.CPTDictionary().codeDict;
 
-        this.drawScoreFilterBox(scoreFilter);
+        this.drawScoreFilterBox(this.scoreBox);
         this.drawOrderFilterBox(orderFilter);
         this.attachListener();
 
@@ -125,19 +128,20 @@ export class CodeSidebar {
     }
 
     private drawScoreFilterBox (div) {
-
+        div.selectAll('div').remove();
+        div.selectAll('form').remove();
         let scoreFilterLabel = div.append('div').classed('divLabel', true).append('text').text('Score Filters');
         const form = div.append('form');
     
         let countPromis = form.append('div').classed('input-group', true).classed('countPromis', true);
                         //filter patients by a minimum score count threshold
 
-            countPromis.append('input').attr('type', 'text').classed('form-control', true)
+        countPromis.append('input').attr('type', 'text').classed('form-control', true)
                         .attr('placeholder', 'Min Score Count')
                         .attr('id', 'count_search')
                         .attr('value');
                 
-            countPromis.append('div').classed('input-group-btn', true)
+        countPromis.append('div').classed('input-group-btn', true)
             .append('input').attr('type', 'button').classed('btn', true).classed('btn-default', true)
                         .attr('value', 'Filter').on('click', () =>{
                             let val = (<HTMLInputElement>document.getElementById('count_search')).value;
@@ -145,12 +149,35 @@ export class CodeSidebar {
                             events.fire('filter_by_Promis_count', count);
                     });
 
-                    form.append('input')
-                    .attr('type', 'button')
-                    .classed('btn', true).classed('btn-primary', true)
-                    .attr('value', 'Change Score Scale')
-                    .on('click', () =>events.fire('change_promis_scale'));
-        
+                let scaleToggle = form.append('div').classed('btn-group', true);
+
+                    scaleToggle.append('button').classed('btn', true).classed('btn-primary', true)
+                                .append('text').text(this.scoreLabel);
+                    let togglebutton = scaleToggle.append('button')
+                                    .classed('btn', true).classed('btn-primary', true)
+                                    .classed('dropdown-toggle', true)
+                                    .attr('data-toggle', 'dropdown');
+
+                        togglebutton.append('span').classed('caret', true);
+
+                    let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+                    let abs = ul.append('li').append('href').append('text').text('Absolute');
+                    let rel = ul.append('li').append('href').append('text').text('Relative');//.attr('value', 'Absolute');
+                   // ul.append('li').append('button').append('text').text('Relative');
+                    abs.on('click', () =>{
+                        this.scoreLabel = 'Absolute Scale';
+                        console.log(this.scoreLabel);
+                        this.drawScoreFilterBox(this.scoreBox);
+
+                        events.fire('change_promis_scale', this.scoreLabel)});
+
+                    rel.on('click', () =>{
+                            this.scoreLabel = 'Relative Scale';
+                            console.log(this.scoreLabel);
+                            this.drawScoreFilterBox(this.scoreBox);
+    
+                            events.fire('change_promis_scale', this.scoreLabel)});
+
                 form.append('input')
                     .attr('type', 'button')
                     .classed('btn', true).classed('btn-primary', true)
@@ -307,8 +334,6 @@ private drawOrderSearchBar(order){
     });
 
     events.fire('filter_by_cpt', [fixed, cptFilterArray]);
-   // console.log(cptFilterArray);
-   // console.log(fixed);
     events.fire('add_cpt_to filterArray', cptFilterArray);
     select('.orderDiv').select('.codes').remove();
 
@@ -316,7 +341,7 @@ private drawOrderSearchBar(order){
 }
 
 private DrawfilterDescriptionBox(filter){
-    console.log(filter);
+
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
     select('.descriptionDiv').selectAll('div').remove();
