@@ -127,7 +127,7 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-            console.log(item);
+          //  console.log(item);
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
                 console.log(d[0]);

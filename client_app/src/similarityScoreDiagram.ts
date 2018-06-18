@@ -325,7 +325,7 @@ export class similarityScoreDiagram {
     }
 
     private getDays(date) {
-
+        console.log(this.cohortProInfo);
       if(this.cohortProInfo != null)  {
       
  // ----- add diff days to the data

@@ -64,7 +64,7 @@ export class EventLine {
     }
 
     private updateEvents(filters) {
-
+        console.log(filters);
         function filText(d){
             if(d[0] == 'demographic'){return 'First Score'}else{
                 let label = d[1][1];
