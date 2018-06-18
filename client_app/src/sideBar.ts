@@ -20,6 +20,7 @@ import { all } from 'phovea_core/src/range';
 import {brushX} from 'd3-brush';
 import * as cohortStat from './cohortStat';
 import {transition} from 'd3-transition';
+import { stringify } from 'querystring';
 
 export class SideBar {
 
@@ -42,6 +43,7 @@ export class SideBar {
   private demoform;
   private cohortKeeper;
   private selected;
+  private branchSelected;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -67,12 +69,24 @@ export class SideBar {
     this.yScale = scaleLinear().range([0, 30]);
     this.svgWidth = 170;
     this.svgHeight = 40;
+    this.branchSelected = null;
     
   
     this.attachListener();
   }
 
   private attachListener () {
+
+    events.on('branch_selected', (evt, item)=> {
+      console.log(item);
+      let cohortIndex = item[0];
+      console.log('.' + cohortIndex);
+      this.$node.selectAll('.selected').classed('.selected', false);
+      let b = this.cohortKeeper.selectAll('.branch').select('.' + cohortIndex);//.nodes();
+     // b.getElementsByClassName(cohortIndex);
+
+      console.log(b);
+    });
     
       events.on('filter_counted', (evt, item) => {//this get the count from the group
 
@@ -246,7 +260,6 @@ export class SideBar {
     let that = this;
 
     const form = this.$node.select('#cohortDiv').append('form');
-
     this.cohortKeeper = form.append('div').attr('id', 'cohortKeeper').attr('height', 35);
 
   }
@@ -329,25 +342,27 @@ export class SideBar {
         });
 
         counter = counter + 1;
-
+       
         cohortlabel.on('click', ()=> {
             this.selected = i;
             events.fire('cohort_selected', [cohort, i]);
-
+            console.log(cohort);
         });
-        
+
     });
-    
+  
     if(this.selected == undefined){
 
         let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
         let picked = cohortLabels[counter];
+        
         picked.classList.add('selected');
 
     }else{
 
         let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
         let picked = cohortLabels[this.selected];
+       
         picked.classList.add('selected');
     }
 
@@ -368,10 +383,15 @@ private async drawCohortLabelTest(filterKeeper, cohorts) {
 
   cohortBox = cohortBoxEnter.merge(cohortBox);
 
-  let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text((d, i)=> {return 'Cohort  '+ (i+1);} );
+  let cohortlabel = cohortBox.append('div').classed('cohort-label', true);
+  let text = cohortlabel.append('text').text((d, i)=> {return 'Cohort  '+ (i+1);} );
 
   cohortlabel.on('click', (d, i)=> {
     this.selected = i;
+    this.$node.selectAll('.selected').classed('selected', false);
+    let label = cohortlabel.nodes();
+   // label[i].classList.add('selected');
+    console.log(label[i]);
     events.fire('cohort_selected', [d, i]);
 });
 
@@ -395,21 +415,26 @@ cohortBox.nodes().forEach((cohort, i) => {
 
     branch.on('click', (d, j)=> {
       events.fire('branch_selected', [i, j, d]);
+      console.log(branch.node());
+      this.$node.selectAll('.selected').classed('selected', false);
+      branch.classed('selected', true);
   });
   }
 });
   
   if(this.selected == undefined){
 
-      let cohortLabels = cohortBox.nodes();
+      let cohortLabels = cohortBox.selectAll('.cohort-label').nodes();
       let number = cohortBox.size();
       let picked = cohortLabels[number - 1];
+      
       picked.classList.add('selected');
 
   }else{
 
-      let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+      let cohortLabels = this.cohortKeeper.selectAll('.cohort').selectAll('.cohort-label').nodes();
       let picked = cohortLabels[this.selected];
+    
       picked.classList.add('selected');
   }
 
@@ -433,7 +458,6 @@ cohortBox.nodes().forEach((cohort, i) => {
                    };
    
          let children = select(this).selectAll('li').selectAll('input');
-   
    
          children.nodes().forEach(d => {
                 if(select(d).property('checked')){
