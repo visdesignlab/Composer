@@ -80,12 +80,14 @@ export class SideBar {
     events.on('branch_selected', (evt, item)=> {
       console.log(item);
       let cohortIndex = item[0];
-      console.log('.' + cohortIndex);
-      this.$node.selectAll('.selected').classed('.selected', false);
-      let b = this.cohortKeeper.selectAll('.branch').select('.' + cohortIndex);//.nodes();
-     // b.getElementsByClassName(cohortIndex);
+   
+      this.$node.selectAll('.selected').classed('selected', false);
+      let b = document.getElementsByClassName(cohortIndex);
+      let branch = b[1];
+     // branch.classed('selected', true);
+     branch.classList.add('selected');
 
-      console.log(b);
+      console.log(branch);
     });
     
       events.on('filter_counted', (evt, item) => {//this get the count from the group
