@@ -24,6 +24,10 @@
     display: inline-block;
 }
 
+.branch.selected {
+    color: white;
+}
+
 .branch svg {
     height: 20px;
     width: 50px;
