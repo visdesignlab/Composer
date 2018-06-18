@@ -358,12 +358,15 @@ private DrawfilterDescriptionBox(filter){
     select('.descriptionDiv').selectAll('div').remove();
    // let label = select('.descriptionDiv').append('div').classed('divLabel', true).append('text').text('Filter Layers');
     const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
-   
-    let cohortCount = box.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
+    box.append('div').classed('panel-heading', true).append('text').text('Filter Layers');
+
+    let body = box.append('div').classed('panel-body', true);
+
+    let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
    // let filter = cohort[1];
     filter.forEach((fil, i) => {
        
-       let stage = box.append('div').classed('filter_stage', true);
+       let stage = body.append('div').classed('filter_stage', true);
         let stageSvg = stage.append('svg').classed('filter_stage_svg', true);
      
         let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2])).attr('transform', 'translate(12, 0)');
@@ -373,7 +376,6 @@ private DrawfilterDescriptionBox(filter){
             rect.classed(fil[1][1][0].parent, true);
         }
            
-
         let text = stageSvg.append('g').attr('transform', 'translate(0, 12)');
         text.append('text').text((i + 1) + ': ' );
 

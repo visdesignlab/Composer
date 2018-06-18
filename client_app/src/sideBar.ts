@@ -236,7 +236,7 @@ export class SideBar {
         });
         this.demoform.append('div').append('input').attr('type', 'button')
         .classed('btn', true).classed('btn-primary', true)
-        .attr('value', 'Refine by Demo').on('click', ()=> {
+        .attr('value', 'Filter by Demographic').on('click', ()=> {
           that.filterDemo('demo_refine');
         });
   }

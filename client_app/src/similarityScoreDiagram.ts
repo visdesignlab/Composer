@@ -541,7 +541,7 @@ export class similarityScoreDiagram {
                 zeroLine.append('line')
                         .attr('x1', 0).attr('x2', 670)
                         .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
-                        .attr('stroke', 'red');
+                        .attr('stroke', '#E67E22');
             }
 
             let lineCount = cohort.length;
@@ -663,7 +663,7 @@ export class similarityScoreDiagram {
 
                zeroLine.append('line')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
-                    .attr('y1', 0).attr('y2', 350).attr('stroke-width', .5).attr('stroke', 'red');
+                    .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
 
                 function mouseover(d) {
@@ -1062,7 +1062,7 @@ export class similarityScoreDiagram {
 
             zeroLine.append('line')//.attr('class', 'myLine')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
-                    .attr('y1', 0).attr('y2', 350).attr('stroke-width', .5).attr('stroke', 'red');
+                    .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
             zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
     }
 
