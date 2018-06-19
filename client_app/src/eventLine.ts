@@ -29,7 +29,7 @@ export class EventLine {
     private eventScale;
     private circleScale;
     private filter;
-
+    private startCodes;
 
     constructor(parent: Element, cohort) {
 
@@ -43,17 +43,25 @@ export class EventLine {
     this.attachListener();
     this.drawLine();
     this.drawEventButtons();
+    const that = this;
+    this.startCodes = null;
 
     }
 
     private attachListener() {
-        events.on('update_event_line', (evt, item)=> {
-      
-        });
 
-        events.on('send_filter_to_codebar', (evt, item)=> {
+    events.on('send_filter_to_codebar', (evt, item)=> {
             this.updateEvents(item);
-        });
+            let eventIndex = item.length;
+            let event = item[eventIndex -1];
+         
+           if(event[1].length != 0){
+            this.startCodes = event[1];
+           }else{
+               this.startCodes = null;
+           }
+          
+    });
     }
 
     private drawLine(){
@@ -64,7 +72,7 @@ export class EventLine {
     }
 
     private updateEvents(filters) {
-        console.log(filters);
+       
         function filText(d){
             if(d[0] == 'demographic'){return 'First Score'}else{
                 let label = d[1][1];
@@ -74,14 +82,14 @@ export class EventLine {
 
         function labelClick(d){
             let rec = select(d);
-            console.log(select(d).node());
-            console.log(rec);
                 if(d[0] == 'demographic'){
-                    events.fire('revert_to_promis');
-                    console.log('first promis score')
+                  //  events.fire('revert_to_promis');
+                    that.startCodes = null;
+                    console.log(that.startCodes);
                     }else{
-                    
-                    events.fire('event_clicked', d[1]);
+                    that.startCodes = d[1];
+                    console.log(that.startCodes);
+                   // events.fire('event_selected', d[1]);
                 }
         }
 
@@ -106,10 +114,10 @@ export class EventLine {
 
         events.on('click', (d, i)=> {
 
-            events.classed('seleted-event', false);
+            selectAll('.event_label').classed('selected-event', false);
+
             let boop = events.nodes();
-            console.log(boop[i]);
-            
+          
             select(boop[i]).classed('selected-event', true);
             labelClick(d)});
         }
@@ -121,7 +129,15 @@ export class EventLine {
             .attr('type', 'button').attr('id', 'event-start')
             .classed('btn', true).classed('btn-default', true).classed('btn-sm', true)//.classed('disabled', true)
             .attr('value', 'Update Start Day to Event')
-            .on('click', () => events.fire('update_start_button_clicked'));
+            .on('click', () => {
+                if(this.startCodes == null){
+                   // events.fire('revert_to_promis');
+                   events.fire('event_selected', this.startCodes);
+                }else{
+                    events.fire('event_selected', this.startCodes);
+                }
+               
+            });
         }
 
 }

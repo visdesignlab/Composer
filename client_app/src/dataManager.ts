@@ -93,21 +93,25 @@ export class DataManager {
           
         });
 
-        events.on('event_clicked', (evt, item)=> {
-            console.log('eventsclicked');
-            this.searchByEvent(this.patCPT, item[0]).then((d)=> {
+        events.on('event_selected', (evt, item)=> {
+           if(item == null){
+            events.fire('update_start_button_clicked', [null, item]);
+           }else{
+                this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
-            
+                console.log(item);
                 this.targetOrder = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
                 
-                    this.addMinDay(ob, d[1]);
+                    this.addMinDay(ob, d[1]).then(d=> {
+                        events.fire('min_day_added', d);
+                        events.fire('update_start_button_clicked', [d, item]);
+                    });
                    })
                 );
-               
-            });
+            });}
         });
 
 
@@ -143,7 +147,6 @@ export class DataManager {
             this.getCohortIdArrayAfterMap(item[1], 'demo')
             .then(id=>  this.filterObjectByArray(id, this.totalDemoObjects, 'demo')
             .then(ob => this.demoFilter(item[0], ob, 'refine')));
-             //need to go back and clean this up
  
          });
 
@@ -190,7 +193,7 @@ export class DataManager {
         });
 
         events.on('update_cpt_days', (evt, item)=>{
-            this.updateDiff(this.targetOrder[0], item);
+            this.updateDiff(this.targetOrder, item);
         });
 
     }
@@ -733,6 +736,7 @@ private addEventDay(patients, eventArray) {
         let withQuery = [];
         let queryDate = [];
         let eventArray = [];
+        console.log(value);
 
        cohort.forEach((element) => {
         let events = [];
@@ -756,8 +760,10 @@ private addEventDay(patients, eventArray) {
     }
 
     private updateDiff(code, patCPT){
-      
-        code = code.map(c => +c);
+        console.log(code);
+ 
+
+        code = code[0].map(c => +c);
         let filArray = []
         patCPT.forEach(pat => {
             let fil = pat.filter(visit=> {
@@ -774,7 +780,7 @@ private addEventDay(patients, eventArray) {
     }
 
     private updatePromisDiff(code, pat){
-        console.log(pat)
+       
         code = code.map(c => +c);
         let filArray = []
         pat.forEach(pat => {
@@ -789,7 +795,7 @@ private addEventDay(patients, eventArray) {
                 visit.diff = Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24));
             });
         });
-        console.log(pat);
+        
         return pat;
     }
 
