@@ -80,23 +80,21 @@ export class CohortManager {
             this.cptObjectKeeper[this.cohortIndex].branch = bcpt;
             this.cohortfilterarray[this.cohortIndex].branch = bfilter;
             let newSpot = branch.length - 1;
-
-            console.log(this.cohortfilterarray);
          
             events.fire('update_filters', [this.selectedFilter, this.cohortkeeperarray]);
             events.fire('branch_selected', [this.cohortIndex, newSpot, branch[newSpot]]);
         });
 
         events.on('branch_selected', (evt, item)=> {
-            console.log(item);
+   
             this.branchSelected = item;
             this.selectedCohort = item[2];
-            console.log(this.selectedCohort);
+  
             this.cohortIndex = item[0];
             let branchIndex = item[1];
             this.selectedCPT = this.cptObjectKeeper[this.cohortIndex].branch[branchIndex];
             this.selectedFilter = this.cohortfilterarray[this.cohortIndex].branch[branchIndex];
-          //  console.log(this.selectedFilter);
+      
             events.fire('selected_cohort_change', this.selectedCohort);
             events.fire('selected_cpt_change', this.selectedCPT);
             events.fire('selected_stat_change', [this.selectedCohort, this.cohortIndex]);
@@ -134,7 +132,7 @@ export class CohortManager {
           });
 
         events.on('cohort_stats', ()=>{
-            console.log('cohort stats');
+         
             events.fire('send_cohort', this.selectedCohort);
           });
 
@@ -221,7 +219,7 @@ export class CohortManager {
           });
 
           events.on('add_cpt_to_filterArray', (evt, item)=>{
-              console.log('add cpt to filter array?');
+            
             this.cohortfilterarray[this.cohortIndex].push(item);
           });
 
@@ -235,12 +233,13 @@ export class CohortManager {
                 events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
 
               }else{
-                  console.log('branch selected');
+                 
                   let index = this.branchSelected[0];
+                  let branchIndex = this.branchSelected[1];
                  // this.cohortfilterarray[this.branchSelected[0]].branch = [];
-                  this.cohortfilterarray[index].branch.push(['CPT', item[1], item[0].length]);
-                  console.log(this.cohortfilterarray);
-                  events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex].branch);
+                  this.cohortfilterarray[index].branch[branchIndex].push(['CPT', item[1], item[0].length]);
+                
+                  events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex].branch[branchIndex]);
               }
 
           });
@@ -287,7 +286,7 @@ export class CohortManager {
           });
 
           events.on('update_start_button_clicked', (evt, item)=> {
-              console.log(this.selectedCPT);
+           
               events.fire('update_cpt_days', this.selectedCPT);
           });
 
@@ -299,8 +298,7 @@ export class CohortManager {
 
         this.cohortfilterarray.push([filter]);
         this.cohortIndex = this.cohortfilterarray.length - 1;
-       // this.cohortfilterarray[this.cohortIndex] = [];
-       // this.cohortfilterarray[this.cohortIndex].push(filter);
+
         events.fire('cohort_added', this.cohortfilterarray);
     }
 
