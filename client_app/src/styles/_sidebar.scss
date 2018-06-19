@@ -17,21 +17,31 @@
 }
 
 .branch {
-    height: 20px;
+    height: 22px;
     width: 150px;
     padding-left: 20px;
     position: relative;
     display: inline-block;
 }
 
-.branch.selected {
+.branch.selected div {
+    padding: 2px;
     color: white;
+    border: #808B96;
+    background-color: #808B96;
+    border-radius: 2px;
 }
 
 .branch svg {
     height: 20px;
     width: 50px;
-    padding-left: 10px;
+    padding-left: 22px;
+}
+
+.branch div {
+    display: inline;
+    height: 20px;
+    width: 50px;
 }
 
 .center {
@@ -104,4 +114,20 @@ ul {
 .eye {
     width: 20px;
     height: 15px;
+}
+
+.cohort-label.selected div {
+    padding: 2px;
+    color: white;
+    border: #808B96;
+    background-color: #808B96;
+    border-radius: 2px;
+}
+
+.cohort-label div {
+    padding: 2px;
+    color: white;
+    border: rgb(183, 191, 199);
+    background-color: rgb(183, 191, 199);
+    border-radius: 2px;
 }

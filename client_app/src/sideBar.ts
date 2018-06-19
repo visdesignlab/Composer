@@ -84,8 +84,7 @@ export class SideBar {
       this.$node.selectAll('.selected').classed('selected', false);
       let b = document.getElementsByClassName(cohortIndex);
       let branch = b[1];
-     // branch.classed('selected', true);
-     branch.classList.add('selected');
+      branch.classList.add('selected');
 
       console.log(branch);
     });
@@ -386,13 +385,13 @@ private async drawCohortLabelTest(filterKeeper, cohorts) {
   cohortBox = cohortBoxEnter.merge(cohortBox);
 
   let cohortlabel = cohortBox.append('div').classed('cohort-label', true);
-  let text = cohortlabel.append('text').text((d, i)=> {return 'Cohort  '+ (i+1);} );
+  let text = cohortlabel.append('div').append('text').text((d, i)=> {return 'Cohort  '+ (i+1);} );
 
   cohortlabel.on('click', (d, i)=> {
     this.selected = i;
     this.$node.selectAll('.selected').classed('selected', false);
     let label = cohortlabel.nodes();
-   // label[i].classList.add('selected');
+    label[i].classList.add('selected');
     console.log(label[i]);
     events.fire('cohort_selected', [d, i]);
 });
@@ -413,7 +412,7 @@ cohortBox.nodes().forEach((cohort, i) => {
     let line = branch.append('svg').append('path').attr('d', stem([[5, 0], [20, 12], [48, 15]]))
     .attr('stroke', '#212F3D').attr('fill', 'none').attr('stroke-width', .6);
 
-    branch.append('text').text((d)=> 'C' + (i + 1) +' branch');
+    branch.append('div').append('text').text((d)=> 'C' + (i + 1) +' branch');
 
     branch.on('click', (d, j)=> {
       events.fire('branch_selected', [i, j, d]);

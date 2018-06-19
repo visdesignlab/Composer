@@ -187,7 +187,7 @@ export class similarityScoreDiagram {
            });
 
         events.on('change_promis_scale', (evt, item)=>{
-            console.log(item);
+            
             if(item == 'Relative Scale'){
                 this.scaleRelative = true;
                 this.interpolate(this.cohortProInfo);
@@ -260,7 +260,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('update_start_button_clicked', ()=>{
-            console.log(this.targetOrder);
+    
 
             this.clearDiagram();
             this.clearAggDiagram();
@@ -325,7 +325,7 @@ export class similarityScoreDiagram {
     }
 
     private getDays(date) {
-        console.log(this.cohortProInfo);
+
       if(this.cohortProInfo != null)  {
       
  // ----- add diff days to the data
@@ -677,7 +677,7 @@ export class similarityScoreDiagram {
                   }
 
                   function voronoiClicked(d) {
-                    console.log(d);
+          
                     let line = d.line;
                     if(line.classList.contains('selected')) {
                         line.classList.remove('selected');
