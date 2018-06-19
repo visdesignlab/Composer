@@ -155,9 +155,28 @@ export class CohortManager {
           });
 
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
-            this.cohortkeeperarray[this.cohortIndex] = item;
-            this.selectedCohort = item;
-            events.fire('selected_cohort_change', this.selectedCohort);
+            console.log('selected promis filtered');
+            if(this.branchSelected == null){
+                console.log('branch null');
+                if(this.cohortkeeperarray[this.cohortIndex].branch == undefined){
+                    console.log('no branch here');
+                    this.cohortkeeperarray[this.cohortIndex] = item;
+                    this.selectedCohort = item;
+                }else{
+                    console.log('branched!');
+                    console.log(this.selectedCohort);
+                }
+               
+                events.fire('selected_cohort_change', this.selectedCohort);
+            }else{
+                console.log('branch selected');
+                let index = this.branchSelected[0];
+                let indexBranch = this.branchSelected[1];
+                this.cohortkeeperarray[index].branch[indexBranch] = item;
+                this.selectedCohort = item;
+                events.fire('selected_cohort_change', this.selectedCohort);
+                }
+            
         });
 
           events.on('add_demo_to_filter_array', (evt, item) => { // called in sidebar
@@ -167,10 +186,12 @@ export class CohortManager {
            
           });
 
-          
+          /*
           events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
             let filterReq = ['demographic', item[0], item[1]];
+
             if(this.branchSelected == null){
+                console.log('branch not selected');
                 this.cohortfilterarray[this.cohortIndex].push(filterReq);
                 events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
             }else{
@@ -178,7 +199,7 @@ export class CohortManager {
             }
            
            
-          });
+          });*/
 
           events.on('mapped_cpt_filtered', (evt, item)=>{
               this.selectedCPT = item;
@@ -203,7 +224,8 @@ export class CohortManager {
           });
 
           events.on('filtered_patient_promis', (evt, item) => {
-         
+            console.log('filtered patient promis');
+
              this.cohortkeeperarray.push(item);
             
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
@@ -281,8 +303,18 @@ export class CohortManager {
           });
 
           events.on('min_day_added', (evt, item)=> {
-            this.cohortkeeperarray[this.cohortIndex] = item;
-            this.selectedCohort = item;
+              //do I need this??
+              if(this.branchSelected == null){
+                  console.log('branch null');
+                  this.cohortkeeperarray[this.cohortIndex] = item;
+                  this.selectedCohort = item;
+              }else{
+                  let index = this.branchSelected[0];
+                  let branchIndex = this.branchSelected[1];
+                  this.cohortkeeperarray[index].branch[branchIndex] = item;
+                  this.selectedCohort = item;
+              }
+        
           });
 
           events.on('update_start_button_clicked', (evt, item)=> {
