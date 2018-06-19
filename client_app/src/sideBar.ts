@@ -78,7 +78,7 @@ export class SideBar {
   private attachListener () {
 
     events.on('branch_selected', (evt, item)=> {
-      console.log(item);
+   
       let cohortIndex = item[0];
    
       this.$node.selectAll('.selected').classed('selected', false);
@@ -86,7 +86,7 @@ export class SideBar {
       let branch = b[1];
       branch.classList.add('selected');
 
-      console.log(branch);
+      
     });
     
       events.on('filter_counted', (evt, item) => {//this get the count from the group
@@ -115,8 +115,9 @@ export class SideBar {
        });
 
       events.on('add_to_cohort_bar', (evt, item)=> {
-      //  this.drawCohortLabels(item[0], item[1]);
-        this.drawCohortLabelTest(item[0], item[1]);
+        console.log('add_to_cohort_bar');
+        console.log(item);
+        this.drawCohortLabel(item[0], item[1]);
       });
 
       events.on('clear_cohorts', (evt, item)=> {
@@ -131,8 +132,9 @@ export class SideBar {
       });
 
       events.on('update_filters', (evt, item)=> {
-       // this.drawCohortLabels(item[0], item[1]);
-        this.drawCohortLabelTest(item[0], item[1]);
+        console.log('update filters');
+        console.log(item);
+        this.drawCohortLabel(item[0], item[1]);
       });
       }
 
@@ -265,111 +267,7 @@ export class SideBar {
 
   }
 
-  private async drawCohortLabels(filterKeeper, cohorts) {
-    
-    this.cohortKeeper.selectAll('div').remove();
-    let counter = -1;
-    let nodeArray = [];
-    let filters = filterKeeper;
-
-    filters.forEach((cohort, i) => {
-
-        let cohortBox = this.cohortKeeper.append('div').classed('cohort', true).classed(i, true);
-        let cohortarrow = cohortBox.append('div').classed('arrow-up', true);
-        let cohortlabel = cohortBox.append('div').classed('cohort-label', true).append('text').text('Cohort  '+ (i+1) );
-
-        let eyeSvg = cohortBox.append('svg').classed('eye', true);
-        let eye = eyeSvg.append('circle').attr('cx', 10).attr('cy', 9).attr('r', 5);
-        eyeSvg.on('click', ()=> {
-          events.fire('add_cohort_plot', i);
-        });
-
-        let cohortfilter;
-        let label = document.getElementsByClassName('cohort ' + i);
-        let statView = select(label[0]).append('div').classed('stat_view', true).classed('hidden', true);
-        let cohortCount = statView.append('div').classed('cohort-label', true).append('text').text(cohorts[i].length);
-        let view = document.getElementsByClassName('cohort ' + i)[0].querySelector('.stat_view');
-        cohortStat.create(view, cohorts[i], i);
-
-        let labelhide = true;
-        cohortarrow.on('click', ()=> {
-            if(labelhide) {
-                statView.classed('hidden', false);
-                labelhide = false;
-            }else {
-                    statView.classed('hidden', true);
-                    labelhide = true;
-                }
-
-        });
-
-   
-        cohortfilter = filters[i].forEach(element => {
-
-         if(element[0] == 'demographic' && element[1].length != 0){
-
-          
-           element[1].forEach(attr => {
-            statView.append('div').classed('cohort-label', true).append('text').text(attr.attributeName + ': ');
-            attr.checkedOptions.forEach(op => {
-              statView.append('text').text(op + ', ');
-            });
-            statView.append('text').text(attr.checkedOptions.forEach(op => {
-                return op + ',';
-  
-            }));
-           });
-
-         }
-         if(element[0] == 'cpt' && element[1].length != 0){
-
-          let cptBox = statView.append('div').classed('cohort-label', true);
-          cptBox.append('text').text('  CPT: ');
-          filters[i].cpt.forEach(code => {cptBox.append('text').text(code[0] + "  ");
-
-           });
-         }
-         if(element[0] == 'min_count' && element[1].length != 0){
-
-          let minBox = statView.append('div').classed('cohort-label', true);
-            minBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
-         }
-
-         if(element[0] == 'min_count' && element[1].length != 0){
-
-          let minBox = statView.append('div').classed('cohort-label', true);
-            minBox.append('text').text(' Min Score Count: '+ filters[i].minCount);
-         }
-        });
-
-        counter = counter + 1;
-       
-        cohortlabel.on('click', ()=> {
-            this.selected = i;
-            events.fire('cohort_selected', [cohort, i]);
-            console.log(cohort);
-        });
-
-    });
-  
-    if(this.selected == undefined){
-
-        let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
-        let picked = cohortLabels[counter];
-        
-        picked.classList.add('selected');
-
-    }else{
-
-        let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
-        let picked = cohortLabels[this.selected];
-       
-        picked.classList.add('selected');
-    }
-
-}
-
-private async drawCohortLabelTest(filterKeeper, cohorts) {
+private async drawCohortLabel(filterKeeper, cohorts) {
 
   this.cohortKeeper.selectAll('div').remove();
   let counter = -1;
@@ -392,7 +290,6 @@ private async drawCohortLabelTest(filterKeeper, cohorts) {
     this.$node.selectAll('.selected').classed('selected', false);
     let label = cohortlabel.nodes();
     label[i].classList.add('selected');
-    console.log(label[i]);
     events.fire('cohort_selected', [d, i]);
 });
 
@@ -416,10 +313,12 @@ cohortBox.nodes().forEach((cohort, i) => {
 
     branch.on('click', (d, j)=> {
       events.fire('branch_selected', [i, j, d]);
-      console.log(branch.node());
+    
       this.$node.selectAll('.selected').classed('selected', false);
       branch.classed('selected', true);
   });
+  }else{
+    console.log(cohort.__data__);
   }
 });
   

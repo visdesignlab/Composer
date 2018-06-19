@@ -90,10 +90,11 @@ export class DataManager {
             this.mapDemoData().then(value => {
                events.fire('population demo loaded', value);
             });
-           // this.getDataObjects('demo_object', item);
+          
         });
 
         events.on('event_clicked', (evt, item)=> {
+            console.log('eventsclicked');
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
             
@@ -114,10 +115,6 @@ export class DataManager {
             this.getQuant_test(item[0], item[1]);
         });
 
-        events.on('filter_cohort_by_event', (evt, item)=> {
-                events.fire('selected_promis_filtered', this.filteredPatPromis);
-        });
-
         events.on('filtered_patient_promis', (evt, item)=> {
             this.getCPT(this.cohortIdArray, this.totalCptObjects).then(d=> this.mapCPT(this.filteredPatPromis, d));
         });
@@ -127,16 +124,14 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-          //  console.log(item);
             this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
-                console.log(d[0]);
+               
                 this.targetOrder = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
-                    console.log(d[1])
-                    this.addMinDay(ob, d[1]);
+                    let cohort = this.addMinDay(ob, d[1]).then(d=> events.fire('min_day_added', d));
                    })
                 );
                 events.fire('filter_cohort_by_event', [d[0], item]);
@@ -200,12 +195,10 @@ export class DataManager {
 
     }
 
-    private addMinDay(patients, eventArray) {
+    private async addMinDay(patients, eventArray) {
         let cohort = patients
-       // console.log(eventArray);
+      
         if(eventArray == null){
-
-           // cohort = cohort.map(c=> c.CPTtime = c.min_date);
 
         }else{
 
@@ -220,7 +213,8 @@ export class DataManager {
               }
         }
        
-          events.fire('min_day_added', cohort);
+         // events.fire('min_day_added', cohort);
+         return cohort;
 }
 
 private addEventDay(patients, eventArray) {
@@ -237,7 +231,6 @@ private addEventDay(patients, eventArray) {
          }
        }
 
-      // events.fire('min_day_added', cohort);
 }
 
 //pulled from parallel coord

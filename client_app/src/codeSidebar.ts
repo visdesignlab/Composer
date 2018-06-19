@@ -55,7 +55,6 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
-           console.log('when does this happen');
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
 
@@ -98,14 +97,14 @@ export class CodeSidebar {
                         let order = {'key': p, 'value' : this.dictionary[prop][p], 'parent': prop};
                         orderarray.push(order);
                     }
-                    console.log(orderarray);
+                   
                     this.drawOrderSearchBar(orderarray);
                 }else{
                     for(let p in this.dictionary[prop]){
                         
                         if(p == value){
                             let order = {'key': p, 'value': this.dictionary[prop][p], 'parent': prop};
-                            console.log([order]);
+                           
                             this.drawOrderSearchBar([order]);
                         }
                     }
@@ -175,13 +174,13 @@ export class CodeSidebar {
           
                     abs.on('click', () =>{
                         this.scoreLabel = 'Absolute Scale';
-                        console.log(this.scoreLabel);
+                       
                         this.drawScoreFilterBox(this.scoreBox);
                         events.fire('change_promis_scale', this.scoreLabel)});
 
                     rel.on('click', () =>{
                             this.scoreLabel = 'Relative Scale';
-                            console.log(this.scoreLabel);
+                           
                             this.drawScoreFilterBox(this.scoreBox);
     
                             events.fire('change_promis_scale', this.scoreLabel)});
@@ -345,7 +344,7 @@ private drawOrderSearchBar(order){
     });
 
     events.fire('filter_by_cpt', [fixed, cptFilterArray]);
-    events.fire('add_cpt_to filterArray', cptFilterArray);
+  //  events.fire('add_cpt_to filterArray', cptFilterArray);
     select('.orderDiv').select('.codes').remove();
 
 });
