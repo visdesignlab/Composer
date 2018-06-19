@@ -316,7 +316,7 @@ cohortBox.nodes().forEach((cohort, i) => {
       branch.classed('selected', true);
   });
   }else{
-    console.log(cohort.__data__);
+  
   }
 });
   
@@ -340,7 +340,7 @@ cohortBox.nodes().forEach((cohort, i) => {
 
 
   private filterDemo(eventType){
-    console.log('is this doinganything??')
+   
     let that = this;
     let filterList = [];
     that.filters = [];

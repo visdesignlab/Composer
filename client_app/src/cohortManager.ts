@@ -144,7 +144,7 @@ export class CohortManager {
           });
 //fired in sidebar. send the filter information to refine the sidebar
           events.on('demo_refine', (evt, item)=> {
-           console.log(item);
+     
             let filters = item;
             if(this.branchSelected == null){
                 events.fire('get_selected_demo', [filters, this.cohortkeeperarray[this.cohortIndex]]);
@@ -163,21 +163,21 @@ export class CohortManager {
           });
 
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
-            console.log('selected promis filtered');
+          
             if(this.branchSelected == null){
-                console.log('branch null');
+              
                 if(this.cohortkeeperarray[this.cohortIndex].branch == undefined){
-                    console.log('no branch here');
+             
                     this.cohortkeeperarray[this.cohortIndex] = item;
                     this.selectedCohort = item;
                 }else{
-                    console.log('branched!');
-                    console.log(this.selectedCohort);
+             
+              
                 }
                
                 events.fire('selected_cohort_change', this.selectedCohort);
             }else{
-                console.log('branch selected');
+              
                 let index = this.branchSelected[0];
                 let indexBranch = this.branchSelected[1];
                 this.cohortkeeperarray[index].branch[indexBranch] = item;
@@ -199,11 +199,11 @@ export class CohortManager {
             let filterReq = ['demographic', item[0], item[1]];
 
             if(this.branchSelected == null){
-                console.log('branch not selected');
+               
                 this.cohortfilterarray[this.cohortIndex].push(filterReq);
                 events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
             }else{
-                console.log('there is a branch');
+               
             }
            
            
@@ -250,8 +250,7 @@ export class CohortManager {
           });
 
           events.on('filtered_patient_promis', (evt, item) => {
-            console.log('filtered patient promis');
-
+            
              this.cohortkeeperarray.push(item);
             
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
@@ -293,7 +292,7 @@ export class CohortManager {
                         this.cptObjectKeeper[this.cohortIndex] = tempcpt;
                         
                         events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
-                        console.log(this.cohortfilterarray);
+                        
                     }
                
               }else{
@@ -302,14 +301,10 @@ export class CohortManager {
                   let branchIndex = this.branchSelected[1];
                   this.cptObjectKeeper[this.cohortIndex].branch[branchIndex] = item[0];
                   this.cohortfilterarray[index].branch[branchIndex].push(cptfil);
-                  console.log(this.cohortfilterarray);
+                 
                   events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex].branch[branchIndex]);
               }
               
-           //  this.cptObjectKeeper[this.cohortIndex] = item[0];
-           //  let fil = ['CPT', item[1], item[0].length];
-           //  this.branchoNot(fil, this.cohortfilterarray).then(d=> console.log(this.cohortfilterarray));
-
           });
 
           events.on('filter_aggregate', (evt, item)=> {
@@ -363,8 +358,6 @@ export class CohortManager {
               }*/
               this.branchoNot(item, this.cohortkeeperarray).then(cohort=> {
 
-                  console.log( this.cohortkeeperarray);
-                   
                   this.selectedCohort = cohort;
               });
         
@@ -389,22 +382,20 @@ export class CohortManager {
                 selected = item;
         
             }else{
-                console.log('branched!');
+              
                 let tempBranch = array[this.cohortIndex].branch;
                 item.branch = tempBranch;
                 array[this.cohortIndex] = item;
                 selected = item;
             }
         }else{
-            console.log('branch selected');
+           
             let index = this.branchSelected[0];
             let indexBranch = this.branchSelected[1];
             array[index].branch[indexBranch] = item;
             selected = item;
            
             }
-        console.log(selected);
-        console.log(array);
         return selected;
     }
 

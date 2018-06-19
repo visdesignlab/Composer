@@ -254,18 +254,28 @@ export class similarityScoreDiagram {
             this.drawPromisChart(this.cohortProInfo, 'proLine');
         });
 
-        events.on('event_clicked', (evt, item)=> {
-            this.targetOrder = item[1];
+        events.on('event_selected', (evt, item)=> {
+            console.log(item);
+            if(item == null){
+                this.targetOrder = 'First Promis Score';
+            }else{
+                this.targetOrder = item[1];
+            }
+           
             this.$node.select('#eventLabel').text(this.targetOrder);
         });
 
-        events.on('update_start_button_clicked', ()=>{
+        events.on('update_start_button_clicked', (evt, item)=> {
     
-
+            let cohort = item[0];
+            let event = item[1];
+            
             this.clearDiagram();
             this.clearAggDiagram();
-            if(this.targetOrder == 'First Promis Score'){
-               this.zeroEvent = this.targetOrder;
+            if(event == null){
+                
+               this.zeroEvent = 'First Promis Score';
+               //this.zeroEvent = this.targetOrder;
                 this.getDays(null);
                 this.eventDayBool = false;
                 this.getBaselines(null);
@@ -274,11 +284,11 @@ export class similarityScoreDiagram {
                     this.interpolate(this.cohortProInfo);
                       }
             }else{
-                this.zeroEvent = this.targetOrder[1][0].key;
-                this.getDays(this.cohortProInfo);
+                this.zeroEvent = event[1][0].key;
+                this.getDays(cohort);
                 this.eventDayBool = true;
                 this.getBaselines(null);
-                this.interpolate(this.cohortProInfo);
+                this.interpolate(cohort);
             }
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
@@ -311,6 +321,7 @@ export class similarityScoreDiagram {
 
         events.on('revert_to_promis', () =>{
             this.targetOrder = 'First Promis Score';
+
         });
         
         events.on('selected_event_filter_change', (evt, item)=> {
@@ -319,7 +330,6 @@ export class similarityScoreDiagram {
 
         events.on('min_day_added', (evt, item)=> {
             this.cohortProInfo = item;
-
         });
 
     }
