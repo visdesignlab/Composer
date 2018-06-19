@@ -115,8 +115,7 @@ export class SideBar {
        });
 
       events.on('add_to_cohort_bar', (evt, item)=> {
-        console.log('add_to_cohort_bar');
-        console.log(item);
+   
         this.drawCohortLabel(item[0], item[1]);
       });
 
@@ -132,8 +131,7 @@ export class SideBar {
       });
 
       events.on('update_filters', (evt, item)=> {
-        console.log('update filters');
-        console.log(item);
+  
         this.drawCohortLabel(item[0], item[1]);
       });
       }
@@ -342,12 +340,11 @@ cohortBox.nodes().forEach((cohort, i) => {
 
 
   private filterDemo(eventType){
-
+    console.log('is this doinganything??')
     let that = this;
     let filterList = [];
     that.filters = [];
 
-        
          let parentFilter = this.demoform.selectAll('ul.parent');
 
          parentFilter.each(function (element) {
@@ -365,7 +362,6 @@ cohortBox.nodes().forEach((cohort, i) => {
                    d['checked'] = false;
                  }
              });
-   
          filterList.push(filter);
          });
    
@@ -390,9 +386,9 @@ cohortBox.nodes().forEach((cohort, i) => {
             };
            filterList.push(filter);
          }
-      
+
          events.fire(eventType, filterList);
-         
+
          that.filters = [];
          filterList = [];
          that.bmiRange = null;
