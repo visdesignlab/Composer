@@ -116,7 +116,7 @@ export class DataManager {
 
 
         events.on('filter_cohort_agg', (evt, item)=> {
-            this.getQuant_test(item[0], item[1]);
+            this.getQuant_Agg(item[0], item[1]);
         });
 
         events.on('filtered_patient_promis', (evt, item)=> {
@@ -303,7 +303,7 @@ private addEventDay(patients, eventArray) {
        events.fire('filtered_by_count', [filter, count]);
     }
 
-    private getQuant_test(cohort, quant) {
+    private getQuant_Agg(cohort, quant) {
 
         let oneval = [];
         let outofrange = [];
@@ -353,7 +353,8 @@ private addEventDay(patients, eventArray) {
     }
 
     private getQuant_Separate(cohort) {
-      
+
+        console.log(cohort)
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -376,7 +377,6 @@ private addEventDay(patients, eventArray) {
 
                     maxPromisCount = patient.value.length;
                 }
-
             }
 
             if(patient.b != undefined) {
@@ -385,14 +385,11 @@ private addEventDay(patients, eventArray) {
                 if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
                 if(patient.b <= 29){bottomStart.push(patient)};
                 patient.scorespan = [patient.b];
-
             }
         });
       
         events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
-
     }
-
 
     public async mapDemoData() {
 

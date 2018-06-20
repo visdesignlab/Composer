@@ -190,23 +190,16 @@ export class similarityScoreDiagram {
             
             if(item == 'Relative Scale'){
                 this.scaleRelative = true;
-                this.interpolate(this.cohortProInfo);
+                this.interpolate(this.cohortProInfo).then(c=> {
+                    events.fire('cohort_interpolated', c);
+                    this.changeScale(c);
+         });;
             }
             if(item == 'Absolute Scale'){
                 this.scaleRelative = false;
                 this.changeScale(this.cohortProInfo);
             }
-            /*
-            if(!this.scaleRelative){
-                this.scaleRelative = true;
-                this.interpolate(this.cohortProInfo);
-
-                  }
-
-            else{this.scaleRelative = false;
-                this.changeScale(this.cohortProInfo);
-            };*/
-
+  
         });
 
         events.on('clear_clumpin', ()=>{
@@ -273,22 +266,30 @@ export class similarityScoreDiagram {
             this.clearDiagram();
             this.clearAggDiagram();
             if(event == null){
-                
                this.zeroEvent = 'First Promis Score';
                //this.zeroEvent = this.targetOrder;
                 this.getDays(null);
                 this.eventDayBool = false;
-                this.getBaselines(null);
+                this.getBaselines(this.cohortProInfo);
                 if(this.scaleRelative){
                     this.scaleRelative = false;
-                    this.interpolate(this.cohortProInfo);
+                    this.interpolate(this.cohortProInfo).then(c=> {
+                        events.fire('cohort_interpolated', c);
+                        this.changeScale(c);
+             });
                       }
             }else{
                 this.zeroEvent = event[1][0].key;
                 this.getDays(cohort);
                 this.eventDayBool = true;
-                this.getBaselines(null);
-                this.interpolate(cohort);
+                //this.getBaselines(this.cohortProInfo);
+                this.getBaselines(cohort).then(d=> {
+                    this.interpolate(d).then(c=> {
+                               events.fire('cohort_interpolated', c);
+                               this.changeScale(c);
+                    });
+                });
+                
             }
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
@@ -380,9 +381,10 @@ export class similarityScoreDiagram {
         }
 
     }
+//breaks each pat value scores into Original and relative score
+    private async getBaselines(cohort)  {
 
-    private async getBaselines(pat)  {
-        this.cohortProInfo.forEach(patient => {
+        cohort.forEach(patient => {
             let negative = 0;
             let positive = 0;
             let zeroValue = false;
@@ -463,13 +465,12 @@ export class similarityScoreDiagram {
              }
 
          });
-
         });
-        
 
+        return cohort;
     }
     //estimates 
-    private interpolate(cohort) {
+    private async interpolate(cohort) {
 
      cohort.forEach(pat => {
             if(pat.window != null && pat.window != undefined) {
@@ -508,9 +509,9 @@ export class similarityScoreDiagram {
         });
         this.cohortProInfo = cohort;
        
-        events.fire('cohort_interpolated', cohort);
-        this.changeScale(cohort);
-        //return newCohort;
+       // events.fire('cohort_interpolated', cohort);
+       // this.changeScale(cohort);
+        return cohort;
     }
 
     private changeScale(cohort) {
@@ -576,9 +577,7 @@ export class similarityScoreDiagram {
                 return data;
             });
 
-            function vorline(d) { 
-                
-                return d ? 'M' + d.join('L') + 'Z' : null; };
+            function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
           
             // -----  set domains and axis
             // time scale
@@ -778,7 +777,6 @@ export class similarityScoreDiagram {
         }).style('opacity', 1);
 
     }
-
     /**
      * clear the diagram
      */
@@ -789,7 +787,6 @@ export class similarityScoreDiagram {
         this.svg.select('.scoreGroup').select('.voronoi').selectAll('*').remove();
         this.svg.select('.scoreGroup').selectAll('#clip').remove();
     }
-
         /**
      * clear the diagram
      */
