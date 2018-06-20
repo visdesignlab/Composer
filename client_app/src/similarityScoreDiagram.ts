@@ -316,7 +316,10 @@ export class similarityScoreDiagram {
             this.getDays(null);
             if(this.scaleRelative){
                 this.scaleRelative = false;
-                this.interpolate(this.cohortProInfo);
+                this.interpolate(this.cohortProInfo).then(c=> {
+                   // events.fire('cohort_interpolated', c);
+                   // this.changeScale(c);
+         });
                   }
                     });
 
@@ -379,7 +382,6 @@ export class similarityScoreDiagram {
                 this.drawPromisChart(this.cohortProInfo, 'proLine');
             }
         }
-
     }
 //breaks each pat value scores into Original and relative score
     private async getBaselines(cohort)  {
@@ -473,12 +475,12 @@ export class similarityScoreDiagram {
     private async interpolate(cohort) {
 
      cohort.forEach(pat => {
+            let b;
             if(pat.window != null && pat.window != undefined) {
-                let b;
+                
                
                if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
                 
-                   //let b;
                    if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
                    if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
                }else{
@@ -504,9 +506,19 @@ export class similarityScoreDiagram {
 
                 });
 
+            }else{
+
+                b = pat.value[0].SCORE;
+                pat.value.forEach((value) => {
+                    value.ogScore = value.SCORE;
+                    value.b = b;
+                    value.relScore = value.ogScore - b;
+                });
+
             }
 
         });
+        console.log(cohort);
         this.cohortProInfo = cohort;
        
        // events.fire('cohort_interpolated', cohort);
