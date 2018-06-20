@@ -99,7 +99,7 @@ export class DataManager {
            }else{
                 this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
-                console.log(item);
+             
                 this.targetOrder = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
@@ -160,7 +160,20 @@ export class DataManager {
         });
 
         events.on('separate_cohort_agg', (evt, item)=> {
+            console.log(item[0]);
+           /* if(item[0].window == undefined){ 
+                console.log('undefined');
+                this.getBaselines(item).then(d=> {
+                        this.interpolate(d).then(c=> {
+                            this.getQuant_Separate(c);
+                        })
+                })
+            }else{
+                console.log('defined!');
+                this.getQuant_Separate(item);
+            }*/
             this.getQuant_Separate(item);
+            
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
@@ -351,6 +364,138 @@ private addEventDay(patients, eventArray) {
         events.fire('filtered_by_quant', [selected, quant]);
 
     }
+    //breaks each pat value scores into Original and relative score
+    private async getBaselines(cohort)  {
+
+        cohort.forEach(patient => {
+            let negative = 0;
+            let positive = 0;
+            let zeroValue = false;
+            let negMin;
+            let posMin;
+            let absMin;
+
+            patient.value.forEach((value) => {
+                if(value.diff < 0) { negative = negative + 1;    }
+                if(value.diff > 0) { positive = positive + 1;    }
+                if(value.diff == Math.abs(0)) {
+                    zeroValue = true;
+                    value.diff = 0;   }
+            });
+
+            absMin = patient.value[0].diff;
+            let baseStart;
+            let baseEnd;
+            let baseline;
+            patient.window = {'neg' : null, 'pos': null };
+
+            if(negative == 0){ negMin = null; posMin = 6000;
+            }else if(positive == 0){ posMin = null; negMin = patient.value[0].diff;
+            }else {
+                negMin = patient.value[0].diff;
+                posMin = 6000;
+            }
+            if(zeroValue)  {
+               
+                posMin = 0;
+                negMin = 0;
+                absMin = 0;
+            }
+
+            patient.value.forEach(value => {
+                if(absMin != 0) {
+                //if(value.diff != Math.abs(0)){
+                    if(value.diff < 0) {
+                        if(negMin != null) {
+                            if(Math.abs(value.diff) < Math.abs(negMin)) {
+
+                                negMin = value.diff;
+                            }};
+                        }
+                    if(value.diff > 0) {
+                        if(posMin != null) {
+                        if(value.diff < posMin) {
+                        posMin = value.diff;
+                        }};
+                    }}
+
+                if(absMin != 0) {
+                    if(Math.abs(value.diff) < Math.abs(absMin)) {
+                        absMin = +value.diff;
+                            };
+                }else {
+
+                }
+
+                if(value.diff == absMin) {baseline = value.SCORE; };
+                if(value.diff == negMin) {baseStart = value.SCORE; };
+                if(value.diff == posMin) {baseEnd = value.SCORE; };
+
+            });
+
+         patient.value.forEach((value) => {
+             if(posMin == null || negMin == null) {
+                 patient.window = null;
+                
+                 value.ogScore = value.SCORE;
+                 value.relScore = value.SCORE - baseline;
+   
+             }else {
+                value.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
+                patient.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
+                value.ogScore = value.SCORE;
+                value.relScore = value.SCORE - baseline;
+             }
+
+         });
+        });
+
+        return cohort;
+    }
+    //estimates 
+    private async interpolate(cohort) {
+
+     cohort.forEach(pat => {
+            if(pat.window != null && pat.window != undefined) {
+                let b;
+               
+               if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
+                
+                   //let b;
+                   if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
+                   if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
+               }else{
+                    let x1 = pat.window.neg[0];
+                    let x2 = pat.window.pos[0];
+                    let y1 = pat.window.neg[1];
+                    let y2 = pat.window.pos[1];
+                    let X;
+                    let Y;
+
+                    if (x1 < x2){X = x1; Y = y1;}
+                    else {X = x2; Y = y2;};
+
+                    let slope = (y2 - y1) / (x2 - x1);
+                    b = Y - (slope * X);
+                    pat.slope = slope;
+                    pat.b = +b;
+               }
+
+                pat.value.forEach((value) => {
+                    value.b = b;
+                    value.relScore = value.ogScore - b;
+
+                });
+
+            }
+
+        });
+      //  this.cohortProInfo = cohort;
+    
+       // events.fire('cohort_interpolated', cohort);
+       // this.changeScale(cohort);
+        return cohort;
+    }
 
     private getQuant_Separate(cohort) {
 
@@ -385,6 +530,13 @@ private addEventDay(patients, eventArray) {
                 if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
                 if(patient.b <= 29){bottomStart.push(patient)};
                 patient.scorespan = [patient.b];
+            }else{
+                let test = patient.value[0].SCORE;
+                barray.push(test);
+                if(test >= 43){topStart.push(patient)};
+                if(test < 43 && test > 29){ middleStart.push(patient)};
+                if(test <= 29){bottomStart.push(patient)};
+                patient.scorespan = [test];
             }
         });
       
@@ -733,7 +885,6 @@ private addEventDay(patients, eventArray) {
         let withQuery = [];
         let queryDate = [];
         let eventArray = [];
-        console.log(value);
 
        cohort.forEach((element) => {
         let events = [];
@@ -757,9 +908,7 @@ private addEventDay(patients, eventArray) {
     }
 
     private updateDiff(code, patCPT){
-        console.log(code);
- 
-
+       
         code = code[0].map(c => +c);
         let filArray = []
         patCPT.forEach(pat => {
