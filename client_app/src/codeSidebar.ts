@@ -186,7 +186,7 @@ export class CodeSidebar {
                             events.fire('change_promis_scale', this.scoreLabel)});
 
                     form.append('input')
-                    .attr('type', 'button')
+                    .attr('type', 'button').attr('id', 'aggToggle')
                     .classed('btn', true).classed('btn-primary', true)
                     .attr('value', 'Aggregate Scores')
                     .on('click', () => {

@@ -57,14 +57,16 @@ export class CohortManager {
                 events.fire('clear_clumpin');
                 if(this.seperatedBool) {
                     events.fire('draw_plot', this.seperatedCohortArray);
+                    
                 }else{ events.fire('draw_plot', null); }
-
+                document.getElementById('aggToggle').classList.remove('btn-warning');
                 this.clumpedBool = false;
             }else{
 
                 if(this.seperatedBool){
                     events.fire('draw_aggs', this.seperatedCohortArray);
                 }else{ events.fire('draw_aggs', null); }
+                document.getElementById('aggToggle').classList.add('btn-warning');
                 this.clumpedBool = true;
             }
         });
