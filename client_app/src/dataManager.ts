@@ -10,6 +10,7 @@ import {tsv} from 'd3-request';
 import {ICategoricalVector, INumericalVector} from 'phovea_core/src/vector/IVector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
 import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
+import {scaleLinear,scaleTime,scaleOrdinal, scaleBand, scaleLog} from 'd3-scale';
 import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 import * as events from 'phovea_core/src/event';
@@ -17,7 +18,7 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalc from './dataCalculations';
-import { max } from 'd3-array';
+import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
 
 export class DataManager {
 
@@ -141,6 +142,10 @@ export class DataManager {
                 events.fire('filter_cohort_by_event', [d[0], item]);
             });
         });
+
+        events.on('frequency_test', (evt, item)=> {
+            this.scoreFrequency(item);
+        });
         
         events.on('get_selected_demo', (evt, item)=> {
 
@@ -161,23 +166,10 @@ export class DataManager {
 
         events.on('separate_cohort_agg', (evt, item)=> {
             console.log(item[0]);
-           /* if(item[0].window == undefined){ 
-                console.log('undefined');
-                this.getBaselines(item).then(d=> {
-                        this.interpolate(d).then(c=> {
-                            this.getQuant_Separate(c);
-                        })
-                })
-            }else{
-                console.log('defined!');
-                this.getQuant_Separate(item);
-            }*/
             this.getQuant_Separate(item);
-            
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-     
             //change this back to added and selected. 
             //when selected, the index changes. no need to map the cpt
             this.filteredPatPromis = item;
@@ -185,7 +177,6 @@ export class DataManager {
                 });
 
         events.on('selected_pat_array', (evt, item)=> {
-    
             this.cohortIdArray = item;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
@@ -506,7 +497,6 @@ private addEventDay(patients, eventArray) {
         let middleStart = [];
         let bottomStart = [];
         let barray = [];
-        let selected;
         let maxPromisCount = 1;
 
         cohort.forEach(patient => {
@@ -542,6 +532,74 @@ private addEventDay(patients, eventArray) {
       
         events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
     }
+
+    private getQuant_Separate_Test(cohort) {
+
+        console.log(cohort)
+        let oneval = [];
+        let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+        let barray = [];
+        let maxPromisCount = 1;
+
+        cohort.forEach(patient => {
+
+            if(patient.value.length == 1){
+                if(patient.value[0].diff > Math.abs(90)){
+                    outofrange.push(patient);
+                }
+                oneval.push(patient.key);
+            }else {
+
+                if(patient.value.length > maxPromisCount) {
+
+                    maxPromisCount = patient.value.length;
+                }
+            }
+
+            if(patient.b != undefined) {
+                barray.push(patient.b);
+                if(patient.b >= 43){topStart.push(patient)};
+                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
+                if(patient.b <= 29){bottomStart.push(patient)};
+                patient.scorespan = [patient.b];
+            }else{
+                let test = patient.value[0].SCORE;
+                barray.push(test);
+                if(test >= 43){topStart.push(patient)};
+                if(test < 43 && test > 29){ middleStart.push(patient)};
+                if(test <= 29){bottomStart.push(patient)};
+                patient.scorespan = [test];
+            }
+        });
+      
+        events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
+    }
+
+    private scoreFrequency(cohort) {
+        let totalPatients = cohort.length;
+        let mapped = cohort.map(pat  => {return +pat.value.length});
+        console.log(mapped);
+        let maxValue = max(mapped);
+
+        let x = scaleLinear().domain([0, +maxValue]).nice();
+
+        let bins = histogram()
+        .domain([0, +maxValue])
+        .thresholds(x.ticks(20))
+        (mapped);
+    
+        let histogramData = bins.map(function (d) {
+          totalPatients -= d.length;
+          return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
+        });
+        console.log(histogramData);
+        //return histogramData;
+
+    }
+
 
     public async mapDemoData() {
 

@@ -478,7 +478,6 @@ export class similarityScoreDiagram {
             let b;
             if(pat.window != null && pat.window != undefined) {
                 
-               
                if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
                 
                    if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
