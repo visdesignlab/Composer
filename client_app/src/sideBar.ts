@@ -57,8 +57,6 @@ export class SideBar {
 
       ];
 
- 
-      
   constructor(parent: Element) {
     
     this.$node = select(parent);
@@ -71,7 +69,6 @@ export class SideBar {
     this.svgHeight = 40;
     this.branchSelected = null;
     
-  
     this.attachListener();
   }
 
@@ -86,7 +83,6 @@ export class SideBar {
       let branch = b[1];
       branch.classList.add('selected');
 
-      
     });
     
       events.on('filter_counted', (evt, item) => {//this get the count from the group
@@ -115,7 +111,6 @@ export class SideBar {
        });
 
       events.on('add_to_cohort_bar', (evt, item)=> {
-   
         this.drawCohortLabel(item[0], item[1]);
       });
 
@@ -131,7 +126,6 @@ export class SideBar {
       });
 
       events.on('update_filters', (evt, item)=> {
-  
         this.drawCohortLabel(item[0], item[1]);
       });
       }
@@ -526,8 +520,6 @@ cohortBox.nodes().forEach((cohort, i) => {
     select(".tooltip").transition(t)
     .style("opacity", 0);
   });
-
-
   }
 
   private drawDistributionBands(data) {
@@ -535,9 +527,6 @@ cohortBox.nodes().forEach((cohort, i) => {
     let barBrush = brushX()
     .extent([[0, 0], [this.svgWidth, 30]])
     .handleSize(0);
-
-   // let x = function(d) {return d.scale};
-
 
     let distScale = scaleLinear().domain([0, 1000]);
 

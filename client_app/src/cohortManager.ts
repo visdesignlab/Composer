@@ -211,6 +211,8 @@ export class CohortManager {
            
           });
 
+          events.on('frequency', ()=> { events.fire('frequency_test', this.selectedCohort)});
+
           events.on('mapped_cpt_filtered', (evt, item)=>{
               this.selectedCPT = item;
           });
