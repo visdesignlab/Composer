@@ -79,9 +79,12 @@ export class CohortManager {
             let bfilter = [Object.assign([], this.cohortfilterarray[this.cohortIndex])];
             branch.push(b);
             this.cohortkeeperarray[this.cohortIndex].branch = branch;
+            
             this.cptObjectKeeper[this.cohortIndex].branch = bcpt;
             this.cohortfilterarray[this.cohortIndex].branch = bfilter;
             let newSpot = branch.length - 1;
+            let indexBranch = this.cohortfilterarray[this.cohortIndex].length
+            this.cohortfilterarray[this.cohortIndex].push(['Branch', newSpot, indexBranch]);
          
             events.fire('update_filters', [this.selectedFilter, this.cohortkeeperarray]);
             events.fire('branch_selected', [this.cohortIndex, newSpot, branch[newSpot]]);
@@ -102,7 +105,7 @@ export class CohortManager {
             events.fire('selected_stat_change', [this.selectedCohort, this.cohortIndex]);
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
             events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-            events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex].branch[branchIndex]);
+            events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray[this.cohortIndex]]);
         });
 
         events.on('clear_cohorts', () => {
@@ -129,7 +132,7 @@ export class CohortManager {
             events.fire('selected_stat_change', [this.selectedCohort, index]);
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
             events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-            events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
+            events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
 
           });
 
@@ -203,12 +206,10 @@ export class CohortManager {
             if(this.branchSelected == null){
                
                 this.cohortfilterarray[this.cohortIndex].push(filterReq);
-                events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
+                events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
             }else{
                
             }
-           
-           
           });
 
           events.on('frequency', ()=> { events.fire('frequency_test', this.selectedCohort)});
@@ -218,23 +219,7 @@ export class CohortManager {
           });
 
           events.on('promis_from_demo_refiltered', (evt, item)=> {
-            /*
-            if(this.branchSelected == null){
-
-                this.cohortkeeperarray[this.cohortIndex] = item;
-                this.selectedCohort = item;
-                events.fire('selected_cohort_change', this.selectedCohort);
-                events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-  
-              }else{
-                  let index = this.branchSelected[0];
-                  let branchIndex = this.branchSelected[1];
-                  this.cohortkeeperarray[index].branch[branchIndex] = item;
-                  this.selectedCohort = item;
-                  events.fire('selected_cohort_change', this.selectedCohort);
-                  events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-                 
-              }*/
+          
               this.branchoNot(item, this.cohortkeeperarray).then(selected=> { 
 
                 this.selectedCohort = selected;
@@ -265,7 +250,7 @@ export class CohortManager {
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
              events.fire('selected_event_filter_change', this.cohortfilterarray[this.cohortIndex]);
              events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-             events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
+             events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
 
           });
 
@@ -284,7 +269,7 @@ export class CohortManager {
                     if(this.cohortfilterarray[this.cohortIndex].branch == undefined){
                         this.cptObjectKeeper[this.cohortIndex] = item[0];
                         this.cohortfilterarray[this.cohortIndex].push(cptfil);
-                        events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
+                        events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
                     }else{
                         
                         let tempBranch = this.cohortfilterarray[this.cohortIndex].branch;
@@ -295,7 +280,7 @@ export class CohortManager {
                         tempcpt.branch = this.cptObjectKeeper[this.cohortIndex].branch;
                         this.cptObjectKeeper[this.cohortIndex] = tempcpt;
                         
-                        events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex]);
+                        events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
                         
                     }
                
@@ -306,7 +291,7 @@ export class CohortManager {
                   this.cptObjectKeeper[this.cohortIndex].branch[branchIndex] = item[0];
                   this.cohortfilterarray[index].branch[branchIndex].push(cptfil);
                  
-                  events.fire('send_filter_to_codebar', this.cohortfilterarray[this.cohortIndex].branch[branchIndex]);
+                  events.fire('send_filter_to_codebar',[ this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray[this.cohortIndex]]);
               }
               
           });

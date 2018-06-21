@@ -143,10 +143,6 @@ export class DataManager {
             });
         });
 
-        events.on('frequency_test', (evt, item)=> {
-            this.scoreFrequency(item);
-        });
-        
         events.on('get_selected_demo', (evt, item)=> {
 
             this.getCohortIdArrayAfterMap(item[1], 'demo')
@@ -577,29 +573,6 @@ private addEventDay(patients, eventArray) {
       
         events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
     }
-
-    private scoreFrequency(cohort) {
-        let totalPatients = cohort.length;
-        let mapped = cohort.map(pat  => {return +pat.value.length});
-        console.log(mapped);
-        let maxValue = max(mapped);
-
-        let x = scaleLinear().domain([0, +maxValue]).nice();
-
-        let bins = histogram()
-        .domain([0, +maxValue])
-        .thresholds(x.ticks(20))
-        (mapped);
-    
-        let histogramData = bins.map(function (d) {
-          totalPatients -= d.length;
-          return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
-        });
-        console.log(histogramData);
-        //return histogramData;
-
-    }
-
 
     public async mapDemoData() {
 

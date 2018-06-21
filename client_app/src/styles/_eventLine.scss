@@ -7,6 +7,10 @@
     padding-top: 10px;
 }
 
+.event_line_svg {
+    //  display: inline;
+}
+
 .accent {
     color: #b5c0d1;
     opacity: .8;
@@ -32,4 +36,15 @@
 .selected-event rect {
     fill: #E67E22;
     opacity: .8;
+}
+
+.event-buttons {
+    width: 60px;
+    height: 25px;
+    display: inline;
+}
+
+.branch-wrapper svg {
+    width: 700px;
+    height: 50px;
 }

@@ -40,9 +40,13 @@ export class EventLine {
     this.circleScale = scaleLinear().domain([0, 3000])
             .range([1, 15]).clamp(true);
 
+    let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
+    branchWrapper.append('svg');
+   
     this.attachListener();
     this.drawLine();
     this.drawEventButtons();
+
     const that = this;
     this.startCodes = null;
 
@@ -51,9 +55,18 @@ export class EventLine {
     private attachListener() {
 
     events.on('send_filter_to_codebar', (evt, item)=> {
-            this.updateEvents(item);
-            let eventIndex = item.length;
-            let event = item[eventIndex -1];
+           
+            //item[0] is for the event start buttons,
+            let eventButtonData = item[0];
+            
+            //item[1] is the entire cohort and branches for the branch lines
+            let branchLineData = item[1];
+
+            this.updateEvents(eventButtonData);
+            this.drawBranches(branchLineData);
+
+            let eventIndex =  eventButtonData.length;
+            let event =  eventButtonData[eventIndex -1];
          
            if(event[1].length != 0){
             this.startCodes = event[1];
@@ -62,12 +75,30 @@ export class EventLine {
            }
           
     });
+
+    }
+
+    private drawBranches(cohort){
+        console.log(cohort);
+        let branchWrapper = this.$node.select('.branch-wrapper');
+        let branchSvg = branchWrapper.select('svg');
+       // branchSvg.selectAll('*').remove();
+
+        let circles = branchSvg.selectAll('.branch-circle').data(cohort);
+
+        circles.exit().remove();
+
+        let circlesEnter = circles.enter().append('circle').classed('branch-circle', true);
+
+        circles = circlesEnter.merge(circles);
+
+        circles.attr('cx', (d, i)=> {return (i * 20) + 5}).attr('cy', 5).attr('r', 5).attr('fill', '#375f84');
     }
 
     private drawLine(){
         let eventLine = this.$node;
         let eventLineSvg = eventLine.append('svg').classed('event_line_svg', true)
-        .attr('height', 25).attr('width', 700);
+        .attr('height', 25).attr('width', 500);
 
     }
 
