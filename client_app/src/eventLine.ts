@@ -55,7 +55,7 @@ export class EventLine {
     private attachListener() {
 
     events.on('send_filter_to_codebar', (evt, item)=> {
-           
+            console.log(item);
             //item[0] is for the event start buttons,
             let eventButtonData = item[0];
             
@@ -93,6 +93,8 @@ export class EventLine {
         circles = circlesEnter.merge(circles);
 
         circles.attr('cx', (d, i)=> {return (i * 20) + 5}).attr('cy', 5).attr('r', 5).attr('fill', '#375f84');
+
+        let branchCircles = branchSvg.selectAll('.branch-circle').data(cohort);
     }
 
     private drawLine(){
@@ -103,6 +105,8 @@ export class EventLine {
     }
 
     private updateEvents(filters) {
+
+        filters = filters.filter(d=> {return d[0] != 'Branch'});
        
         function filText(d){
             if(d[0] == 'demographic'){return 'First Score'}else{

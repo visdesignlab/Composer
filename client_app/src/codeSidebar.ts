@@ -495,6 +495,8 @@ private drawOrderSearchBar(order){
 
 private DrawfilterDescriptionBox(filter){
 
+    filter = filter.filter(d=> {return d[0] != 'Branch'});
+       
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
     select('.descriptionDiv').selectAll('div').remove();
