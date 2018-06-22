@@ -92,9 +92,40 @@ export class EventLine {
 
         circles = circlesEnter.merge(circles);
 
-        circles.attr('cx', (d, i)=> {return (i * 20) + 5}).attr('cy', 5).attr('r', 5).attr('fill', '#375f84');
+        circles.attr('cx', (d, i)=> {return (i * 25) + 5}).attr('cy', 5).attr('r', 5).attr('fill', '#375f84');
 
-        let branchCircles = branchSvg.selectAll('.branch-circle').data(cohort);
+        circles.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+              .html(() => {
+                return this.renderOrdersTooltip(d);
+              })
+              .transition(t)
+              .style("opacity", 1)
+              .style("left", `${event.pageX + 10}px`)
+              .style("top", `${event.pageY + 10}px`);
+          })
+          .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+          });
+    
+if(cohort.branch != undefined){
+    console.log(cohort.branch)
+    let branchCircles = branchSvg.selectAll('.branch-circle-branch').data(cohort.branch);
+    
+    branchCircles.exit().remove();
+
+    let bcirclesEnter = circles.enter().append('circle').classed('branch-circle-branch', true);
+
+    branchCircles = bcirclesEnter.merge(branchCircles);
+
+    branchCircles.attr('cx', (d, i)=> {return (i * 25) + 5}).attr('cy', 20).attr('r', 5).attr('fill', '#375f84');
+
+}
+       
+
     }
 
     private drawLine(){
@@ -159,7 +190,7 @@ export class EventLine {
 
         private drawEventButtons(){
             let div = this.$node.append('div').classed('event-buttons', true);
-    
+           // let div = this.$node;
             div.append('input')
             .attr('type', 'button').attr('id', 'event-start')
             .classed('btn', true).classed('btn-default', true).classed('btn-sm', true)//.classed('disabled', true)
@@ -175,6 +206,12 @@ export class EventLine {
             });
         }
 
+        private renderOrdersTooltip(tooltip_data) {
+
+            let text = "<strong style='color:darkslateblue'>" + tooltip_data + "</strong></br>";
+          
+            return text;
+        }
 }
 
 export function create(parent:Element, cohort) {
