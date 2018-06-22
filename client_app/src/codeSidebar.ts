@@ -177,7 +177,7 @@ export class CodeSidebar {
         const form = scorebody.append('form');
 
         let freqPanel = form.append('div').classed('frequency-histogram', true);
-        freqPanel.append('text').text('Score Count Distributions');
+        
         freqPanel.append('div').classed('distributionWrapper', true);
         
     
@@ -286,6 +286,7 @@ export class CodeSidebar {
 
     private drawHistogram(histobins) {
 
+
        let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, 'scale': this.xScale.domain([0, histobins[0].binCount])};
 
         this.yScale.domain([0, max(histobins, function (d) {
@@ -300,6 +301,7 @@ export class CodeSidebar {
         let freqScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
     
         let distLabel = this.$node.select('.distributionWrapper');
+        distLabel.append('text').text('Score Count Distributions');
         let distDiagrams = distLabel.append('div').classed('distLabel', true).attr('width', this.svgWidth).attr('height', this.svgHeight);
     
         let distFilter = distDiagrams.append('div').classed('distFilter', true).attr('width', this.svgWidth);
@@ -525,7 +527,26 @@ private DrawfilterDescriptionBox(filter){
 
         if(fil[0] == 'demographic'){
             if(fil[1].length != 0){
-                    text.append('text').text('Demo').attr('transform', 'translate(15, 0)');
+                   console.log(fil[1]);
+                   // text.selectAll('text').data(fil[1]).enter().append('text').text('Demographic').attr('transform', 'translate(15, 0)');
+                    text.append('text').text('Demographic').attr('transform', 'translate(15, 0)').data(fil[1]);
+                    text.on("mouseover", (d) => {
+                        let t = transition('t').duration(500);
+                        select(".tooltip")
+                          .html(() => {
+                            return this.renderFilterTooltip(d);
+                          })
+                          .transition(t)
+                          .style("opacity", 1)
+                          .style("left", `${event.pageX + 10}px`)
+                          .style("top", `${event.pageY + 10}px`);
+                      })
+                      .on("mouseout", () => {
+                        let t = transition('t').duration(500);
+                        select(".tooltip").transition(t)
+                        .style("opacity", 0);
+                      });
+                
                }
             else{ text.append('text').text('all patients').attr('transform', 'translate(15, 0)'); }
             }
@@ -551,6 +572,20 @@ private renderHistogramTooltip(tooltip_data) {
 
     return text;
 }
+
+private renderFilterTooltip(tooltip_data) {
+
+    let text = "<strong style='color:darkslateblue'>" + tooltip_data[0] + "</strong></br>";
+/*
+    tooltip_data.forEach(data => {
+    console.log(data);
+    });*/
+
+   // text = "<strong style='color:darkslateblue'>" + tooltip_data[0] + "</strong></br>";
+
+    return text;
+}
+
 
     /**
      * getting the similar patients info and firing events to update the vis
