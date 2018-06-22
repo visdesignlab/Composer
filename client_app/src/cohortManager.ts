@@ -72,7 +72,10 @@ export class CohortManager {
         });
 
         events.on('branch_cohort', ()=> {
-          
+            
+            if(this.cohortkeeperarray == undefined){
+                console.log('new branch');
+            }
             let branch = [];
             let b = Object.assign([], this.cohortkeeperarray[this.cohortIndex]);
             let bcpt = [Object.assign([], this.cptObjectKeeper[this.cohortIndex])];

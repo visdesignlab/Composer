@@ -5,7 +5,7 @@ import * as ajax from 'phovea_core/src/ajax';
 import {BaseType, select, selectAll, event} from 'd3-selection';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
-import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
+import {scaleLinear, scaleTime, scaleOrdinal, scaleSqrt} from 'd3-scale';
 import {line, curveMonotoneX, curveLinear} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
@@ -83,6 +83,7 @@ export class EventLine {
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg');
        // branchSvg.selectAll('*').remove();
+       let circleScale = scaleSqrt().range([2, 12]).domain([0, 3000]).clamp(true);
 
         let circles = branchSvg.selectAll('.branch-circle').data(cohort);
 
@@ -92,7 +93,8 @@ export class EventLine {
 
         circles = circlesEnter.merge(circles);
 
-        circles.attr('cx', (d, i)=> {return (i * 25) + 5}).attr('cy', 5).attr('r', 5).attr('fill', '#375f84');
+        circles.attr('cx', (d, i)=> {return (i * 30) + 18}).attr('cy', 12)
+        .attr('r', (d)=> {return circleScale(d[2]); }).attr('fill', '#375f84');
 
         circles.on("mouseover", (d) => {
             let t = transition('t').duration(500);
@@ -121,7 +123,8 @@ if(cohort.branch != undefined){
 
     branchCircles = bcirclesEnter.merge(branchCircles);
 
-    branchCircles.attr('cx', (d, i)=> {return (i * 25) + 5}).attr('cy', 20).attr('r', 5).attr('fill', '#375f84');
+    branchCircles.attr('cx', (d, i)=> {return (i * 25) + 5}).attr('cy', 20)
+    .attr('r', (d)=> {return Math.sqrt(d[2]); }).attr('fill', '#375f84');
 
 }
        
