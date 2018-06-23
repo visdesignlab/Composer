@@ -1,7 +1,7 @@
 .event_line_view {
     display: inline-block;
     // margin-top: 15px;
-    height: 60px;
+    height: 100px;
     width: 100%;
     padding-left: 80px;
     padding-top: 10px;
@@ -15,6 +15,11 @@
     color: #b5c0d1;
     opacity: .8;
     font-size: 9px;
+}
+
+.checkDiv div {
+    display: block;
+    padding-top: 10px;
 }
 
 .event_label {
@@ -39,10 +44,17 @@
 }
 
 .event-buttons {
-    width: 600px;
+    width: 700px;
     height: 25px;
-    display: block;
+    display: inline;
     float: left;
+}
+
+.event-buttons div {
+    display: inline;
+    float: left;
+    margin-right: 2px;
+    padding-top: 5px;
 }
 
 .branch-wrapper svg {

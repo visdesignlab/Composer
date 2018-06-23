@@ -197,90 +197,6 @@ export class CodeSidebar {
                             events.fire('filter_by_Promis_count', count);
                     });
 
-                let scalePanel = form.append('div').classed('scale', true);
-                    
-                let scaleToggle = scalePanel.append('div').classed('btn-group', true);
-                    scaleToggle.append('button').classed('btn', true).classed('btn-primary', true)
-                                .append('text').text(this.scoreLabel);
-
-                let togglebutton = scaleToggle.append('button')
-                                    .classed('btn', true).classed('btn-primary', true)
-                                    .classed('dropdown-toggle', true)
-                                    .attr('data-toggle', 'dropdown');
-
-                togglebutton.append('span').classed('caret', true);
-
-                    let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
-                    let abs = ul.append('li').append('href').append('text').text('Absolute');
-                    let rel = ul.append('li').append('href').append('text').text('Relative');//.attr('value', 'Absolute');
-          
-                    abs.on('click', () =>{
-                        this.scoreLabel = 'Absolute Scale';
-                       
-                        this.drawScoreFilterBox(this.scoreBox);
-                        events.fire('change_promis_scale', this.scoreLabel)});
-
-                    rel.on('click', () =>{
-                            this.scoreLabel = 'Relative Scale';
-                           
-                            this.drawScoreFilterBox(this.scoreBox);
-    
-                            events.fire('change_promis_scale', this.scoreLabel)});
-
-                    form.append('input')
-                    .attr('type', 'button').attr('id', 'aggToggle')
-                    .classed('btn', true).classed('btn-primary', true)
-                    .attr('value', 'Aggregate Scores')
-                    .on('click', () => {
-                        events.fire('aggregate_button_clicked');
-                    });
-        
-        let aggDiv = form.append('div').classed('aggDiv', true);
-            aggDiv.append('div').append('input').attr('type', 'button')
-                .classed('btn', true).classed('btn-primary', true)
-                .attr('value', 'Separate by Quartiles').on('click', () =>{
-                    select('.checkDiv').remove();
-                    events.fire('separate_aggregate');
-                      ///radio aggregation
-                    let checkDiv = aggDiv.append('div').classed('checkDiv', true);
-                    let tCheck = checkDiv.append('div');
-                    tCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleT').attr('checked', true)
-                    .attr('value', 'top').on('click', () => {
-
-                        let p = selectAll('.top');
-                  
-                        if(select("#sampleT").property("checked")){
-                            p.classed('hidden', false);
-                        }else{
-                            p.classed('hidden', true);
-                        }
-                    })
-                    tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
-
-                    let mCheck = checkDiv.append('div');
-                    mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
-                    .attr('value', 'middle').on('click', () => {
-                        let p = selectAll('.middle');
-                        if(select("#sampleM").property("checked")){
-                            p.classed('hidden', false);
-                        }else{
-                            p.classed('hidden', true);
-                        }
-                    });
-                    mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
-
-                    let bCheck = checkDiv.append('div');
-                    bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
-                    .attr('value', 'bottom').on('click', () =>{
-                        let p = selectAll('.bottom');
-                        if(select("#sampleB").property("checked")){
-                            p.classed('hidden', false);
-                        }else{
-                            p.classed('hidden', true);
-                        }
-                    });
-                    bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
-                });
 
 }
 
@@ -347,9 +263,9 @@ export class CodeSidebar {
         .attr("height", (d) => {
             return this.yScale(d.frequency);
         });
-        console.log(barGroupsALL);
+ 
         barGroupsALL.on("mouseover", (d) => {
-            console.log(d);
+    
             let t = transition('t').duration(500);
             select(".tooltip")
             .html(() => {
@@ -527,7 +443,7 @@ private DrawfilterDescriptionBox(filter){
 
         if(fil[0] == 'demographic'){
             if(fil[1].length != 0){
-                   console.log(fil[1]);
+                
                    // text.selectAll('text').data(fil[1]).enter().append('text').text('Demographic').attr('transform', 'translate(15, 0)');
                     text.append('text').text('Demographic').attr('transform', 'translate(15, 0)').data(fil[1]);
                     text.on("mouseover", (d) => {

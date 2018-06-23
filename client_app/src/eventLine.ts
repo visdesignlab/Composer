@@ -30,6 +30,9 @@ export class EventLine {
     private circleScale;
     private filter;
     private startCodes;
+    private scoreLabel;
+    private startEventLabel;
+    private eventToggleLabels;
 
     constructor(parent: Element, cohort) {
 
@@ -40,12 +43,13 @@ export class EventLine {
     this.circleScale = scaleLinear().domain([0, 3000])
             .range([1, 15]).clamp(true);
 
+    this.scoreLabel = 'Absolute Scale';
+    this.startEventLabel = 'Change Start to Event';
+
     let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
     branchWrapper.append('svg');
    
     this.attachListener();
-    this.drawLine();
-    this.drawEventButtons();
 
     const that = this;
     this.startCodes = null;
@@ -55,14 +59,17 @@ export class EventLine {
     private attachListener() {
 
     events.on('send_filter_to_codebar', (evt, item)=> {
-            console.log(item);
+       
             //item[0] is for the event start buttons,
             let eventButtonData = item[0];
             
             //item[1] is the entire cohort and branches for the branch lines
             let branchLineData = item[1];
 
-            this.updateEvents(eventButtonData);
+            this.filter = item[0];
+
+            this.drawEventButtons(item[0]);
+           // this.updateEvents(eventButtonData);
             this.drawBranches(branchLineData);
 
             let eventIndex =  eventButtonData.length;
@@ -72,6 +79,7 @@ export class EventLine {
             this.startCodes = event[1];
            }else{
                this.startCodes = null;
+               this.startEventLabel = 'First Promis Score';
            }
           
     });
@@ -79,24 +87,38 @@ export class EventLine {
     }
 
     private drawBranches(cohort){
-        console.log(cohort);
+    
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg');
        // branchSvg.selectAll('*').remove();
        let circleScale = scaleSqrt().range([2, 12]).domain([0, 3000]).clamp(true);
 
-        let circles = branchSvg.selectAll('.branch-circle').data(cohort);
+        let cohorts = branchSvg.selectAll('.cohort-lines').data(cohort);
 
-        circles.exit().remove();
+        cohorts.exit().remove();
 
-        let circlesEnter = circles.enter().append('circle').classed('branch-circle', true);
+        let coEnter = cohorts.enter().append('g').classed('cohort-lines', true);
 
-        circles = circlesEnter.merge(circles);
+        cohorts = coEnter.merge(cohorts);
 
-        circles.attr('cx', (d, i)=> {return (i * 30) + 18}).attr('cy', 12)
-        .attr('r', (d)=> {return circleScale(d[2]); }).attr('fill', '#375f84');
+        cohorts.attr('transform', (d, i)=> 'translate(0,' + i * 20 + ')');
+        cohorts.classed((d, i)=> i, true);
 
-        circles.on("mouseover", (d) => {
+        let label = cohorts.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)}).attr('transform', 'translate(0, 10)');
+        
+        let events = cohorts.append('g').attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d);
+
+        events.exit().remove();
+
+        let eventEnter = events.enter().append('g').classed('.events', true);
+
+        events = eventEnter.merge(events);
+
+        events.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
+        
+        let circle = events.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
+        
+        circle.on("mouseover", (d) => {
             let t = transition('t').duration(500);
             select(".tooltip")
               .html(() => {
@@ -112,23 +134,14 @@ export class EventLine {
             select(".tooltip").transition(t)
             .style("opacity", 0);
           });
-    
-if(cohort.branch != undefined){
-    console.log(cohort.branch)
-    let branchCircles = branchSvg.selectAll('.branch-circle-branch').data(cohort.branch);
-    
-    branchCircles.exit().remove();
 
-    let bcirclesEnter = circles.enter().append('circle').classed('branch-circle-branch', true);
+          let branchSpot = cohort.filter(d=> d[0] == 'Branch');
 
-    branchCircles = bcirclesEnter.merge(branchCircles);
-
-    branchCircles.attr('cx', (d, i)=> {return (i * 25) + 5}).attr('cy', 20)
-    .attr('r', (d)=> {return Math.sqrt(d[2]); }).attr('fill', '#375f84');
-
-}
-       
-
+          let branchTest = cohort.map(d=> d[0] == 'Branch');
+          console.log(cohort);
+          console.log(branchSpot);
+          console.log(branchTest);
+      
     }
 
     private drawLine(){
@@ -138,75 +151,151 @@ if(cohort.branch != undefined){
 
     }
 
-    private updateEvents(filters) {
-
-        filters = filters.filter(d=> {return d[0] != 'Branch'});
-       
-        function filText(d){
-            if(d[0] == 'demographic'){return 'First Score'}else{
-                let label = d[1][1];
-                return label[0].parent;
-            }
-        }
-
-        function labelClick(d){
-            let rec = select(d);
-                if(d[0] == 'demographic'){
-                  //  events.fire('revert_to_promis');
-                    that.startCodes = null;
-                    console.log(that.startCodes);
-                    }else{
-                    that.startCodes = d[1];
-                    console.log(that.startCodes);
-                   // events.fire('event_selected', d[1]);
+    private drawEventButtons(filters){
+            let that = this;
+            
+            function filText(d){
+                if(d[0] == 'demographic'){return 'First Score'}else{
+                    let label = d[1][1];
+                    return label[0].parent;
                 }
-        }
+            }
 
-        let that = this;
-        let svg = this.$node.select('.event_line_svg');
-        
-        svg.selectAll('.event_label').remove();
+            function labelClick(d){
+                let rec = select(d);
+                    if(d[0] == 'demographic'){
+                      //  events.fire('revert_to_promis');
+                        that.startCodes = null;
+                        that.startEventLabel = 'First Promis Score';
+                        that.drawEventButtons(that.filter);
+                        events.fire('event_selected', that.startCodes);
+                       
+                        }else{
+                        
+                        that.startCodes = d[1];
+                        let label = d[1][1];
+                        that.startEventLabel = label[0].parent;
+                       
+                        that.drawEventButtons(that.filter);
+                        events.fire('event_selected', that.startCodes);
+                       
+                    }
+                }
 
-        let events = svg.selectAll('.event_label').data(filters);
-        events.exit().remove();
-        let eventsEnter = events.enter().append('g').classed('event_label', true);
+            filters = filters.filter(d=> {return d[0] != 'Branch' || d[0] != 'demographic'});
 
-        events = eventsEnter.merge(events);
-        events.attr('transform', (d, i) => `translate(${(i * 82)}, 0)`);
-       
-        let rect = events.append('rect').attr('rx', 3).attr('ry', 3);
-        let text = events.append('text').text(d=> filText(d)).attr('transform', 'translate(18,15)');
-        let eventNodes = events.nodes();
+            this.$node.select('.event-buttons').remove();
 
-        let last = eventNodes.length;
-        eventNodes[last - 1].classList.add('selected-event');
-
-        events.on('click', (d, i)=> {
-
-            selectAll('.event_label').classed('selected-event', false);
-
-            let boop = events.nodes();
-          
-            select(boop[i]).classed('selected-event', true);
-            labelClick(d)});
-        }
-
-        private drawEventButtons(){
             let div = this.$node.append('div').classed('event-buttons', true);
            // let div = this.$node;
-            div.append('input')
-            .attr('type', 'button').attr('id', 'event-start')
-            .classed('btn', true).classed('btn-default', true).classed('btn-sm', true)//.classed('disabled', true)
-            .attr('value', 'Update Start Day to Event')
-            .on('click', () => {
-                if(this.startCodes == null){
-                   // events.fire('revert_to_promis');
-                   events.fire('event_selected', this.startCodes);
-                }else{
-                    events.fire('event_selected', this.startCodes);
-                }
-               
-            });
+            //toggle for event day
+            let startPanel = div.append('div').classed('start-event', true);
+                    
+            let startToggle = startPanel.append('div').classed('btn-group', true);
+            startToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                    .append('text').text(this.startEventLabel);
+    
+            let startTogglebutton = startToggle.append('button')
+                                        .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                        .classed('dropdown-toggle', true)
+                                        .attr('data-toggle', 'dropdown');
+    
+            startTogglebutton.append('span').classed('caret', true);
+    
+            let startUl = startToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+            
+            let eventLabels = startUl.selectAll('li').data(filters).enter().append('li');
+                                      
+            eventLabels.append('href').append('text').text(d=> filText(d));
+
+            eventLabels.on('click', d=> labelClick(d))
+  
+            //toggle for scale
+            let scalePanel = div.append('div').classed('scale', true);
+                    
+            let scaleToggle = scalePanel.append('div').classed('btn-group', true);
+            scaleToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                    .append('text').text(this.scoreLabel);
+
+            
+            let togglebutton = scaleToggle.append('button')
+                                        .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                        .classed('dropdown-toggle', true)
+                                        .attr('data-toggle', 'dropdown');
+    
+            togglebutton.append('span').classed('caret', true);
+    
+                        let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+                        let abs = ul.append('li').append('href').append('text').text('Absolute');
+                        let rel = ul.append('li').append('href').append('text').text('Relative');//.attr('value', 'Absolute');
+              
+            abs.on('click', () =>{
+                            this.scoreLabel = 'Absolute Scale';
+                            this.drawEventButtons(this.filter);
+                           // this.drawScoreFilterBox(this.scoreBox);
+                            events.fire('change_promis_scale', this.scoreLabel)});
+    
+            rel.on('click', () =>{
+                                this.scoreLabel = 'Relative Scale';
+                                this.drawEventButtons(this.filter);
+                              //  this.drawScoreFilterBox(this.scoreBox);
+        
+                                events.fire('change_promis_scale', this.scoreLabel)});
+    
+            let aggToggle = div.append('div').classed('aggDiv', true).append('input')
+                            .attr('type', 'button').attr('id', 'aggToggle')
+                            .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                            .attr('value', 'Aggregate Scores')
+                            .on('click', () => {
+                                events.fire('aggregate_button_clicked');
+                            });
+            
+            let quartDiv = div.append('div').classed('quartDiv', true);
+                quartDiv.append('input').attr('type', 'button')
+                    .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                    .attr('value', 'Separate by Quartiles').on('click', () =>{
+                        select('.checkDiv').remove();
+                        events.fire('separate_aggregate');
+                          ///radio aggregation
+                        let checkDiv = quartDiv.append('div').classed('checkDiv', true);
+                        let tCheck = checkDiv.append('div');
+                        tCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleT').attr('checked', true)
+                        .attr('value', 'top').on('click', () => {
+    
+                            let p = selectAll('.top');
+                      
+                            if(select("#sampleT").property("checked")){
+                                p.classed('hidden', false);
+                            }else{
+                                p.classed('hidden', true);
+                            }
+                        })
+                        tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
+    
+                        let mCheck = checkDiv.append('div');
+                        mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
+                        .attr('value', 'middle').on('click', () => {
+                            let p = selectAll('.middle');
+                            if(select("#sampleM").property("checked")){
+                                p.classed('hidden', false);
+                            }else{
+                                p.classed('hidden', true);
+                            }
+                        });
+                        mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
+    
+                        let bCheck = checkDiv.append('div');
+                        bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
+                        .attr('value', 'bottom').on('click', () =>{
+                            let p = selectAll('.bottom');
+                            if(select("#sampleB").property("checked")){
+                                p.classed('hidden', false);
+                            }else{
+                                p.classed('hidden', true);
+                            }
+                        });
+                        bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
+                    });
         }
 
         private renderOrdersTooltip(tooltip_data) {
