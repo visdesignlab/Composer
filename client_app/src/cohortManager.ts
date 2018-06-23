@@ -29,6 +29,7 @@ export class CohortManager {
     clumpedBool;
     seperatedCohortArray = [];
     branchSelected;
+    cohortTree = [];
 
     //attempting to set up structure to hold filters
     filterRequirements = {
@@ -72,11 +73,12 @@ export class CohortManager {
         });
 
         events.on('branch_cohort', ()=> {
-            
-            if(this.cohortkeeperarray == undefined){
+            let branch;
+            if(this.cohortkeeperarray[this.cohortIndex].branch == undefined){
                 console.log('new branch');
-            }
-            let branch = [];
+                branch = [];
+            }else{ branch = this.cohortkeeperarray[this.cohortIndex].branch; }
+            
             let b = Object.assign([], this.cohortkeeperarray[this.cohortIndex]);
             let bcpt = [Object.assign([], this.cptObjectKeeper[this.cohortIndex])];
             let bfilter = [Object.assign([], this.cohortfilterarray[this.cohortIndex])];
@@ -88,6 +90,16 @@ export class CohortManager {
             let newSpot = branch.length - 1;
             let indexBranch = this.cohortfilterarray[this.cohortIndex].length
             this.cohortfilterarray[this.cohortIndex].push(['Branch', newSpot, indexBranch]);
+            let treeBranch = { 
+                eventIndex: indexBranch,
+                parentIndex: this.cohortIndex, 
+                events: null, 
+                promis: this.cohortkeeperarray[this.cohortIndex], 
+                branches: [] };
+            
+            this.cohortTree[this.cohortIndex].branches.push(treeBranch);
+
+            console.log(this.cohortTree)
          
             events.fire('update_filters', [this.selectedFilter, this.cohortkeeperarray]);
             events.fire('branch_selected', [this.cohortIndex, newSpot, branch[newSpot]]);
@@ -108,7 +120,7 @@ export class CohortManager {
             events.fire('selected_stat_change', [this.selectedCohort, this.cohortIndex]);
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
             events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-            events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray[this.cohortIndex]]);
+            events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray]);
         });
 
         events.on('clear_cohorts', () => {
@@ -135,7 +147,7 @@ export class CohortManager {
             events.fire('selected_stat_change', [this.selectedCohort, index]);
             events.fire('selected_event_filter_change', this.selectedFilter.cpt);
             events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-            events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
+            events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray]);
 
           });
 
@@ -209,7 +221,7 @@ export class CohortManager {
             if(this.branchSelected == null){
                
                 this.cohortfilterarray[this.cohortIndex].push(filterReq);
-                events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
+                events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray]);
             }else{
                
             }
@@ -244,6 +256,16 @@ export class CohortManager {
           events.on('filtered_patient_promis', (evt, item) => {
             
              this.cohortkeeperarray.push(item);
+
+             let  newParent = {
+                 eventIndex: 0,
+                 parentIndex: null,
+                 events: this.cohortfilterarray[this.cohortIndex], 
+                 promis: this.cohortkeeperarray[this.cohortIndex], 
+                 branches: [] };
+
+             this.cohortTree.push(newParent);
+            // console.log(this.cohortTree);
             
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
@@ -253,13 +275,14 @@ export class CohortManager {
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
              events.fire('selected_event_filter_change', this.cohortfilterarray[this.cohortIndex]);
              events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
-             events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
+             events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray]);
 
           });
 
           events.on('add_cpt_to_filterArray', (evt, item)=>{
             
             this.cohortfilterarray[this.cohortIndex].push(item);
+            console.log(this.cohortTree);
           });
 
           events.on('filter_cohort_by_event', (evt, item)=> {
@@ -272,7 +295,7 @@ export class CohortManager {
                     if(this.cohortfilterarray[this.cohortIndex].branch == undefined){
                         this.cptObjectKeeper[this.cohortIndex] = item[0];
                         this.cohortfilterarray[this.cohortIndex].push(cptfil);
-                        events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
+                        events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray]);
                     }else{
                         
                         let tempBranch = this.cohortfilterarray[this.cohortIndex].branch;
@@ -283,7 +306,7 @@ export class CohortManager {
                         tempcpt.branch = this.cptObjectKeeper[this.cohortIndex].branch;
                         this.cptObjectKeeper[this.cohortIndex] = tempcpt;
                         
-                        events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray[this.cohortIndex]]);
+                        events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray]);
                         
                     }
                
@@ -294,8 +317,10 @@ export class CohortManager {
                   this.cptObjectKeeper[this.cohortIndex].branch[branchIndex] = item[0];
                   this.cohortfilterarray[index].branch[branchIndex].push(cptfil);
                  
-                  events.fire('send_filter_to_codebar',[ this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray[this.cohortIndex]]);
+                  events.fire('send_filter_to_codebar',[ this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray]);
               }
+
+              console.log(this.cohortTree);
               
           });
 
