@@ -58,6 +58,12 @@ export class EventLine {
 
     private attachListener() {
 
+    events.on('test', (evt, item)=> {
+        console.log(item);
+        this.drawBranches(item);
+
+    })
+
     events.on('send_filter_to_codebar', (evt, item)=> {
        
             //item[0] is for the event start buttons,
@@ -70,7 +76,7 @@ export class EventLine {
 
             this.drawEventButtons(item[0]);
            // this.updateEvents(eventButtonData);
-            this.drawBranches(branchLineData);
+          //  this.drawBranches(branchLineData);
 
             let eventIndex =  eventButtonData.length;
             let event =  eventButtonData[eventIndex -1];
@@ -90,23 +96,22 @@ export class EventLine {
     
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg');
-       // branchSvg.selectAll('*').remove();
-       let circleScale = scaleSqrt().range([2, 12]).domain([0, 3000]).clamp(true);
+        branchSvg.selectAll('*').remove();
+       //let circleScale = scaleSqrt().range([2, 12]).domain([0, 3000]).clamp(true);
 
         let cohorts = branchSvg.selectAll('.cohort-lines').data(cohort);
 
         cohorts.exit().remove();
 
-        let coEnter = cohorts.enter().append('g').classed('cohort-lines', true);
+        let coEnter = cohorts.enter().append('g').attr('class', (d, i) => i).classed('cohort-lines', true);
 
         cohorts = coEnter.merge(cohorts);
 
-        cohorts.attr('transform', (d, i)=> 'translate(0,' + i * 20 + ')');
-        cohorts.classed((d, i)=> i, true);
+        cohorts.attr('transform', (d, i)=> 'translate(0,' + i * 40 + ')');
 
         let label = cohorts.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)}).attr('transform', 'translate(0, 10)');
         
-        let events = cohorts.append('g').attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d);
+        let events = cohorts.append('g').attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.events);
 
         events.exit().remove();
 
@@ -135,12 +140,46 @@ export class EventLine {
             .style("opacity", 0);
           });
 
-          let branchSpot = cohort.filter(d=> d[0] == 'Branch');
+          let branchGroups = cohorts.selectAll('.branches').data(d=>d.branches);
 
-          let branchTest = cohort.map(d=> d[0] == 'Branch');
-          console.log(cohort);
-          console.log(branchSpot);
-          console.log(branchTest);
+          branchGroups.exit().remove();
+
+          let benter = branchGroups.enter().append('g').classed('branches', true);
+
+          branchGroups = benter.merge(branchGroups);
+
+          branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');
+
+          console.log(branchGroups);
+
+          let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.events);
+
+          branchEvents.exit().remove();
+
+          let branchEventsEnter = branchEvents.enter().append('g').classed('branch-events', true);
+          
+          branchEvents = branchEventsEnter.merge(branchEvents);
+
+          branchEvents.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
+
+          let branchCircle = branchEvents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
+
+          branchCircle.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+              .html(() => {
+                return this.renderOrdersTooltip(d);
+              })
+              .transition(t)
+              .style("opacity", 1)
+              .style("left", `${event.pageX + 10}px`)
+              .style("top", `${event.pageY + 10}px`);
+          })
+          .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+          });
       
     }
 
@@ -208,7 +247,7 @@ export class EventLine {
                                       
             eventLabels.append('href').append('text').text(d=> filText(d));
 
-            eventLabels.on('click', d=> labelClick(d))
+            eventLabels.on('click', d=> labelClick(d));
   
             //toggle for scale
             let scalePanel = div.append('div').classed('scale', true);
