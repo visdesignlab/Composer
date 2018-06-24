@@ -6,7 +6,8 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal, scaleSqrt} from 'd3-scale';
-import {line, curveMonotoneX, curveLinear} from 'd3-shape';
+import * as hierarchy from 'd3-hierarchy';
+import {line, curveMonotoneX, curveLinear, linkHorizontal} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
@@ -61,6 +62,7 @@ export class EventLine {
     events.on('test', (evt, item)=> {
         console.log(item);
         this.drawBranches(item);
+        this.tester(item);
 
     })
 
@@ -180,7 +182,21 @@ export class EventLine {
             select(".tooltip").transition(t)
             .style("opacity", 0);
           });
+
+
+          var link = linkHorizontal();
+         // .x(function(d) { return d.y; })
+         // .y(function(d) { return d.x; });
       
+    }
+
+    private tester(treedata){
+
+        let nodes = hierarchy(treedata, function(d) {
+            return d.children;
+          });
+
+          console.log(nodes);
     }
 
     private drawLine(){
