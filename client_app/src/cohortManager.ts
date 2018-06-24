@@ -91,7 +91,8 @@ export class CohortManager {
             let indexBranch = this.cohortfilterarray[this.cohortIndex].length;
             this.cohortfilterarray[this.cohortIndex].push(['Branch', newSpot, indexBranch]);
 
-            let branchFirst = [bfilter];
+            let branchFirst = [{parentEvents: bfilter, parentLink: [this.cohortIndex, b.length - 2]}];
+
             let treeBranch = { 
                 eventIndex: indexBranch,
                 parentIndex: this.cohortIndex,
@@ -264,8 +265,8 @@ export class CohortManager {
              let  newParent = {
                  eventIndex: 0,
                  parentIndex: null,
-                 events: this.cohortfilterarray[this.cohortIndex], 
-                 promis: this.cohortkeeperarray[this.cohortIndex], 
+                 events: this.cohortfilterarray[this.cohortIndex],
+                 promis: this.cohortkeeperarray[this.cohortIndex],
                  branches: [] };
 
              this.cohortTree.push(newParent);
@@ -374,18 +375,7 @@ export class CohortManager {
           });
 
           events.on('min_day_added', (evt, item)=> {
-              //do I need this??
-              /*
-              if(this.branchSelected == null){
-                  console.log('branch null');
-                  this.cohortkeeperarray[this.cohortIndex] = item;
-                  this.selectedCohort = item;
-              }else{
-                  let index = this.branchSelected[0];
-                  let branchIndex = this.branchSelected[1];
-                  this.cohortkeeperarray[index].branch[branchIndex] = item;
-                  this.selectedCohort = item;
-              }*/
+         
               this.branchoNot(item, this.cohortkeeperarray).then(cohort=> {
 
                   this.selectedCohort = cohort;
