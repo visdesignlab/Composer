@@ -183,6 +183,7 @@ export class EventLine {
             .style("opacity", 0);
           });
 
+          
 
           var link = linkHorizontal();
          // .x(function(d) { return d.y; })
@@ -191,12 +192,24 @@ export class EventLine {
     }
 
     private tester(treedata){
+      //  let hierarchy = hierarchy;
+      
+        let nodes = hierarchy(treedata, function(d){
+            return d.branches;
+        });
 
-        let nodes = hierarchy(treedata, function(d) {
-            return d.children;
-          });
+          console.log(treedata);
 
-          console.log(nodes);
+          let branch = treedata.map(d=> d.branches);
+
+        //  selectAll(cohort)
+        console.log(branch);
+
+          function positionLink(d) {
+            return "M" + d[0].x + "," + d[0].y
+                 + "S" + d[1].x + "," + d[1].y
+                 + " " + d[2].x + "," + d[2].y;
+          }
     }
 
     private drawLine(){
