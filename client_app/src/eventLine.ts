@@ -79,9 +79,7 @@ export class EventLine {
             this.filter = item[0];
 
             this.drawEventButtons(item[0]);
-           // this.updateEvents(eventButtonData);
-          //  this.drawBranches(branchLineData);
-
+     
             let eventIndex =  eventButtonData.length;
             let event =  eventButtonData[eventIndex -1];
          
@@ -99,14 +97,11 @@ export class EventLine {
 
         this.branchHeight = cohort.length * 30;
         let moveDistance = this.branchHeight / cohort.length;
-        console.log(moveDistance);
-    
+     
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
         branchSvg.selectAll('*').remove();
-       //let circleScale = scaleSqrt().range([2, 12]).domain([0, 3000]).clamp(true);
-
-
+      
         let cohorts = branchSvg.selectAll('.cohort-lines').data(cohort);
 
         cohorts.exit().remove();
@@ -123,7 +118,7 @@ export class EventLine {
 
         events.exit().remove();
 
-        let eventEnter = events.enter().append('g').classed('.events', true);
+        let eventEnter = events.enter().append('g').classed('events', true);
 
         events = eventEnter.merge(events);
 
@@ -147,6 +142,26 @@ export class EventLine {
             select(".tooltip").transition(t)
             .style("opacity", 0);
           });
+
+          let nodes = events.nodes();
+          let linkData = [];
+          nodes.forEach((n, i) => {
+
+                 let x = n.getBoundingClientRect().x;
+                 let y = n.getBoundingClientRect().y;
+                 console.log(n.parentNode);
+                
+
+                 linkData.push([x, y]);
+
+          });
+
+          events.map(e=> {
+              console.log(e);
+
+          });
+
+          console.log(linkData);
 
           let branchGroups = cohorts.selectAll('.branches').data(d=>d.branches);
 
@@ -218,25 +233,22 @@ export class EventLine {
           }
     }
 
-    private drawLine(){
-        let eventLine = this.$node;
-        let eventLineSvg = eventLine.append('svg').classed('event_line_svg', true)
-        .attr('height', 25).attr('width', 500);
-
-    }
-
     private drawEventButtons(filters){
             let that = this;
             
             function filText(d){
-                if(d[0] == 'demographic'){return 'First Score'}else{
-                    let label = d[1][1];
-                    console.log(d);
-                    return label[0].parent;
-                }
+                if(d[0] !=  'Branch'){
+
+                    if(d[0] == 'demographic'){return 'First Score'}else{
+                        let label = d[1][1];
+                        return label[0].parent;
+                    }
+
+                }else{ console.log('Branch filter passed')}
             }
 
             function labelClick(d){
+
                 let rec = select(d);
                     if(d[0] == 'demographic'){
                       //  events.fire('revert_to_promis');
@@ -257,7 +269,7 @@ export class EventLine {
                     }
                 }
 
-            filters = filters.filter(d=> {return d[0] != 'Branch' || d[0] != 'demographic'});
+            filters = filters.filter(d=> {return d[0] != 'Branch' && d[0] != 'demographic'});
 
             this.$node.select('.event-buttons').remove();
 
