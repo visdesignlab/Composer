@@ -34,6 +34,7 @@ export class EventLine {
     private scoreLabel;
     private startEventLabel;
     private eventToggleLabels;
+    private branchHeight;
 
     constructor(parent: Element, cohort) {
 
@@ -46,9 +47,10 @@ export class EventLine {
 
     this.scoreLabel = 'Absolute Scale';
     this.startEventLabel = 'Change Start to Event';
+    this.branchHeight = 20;
 
     let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
-    branchWrapper.append('svg');
+    branchWrapper.append('svg').attr('height', this.branchHeight);
    
     this.attachListener();
 
@@ -62,7 +64,7 @@ export class EventLine {
     events.on('test', (evt, item)=> {
         console.log(item);
         this.drawBranches(item);
-        this.tester(item);
+    //    this.tester(item);
 
     })
 
@@ -89,17 +91,21 @@ export class EventLine {
                this.startCodes = null;
                this.startEventLabel = 'First Promis Score';
            }
-          
     });
 
     }
 
     private drawBranches(cohort){
+
+        this.branchHeight = cohort.length * 30;
+        let moveDistance = this.branchHeight / cohort.length;
+        console.log(moveDistance);
     
         let branchWrapper = this.$node.select('.branch-wrapper');
-        let branchSvg = branchWrapper.select('svg');
+        let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
         branchSvg.selectAll('*').remove();
        //let circleScale = scaleSqrt().range([2, 12]).domain([0, 3000]).clamp(true);
+
 
         let cohorts = branchSvg.selectAll('.cohort-lines').data(cohort);
 
@@ -109,7 +115,7 @@ export class EventLine {
 
         cohorts = coEnter.merge(cohorts);
 
-        cohorts.attr('transform', (d, i)=> 'translate(0,' + i * 40 + ')');
+        cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
 
         let label = cohorts.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)}).attr('transform', 'translate(0, 10)');
         
@@ -225,6 +231,7 @@ export class EventLine {
             function filText(d){
                 if(d[0] == 'demographic'){return 'First Score'}else{
                     let label = d[1][1];
+                    console.log(d);
                     return label[0].parent;
                 }
             }
