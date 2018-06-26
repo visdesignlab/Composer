@@ -7,7 +7,7 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal, scaleSqrt} from 'd3-scale';
 import * as hierarchy from 'd3-hierarchy';
-import {line, curveMonotoneX, curveLinear, linkHorizontal} from 'd3-shape';
+import {line, curveMonotoneX, curveLinear, linkHorizontal, curveMonotoneY, curveCardinal} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
@@ -62,7 +62,7 @@ export class EventLine {
     private attachListener() {
 
     events.on('test', (evt, item)=> {
-        console.log(item);
+       
         this.drawBranches(item);
     //    this.tester(item);
 
@@ -101,7 +101,35 @@ export class EventLine {
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
         branchSvg.selectAll('*').remove();
+
+               
+        let rows = [];
+        cohort.forEach(c => {
+            let e = c.events.map((event, i) => {
+               let coord = {x: (i * 30.5) + 65, y: 0 + 5 };
+               return coord;
+            });
+            rows.push(e);
+            c.rowData = e;
+        });
+
+        cohort.forEach(c => {
       
+          if(c.branches.length != 0){
+              c.branches.forEach((b, i) => {
+                  b.rowData = [{x: -25, y: -10 }, {x: -15, y: -8 }];
+                  b.events.forEach((event, i) => {
+                      let coord = {x: (i * 30.5) + 5, y: 0 + 5 };
+                      b.rowData.push(coord);
+                   });
+              });
+          }
+        
+      });
+      let linko = line().curve(curveMonotoneY)
+      .x(function(d) { return d['x'] })
+      .y(function(d) { return d['y'] });
+
         let cohorts = branchSvg.selectAll('.cohort-lines').data(cohort);
 
         cohorts.exit().remove();
@@ -113,6 +141,9 @@ export class EventLine {
         cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
 
         let label = cohorts.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)}).attr('transform', 'translate(0, 10)');
+ 
+        let linegroups = cohorts.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+        linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
         
         let events = cohorts.append('g').attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.events);
 
@@ -147,34 +178,6 @@ export class EventLine {
 
           let nodes = events.nodes();
 
-       
-          let rows = [];
-          cohort.forEach(c => {
-              let e = c.events.map((event, i) => {
-                 // let coord = {x: event['root'][0], y: event['root'][1] };
-                 let coord = {x: (i * 30.5) + 65, y: 0 + 5 };
-               // let coord = event['root'];
-                  return coord;
-              });
-              console.log(e);
-              rows.push(e);
-              c.rowData = e;
-          });
-
-          console.log(cohort);
-
-        //  var link = line().x((d, i) => i * 30).y(0);
-         // var link = line().x((d, i) => i * 30).y(0);
-          let linko = line()
-          .x(function(d) { return d['x'] })
-          .y(function(d) { return d['y'] });
-      
-          let linegroups = cohorts.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
-          linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
-
-       //   console.log(linkData);
-      //    console.log(events);
-
           let branchGroups = cohorts.selectAll('.branches').data(d=>d.branches);
 
           branchGroups.exit().remove();
@@ -185,7 +188,8 @@ export class EventLine {
 
           branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');
 
-     //     console.log(branchGroups);
+          let branchlines = branchGroups.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+          branchlines.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
 
           let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.events);
 
@@ -228,12 +232,6 @@ export class EventLine {
             return d.branches;
         });
 
-          console.log(treedata);
-
-        //  let branch = treedata.map(d=> d.branches);
-
-        //  selectAll(cohort)
-       
           function positionLink(d) {
             return "M" + d[0].x + "," + d[0].y
                  + "S" + d[1].x + "," + d[1].y
