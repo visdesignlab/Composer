@@ -62,12 +62,13 @@
     //  min-height: 50px;
 }
 
-.events circle {
+.events circle,
+.branch-events circle {
     fill: #808B96;
 }
 
 .node-links {
     fill: none;
-    stroke: steelblue;
-    stroke-width: 1.5px;
+    stroke: #808B96;
+    stroke-width: 1px;
 }
