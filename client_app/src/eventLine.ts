@@ -35,6 +35,7 @@ export class EventLine {
     private startEventLabel;
     private eventToggleLabels;
     private branchHeight;
+    private selectedCohortIndex;
 
     constructor(parent: Element, cohort) {
 
@@ -66,7 +67,28 @@ export class EventLine {
         this.drawBranches(item);
     //    this.tester(item);
 
-    })
+    });
+
+    events.on('branch_selected', (evt, item)=> {
+        console.log(item);
+    });
+
+    events.on('cohort_selected', (evt, item)=> {
+
+        console.log('cohort_selected');
+   
+        if(this.selectedCohortIndex != item[1]){
+            selectAll('.selected-group').classed('selected-group', false);
+            this.selectedCohortIndex = item[1];
+
+            let cohortclass = String(item[1]);
+            let cohorts = this.$node.selectAll('.cohort-lines');
+            let selected = document.getElementsByClassName(cohortclass + ' cohort-lines');
+            console.log(selected);
+            selectAll(selected).classed('selected-group', true);
+        }else{console.log('cohort already selected');}
+        
+    });
 
     events.on('send_filter_to_codebar', (evt, item)=> {
        
@@ -93,7 +115,9 @@ export class EventLine {
 
     }
 
+
     private drawBranches(cohort){
+
 
         this.branchHeight = cohort.length * 30;
         let moveDistance = this.branchHeight / cohort.length;
@@ -137,6 +161,9 @@ export class EventLine {
         let coEnter = cohorts.enter().append('g').attr('class', (d, i) => i).classed('cohort-lines', true);
 
         cohorts = coEnter.merge(cohorts);
+
+        let selected = document.getElementsByClassName(String(this.selectedCohortIndex) + ' cohort-lines');
+        selectAll(selected).classed('selected-group', true);
 
         cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
 
