@@ -674,9 +674,7 @@ export class similarityScoreDiagram {
                             .on('mouseover', mouseover)
                             .on('mouseout', mouseout)
                             .on('click', (d)=>  voronoiClicked(d.data.pat));
-
                     }
-
 }
                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);

@@ -150,21 +150,27 @@ export class EventLine {
        
           let rows = [];
           cohort.forEach(c => {
-              let e = c.events.map(event => {
-                  let coord = {x: event['root'][0], y: event['root'][1] };
+              let e = c.events.map((event, i) => {
+                 // let coord = {x: event['root'][0], y: event['root'][1] };
+                 let coord = {x: (i * 30.5) + 65, y: 0 + 5 };
                // let coord = event['root'];
                   return coord;
               });
               console.log(e);
               rows.push(e);
+              c.rowData = e;
           });
 
-          console.log(rows);
+          console.log(cohort);
 
-          var link = line().x(d=> +d['x']).y(d=> +d['y']);
+        //  var link = line().x((d, i) => i * 30).y(0);
+         // var link = line().x((d, i) => i * 30).y(0);
+          let linko = line()
+          .x(function(d) { return d['x'] })
+          .y(function(d) { return d['y'] });
       
-          let linegroups = events.selectAll('.rows').data(rows).enter().append('g').classed('rows', true);
-          linegroups.selectAll('.node-links').data(d=> d).enter().append('path').attr('d', link).classed('node-links', true);
+          let linegroups = cohorts.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+          linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
 
        //   console.log(linkData);
       //    console.log(events);
