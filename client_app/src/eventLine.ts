@@ -125,6 +125,8 @@ export class EventLine {
         events.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
         
         let circle = events.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
+
+        events.attr('d', function(d, i){ return d['root'] = [this.getBoundingClientRect().x, this.getBoundingClientRect().y]; });
         
         circle.on("mouseover", (d) => {
             let t = transition('t').duration(500);
@@ -144,24 +146,28 @@ export class EventLine {
           });
 
           let nodes = events.nodes();
-          let linkData = [];
-          nodes.forEach((n, i) => {
 
-                 let x = n.getBoundingClientRect().x;
-                 let y = n.getBoundingClientRect().y;
-                 console.log(n.parentNode);
-                
-
-                 linkData.push([x, y]);
-
-          });
-
-          events.map(e=> {
+       
+          let rows = [];
+          cohort.forEach(c => {
+              let e = c.events.map(event => {
+                  let coord = {x: event['root'][0], y: event['root'][1] };
+               // let coord = event['root'];
+                  return coord;
+              });
               console.log(e);
-
+              rows.push(e);
           });
 
-          console.log(linkData);
+          console.log(rows);
+
+          var link = line().x(d=> +d['x']).y(d=> +d['y']);
+      
+          let linegroups = events.selectAll('.rows').data(rows).enter().append('g').classed('rows', true);
+          linegroups.selectAll('.node-links').data(d=> d).enter().append('path').attr('d', link).classed('node-links', true);
+
+       //   console.log(linkData);
+      //    console.log(events);
 
           let branchGroups = cohorts.selectAll('.branches').data(d=>d.branches);
 
@@ -173,7 +179,7 @@ export class EventLine {
 
           branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');
 
-          console.log(branchGroups);
+     //     console.log(branchGroups);
 
           let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.events);
 
@@ -206,10 +212,7 @@ export class EventLine {
 
           
 
-          var link = linkHorizontal();
-         // .x(function(d) { return d.y; })
-         // .y(function(d) { return d.x; });
-      
+        
     }
 
     private tester(treedata){
@@ -221,11 +224,10 @@ export class EventLine {
 
           console.log(treedata);
 
-          let branch = treedata.map(d=> d.branches);
+        //  let branch = treedata.map(d=> d.branches);
 
         //  selectAll(cohort)
-        console.log(branch);
-
+       
           function positionLink(d) {
             return "M" + d[0].x + "," + d[0].y
                  + "S" + d[1].x + "," + d[1].y
