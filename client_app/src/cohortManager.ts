@@ -347,12 +347,16 @@ export class CohortManager {
           events.on('filtered_by_count', (evt, item)=>{
             this.selectedCohort = item[0];
             this.cohortkeeperarray[this.cohortIndex] = item[0];
-            this.cohortfilterarray[this.cohortIndex].minCount = item[1];
+           
             if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].events.push(['Score Count', item[1], item[0].length]);
+                this.cohortfilterarray[this.cohortIndex].push(['Score Count', item[1], item[0].length]);
+                events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex], this.cohortfilterarray]);
                 events.fire('test', [this.cohortTree, this.cohortIndex]);
             }else{
-                this.cohortTree[this.cohortIndex].branch[this.branchSelected[1]].events.push(['Score Count', item[1], item[0].length]);
+                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].events.push(['Score Count', item[1], item[0].length]);
+                this.cohortfilterarray[this.cohortIndex].branch[this.branchSelected[1]].push(['Score Count', item[1], item[0].length]);
+                events.fire('send_filter_to_codebar',[ this.cohortfilterarray[this.cohortIndex].branch[this.branchSelected[1]], this.cohortfilterarray]);
                 events.fire('test', [this.cohortTree, this.branchSelected]);
             }
            
