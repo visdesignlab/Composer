@@ -270,8 +270,8 @@ export class CohortManager {
     
              this.selectedCohort = this.cohortkeeperarray[this.cohortIndex];
              this.selectedFilter = this.cohortfilterarray[this.cohortIndex];
-
-             events.fire('cohort_selected', [this.selectedCohort, this.cohortIndex, this.cohortTree]);
+             this.branchSelected = null;
+            // events.fire('cohort_selected', [this.selectedCohort, this.cohortIndex, this.cohortTree]);
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('add_to_cohort_bar', [this.cohortfilterarray, this.cohortkeeperarray]);
              events.fire('add_to_cohort_stat', [this.selectedCohort, this.cohortIndex]);
@@ -327,8 +327,6 @@ export class CohortManager {
                   events.fire('send_filter_to_codebar',[ this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray]);
                   events.fire('test', [this.cohortTree, this.branchSelected]);
                 }
-
-              console.log(this.cohortTree);
               
           });
 

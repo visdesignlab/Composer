@@ -67,6 +67,7 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
+           console.log(item);
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
         this.$node.select('.distributionWrapper').selectAll('*').remove();
