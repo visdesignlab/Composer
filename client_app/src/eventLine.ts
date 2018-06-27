@@ -256,10 +256,11 @@ export class EventLine {
             function filText(d){
                 if(d[0] !=  'Branch'){
 
-                    if(d[0] == 'demographic'){return 'First Score'}else{
+                    if(d[0] == 'demographic'){return 'First Score'}
+                    else if(d[0] == 'CPT'){
                         let label = d[1][1];
                         return label[0].parent;
-                    }
+                    }else{ console.log('nope'); }
 
                 }else{ console.log('Branch filter passed')}
             }

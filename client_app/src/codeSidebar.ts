@@ -199,7 +199,7 @@ export class CodeSidebar {
                     });
 }
 
-    private drawHistogram(histobins) {
+private drawHistogram(histobins) {
 
 
        let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, 'scale': this.xScale.domain([0, histobins[0].binCount])};
@@ -405,7 +405,7 @@ private drawOrderSearchBar(order){
     });
 
     events.fire('filter_by_cpt', [fixed, cptFilterArray]);
-  //  events.fire('add_cpt_to filterArray', cptFilterArray);
+ 
     select('.orderDiv').select('.codes').remove();
 });
 }
@@ -417,7 +417,7 @@ private DrawfilterDescriptionBox(filter){
     let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
     select('.descriptionDiv').selectAll('div').remove();
-   // let label = select('.descriptionDiv').append('div').classed('divLabel', true).append('text').text('Filter Layers');
+
     const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
     box.append('div').classed('panel-heading', true).append('text').text('Filter Layers');
 
@@ -444,25 +444,22 @@ private DrawfilterDescriptionBox(filter){
         let name;
         if(d[0] == 'demographic'){ name = 'demographic';
         }else if(d[0] == 'CPT'){ name = d[1][1][0].parent;
-        }
+        }else if(d[0] ==  'Score Count'){ name = 'score'; }
         return name;
     }
 
     function fillText(d){
         let des;
         if(d[0] == 'demographic'){
-
             if(d[1].length != 0){
- 
                 des = 'Demographic Filter';
-
             }else{
                 des = 'All Patients';
             }
-
         }else if(d[0] == 'CPT'){
                 des = d[1][1][0].parent;
             }
+        else{ des = d[0] + ' > ' + d[1]; }
 
         return des;
     }
