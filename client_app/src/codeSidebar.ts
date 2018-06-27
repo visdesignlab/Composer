@@ -67,7 +67,7 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
-           console.log(item);
+     
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
         this.$node.select('.distributionWrapper').selectAll('*').remove();
@@ -197,8 +197,6 @@ export class CodeSidebar {
                             let count = +val;
                             events.fire('filter_by_Promis_count', count);
                     });
-
-
 }
 
     private drawHistogram(histobins) {
@@ -301,7 +299,7 @@ export class CodeSidebar {
         this.scoreFreqRange = [Dom1, Dom2];
             }
         });
-                    
+
         this.$node.select('#Score-Count-Brush').call(this.freqBrush);
 
   }
@@ -426,7 +424,56 @@ private DrawfilterDescriptionBox(filter){
     let body = box.append('div').classed('panel-body', true);
 
     let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
-   // let filter = cohort[1];
+   
+    let barGroup = body.selectAll('.filter_stage').data(filter);
+    barGroup.exit().remove();
+    let barGroupEnter = barGroup.enter().append('div').classed('filter_stage', true);
+    barGroup = barGroupEnter.merge(barGroup);
+
+    let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
+
+    let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d[2])).attr('transform', 'translate(12, 0)');
+    rect.attr('class', d=> classRect(d));
+
+    let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
+    text.append('text').text((d, i)=> { return (i + 1) + ': '});
+
+    let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
+
+    function classRect(d){
+        let name;
+        if(d[0] == 'demographic'){ name = 'demographic';
+        }else if(d[0] == 'CPT'){ name = d[1][1][0].parent;
+        }
+        return name;
+    }
+
+    function fillText(d){
+        let des;
+        if(d[0] == 'demographic'){
+
+            if(d[1].length != 0){
+                des = ' ';
+                d[1].forEach(f=> {
+                    console.log(f);
+                    des = des + f.attributeName;
+                });
+
+            }else{
+                des = 'All Patients';
+            }
+
+        }else if(d[0] == 'CPT'){
+                des = d[1][1][0].parent;
+            }
+
+        return des;
+    }
+
+    text.append('text').text(d => d[2]).attr('transform', 'translate(170, 0)');
+
+
+   /*
     filter.forEach((fil, i) => {
        
        let stage = body.append('div').classed('filter_stage', true);
@@ -444,9 +491,10 @@ private DrawfilterDescriptionBox(filter){
 
         if(fil[0] == 'demographic'){
             if(fil[1].length != 0){
-                
+                    console.log(fil);
                    // text.selectAll('text').data(fil[1]).enter().append('text').text('Demographic').attr('transform', 'translate(15, 0)');
-                    text.append('text').text('Demographic').attr('transform', 'translate(15, 0)').data(fil[1]);
+                    let demo = text.append('text').text('Demographic').attr('transform', 'translate(15, 0)');
+                    select(demo).data(fil);
                     text.on("mouseover", (d) => {
                         let t = transition('t').duration(500);
                         select(".tooltip")
@@ -469,10 +517,9 @@ private DrawfilterDescriptionBox(filter){
             }
         if(fil[0] == 'CPT') {
        
-            text.append('text').text(fil[1][1][0].parent).attr('transform', 'translate(15, 0)');}
-
+        text.append('text').text(fil[1][1][0].parent).attr('transform', 'translate(15, 0)');}
         text.append('text').text(fil[2]).attr('transform', 'translate(170, 0)');
-    });
+    });*/
 
 }
 
@@ -486,19 +533,19 @@ private renderOrdersTooltip(tooltip_data) {
 private renderHistogramTooltip(tooltip_data) {
 
     let text = "<strong style='color:darkslateblue'>" + tooltip_data.x0 + ' - ' + tooltip_data.x1 + ': ' +  tooltip_data.length + "</strong></br>";
-
     return text;
 }
 
 private renderFilterTooltip(tooltip_data) {
+    console.log(tooltip_data);
+    let text;
+    tooltip_data.forEach(tip => {
+        console.log(tip);
 
-    let text = "<strong style='color:darkslateblue'>" + tooltip_data[0] + "</strong></br>";
-/*
-    tooltip_data.forEach(data => {
-    console.log(data);
-    });*/
+        text = text + " " + tip + '<br>';
 
-   // text = "<strong style='color:darkslateblue'>" + tooltip_data[0] + "</strong></br>";
+    });
+   // "<strong style='color:darkslateblue'>" + tooltip_data + "</strong></br>";
 
     return text;
 }
