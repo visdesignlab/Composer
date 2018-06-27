@@ -54,6 +54,8 @@ export class CohortManager {
         });
 
         events.on('aggregate_button_clicked', ()=> {
+            console.log(this.selectedCohort);
+            console.log(this.cohortkeeperarray[this.cohortIndex]);
             if(this.clumpedBool){
                 events.fire('clear_clumpin');
                 if(this.seperatedBool) {
@@ -179,7 +181,7 @@ export class CohortManager {
 
           events.on('separated_by_quant', (evt, item)=> {
             this.seperatedCohortArray = item;
-            this.seperatedBool = true;
+           // this.seperatedBool = true;
           });
 
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
@@ -333,7 +335,19 @@ export class CohortManager {
         });
 
         events.on('separate_aggregate', (evt, item)=> {
-            events.fire('separate_cohort_agg', this.selectedCohort);
+            if(!this.seperatedBool){
+                this.seperatedBool = true;
+                document.getElementById('quartile-btn').classList.add('btn-warning');
+                document.getElementById('checkDiv').classList.remove('hidden');
+                events.fire('separate_cohort_agg', this.selectedCohort);
+
+            }else{
+                this.seperatedBool = false;
+                document.getElementById('quartile-btn').classList.remove('btn-warning');
+                document.getElementById('checkDiv').classList.add('hidden');
+                events.fire('draw_plot', null);
+            }
+            
         });
 
         events.on('filter_by_cpt', (evt, item)=> {

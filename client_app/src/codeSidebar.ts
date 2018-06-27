@@ -199,7 +199,7 @@ export class CodeSidebar {
                     });
 }
 
-private drawHistogram(histobins) {
+    private drawHistogram(histobins) {
 
 
        let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, 'scale': this.xScale.domain([0, histobins[0].binCount])};
@@ -304,7 +304,7 @@ private drawHistogram(histobins) {
 
   }
 
-private drawOrderFilterBox (div) {
+    private drawOrderFilterBox (div) {
     let orderpanel = div.classed('panel', true).classed('panel-default', true);
     let scorehead = orderpanel.append('div').classed('panel-heading', true)
     scorehead.append('text').text('Order Filters');
@@ -340,147 +340,147 @@ private drawOrderFilterBox (div) {
     });
 
 }
-private drawOrderSearchBar(order){
+    private drawOrderSearchBar(order){
 
-    select('.orderDiv').select('.codes').remove();
+        select('.orderDiv').select('.codes').remove();
 
-    const box = select('.orderDiv').append('div').classed('codes', true);
-    let props = [];
+        const box = select('.orderDiv').append('div').classed('codes', true);
+        let props = [];
 
-    let orderFilters = box.selectAll('.orderFilters').data(order);
+        let orderFilters = box.selectAll('.orderFilters').data(order);
 
-    let orderEnter = orderFilters.enter().append('div').classed('orderFilters', true);
+        let orderEnter = orderFilters.enter().append('div').classed('orderFilters', true);
 
-    orderFilters.exit().remove();
+        orderFilters.exit().remove();
 
-    orderFilters = orderEnter.merge(orderFilters);
-   
-    let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', d => d['value']).attr('checked', true);
-    let ordertext = orderFilters.append('text').text(d => d['key']);
+        orderFilters = orderEnter.merge(orderFilters);
+    
+        let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', d => d['value']).attr('checked', true);
+        let ordertext = orderFilters.append('text').text(d => d['key']);
 
-    ordertext.on("mouseover", (d) => {
-        let t = transition('t').duration(500);
-        select(".tooltip")
-          .html(() => {
-            return this.renderOrdersTooltip(d);
-          })
-          .transition(t)
-          .style("opacity", 1)
-          .style("left", `${event.pageX + 10}px`)
-          .style("top", `${event.pageY + 10}px`);
-      })
-      .on("mouseout", () => {
-        let t = transition('t').duration(500);
-        select(".tooltip").transition(t)
-        .style("opacity", 0);
-      });
+        ordertext.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+            .html(() => {
+                return this.renderOrdersTooltip(d);
+            })
+            .transition(t)
+            .style("opacity", 1)
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY + 10}px`);
+        })
+        .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+        });
 
-    ordercheck.on('click', (d)=>{ console.log(d);})
+        ordercheck.on('click', (d)=>{ console.log(d);})
 
-    box.append('input')
-    .attr('type', 'button').classed('btn', true).classed('btn-default', true)
-    .attr('value', 'Filter by Code')
-    .on('click', () => {
+        box.append('input')
+        .attr('type', 'button').classed('btn', true).classed('btn-default', true)
+        .attr('value', 'Filter by Code')
+        .on('click', () => {
 
-    let checkNodes = ordercheck.nodes();
-    let checkedarray = [];
-    let cptFilterArray = [];
+        let checkNodes = ordercheck.nodes();
+        let checkedarray = [];
+        let cptFilterArray = [];
 
-    checkNodes.forEach((n, i) => {
-        if(n['checked']){
-            checkedarray.push(n['value']);
-           // Maybe make the 2 arrays use this array?
-           cptFilterArray.push(order[i]);
-        }
+        checkNodes.forEach((n, i) => {
+            if(n['checked']){
+                checkedarray.push(n['value']);
+            // Maybe make the 2 arrays use this array?
+            cptFilterArray.push(order[i]);
+            }
+        });
+
+        let fixed = [];
+        checkedarray.forEach(ch=> {
+            if (ch.indexOf(',') > -1) { 
+                let fix = ch.split(',');
+                fix.forEach(f => {
+                    fixed.push(f);
+                });
+            }else{fixed.push(ch); };
+        });
+
+        events.fire('filter_by_cpt', [fixed, cptFilterArray]);
+    
+        select('.orderDiv').select('.codes').remove();
     });
-
-    let fixed = [];
-    checkedarray.forEach(ch=> {
-        if (ch.indexOf(',') > -1) { 
-            let fix = ch.split(',');
-            fix.forEach(f => {
-                fixed.push(f);
-            });
-        }else{fixed.push(ch); };
-    });
-
-    events.fire('filter_by_cpt', [fixed, cptFilterArray]);
- 
-    select('.orderDiv').select('.codes').remove();
-});
 }
 
-private DrawfilterDescriptionBox(filter){
+    private DrawfilterDescriptionBox(filter){
 
-    filter = filter.filter(d=> {return d[0] != 'Branch'});
-       
-    let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
+        filter = filter.filter(d=> {return d[0] != 'Branch'});
+        
+        let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
-    select('.descriptionDiv').selectAll('div').remove();
+        select('.descriptionDiv').selectAll('div').remove();
 
-    const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
-    box.append('div').classed('panel-heading', true).append('text').text('Filter Layers');
+        const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
+        box.append('div').classed('panel-heading', true).append('text').text('Filter Layers');
 
-    let body = box.append('div').classed('panel-body', true);
+        let body = box.append('div').classed('panel-body', true);
 
-    let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
-   
-    let barGroup = body.selectAll('.filter_stage').data(filter);
-    barGroup.exit().remove();
-    let barGroupEnter = barGroup.enter().append('div').classed('filter_stage', true);
-    barGroup = barGroupEnter.merge(barGroup);
+        let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
+    
+        let barGroup = body.selectAll('.filter_stage').data(filter);
+        barGroup.exit().remove();
+        let barGroupEnter = barGroup.enter().append('div').classed('filter_stage', true);
+        barGroup = barGroupEnter.merge(barGroup);
 
-    let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
+        let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
 
-    let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d[2])).attr('transform', 'translate(12, 0)');
-    rect.attr('class', d=> classRect(d));
+        let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d[2])).attr('transform', 'translate(12, 0)');
+        rect.attr('class', d=> classRect(d));
 
-    let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
-    text.append('text').text((d, i)=> { return (i + 1) + ': '});
+        let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
+        text.append('text').text((d, i)=> { return (i + 1) + ': '});
 
-    let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
+        let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
 
-    function classRect(d){
-        let name;
-        if(d[0] == 'demographic'){ name = 'demographic';
-        }else if(d[0] == 'CPT'){ name = d[1][1][0].parent;
-        }else if(d[0] ==  'Score Count'){ name = 'score'; }
-        return name;
-    }
+        function classRect(d){
+            let name;
+            if(d[0] == 'demographic'){ name = 'demographic';
+            }else if(d[0] == 'CPT'){ name = d[1][1][0].parent;
+            }else if(d[0] ==  'Score Count'){ name = 'score'; }
+            return name;
+        }
 
-    function fillText(d){
-        let des;
-        if(d[0] == 'demographic'){
-            if(d[1].length != 0){
-                des = 'Demographic Filter';
-            }else{
-                des = 'All Patients';
-            }
-        }else if(d[0] == 'CPT'){
-                des = d[1][1][0].parent;
-            }
-        else{ des = d[0] + ' > ' + d[1]; }
+        function fillText(d){
+            let des;
+            if(d[0] == 'demographic'){
+                if(d[1].length != 0){
+                    des = 'Demographic Filter';
+                }else{
+                    des = 'All Patients';
+                }
+            }else if(d[0] == 'CPT'){
+                    des = d[1][1][0].parent;
+                }
+            else{ des = d[0] + ' > ' + d[1]; }
 
-        return des;
-    }
+            return des;
+        }
 
-    text.append('text').text(d => d[2]).attr('transform', 'translate(170, 0)');
-    text.on("mouseover", (d) => {
-        let t = transition('t').duration(500);
-        select(".tooltip")
-          .html(() => {
-            return this.renderFilterTooltip(d);
-          })
-          .transition(t)
-          .style("opacity", 1)
-          .style("left", `${event.pageX + 10}px`)
-          .style("top", `${event.pageY + 10}px`);
-      })
-      .on("mouseout", () => {
-        let t = transition('t').duration(500);
-        select(".tooltip").transition(t)
-        .style("opacity", 0);
-      });
+        text.append('text').text(d => d[2]).attr('transform', 'translate(170, 0)');
+        text.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+            .html(() => {
+                return this.renderFilterTooltip(d);
+            })
+            .transition(t)
+            .style("opacity", 1)
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY + 10}px`);
+        })
+        .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+        });
 
 }
 
