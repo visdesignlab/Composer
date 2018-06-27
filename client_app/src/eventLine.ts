@@ -96,11 +96,11 @@ export class EventLine {
             selectAll('.selected-group').classed('selected-group', false);
 
         if(index.length > 1){ 
-            console.log('branch index');
+
             let selected = document.getElementsByClassName(String(index[0]) + ' cohort-lines');
             selectAll(selected).selectAll('.branches').classed('selected-group', true);
         }else{
-            console.log('cohort index');
+         
             let selected = document.getElementsByClassName(String(index) + ' cohort-lines');
             selectAll(selected).selectAll('.event-rows').classed('selected-group', true);
         }
@@ -108,7 +108,7 @@ export class EventLine {
 
 
     private async drawBranches(cohort){
-      
+        console.log(cohort)
         this.branchHeight = cohort.length * 30;
         let moveDistance = this.branchHeight / cohort.length;
      
@@ -404,8 +404,20 @@ export class EventLine {
 
         private renderOrdersTooltip(tooltip_data) {
 
-            let text = "<strong style='color:darkslateblue'>" + tooltip_data + "</strong></br>";
-          
+            let text;
+            if(tooltip_data[0] == 'demographic') {
+              if(tooltip_data[1].length == 0){
+                text = "<strong style='color:darkslateblue'>" + 'All Patients: ' + tooltip_data[2] + "</strong></br>";
+              }else{ 
+                text = "<strong style='color:darkslateblue'>" + 'Demographic Filter: ' + tooltip_data[2] + "</strong></br>";
+              }
+            } 
+            if(tooltip_data[0] == 'CPT'){ 
+                let code = tooltip_data[1][1];
+                console.log(code[0].parent);
+                text = "<strong style='color:darkslateblue'>" + code[0].parent + ': ' + tooltip_data[2] + "</strong></br>";
+            }
+           
             return text;
         }
 }
