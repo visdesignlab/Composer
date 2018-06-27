@@ -108,10 +108,9 @@ export class EventLine {
 
 
     private async drawBranches(cohort){
-        console.log(cohort)
+    
         this.branchHeight = cohort.length * 30;
         let moveDistance = this.branchHeight / cohort.length;
-     
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
         branchSvg.selectAll('*').remove();
@@ -138,16 +137,15 @@ export class EventLine {
               });
           }
       });
+
       let linko = line().curve(curveMonotoneY)
       .x(function(d) { return d['x'] })
       .y(function(d) { return d['y'] });
 
         let cohorts = branchSvg.selectAll('.cohort-lines').data(cohort);
-
         cohorts.exit().remove();
 
         let coEnter = cohorts.enter().append('g').attr('class', (d, i) => i).classed('cohort-lines', true);
-
         cohorts = coEnter.merge(cohorts);
 
         cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
@@ -158,18 +156,15 @@ export class EventLine {
         linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
         
         let events = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.events);
-
         events.exit().remove();
 
         let eventEnter = events.enter().append('g').classed('events', true);
 
         events = eventEnter.merge(events);
         events.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
-        
-        let circle = events.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
-
         events.attr('d', function(d, i){ return d['root'] = [this.getBoundingClientRect().x, this.getBoundingClientRect().y]; });
-        
+
+        let circle = events.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
         circle.on("mouseover", (d) => {
             let t = transition('t').duration(500);
             select(".tooltip")
@@ -238,7 +233,6 @@ export class EventLine {
 
             function filText(d){
                 if(d[0] !=  'Branch'){
-
                     if(d[0] == 'CPT'){
                         let label = d[1][1];
                         return label[0].parent;
@@ -247,29 +241,23 @@ export class EventLine {
                         let label = d;
                         return label;
                     }
-
-                }else{ console.log('Branch filter passed')}
+                }else{ console.log('Branch filter passed')};
             }
 
             function labelClick(d){
                 console.log(d);
                 let rec = select(d);
                     if(d == 'First Promis Score'){
-                      //  events.fire('revert_to_promis');
                         that.startCodes = null;
                         that.startEventLabel = 'First Promis Score';
                         that.drawEventButtons(that.filter);
                         events.fire('event_selected', that.startCodes);
-                       
                         }else{
-                        
                         that.startCodes = d[1];
                         let label = d[1][1];
                         that.startEventLabel = label[0].parent;
-                       
                         that.drawEventButtons(that.filter);
                         events.fire('event_selected', that.startCodes);
-                       
                     }
             }
 
@@ -284,7 +272,6 @@ export class EventLine {
             this.$node.select('.event-buttons').remove();
 
             let div = this.$node.append('div').classed('event-buttons', true);
-           // let div = this.$node;
             //toggle for event day
             let startPanel = div.append('div').classed('start-event', true);
                     
@@ -335,8 +322,7 @@ export class EventLine {
             rel.on('click', () =>{
                                 this.scoreLabel = 'Relative Scale';
                                 this.drawEventButtons(this.filter);
-                              //  this.drawScoreFilterBox(this.scoreBox);
-        
+                            
                                 events.fire('change_promis_scale', this.scoreLabel)});
     
             let aggToggle = div.append('div').classed('aggDiv', true).append('input')
@@ -348,54 +334,54 @@ export class EventLine {
                             });
             
             let quartDiv = div.append('div').classed('quartDiv', true);
-                quartDiv.append('input').attr('type', 'button')
+                quartDiv.append('input').attr('type', 'button').attr('id', 'quartile-btn')
                     .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                     .attr('value', 'Separate by Quartiles').on('click', () =>{
                         select('.checkDiv').remove();
                         events.fire('separate_aggregate');
                           ///radio aggregation
-                        let checkDiv = quartDiv.append('div').classed('checkDiv', true);
-                        let tCheck = checkDiv.append('div');
-                        tCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleT').attr('checked', true)
-                        .attr('value', 'top').on('click', () => {
-    
-                            let p = selectAll('.top');
-                      
-                            if(select("#sampleT").property("checked")){
-                                p.classed('hidden', false);
-                            }else{
-                                p.classed('hidden', true);
-                            }
-                        })
-                        tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
-    
-                        let mCheck = checkDiv.append('div');
-                        mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
-                        .attr('value', 'middle').on('click', () => {
-                            let p = selectAll('.middle');
-                            if(select("#sampleM").property("checked")){
-                                p.classed('hidden', false);
-                            }else{
-                                p.classed('hidden', true);
-                            }
-                        });
-                        mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
-    
-                        let bCheck = checkDiv.append('div');
-                        bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
-                        .attr('value', 'bottom').on('click', () =>{
-                            let p = selectAll('.bottom');
-                            if(select("#sampleB").property("checked")){
-                                p.classed('hidden', false);
-                            }else{
-                                p.classed('hidden', true);
-                            }
-                        });
-                        bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
                     });
-        }
+                    let checkDiv = quartDiv.append('div').attr('id', 'checkDiv').classed('hidden', true);
+                    let tCheck = checkDiv.append('div');
+                    tCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleT').attr('checked', true)
+                    .attr('value', 'top').on('click', () => {
 
-        private renderOrdersTooltip(tooltip_data) {
+                        let p = selectAll('.top');
+                  
+                        if(select("#sampleT").property("checked")){
+                            p.classed('hidden', false);
+                        }else{
+                            p.classed('hidden', true);
+                        }
+                    })
+                    tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
+
+                    let mCheck = checkDiv.append('div');
+                    mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
+                    .attr('value', 'middle').on('click', () => {
+                        let p = selectAll('.middle');
+                        if(select("#sampleM").property("checked")){
+                            p.classed('hidden', false);
+                        }else{
+                            p.classed('hidden', true);
+                        }
+                    });
+                    mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
+
+                    let bCheck = checkDiv.append('div');
+                    bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
+                    .attr('value', 'bottom').on('click', () =>{
+                        let p = selectAll('.bottom');
+                        if(select("#sampleB").property("checked")){
+                            p.classed('hidden', false);
+                        }else{
+                            p.classed('hidden', true);
+                        }
+                    });
+                    bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
+            }
+
+    private renderOrdersTooltip(tooltip_data) {
 
             let text;
             if(tooltip_data[0] == 'demographic') {
@@ -406,15 +392,26 @@ export class EventLine {
               }
             } 
             if(tooltip_data[0] == 'CPT'){ 
+               
                 let code = tooltip_data[1][1];
-                console.log(code[0].parent);
+               
                 text = "<strong style='color:darkslateblue'>" + code[0].parent + ': ' + tooltip_data[2] + "</strong></br>";
-            } if(tooltip_data[0] == 'Score Count'){ 
+            } 
+            if(tooltip_data[0] == 'Score Count'){ 
+
                 text = "<strong style='color:darkslateblue'>" + tooltip_data[0] + ' > ' + tooltip_data[1] +  ' : ' + tooltip_data[2] + "</strong></br>";
             }
+            if(tooltip_data[0] == 'Branch'){
+                text = 'Cohort Branched';
+            }
+            if(tooltip_data.parentLink){ 
+                text = 'Branch from Cohort at ' + tooltip_data.parentLink[1] + ' patients';
+                console.log(tooltip_data); }
            
             return text;
-        }
+    }
+
+
 }
 
 export function create(parent:Element, cohort) {

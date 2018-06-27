@@ -122,7 +122,12 @@ export class DataManager {
         });
 
         events.on('filtered_patient_promis', (evt, item)=> {
-            this.getCPT(this.cohortIdArray, this.totalCptObjects).then(d=> this.mapCPT(this.filteredPatPromis, d));
+            this.getCPT(this.cohortIdArray, this.totalCptObjects).then(d=> {
+                this.mapCPT(this.filteredPatPromis, d).then(orders=> {
+                    events.fire('cpt_mapped', orders);
+                    this.patCPT = orders;
+                });
+            });
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -194,6 +199,7 @@ export class DataManager {
         events.on('cpt_object', (evt, item)=> {
             console.log('cpt loaded');
             this.totalCptObjects = item;
+            events.fire('create_button_down');
         });
 
         events.on('update_cpt_days', (evt, item)=>{
@@ -209,9 +215,7 @@ export class DataManager {
     private async addMinDay(patients, eventArray) {
         let cohort = patients
       
-        if(eventArray == null){
-
-        }else{
+        if(eventArray != null){
 
             for(var i= 0;  i< cohort.length; i++) {
                 var keyA = cohort[i].key;
@@ -222,9 +226,8 @@ export class DataManager {
                   }
                 }
               }
-        }
-       
-         // events.fire('min_day_added', cohort);
+        }else{ console.log('vent array is null'); }
+
          return cohort;
 }
 
@@ -259,7 +262,7 @@ private addEventDay(patients, eventArray) {
             if (parent == 'DM_CODE') {
                    
                     filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
-                }else{ 
+            }else{ 
                        
                         if (choice.length === 1){
                             filter = filter.filter(d => d[parent] == choice);
@@ -290,7 +293,7 @@ private addEventDay(patients, eventArray) {
                
             }else{
              //this is a test, manual array for filter
-             events.fire('add_demo_to_filter_array', [sidebarFilter, this.cohortIdArray.length]);
+            events.fire('add_demo_to_filter_array', [sidebarFilter, this.cohortIdArray.length]);
             this.mapPromisScores(this.cohortIdArray, this.totalProObjects, type);
            }
            
@@ -485,10 +488,7 @@ private addEventDay(patients, eventArray) {
             }
 
         });
-      //  this.cohortProInfo = cohort;
-    
-       // events.fire('cohort_interpolated', cohort);
-       // this.changeScale(cohort);
+
         return cohort;
     }
 
@@ -783,7 +783,7 @@ private addEventDay(patients, eventArray) {
      */
     //you need the promis objects and the cpt objects
     //you should only have to do this once??
-    private mapCPT(patProInfo, CPTobjects) {
+    private async mapCPT(patProInfo, CPTobjects) {
        
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
@@ -865,8 +865,7 @@ private addEventDay(patients, eventArray) {
 
         });
 
-        events.fire('cpt_mapped', filteredOrders);
-        this.patCPT = filteredOrders;
+        return filteredOrders;
     }
 
     private async getCohortIdArrayAfterMap (selectedData, typeofData: string)   {
