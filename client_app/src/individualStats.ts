@@ -63,14 +63,15 @@ export class individualStats {
         });
 
         events.on('send_filter_to_codebar', (evt, item)=>{
-            this.cptFilter = item.filter(d=> {return d[0] == 'CPT'});
+            console.log(item[0]);
+            this.cptFilter = item[0].filter(d=> {return d[0] == 'CPT'});
         });
 
         events.on('domain updated', (evt, item)=> {
             this.timeScale.domain(item);
             this.rectSvg.selectAll('.rect_group').remove();
            // this.drawPatRects(item);
-        })
+        });
     }
 
     private drawOrderWin(orders){
@@ -180,6 +181,7 @@ export class individualStats {
 
         codes.forEach(code => {
             let selected = selectedRects.filter(d=> code[0].includes(d.toString()));
+            console.log(code);
             selected.classed(code[1][0].key, true);
         });
         

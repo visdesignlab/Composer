@@ -198,7 +198,10 @@ export class DataManager {
 
         events.on('update_cpt_days', (evt, item)=>{
             console.log(item);
-            this.updateDiff(this.targetOrder, item[0]);
+            this.updateDiff(this.targetOrder, item[0]).then(cpt=> {
+                this.patCPT = cpt;
+                events.fire('cpt_updated', cpt);
+            });
         });
 
     }
@@ -769,12 +772,10 @@ private addEventDay(patients, eventArray) {
                     }
                 filteredPatOrders[d.PAT_ID].push(d);
             });
-    }
-
+        }
         const mapped = entries(filteredPatOrders);
         return mapped;
-
- };
+    };
 
           /**
      *
@@ -943,11 +944,11 @@ private addEventDay(patients, eventArray) {
         return [withQuery, queryDate];
     }
 
-    private updateDiff(code, patCPT){
+    private async updateDiff(code, patCPT){
 
         console.log(code);
        if(code!= undefined){
-           
+
         code = code[0].map(c => +c);
         let filArray = []
         patCPT.forEach(pat => {
@@ -964,7 +965,8 @@ private addEventDay(patients, eventArray) {
         });
 
        }
-       
+       console.log(patCPT);
+       return patCPT;
     }
 
     private updatePromisDiff(code, pat){
