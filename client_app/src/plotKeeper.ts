@@ -25,14 +25,13 @@ export class PlotKeeper {
     private $node;
     private cohortData;
     private plotDiv;
-    private maxDay;
-    private minDay;
 
     constructor(parent: Element) {
 
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
+        this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
       //  this.drawEventButtons();
         this.buildPlot(this.cohortData);
         const timeline = this.$node.append('div').classed('timeline_view', true);
@@ -44,16 +43,13 @@ export class PlotKeeper {
 
         let that = this;
 
-        events.on('domain updated', (evt, item)=> {
-            this.maxDay = item[1];
-            this.minDay = item[0];
+        events.on('compare_cohorts', ()=> {
+            console.log(this.cohortData);
+           // this.buildPlot(this.cohortData);
         });
 
-        events.on('got_promis_scores', (evt, item) => {  // called in parrallel on brush and 
-            this.cohortData = item;
-                });
-
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
+            console.log('selected cohort change firing?')
                 this.cohortData = item;
                     });
 
@@ -62,15 +58,14 @@ export class PlotKeeper {
             let cohort = item;
 
             for(let i = 0; i < cohort.length; i++){
-                similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort[i], this.maxDay, this.minDay);
+                similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort[i]);
             }
         });
 }
 
     private buildPlot(cohort) {
 
-        this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-        similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, this.maxDay, this.minDay);
+        similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort);
 
     }
 

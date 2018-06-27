@@ -65,9 +65,11 @@ export class App {
     let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).classed('btn-sm', true).attr('value', 'Add Cohort');
     let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Branch Cohort');
     let clear = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Clear Cohorts');
+    let compare = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Comparison View');
     create.on('click', function(d){ events.fire('create_button_down'); });
     branch.on('click', function(d){ events.fire('branch_cohort'); });
     clear.on('click', function(d){ events.fire('clear_cohorts'); });
+    compare.on('click', function(d){ events.fire('compare_cohorts'); });
 
     // main div with child views
     const main = this.$node.append('div').classed('main', true);
