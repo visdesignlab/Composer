@@ -453,11 +453,13 @@ private DrawfilterDescriptionBox(filter){
         if(d[0] == 'demographic'){
 
             if(d[1].length != 0){
+                /*
                 des = ' ';
                 d[1].forEach(f=> {
                     console.log(f);
-                    des = des + f.attributeName;
-                });
+                    des = des + f.attributeName + "<br>";
+                });*/
+                des = 'Demographic Filter';
 
             }else{
                 des = 'All Patients';
@@ -471,55 +473,22 @@ private DrawfilterDescriptionBox(filter){
     }
 
     text.append('text').text(d => d[2]).attr('transform', 'translate(170, 0)');
-
-
-   /*
-    filter.forEach((fil, i) => {
-       
-       let stage = body.append('div').classed('filter_stage', true);
-        let stageSvg = stage.append('svg').classed('filter_stage_svg', true);
-     
-        let rect = stageSvg.append('rect').attr('height', 20).attr('width', rectScale(fil[2])).attr('transform', 'translate(12, 0)');
-        if(fil[0] == 'demographic') {
-            rect.attr('fill', '#D5D8DC');}
-        if(fil[0] == 'CPT') {
-            rect.classed(fil[1][1][0].parent, true);
-        }
-           
-        let text = stageSvg.append('g').attr('transform', 'translate(0, 12)');
-        text.append('text').text((i + 1) + ': ' );
-
-        if(fil[0] == 'demographic'){
-            if(fil[1].length != 0){
-                    console.log(fil);
-                   // text.selectAll('text').data(fil[1]).enter().append('text').text('Demographic').attr('transform', 'translate(15, 0)');
-                    let demo = text.append('text').text('Demographic').attr('transform', 'translate(15, 0)');
-                    select(demo).data(fil);
-                    text.on("mouseover", (d) => {
-                        let t = transition('t').duration(500);
-                        select(".tooltip")
-                          .html(() => {
-                            return this.renderFilterTooltip(d);
-                          })
-                          .transition(t)
-                          .style("opacity", 1)
-                          .style("left", `${event.pageX + 10}px`)
-                          .style("top", `${event.pageY + 10}px`);
-                      })
-                      .on("mouseout", () => {
-                        let t = transition('t').duration(500);
-                        select(".tooltip").transition(t)
-                        .style("opacity", 0);
-                      });
-                
-               }
-            else{ text.append('text').text('all patients').attr('transform', 'translate(15, 0)'); }
-            }
-        if(fil[0] == 'CPT') {
-       
-        text.append('text').text(fil[1][1][0].parent).attr('transform', 'translate(15, 0)');}
-        text.append('text').text(fil[2]).attr('transform', 'translate(170, 0)');
-    });*/
+    text.on("mouseover", (d) => {
+        let t = transition('t').duration(500);
+        select(".tooltip")
+          .html(() => {
+            return this.renderFilterTooltip(d);
+          })
+          .transition(t)
+          .style("opacity", 1)
+          .style("left", `${event.pageX + 10}px`)
+          .style("top", `${event.pageY + 10}px`);
+      })
+      .on("mouseout", () => {
+        let t = transition('t').duration(500);
+        select(".tooltip").transition(t)
+        .style("opacity", 0);
+      });
 
 }
 
@@ -536,16 +505,22 @@ private renderHistogramTooltip(tooltip_data) {
     return text;
 }
 
-private renderFilterTooltip(tooltip_data) {
-    console.log(tooltip_data);
+private renderFilterTooltip(data) {
+    console.log(data);
     let text;
-    tooltip_data.forEach(tip => {
-        console.log(tip);
+    if(data[0]== 'demographic'){
+        if(data[1].length == 0){ text = 'All Patients'; 
+        }else{
+                text = ' ';
+                data[1].forEach(f=> {
+                    console.log(f);
+                    text = text + f.attributeName + ": " + f.checkedOptions[0] + "</br>";
+                });
+        }
 
-        text = text + " " + tip + '<br>';
-
-    });
-   // "<strong style='color:darkslateblue'>" + tooltip_data + "</strong></br>";
+    }else{
+        text = data[1][0].parent;
+    }
 
     return text;
 }
