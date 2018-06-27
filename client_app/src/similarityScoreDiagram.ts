@@ -71,7 +71,7 @@ export class similarityScoreDiagram {
     private scaleRelative = false;
     private yBrushSelection = false;
 
-    constructor(parent: Element, diagram, cohortData, max, min) {
+    constructor(parent: Element, diagram, cohortData) {
 
         const that = this;
 
@@ -1116,6 +1116,6 @@ export class similarityScoreDiagram {
 export let targetPatientOrders;
 
 
-export function create(parent: Element, diagram, cohortData, max, min) {
-    return new similarityScoreDiagram(parent, diagram, cohortData, max, min);
+export function create(parent: Element, diagram, cohortData) {
+    return new similarityScoreDiagram(parent, diagram, cohortData);
 }
