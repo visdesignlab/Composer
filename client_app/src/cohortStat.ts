@@ -49,7 +49,8 @@ export class CohortStat{
     private attachListener(){
 
         events.on('calculate_agg', (evt,item)=> {
-
+           
+           // console.log(this.$node);
             this.statWrapper.select('.statsAfterEvent').remove();
             this.getAverage(item);
         });
