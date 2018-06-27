@@ -125,7 +125,10 @@ export class DataManager {
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
-            this.filterByPromisCount(item[0], item[1]);
+            this.filterByPromisCount(item[0], item[1]).then(d=> {
+                console.log(d);
+                events.fire('filtered_by_count', d);
+            });
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
@@ -288,19 +291,19 @@ private addEventDay(patients, eventArray) {
            
        }
 
-    private filterByPromisCount(cohort, count) {
+    private async filterByPromisCount(cohort, count) {
     
         let filter = [];
 
         cohort.forEach(patient => {
             if(patient.value.length > count){
-              
+
                 filter.push(patient);
             }
 
        });
-
-       events.fire('filtered_by_count', [filter, count]);
+       return [filter, count];
+     //  events.fire('filtered_by_count', [filter, count]);
     }
 
     private getQuant_Agg(cohort, quant) {

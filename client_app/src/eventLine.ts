@@ -416,6 +416,8 @@ export class EventLine {
                 let code = tooltip_data[1][1];
                 console.log(code[0].parent);
                 text = "<strong style='color:darkslateblue'>" + code[0].parent + ': ' + tooltip_data[2] + "</strong></br>";
+            } if(tooltip_data[0] == 'Score Count'){ 
+                text = "<strong style='color:darkslateblue'>" + tooltip_data[0] + ' > ' + tooltip_data[1] +  ' : ' + tooltip_data[2] + "</strong></br>";
             }
            
             return text;
