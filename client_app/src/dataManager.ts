@@ -96,7 +96,8 @@ export class DataManager {
 
         events.on('event_selected', (evt, item)=> {
            if(item == null){
-            events.fire('update_start_button_clicked', [null, item]);
+               console.log('item is null');
+            events.fire('update_start_button_clicked', null);
            }else{
                 this.searchByEvent(this.patCPT, item[0]).then((d)=> {
                 this.patCPT = d[0];
@@ -196,7 +197,8 @@ export class DataManager {
         });
 
         events.on('update_cpt_days', (evt, item)=>{
-            this.updateDiff(this.targetOrder, item);
+            console.log(item);
+            this.updateDiff(this.targetOrder, item[0]);
         });
 
     }
@@ -942,7 +944,10 @@ private addEventDay(patients, eventArray) {
     }
 
     private updateDiff(code, patCPT){
-       
+
+        console.log(code);
+       if(code!= undefined){
+           
         code = code[0].map(c => +c);
         let filArray = []
         patCPT.forEach(pat => {
@@ -957,6 +962,9 @@ private addEventDay(patients, eventArray) {
                 visit.diff = Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24));
             });
         });
+
+       }
+       
     }
 
     private updatePromisDiff(code, pat){

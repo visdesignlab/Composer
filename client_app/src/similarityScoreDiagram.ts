@@ -259,15 +259,14 @@ export class similarityScoreDiagram {
         });
 
         events.on('update_start_button_clicked', (evt, item)=> {
-    
-            let cohort = item[0];
-            let event = item[1];
-            
+            console.log(item);
+      
             this.clearDiagram();
             this.clearAggDiagram();
-            if(event == null){
+            if(item == null){
+                
                this.zeroEvent = 'First Promis Score';
-               //this.zeroEvent = this.targetOrder;
+           
                 this.getDays(null);
                 this.eventDayBool = false;
                 this.getBaselines(this.cohortProInfo);
@@ -279,6 +278,8 @@ export class similarityScoreDiagram {
              });
                       }
             }else{
+                let cohort = item[0];
+                let event = item[1];
                 this.zeroEvent = event[1][0].key;
                 this.getDays(cohort);
                 this.eventDayBool = true;

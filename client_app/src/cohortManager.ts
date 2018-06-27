@@ -367,7 +367,7 @@ export class CohortManager {
           });
 
           events.on('send_stats', () => {
-           // events.fire('calculate_agg', [this.selectedCohort, this.cohortIndex]);
+          
            events.fire('calculate_aggregate', [this.selectedCohort, this.cohortIndex]);
           });
 
@@ -386,8 +386,8 @@ export class CohortManager {
           });
 
           events.on('update_start_button_clicked', (evt, item)=> {
-           
-              events.fire('update_cpt_days', this.selectedCPT);
+
+              events.fire('update_cpt_days', [this.selectedCPT, null]);
           });
 
     }

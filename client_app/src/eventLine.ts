@@ -231,44 +231,30 @@ export class EventLine {
             .style("opacity", 0);
           });
 
-          
-
-        
-    }
-
-    private tester(treedata){
-      //  let hierarchy = hierarchy;
-      
-        let nodes = hierarchy(treedata, function(d){
-            return d.branches;
-        });
-
-          function positionLink(d) {
-            return "M" + d[0].x + "," + d[0].y
-                 + "S" + d[1].x + "," + d[1].y
-                 + " " + d[2].x + "," + d[2].y;
-          }
     }
 
     private drawEventButtons(filters){
             let that = this;
-            
+
             function filText(d){
                 if(d[0] !=  'Branch'){
 
-                    if(d[0] == 'demographic'){return 'First Score'}
-                    else if(d[0] == 'CPT'){
+                    if(d[0] == 'CPT'){
                         let label = d[1][1];
                         return label[0].parent;
-                    }else{ console.log('nope'); }
+                    }else{ 
+                        console.log(d); 
+                        let label = d;
+                        return label;
+                    }
 
                 }else{ console.log('Branch filter passed')}
             }
 
             function labelClick(d){
-
+                console.log(d);
                 let rec = select(d);
-                    if(d[0] == 'demographic'){
+                    if(d == 'First Promis Score'){
                       //  events.fire('revert_to_promis');
                         that.startCodes = null;
                         that.startEventLabel = 'First Promis Score';
@@ -285,9 +271,15 @@ export class EventLine {
                         events.fire('event_selected', that.startCodes);
                        
                     }
-                }
+            }
 
+           
             filters = filters.filter(d=> {return d[0] != 'Branch' && d[0] != 'demographic'});
+
+           
+            filters.push(['First Promis Score']);
+        
+            console.log(filters);
 
             this.$node.select('.event-buttons').remove();
 
