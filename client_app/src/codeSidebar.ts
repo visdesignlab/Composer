@@ -453,12 +453,7 @@ private DrawfilterDescriptionBox(filter){
         if(d[0] == 'demographic'){
 
             if(d[1].length != 0){
-                /*
-                des = ' ';
-                d[1].forEach(f=> {
-                    console.log(f);
-                    des = des + f.attributeName + "<br>";
-                });*/
+ 
                 des = 'Demographic Filter';
 
             }else{

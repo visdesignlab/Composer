@@ -257,8 +257,6 @@ export class CohortManager {
             
              this.cohortkeeperarray.push(item);
 
-             console.log(this.cohortIndex);
-
              let  newParent = {
                  eventIndex: 0,
                  parentIndex: null,
@@ -286,7 +284,7 @@ export class CohortManager {
           events.on('add_cpt_to_filterArray', (evt, item)=>{
             
             this.cohortfilterarray[this.cohortIndex].push(item);
-            console.log(this.cohortTree);
+
           });
 
           events.on('filter_cohort_by_event', (evt, item)=> {
@@ -350,6 +348,14 @@ export class CohortManager {
             this.selectedCohort = item[0];
             this.cohortkeeperarray[this.cohortIndex] = item[0];
             this.cohortfilterarray[this.cohortIndex].minCount = item[1];
+            if(this.branchSelected == null){
+                this.cohortTree[this.cohortIndex].events.push(['Score Count', item[1], item[0].length]);
+                events.fire('test', [this.cohortTree, this.cohortIndex]);
+            }else{
+                this.cohortTree[this.cohortIndex].branch[this.branchSelected[1]].events.push(['Score Count', item[1], item[0].length]);
+                events.fire('test', [this.cohortTree, this.branchSelected]);
+            }
+           
           });
 
           events.on('filter_by_Promis_count', (evt, item)=> {
