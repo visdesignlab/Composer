@@ -7,11 +7,7 @@ import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
 import * as events from 'phovea_core/src/event';
-//import {transition} from 'd3-transition';
-//import {Constants} from './constants';
-import * as parallel from './parallel';
 import {scaleLinear,scaleTime,scaleOrdinal, scaleBand} from 'd3-scale';
-//importing other modules from app
 import * as demoGraph from './demoGraphs';
 import * as d3 from 'd3';
 import {extent, min, max, ascending} from 'd3-array';
