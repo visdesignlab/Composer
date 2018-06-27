@@ -386,8 +386,11 @@ export class CohortManager {
           });
 
           events.on('update_start_button_clicked', (evt, item)=> {
-
               events.fire('update_cpt_days', [this.selectedCPT, null]);
+          });
+
+          events.on('cpt_updated', (evt, item)=> {
+             this.selectedCPT = item;
           });
 
     }
