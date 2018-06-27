@@ -6,21 +6,17 @@ import {select} from 'd3-selection';
 import * as sideBar from './sideBar';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
-import * as rectExploration from './rectExploration';
 import * as distributionDiagram from './distributionDiagram';
-import * as parallel from './parallel';
 import * as dataManager from './dataManager';
 import * as cohortManager from './cohortManager';
 import * as cptBreak from './cptBreakdown';
 import * as populationStat from './populationStat';
 import * as timelineKeeper from './timelinekeeper';
 import * as inStat from './individualStats';
-import { individualStats } from './individualStats';
 import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
 import * as cohortStat from './cohortStat';
 import * as codeside from './codeSidebar';
-//import * as eventLine from './eventLine';
 import { selectAll } from 'd3';
 
 
