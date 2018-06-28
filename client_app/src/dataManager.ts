@@ -151,7 +151,6 @@ export class DataManager {
                 events.fire('filter_cohort_by_event', [d[0], item]);
             });
         });
-
         events.on('get_selected_demo', (evt, item)=> {
 
             this.getCohortIdArrayAfterMap(item[1], 'demo')
@@ -163,17 +162,14 @@ export class DataManager {
         events.on('selected_line_array', (evt, item)=> {
             this.filterObjectByArray(item, this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
-
         events.on('start_date_updated', (evt, item)=> {
             this.startDate = item;
             startDateSelection.text(this.startDate);
         });
-
         events.on('separate_cohort_agg', (evt, item)=> {
             console.log(item[0]);
             this.getQuant_Separate(item);
         });
-
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
             //change this back to added and selected. 
             //when selected, the index changes. no need to map the cpt
@@ -231,21 +227,21 @@ export class DataManager {
          return cohort;
 }
 
-private addEventDay(patients, eventArray) {
+    private addEventDay(patients, eventArray) {
 
-    let cohort = patients;
+        let cohort = patients;
 
-     for(var i= 0;  i< cohort.length; i++) {
-         var keyA = cohort[i].key;
-         for(var j = 0; j< eventArray.length; j++) {
-           var keyB = eventArray[j].key;
-           if(keyA == keyB) {
-             cohort[i].CPTtime = eventArray[j].time;
-           }
-         }
-       }
+        for(var i= 0;  i< cohort.length; i++) {
+            var keyA = cohort[i].key;
+            for(var j = 0; j< eventArray.length; j++) {
+            var keyB = eventArray[j].key;
+            if(keyA == keyB) {
+                cohort[i].CPTtime = eventArray[j].time;
+            }
+            }
+        }
 
-}
+    }   
 
 //pulled from parallel coord
 //this hapens when demo button it pushed
@@ -260,7 +256,6 @@ private addEventDay(patients, eventArray) {
         if(parent != 'BMI' || 'CCI' || 'AGE') {
 
             if (parent == 'DM_CODE') {
-                   
                     filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
             }else{ 
                        

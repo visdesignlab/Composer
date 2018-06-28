@@ -32,7 +32,6 @@ export class PlotKeeper {
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-      //  this.drawEventButtons();
         this.buildPlot(this.cohortData);
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());

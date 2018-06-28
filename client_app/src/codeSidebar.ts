@@ -77,8 +77,8 @@ export class CodeSidebar {
        });
 
        events.on('send_filter_to_codebar', (evt, item)=> {
-        this.selectedCohortFilters = item[0];
-        this.DrawfilterDescriptionBox(item[0]);
+        this.selectedCohortFilters = item;
+        this.DrawfilterDescriptionBox(item);
        });
 
         events.on('make_stat_node', (evt, item)=> {
@@ -98,6 +98,9 @@ export class CodeSidebar {
             this.startDay = item;
             let startLabel = select('#start_date_label').text(item);
             let startLabelBool = select('#pat_or_event').text(this.startBool);
+        });
+        events.on('test', (evt, item) => {
+ 
         });
 
     }
