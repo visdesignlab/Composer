@@ -24,13 +24,13 @@
     display: inline-block;
 }
 
-.branch.selected div {
+.selected {
     padding: 2px;
-    color: white;
-    border: #E67E22;
+    color: #E67E22;
+    // border: #E67E22;
     background-color: #E67E22;
     opacity: .8;
-    border-radius: 2px;
+    // border-radius: 2px;
 }
 
 .branch svg {

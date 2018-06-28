@@ -72,14 +72,13 @@ export class SideBar {
   private attachListener () {
 
     events.on('branch_selected', (evt, item)=> {
-   
+   /*
       let cohortIndex = item[0];
    
       this.$node.selectAll('.selected').classed('selected', false);
       let b = document.getElementsByClassName(cohortIndex);
       let branch = b[1];
-      branch.classList.add('selected');
-
+      branch.classList.add('selected');*/
     });
     
       events.on('filter_counted', (evt, item) => {//this get the count from the group
@@ -110,7 +109,7 @@ export class SideBar {
       events.on('add_to_cohort_bar', (evt, item)=> {
         console.log('add cohort');
         console.log(item);
-        this.drawCohortLabel(item);
+       // this.drawCohortLabel(item);
       });
 
       events.on('clear_cohorts', (evt, item)=> {
@@ -124,10 +123,11 @@ export class SideBar {
         select('.cohort.' + item[1]);
       });
 
-      events.on('update_filters', (evt, item)=> {
-        console.log('update filters');
+      events.on('test', (evt, item)=> {
+        selectAll('.selected').classed('selected', false);
         console.log(item);
-        this.drawCohortLabel(item);
+        this.selected = item[1];
+      //  this.drawCohortLabel(item[0]);
       });
       }
 
@@ -301,7 +301,7 @@ branch.append('div').append('text').text((d, i)=> 'C' + (d.parentIndex + 1) +' b
 branch.on('click', (d, i)=> {
   console.log(d);
   console.log(i);
-  events.fire('branch_selected', [d.parentIndex, i, d]);
+  events.fire('branch_selected', [d.parentIndex, i]);
 
   this.$node.selectAll('.selected').classed('selected', false);
   branch.classed('selected', true);
@@ -334,21 +334,30 @@ console.log(cohort);
 */
   
   if(this.selected == undefined){
-
-    
-
+      
       let cohortLabels = cohortBox.selectAll('.cohort-label').nodes();
       let number = cohortBox.size();
       let picked = cohortLabels[number - 1];
-      console.log(picked);
+     
       picked.classList.add('selected');
 
   }else{
+      if(this.selected.length > 1){
+        let index = this.selected[0];
+        console.log(index);
+        let branchI = this.selected[1];
+        let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+        let select = cohortLabels[index];
+        select.classList.add('selected');
+ 
+      }else{
+        let cohortLabels = this.cohortKeeper.selectAll('.cohort').selectAll('.cohort-label').nodes();
+        let picked = cohortLabels[this.selected];
+      
+        picked.classList.add('selected');
 
-      let cohortLabels = this.cohortKeeper.selectAll('.cohort').selectAll('.cohort-label').nodes();
-      let picked = cohortLabels[this.selected];
-    
-      picked.classList.add('selected');
+      }
+ 
   }
 
 }
