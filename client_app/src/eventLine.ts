@@ -61,6 +61,7 @@ export class EventLine {
     private attachListener() {
 
         events.on('test', (evt, item)=> {
+            console.log(item);
             this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
         });
 
@@ -85,7 +86,7 @@ export class EventLine {
     }
 
     private async classingSelected(index){
-
+            console.log(index.length);
             selectAll('.selected-group').classed('selected-group', false);
 
         if(index.length > 1){ 
@@ -102,7 +103,7 @@ export class EventLine {
 
     private async drawBranches(cohort){
     
-        this.branchHeight = cohort.length * 30;
+        this.branchHeight = cohort.length * 50;
         let moveDistance = this.branchHeight / cohort.length;
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
@@ -111,7 +112,7 @@ export class EventLine {
         let rows = [];
         cohort.forEach(c => {
             let e = c.events.map((event, i) => {
-               let coord = {x: (i * 30.5) + 65, y: 0 + 5 };
+               let coord = {x: (i * 30.5) + 65, y: 6 };
                return coord;
             });
             rows.push(e);
@@ -122,9 +123,9 @@ export class EventLine {
       
           if(c.branches.length != 0){
               c.branches.forEach((b, i) => {
-                  b.rowData = [{x: -21, y: -10 }, {x: -15, y: -8 }];
+                  b.rowData = [{x: -25, y: -18 }, {x: -15, y: -5 }];
                   b.events.forEach((event, i) => {
-                      let coord = {x: (i * 30.5) + 5, y: 0 + 5 };
+                      let coord = {x: (i * 30.5) + 5, y: 6 };
                       b.rowData.push(coord);
                    });
               });
@@ -143,20 +144,31 @@ export class EventLine {
 
         cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
 
-        let label = cohorts.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)}).attr('transform', 'translate(0, 10)');
+        let label = cohorts.append('g').classed('labels', true);
+        label.append('rect').attr('width', 20).attr('hieght', 15).attr('fill', 'red');
+        label.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)});
+        label.attr('transform', 'translate(0, 10)');
+        label.on('click', (d, i)=> {
+           
+            this.$node.selectAll('.selected-group').classed('selected-group', false);
+            let thislabel = label.nodes();
+            console.log(thislabel);
+            thislabel[i].classList.add('selected-group');
+            events.fire('cohort_selected', [d, i]);
+        });
  
         let linegroups = cohorts.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
         linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
         
-        let events = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.events);
-        events.exit().remove();
+        let cohortevents = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.events);
+        cohortevents.exit().remove();
 
-        let eventEnter = events.enter().append('g').classed('events', true);
+        let eventEnter = cohortevents.enter().append('g').classed('events', true);
 
-        events = eventEnter.merge(events);
-        events.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
+        cohortevents = eventEnter.merge(cohortevents);
+        cohortevents.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
 
-        let circle = events.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
+        let circle = cohortevents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
         circle.on("mouseover", (d) => {
             let t = transition('t').duration(500);
             select(".tooltip")
@@ -174,7 +186,7 @@ export class EventLine {
             .style("opacity", 0);
           });
 
-          let nodes = events.nodes();
+          let nodes = cohortevents.nodes();
 
           let branchGroups = cohorts.selectAll('.branches').data(d=>d.branches);
 
@@ -184,9 +196,26 @@ export class EventLine {
 
           branchGroups = benter.merge(branchGroups);
 
-          branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');
+          let blabel = branchGroups.append('g').classed('b-labels', true);
+          blabel.append('text').text((d, i)=> {return 'B-' + (i + 1)});
+          blabel.attr('transform', 'translate(0, 10)');
+          blabel.on('click', (d, i)=> {
+             
+            console.log(d);
+            console.log(i);
+            events.fire('branch_selected', [d.parentIndex, i]);
+          
+            this.$node.selectAll('.selected-group').classed('selected-group', false);
+          //  blabel.classed('selected', true);
+          });
 
-          let branchlines = branchGroups.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+          blabel.attr('transform', (d, i) => 'translate(-60,'+ ((i * 10) + 8) + ')');
+          
+
+          branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 22) + ')');
+
+          let branchlines = branchGroups.append('g').classed('rows', true);
+          //branchlines.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
           branchlines.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
 
           let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.events);
