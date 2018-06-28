@@ -60,34 +60,27 @@ export class EventLine {
 
     private attachListener() {
 
-    events.on('test', (evt, item)=> {
-       
-        this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
+        events.on('test', (evt, item)=> {
+            this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
+        });
 
-    });
-
-    events.on('send_filter_to_codebar', (evt, item)=> {
-       
-            //item[0] is for the event start buttons,
-            let eventButtonData = item[0];
+        events.on('send_filter_to_codebar', (evt, item)=> {
             
-            //item[1] is the entire cohort and branches for the branch lines
-            let branchLineData = item[1];
+                let eventButtonData = item;
+                this.filter = item;
 
-            this.filter = item[0];
-
-            this.drawEventButtons(item[0]);
-     
-            let eventIndex =  eventButtonData.length;
-            let event =  eventButtonData[eventIndex -1];
-         
-           if(event[1].length != 0){
-            this.startCodes = event[1];
-           }else{
-               this.startCodes = null;
-               this.startEventLabel = 'First Promis Score';
-           }
-    });
+                this.drawEventButtons(item);
+        
+                let eventIndex =  eventButtonData.length;
+                let event =  eventButtonData[eventIndex - 1];
+                
+            if(eventButtonData.length != 0 || eventButtonData[1] != undefined){
+                this.startCodes = event[1];
+            }else{
+                this.startCodes = null;
+                this.startEventLabel = 'First Promis Score';
+            }
+        });
 
     }
 
@@ -162,7 +155,6 @@ export class EventLine {
 
         events = eventEnter.merge(events);
         events.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
-        events.attr('d', function(d, i){ return d['root'] = [this.getBoundingClientRect().x, this.getBoundingClientRect().y]; });
 
         let circle = events.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
         circle.on("mouseover", (d) => {
@@ -237,7 +229,7 @@ export class EventLine {
                         let label = d[1][1];
                         return label[0].parent;
                     }else{ 
-                        console.log(d); 
+                       
                         let label = d;
                         return label;
                     }
@@ -245,7 +237,7 @@ export class EventLine {
             }
 
             function labelClick(d){
-                console.log(d);
+              
                 let rec = select(d);
                     if(d == 'First Promis Score'){
                         that.startCodes = null;
@@ -264,11 +256,8 @@ export class EventLine {
            
             filters = filters.filter(d=> {return d[0] != 'Branch' && d[0] != 'demographic'});
 
-           
             filters.push(['First Promis Score']);
         
-            console.log(filters);
-
             this.$node.select('.event-buttons').remove();
 
             let div = this.$node.append('div').classed('event-buttons', true);

@@ -39,22 +39,16 @@ export class CohortStat{
         this.$node = select(parent).attr('id', index);
         this.statView = this.$node.append('div').classed('cohort_stat_view', true);
         this.statWrapper = this.statView.append('div').classed('cohortStatWrapper' + index, true);
-    
         this.getPromisCount(this.cohort);
-       // this.getAverage(this.cohort);
         this.buildStatBox();
         this.attachListener();
     }
 
     private attachListener(){
-
         events.on('calculate_agg', (evt,item)=> {
-           
-           // console.log(this.$node);
             this.statWrapper.select('.statsAfterEvent').remove();
             this.getAverage(item);
         });
-       
     }
 
     private getPromisCount(cohort){

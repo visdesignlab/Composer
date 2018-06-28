@@ -108,7 +108,9 @@ export class SideBar {
        });
 
       events.on('add_to_cohort_bar', (evt, item)=> {
-        this.drawCohortLabel(item[0], item[1]);
+        console.log('add cohort');
+        console.log(item);
+        this.drawCohortLabel(item);
       });
 
       events.on('clear_cohorts', (evt, item)=> {
@@ -123,7 +125,9 @@ export class SideBar {
       });
 
       events.on('update_filters', (evt, item)=> {
-        this.drawCohortLabel(item[0], item[1]);
+        console.log('update filters');
+        console.log(item);
+        this.drawCohortLabel(item);
       });
       }
 
@@ -256,14 +260,16 @@ export class SideBar {
 
   }
 
-private async drawCohortLabel(filterKeeper, cohorts) {
+private async drawCohortLabel(cohortTree) {
+
+  console.log(cohortTree);
 
   this.cohortKeeper.selectAll('div').remove();
   let counter = -1;
   let nodeArray = [];
-  let filters = filterKeeper;
+//  let filters = filterKeeper;
 
-  let cohortBox = this.cohortKeeper.selectAll('.cohort').data(cohorts);
+  let cohortBox = this.cohortKeeper.selectAll('.cohort').data(cohortTree);
 
   cohortBox.exit().remove();
 
@@ -286,9 +292,24 @@ const stem = line().curve(curveBasis)
 .x((d) => { return +d[0]; })
 .y((d) => { return +d[1]; });
 
+let branch = cohortBox.selectAll('.branch').data(d => d.branches);
+branch.exit().remove();
+let branchEnter = branch.enter().append('div').attr('class', (d, i)=> i).classed('branch', true);
+branch = branchEnter.merge(branch);
+branch.append('div').append('text').text((d, i)=> 'C' + (d.parentIndex + 1) +' branch');
+
+branch.on('click', (d, i)=> {
+  console.log(d);
+  console.log(i);
+  events.fire('branch_selected', [d.parentIndex, i, d]);
+
+  this.$node.selectAll('.selected').classed('selected', false);
+  branch.classed('selected', true);
+});
+/*
 cohortBox.nodes().forEach((cohort, i) => {
- 
-  if(cohort.__data__.branch != undefined){
+console.log(cohort);
+  if(cohort.__data__.branches != undefined){
    
     let branch = select(cohort).selectAll('.branch').data(cohort.__data__.branch);
     branch.exit().remove();
@@ -310,13 +331,16 @@ cohortBox.nodes().forEach((cohort, i) => {
   
   }
 });
+*/
   
   if(this.selected == undefined){
+
+    
 
       let cohortLabels = cohortBox.selectAll('.cohort-label').nodes();
       let number = cohortBox.size();
       let picked = cohortLabels[number - 1];
-      
+      console.log(picked);
       picked.classList.add('selected');
 
   }else{

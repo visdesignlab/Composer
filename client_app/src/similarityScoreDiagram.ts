@@ -340,10 +340,9 @@ export class similarityScoreDiagram {
     }
 
     private getDays(date) {
-
       if(this.cohortProInfo != null)  {
       
- // ----- add diff days to the data
+        // ----- add diff days to the data
           
             let maxDiff = 0;// this sets the score scale max.
             //need to make this dynamic. 
@@ -525,7 +524,6 @@ export class similarityScoreDiagram {
        // this.changeScale(cohort);
         return cohort;
     }
-
     private changeScale(cohort) {
       
         if(this.scaleRelative)  {
