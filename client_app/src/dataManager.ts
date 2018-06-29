@@ -168,12 +168,14 @@ export class DataManager {
         });
         events.on('separate_cohort_agg', (evt, item)=> {
             console.log(item[0]);
-            this.getQuant_Separate(item);
+            this.getQuant_Separate(item).then(sep=> {
+                events.fire('separated_by_quant', sep);
+            });
         });
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
             //change this back to added and selected. 
             //when selected, the index changes. no need to map the cpt
-            this.filteredPatPromis = item;
+            this.filteredPatPromis = item.promis;
             this.getCPT(this.cohortIdArray, this.totalCptObjects);
                 });
 
@@ -487,7 +489,7 @@ export class DataManager {
         return cohort;
     }
 
-    private getQuant_Separate(cohort) {
+    private async getQuant_Separate(cohort) {
 
         console.log(cohort)
         let oneval = [];
@@ -529,7 +531,8 @@ export class DataManager {
             }
         });
       
-        events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
+        //events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
+        return [topStart, middleStart, bottomStart];
     }
 
     private getQuant_Separate_Test(cohort) {
