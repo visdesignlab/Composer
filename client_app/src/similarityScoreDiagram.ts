@@ -189,6 +189,7 @@ export class similarityScoreDiagram {
 
         events.on('change_promis_scale', (evt, item)=>{
             console.log(this.cohortProInfo);
+            /*
             if(item == 'Relative Scale'){
                 this.scaleRelative = true;
                 this.interpolate(this.cohortProInfo).then(c=> {
@@ -200,7 +201,7 @@ export class similarityScoreDiagram {
                 this.scaleRelative = false;
                 this.changeScale(this.cohortProInfo);
             }
-  
+  */
         });
 
         events.on('draw_plot', (evt, item)=> {
@@ -222,20 +223,38 @@ export class similarityScoreDiagram {
             this.yBrushSelection = true;
         });
 
+        events.on('update_scale', (evt, item)=> {
+            this.cohortProInfo = item.promis;
+            this.scaleRelative = item.scaleR;
+            this.clumped = item.clumped;
+            let separated = item.separated;
+
+            if(!this.scaleRelative){
+                this.changeScale(this.cohortProInfo);
+            }else{
+                this.interpolate(this.cohortProInfo).then(c=> {
+                    events.fire('cohort_interpolated', c);
+                    this.changeScale(c);
+                });
+            }
+        });
+
         events.on('update_chart', (evt, item)=> {
            
             this.cohortProInfo = item.promis;
+
             this.scaleRelative = item.scaleR;
             this.clumped = item.clumped;
             let separated = item.separated;
             this.clearDiagram();
             this.clearAggDiagram();
+           
             if(this.clumped){
                 //if it is aggregated
                 if(separated){
-                    this.frequencyTest(this.cohortProInfo[0], 'top');
-                    this.frequencyTest(this.cohortProInfo[1], 'middle');
-                    this.frequencyTest(this.cohortProInfo[2], 'bottom');
+                    this.frequencyTest(item.promisSep[0], 'top');
+                    this.frequencyTest(item.promisSep[1], 'middle');
+                    this.frequencyTest(item.promisSep[2], 'bottom');
                 }else{
                     console.log('not sep');
                     this.frequencyTest(this.cohortProInfo, 'all');
@@ -245,9 +264,9 @@ export class similarityScoreDiagram {
                 //if it is not aggregated
                 if(separated){
                     console.log(this.cohortProInfo);
-                    this.drawPromisChart(this.cohortProInfo[0], 'top');
-                    this.drawPromisChart(this.cohortProInfo[1], 'middle');
-                    this.drawPromisChart(this.cohortProInfo[2], 'bottom');
+                    this.drawPromisChart(item.promisSep[0], 'top');
+                    this.drawPromisChart(item.promisSep[1], 'middle');
+                    this.drawPromisChart(item.promisSep[2], 'bottom');
                 }else{
                     this.drawPromisChart(this.cohortProInfo, 'proLine');
                 }
@@ -303,9 +322,7 @@ export class similarityScoreDiagram {
 
                 });
                 this.eventDayBool = true;
-                //this.getBaselines(this.cohortProInfo);
-          
-                
+
             }
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
