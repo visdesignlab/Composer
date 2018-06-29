@@ -30,7 +30,7 @@
 .event_label rect {
     height: 24px;
     width: 80px;
-    fill: #808B96;
+    fill: rgb(135, 191, 248);
 }
 
 .event_label text {
@@ -79,4 +79,14 @@
 
 .selected text {
     color: #E67E22;
+}
+
+.selected rect {
+    color: #808B96;
+}
+
+.labels text:hover,
+.b-labels text:hover {
+    fill: #E67E22;
+    cursor: pointer;
 }

@@ -145,15 +145,15 @@ export class EventLine {
         cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
 
         let label = cohorts.append('g').classed('labels', true);
-        label.append('rect').attr('width', 20).attr('hieght', 15).attr('fill', 'red');
+        label.append('rect').attr('width', 55).attr('height', 18).attr('fill', 'white').attr('transform', 'translate(-3, -13)');;
         label.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)});
-        label.attr('transform', 'translate(0, 10)');
+        label.attr('transform', 'translate(3, 10)');
         label.on('click', (d, i)=> {
            
-            this.$node.selectAll('.selected-group').classed('selected-group', false);
+            this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
             console.log(thislabel);
-            thislabel[i].classList.add('selected-group');
+            thislabel[i].classList.add('selected');
             events.fire('cohort_selected', [d, i]);
         });
  
@@ -205,7 +205,7 @@ export class EventLine {
             console.log(i);
             events.fire('branch_selected', [d.parentIndex, i]);
           
-            this.$node.selectAll('.selected-group').classed('selected-group', false);
+            //this.$node.selectAll('.selected-group').classed('selected-group', false);
           //  blabel.classed('selected', true);
           });
 
