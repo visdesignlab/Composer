@@ -145,10 +145,13 @@ export class DataManager {
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
-                    let cohort = this.addMinDay(ob, d[1]).then(co=> events.fire('min_day_added', co));
+                    let cohort = this.addMinDay(ob, d[1]).then(co=> {
+                        let promis = co;
+                        events.fire('filter_cohort_by_event', [this.patCPT, promis, this.targetOrder]);
+                    });
                    })
                 );
-                events.fire('filter_cohort_by_event', [d[0], item]);
+               // events.fire('filter_cohort_by_event', [this.patCPT, co, this.targetOrder]);
             });
         });
         events.on('get_selected_demo', (evt, item)=> {
@@ -167,8 +170,9 @@ export class DataManager {
             startDateSelection.text(this.startDate);
         });
         events.on('separate_cohort_agg', (evt, item)=> {
-            console.log(item[0]);
-            this.getQuant_Separate(item).then(sep=> {
+            console.log(item);
+        
+            this.getQuant_Separate(item.promis).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
         });

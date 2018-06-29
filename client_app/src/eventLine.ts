@@ -61,7 +61,7 @@ export class EventLine {
     private attachListener() {
 
         events.on('test', (evt, item)=> {
-            console.log(item);
+           
             this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
         });
 
@@ -83,10 +83,15 @@ export class EventLine {
             }
         });
 
+        events.on('selected_cohort_change', ()=> {
+          //  document.getElementById('aggToggle').classList.remove('btn-warning');
+
+        });
+
     }
 
     private async classingSelected(index){
-            console.log(index.length);
+            
             selectAll('.selected-group').classed('selected-group', false);
 
         if(index.length > 1){ 
@@ -152,7 +157,7 @@ export class EventLine {
            
             this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
-            console.log(thislabel);
+      
             thislabel[i].classList.add('selected');
             events.fire('cohort_selected', [d, i]);
         });
@@ -201,12 +206,8 @@ export class EventLine {
           blabel.attr('transform', 'translate(0, 10)');
           blabel.on('click', (d, i)=> {
              
-            console.log(d);
-            console.log(i);
             events.fire('branch_selected', [d.parentIndex, i]);
-          
-            //this.$node.selectAll('.selected-group').classed('selected-group', false);
-          //  blabel.classed('selected', true);
+ 
           });
 
           blabel.attr('transform', (d, i) => 'translate(-60,'+ ((i * 10) + 8) + ')');
