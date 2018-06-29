@@ -108,8 +108,8 @@ export class SideBar {
 
       events.on('add_to_cohort_bar', (evt, item)=> {
         console.log('add cohort');
-        console.log(item);
-       // this.drawCohortLabel(item);
+     
+      
       });
 
       events.on('clear_cohorts', (evt, item)=> {
@@ -262,7 +262,7 @@ export class SideBar {
 
 private async drawCohortLabel(cohortTree) {
 
-  console.log(cohortTree);
+
 
   this.cohortKeeper.selectAll('div').remove();
   let counter = -1;
@@ -299,8 +299,7 @@ branch = branchEnter.merge(branch);
 branch.append('div').append('text').text((d, i)=> 'C' + (d.parentIndex + 1) +' branch');
 
 branch.on('click', (d, i)=> {
-  console.log(d);
-  console.log(i);
+ 
   events.fire('branch_selected', [d.parentIndex, i]);
 
   this.$node.selectAll('.selected').classed('selected', false);
@@ -344,7 +343,7 @@ console.log(cohort);
   }else{
       if(this.selected.length > 1){
         let index = this.selected[0];
-        console.log(index);
+   
         let branchI = this.selected[1];
         let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
         let select = cohortLabels[index];

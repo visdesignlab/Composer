@@ -203,10 +203,6 @@ export class similarityScoreDiagram {
   
         });
 
-        events.on('clear_clumpin', ()=>{
-            this.clearAggDiagram();
-        });
-
         events.on('draw_plot', (evt, item)=> {
             this.clearDiagram();
             if(item == null){  
@@ -225,21 +221,6 @@ export class similarityScoreDiagram {
             this.drawPromisChart(this.cohortProInfo, 'proLine');
             this.yBrushSelection = true;
         });
-/*
-        events.on('filtered_by_quant', (evt, item)=> {
-            this.cohortProInfo = item[0];
-            this.clearDiagram();
-            this.drawPromisChart(this.cohortProInfo, 'proLine');
-        });*/
-/*
-        events.on('separated_by_quant', (evt, item)=> {
-            this.clearDiagram();
-            this.clearAggDiagram();
-           
-            this.drawPromisChart(item[0], 'top');
-            this.drawPromisChart(item[1], 'middle');
-            this.drawPromisChart(item[2], 'bottom');
-        });*/
 
         events.on('update_chart', (evt, item)=> {
            
@@ -249,14 +230,30 @@ export class similarityScoreDiagram {
             let separated = item.separated;
             this.clearDiagram();
             this.clearAggDiagram();
+            if(this.clumped){
+                //if it is aggregated
+                if(separated){
+                    this.frequencyTest(this.cohortProInfo[0], 'top');
+                    this.frequencyTest(this.cohortProInfo[1], 'middle');
+                    this.frequencyTest(this.cohortProInfo[2], 'bottom');
+                }else{
+                    console.log('not sep');
+                    this.frequencyTest(this.cohortProInfo, 'all');
+                }
 
-            if(separated){
-                this.drawPromisChart(this.cohortProInfo[0], 'top');
-                this.drawPromisChart(this.cohortProInfo[1], 'middle');
-                this.drawPromisChart(this.cohortProInfo[2], 'bottom');
             }else{
-                this.drawPromisChart(this.cohortProInfo, 'proLine');
+                //if it is not aggregated
+                if(separated){
+                    console.log(this.cohortProInfo);
+                    this.drawPromisChart(this.cohortProInfo[0], 'top');
+                    this.drawPromisChart(this.cohortProInfo[1], 'middle');
+                    this.drawPromisChart(this.cohortProInfo[2], 'bottom');
+                }else{
+                    this.drawPromisChart(this.cohortProInfo, 'proLine');
+                }
+
             }
+           
            
         });
 
@@ -279,10 +276,10 @@ export class similarityScoreDiagram {
             if(item == null){
                 
                this.zeroEvent = 'First Promis Score';
-           
-                this.getDays(null);
+               console.log('updateStartButtoncLicked item NULL');
+                this.getDays(this.cohortProInfo, null).then(co=> this.getBaselines(co));
                 this.eventDayBool = false;
-                this.getBaselines(this.cohortProInfo);
+               
                 if(this.scaleRelative){
                     this.scaleRelative = false;
                     this.interpolate(this.cohortProInfo).then(c=> {
@@ -291,18 +288,23 @@ export class similarityScoreDiagram {
              });
                       }
             }else{
+                console.log('updateStartButtoncLicked item is not null');
                 let cohort = item[0];
                 let event = item[1];
                 this.zeroEvent = event[1][0].key;
-                this.getDays(cohort);
+                this.getDays(cohort, 'days').then(co=> {
+
+                    this.getBaselines(cohort).then(d=> {
+                        this.interpolate(d).then(c=> {
+                                   events.fire('cohort_interpolated', c);
+                                   this.changeScale(c);
+                        });
+                    });
+
+                });
                 this.eventDayBool = true;
                 //this.getBaselines(this.cohortProInfo);
-                this.getBaselines(cohort).then(d=> {
-                    this.interpolate(d).then(c=> {
-                               events.fire('cohort_interpolated', c);
-                               this.changeScale(c);
-                    });
-                });
+          
                 
             }
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
@@ -324,47 +326,56 @@ export class similarityScoreDiagram {
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-           console.log(item);
+          
             this.cohortProInfo = item.promis;
-            this.scaleRelative = item.scaleR;
+            let relativeScale = item.scaleR;
+            let separated = item.separated;
+            console.log(item);
             this.clearDiagram();
             this.clearAggDiagram();
-            this.getDays(this.cohortProInfo);
-            if(this.scaleRelative){
-                this.scaleRelative = false;
+            if(separated){
+                console.log('selected cohort separate');
+                console.log(this.cohortProInfo);
+                this.getDays(this.cohortProInfo[0], 'days').then(top => this.drawPromisChart(top, 'top'));
+                this.getDays(this.cohortProInfo[1], 'days').then(mid => this.drawPromisChart(mid, 'middle'));
+                this.getDays(this.cohortProInfo[2], 'days').then(bot => this.drawPromisChart(bot, 'bottom'));
+                   
+            }else{
+                this.getDays(this.cohortProInfo, 'days').then(co=> {
+                    this.drawPromisChart(co, 'proLine');
+                });
+            }
+           
+            if(relativeScale){
+               // relativeScale = false;
                 this.interpolate(this.cohortProInfo).then(c=> {
                    // events.fire('cohort_interpolated', c);
                    // this.changeScale(c);
-         });
+                });
                   }
                     });
 
         events.on('revert_to_promis', () =>{
             this.targetOrder = 'First Promis Score';
-
         });
         
         events.on('selected_event_filter_change', (evt, item)=> {
             this.codeArray = item;
         });
 
-        events.on('min_day_added', (evt, item)=> {
-            this.cohortProInfo = item;
-        });
-
     }
 
-    private getDays(date) {
-      if(this.cohortProInfo != null)  {
-      
+    private async getDays(cohort, date) {
+        console.log(cohort.length);
+
         // ----- add diff days to the data
           
             let maxDiff = 0;// this sets the score scale max.
             //need to make this dynamic. 
             let diffArray = [];
-            if (this.cohortProInfo != null) {
-
-                this.cohortProInfo.forEach((g) => {
+            if (cohort != null) {
+                
+                cohort.forEach((g) => {
                     let  minDate;
                    
                     if(g.CPTtime != undefined && date != null ) {
@@ -388,15 +399,18 @@ export class similarityScoreDiagram {
                             g.value.sort((a, b) => ascending(a.diff, b.diff));
 
                             });
+
+                            diffArray.sort((a, b) => ascending(a, b));
+                            events.fire('timeline_max_set', max(diffArray));
+                            events.fire('day_dist', cohort);
+                            if(this.maxDay != undefined){
+                              //  this.drawPromisChart(this.cohortProInfo, 'proLine');
+                            }
+                            console.log(cohort);
+                            return cohort;
+
             }else{console.log('error'); }
-           
-            diffArray.sort((a, b) => ascending(a, b));
-            events.fire('timeline_max_set', max(diffArray));
-            events.fire('day_dist', this.cohortProInfo);
-            if(this.maxDay != undefined){
-                this.drawPromisChart(this.cohortProInfo, 'proLine');
-            }
-        }
+
     }
 //breaks each pat value scores into Original and relative score
     private async getBaselines(cohort)  {
@@ -567,7 +581,7 @@ export class similarityScoreDiagram {
      * @param args
      */
     private drawPromisChart(cohort, clump) {
-           
+            console.log(cohort);
             if(this.scaleRelative){
 
                 const promisScoreGroup = this.svg.select('.scoreGroup');
