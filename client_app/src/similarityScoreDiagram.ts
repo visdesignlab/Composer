@@ -187,21 +187,28 @@ export class similarityScoreDiagram {
                 this.frequencyTest(this.cohortProInfo, 'all'); }
            });
 
-        events.on('change_promis_scale', (evt, item)=>{
+        events.on('update_scale', (evt, item)=>{
             console.log(this.cohortProInfo);
-            /*
-            if(item == 'Relative Scale'){
-                this.scaleRelative = true;
+
+            let scaleRelative = item.scaleR;
+            if(scaleRelative){
                 this.interpolate(this.cohortProInfo).then(c=> {
                     events.fire('cohort_interpolated', c);
-                    this.changeScale(c);
-         });
+                    this.changeScale(c, true).then( cohort=> {
+                        this.clearDiagram();
+                        this.clearAggDiagram();
+                        this.drawPromisChart(cohort, 'proLine');
+                    });
+                });
+
+            }else{
+
+                this.changeScale(this.cohortProInfo, false).then( cohort=> {
+                    this.clearDiagram();
+                    this.clearAggDiagram();
+                    this.drawPromisChart(cohort, 'proLine');
+                });
             }
-            if(item == 'Absolute Scale'){
-                this.scaleRelative = false;
-                this.changeScale(this.cohortProInfo);
-            }
-  */
         });
 
         events.on('draw_plot', (evt, item)=> {
@@ -223,38 +230,20 @@ export class similarityScoreDiagram {
             this.yBrushSelection = true;
         });
 
-        events.on('update_scale', (evt, item)=> {
-            this.cohortProInfo = item.promis;
-            this.scaleRelative = item.scaleR;
-            this.clumped = item.clumped;
-            let separated = item.separated;
-
-            if(!this.scaleRelative){
-                this.changeScale(this.cohortProInfo);
-            }else{
-                this.interpolate(this.cohortProInfo).then(c=> {
-                    events.fire('cohort_interpolated', c);
-                    this.changeScale(c);
-                });
-            }
-        });
-
         events.on('update_chart', (evt, item)=> {
            
             this.cohortProInfo = item.promis;
-
             this.scaleRelative = item.scaleR;
             this.clumped = item.clumped;
             let separated = item.separated;
             this.clearDiagram();
             this.clearAggDiagram();
-           
             if(this.clumped){
                 //if it is aggregated
                 if(separated){
-                    this.frequencyTest(item.promisSep[0], 'top');
-                    this.frequencyTest(item.promisSep[1], 'middle');
-                    this.frequencyTest(item.promisSep[2], 'bottom');
+                    this.frequencyTest(this.cohortProInfo[0], 'top');
+                    this.frequencyTest(this.cohortProInfo[1], 'middle');
+                    this.frequencyTest(this.cohortProInfo[2], 'bottom');
                 }else{
                     console.log('not sep');
                     this.frequencyTest(this.cohortProInfo, 'all');
@@ -264,9 +253,9 @@ export class similarityScoreDiagram {
                 //if it is not aggregated
                 if(separated){
                     console.log(this.cohortProInfo);
-                    this.drawPromisChart(item.promisSep[0], 'top');
-                    this.drawPromisChart(item.promisSep[1], 'middle');
-                    this.drawPromisChart(item.promisSep[2], 'bottom');
+                    this.drawPromisChart(this.cohortProInfo[0], 'top');
+                    this.drawPromisChart(this.cohortProInfo[1], 'middle');
+                    this.drawPromisChart(this.cohortProInfo[2], 'bottom');
                 }else{
                     this.drawPromisChart(this.cohortProInfo, 'proLine');
                 }
@@ -303,9 +292,13 @@ export class similarityScoreDiagram {
                     this.scaleRelative = false;
                     this.interpolate(this.cohortProInfo).then(c=> {
                         events.fire('cohort_interpolated', c);
-                        this.changeScale(c);
-             });
-                      }
+                        this.changeScale(c, true).then( cohort=> {
+                            this.clearDiagram();
+                            this.clearAggDiagram();
+                            this.drawPromisChart(cohort, 'proLine');
+                        });
+                    });
+                }
             }else{
                 console.log('updateStartButtoncLicked item is not null');
                 let cohort = item[0];
@@ -316,13 +309,19 @@ export class similarityScoreDiagram {
                     this.getBaselines(cohort).then(d=> {
                         this.interpolate(d).then(c=> {
                                    events.fire('cohort_interpolated', c);
-                                   this.changeScale(c);
+                                   this.changeScale(c, false).then( cohort=> {
+                                    this.clearDiagram();
+                                    this.clearAggDiagram();
+                                    this.drawPromisChart(cohort, 'proLine');
+                                });
                         });
                     });
 
                 });
                 this.eventDayBool = true;
-
+                //this.getBaselines(this.cohortProInfo);
+          
+                
             }
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
@@ -366,9 +365,15 @@ export class similarityScoreDiagram {
             if(relativeScale){
                // relativeScale = false;
                 this.interpolate(this.cohortProInfo).then(c=> {
-                   // events.fire('cohort_interpolated', c);
-                   // this.changeScale(c);
+                    events.fire('cohort_interpolated', c);
+                    this.changeScale(c, true).then( cohort=> {
+                        this.clearDiagram();
+                        this.clearAggDiagram();
+                        this.drawPromisChart(cohort, 'proLine');
+                    });
                 });
+                  }else{
+
                   }
                     });
 
@@ -559,9 +564,7 @@ export class similarityScoreDiagram {
                     value.b = b;
                     value.relScore = value.ogScore - b;
                 });
-
             }
-
         });
         console.log(cohort);
         this.cohortProInfo = cohort;
@@ -570,28 +573,28 @@ export class similarityScoreDiagram {
        // this.changeScale(cohort);
         return cohort;
     }
-    private changeScale(cohort) {
+    private async changeScale(cohort, scale) {
       
-        if(this.scaleRelative)  {
+        if(scale)  {
             this.scoreScale.domain([30, -30]);
-            this.cohortProInfo.forEach(patient => {
+            cohort.forEach(patient => {
                 patient.value.forEach(value => {
                     value.SCORE = +value.relScore;
                 });
             });
-            };
-        if(!this.scaleRelative) {
-            this.scoreScale.domain([80, 0]);
-            this.cohortProInfo.forEach(patient => {
-                patient.value.forEach(value => {
-                    value.SCORE = +value.ogScore;
+            }else{
+                this.scoreScale.domain([80, 0]);
+                cohort.forEach(patient => {
+                    patient.value.forEach(value => {
+                        value.SCORE = +value.ogScore;
                 });
             });
-        };
-        this.clearDiagram();
-        this.clearAggDiagram();
-        this.drawPromisChart(this.cohortProInfo, 'proLine');
+            }
 
+        return cohort;
+      //  this.clearDiagram();
+      //  this.clearAggDiagram();
+      //  this.drawPromisChart(this.cohortProInfo, 'proLine');
     }
     /**
      * Draw the diagram with the given data from getSimilarRows
