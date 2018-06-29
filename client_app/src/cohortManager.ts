@@ -223,6 +223,8 @@ export class CohortManager {
                 events.fire('test', [this.cohortTree, [this.cohortIndex]]);
             }else{
                 this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].events.push(filterReq);
+                events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].events);
+                events.fire('test', [this.cohortTree, [this.branchSelected]]);
             }
           });
 
@@ -366,6 +368,14 @@ export class CohortManager {
           });
 
         events.on('update_start_button_clicked', (evt, item)=> {
+           // console.log(item);
+           // this.selectedCohort = item[0];
+            if(this.branchSelected == null){
+               
+              //  this.cohortTree[this.cohortIndex].promis = item[0];
+            }else{
+               // this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].promis = item[0];
+            }
               events.fire('update_cpt_days', [this.selectedCPT, null]);
           });
 

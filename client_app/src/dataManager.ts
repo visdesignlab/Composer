@@ -107,9 +107,9 @@ export class DataManager {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
                 
-                    this.addMinDay(ob, d[1]).then(d=> {
-                        events.fire('min_day_added', d);
-                        events.fire('update_start_button_clicked', [d, item]);
+                    this.addMinDay(ob, d[1]).then(co=> {
+                        events.fire('min_day_added', co);
+                        events.fire('update_start_button_clicked', [co, item]);
                     });
                    })
                 );
@@ -145,7 +145,7 @@ export class DataManager {
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
-                    let cohort = this.addMinDay(ob, d[1]).then(d=> events.fire('min_day_added', d));
+                    let cohort = this.addMinDay(ob, d[1]).then(co=> events.fire('min_day_added', co));
                    })
                 );
                 events.fire('filter_cohort_by_event', [d[0], item]);

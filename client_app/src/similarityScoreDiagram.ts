@@ -314,7 +314,7 @@ export class similarityScoreDiagram {
             this.cohortProInfo = item;
             this.clearDiagram();
             this.clearAggDiagram();
-            this.getDays(null);
+            this.getDays(item);
             if(this.scaleRelative){
                 this.scaleRelative = false;
                 this.interpolate(this.cohortProInfo).then(c=> {
