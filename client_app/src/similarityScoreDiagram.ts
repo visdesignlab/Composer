@@ -69,6 +69,7 @@ export class similarityScoreDiagram {
     private lineOpacity;
     private eventDayBool;
     private scaleRelative = false;
+    private clumped = false;
     private yBrushSelection = false;
 
     constructor(parent: Element, diagram, cohortData) {
@@ -187,13 +188,13 @@ export class similarityScoreDiagram {
            });
 
         events.on('change_promis_scale', (evt, item)=>{
-            
+            console.log(this.cohortProInfo);
             if(item == 'Relative Scale'){
                 this.scaleRelative = true;
                 this.interpolate(this.cohortProInfo).then(c=> {
                     events.fire('cohort_interpolated', c);
                     this.changeScale(c);
-         });;
+         });
             }
             if(item == 'Absolute Scale'){
                 this.scaleRelative = false;
@@ -224,13 +225,13 @@ export class similarityScoreDiagram {
             this.drawPromisChart(this.cohortProInfo, 'proLine');
             this.yBrushSelection = true;
         });
-
+/*
         events.on('filtered_by_quant', (evt, item)=> {
             this.cohortProInfo = item[0];
             this.clearDiagram();
             this.drawPromisChart(this.cohortProInfo, 'proLine');
-        });
-
+        });*/
+/*
         events.on('separated_by_quant', (evt, item)=> {
             this.clearDiagram();
             this.clearAggDiagram();
@@ -238,13 +239,25 @@ export class similarityScoreDiagram {
             this.drawPromisChart(item[0], 'top');
             this.drawPromisChart(item[1], 'middle');
             this.drawPromisChart(item[2], 'bottom');
-        });
+        });*/
 
-        events.on('filtered_by_count', (evt, item)=> {
-            this.cohortProInfo = item[0];
+        events.on('update_chart', (evt, item)=> {
+           
+            this.cohortProInfo = item.promis;
+            this.scaleRelative = item.scaleR;
+            this.clumped = item.clumped;
+            let separated = item.separated;
             this.clearDiagram();
             this.clearAggDiagram();
-            this.drawPromisChart(this.cohortProInfo, 'proLine');
+
+            if(separated){
+                this.drawPromisChart(this.cohortProInfo[0], 'top');
+                this.drawPromisChart(this.cohortProInfo[1], 'middle');
+                this.drawPromisChart(this.cohortProInfo[2], 'bottom');
+            }else{
+                this.drawPromisChart(this.cohortProInfo, 'proLine');
+            }
+           
         });
 
         events.on('event_selected', (evt, item)=> {
@@ -311,10 +324,12 @@ export class similarityScoreDiagram {
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-            this.cohortProInfo = item;
+           console.log(item);
+            this.cohortProInfo = item.promis;
+            this.scaleRelative = item.scaleR;
             this.clearDiagram();
             this.clearAggDiagram();
-            this.getDays(item);
+            this.getDays(this.cohortProInfo);
             if(this.scaleRelative){
                 this.scaleRelative = false;
                 this.interpolate(this.cohortProInfo).then(c=> {

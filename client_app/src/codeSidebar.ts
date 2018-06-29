@@ -67,12 +67,12 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('selected_cohort_change', (evt, item)=> {
-     
+        let cohortPromis = item.promis;
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
         this.$node.select('.distributionWrapper').selectAll('*').remove();
     
-        this.histogrammer(item).then(d=> this.drawHistogram(d));
+        this.histogrammer(cohortPromis).then(d=> this.drawHistogram(d));
     
        });
 
@@ -146,6 +146,7 @@ export class CodeSidebar {
     }
 
     private async histogrammer(cohort) {
+        console.log(cohort);
         let totalPatients = cohort.length;
         let mapped = cohort.map(pat  => {return +pat.value.length});
  
