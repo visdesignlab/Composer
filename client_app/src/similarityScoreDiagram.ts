@@ -177,23 +177,44 @@ export class similarityScoreDiagram {
       
         events.on('update_scale', (evt, item)=>{
             console.log(this.cohortProInfo);
-
+            let separated = item.separated;
             let scaleRelative = item.scaleR;
+            this.clearDiagram();
+            this.clearAggDiagram();
             if(scaleRelative){
-                this.interpolate(this.cohortProInfo).then(c=> {
-                    events.fire('cohort_interpolated', c);
-                    this.changeScale(c, true).then( cohort=> {
-                        this.clearDiagram();
-                        this.clearAggDiagram();
-                        this.drawPromisChart(cohort, 'proLine');
-                    });
-                });
+                if(separated){
+                    this.interpolate(item.promisSep[0].then(c=> {
+                        this.changeScale(c, true).then(cohort=> {
+                            let topc = cohort;
+                            this.drawPromisChart(cohort, 'top');
+                        });
+                    }));
+                    this.interpolate(item.promisSep[1].then(c=> {
+                        this.changeScale(c, true).then(cohort=> {
+                            let midc = cohort;
+                            this.drawPromisChart(cohort, 'middle');
+                        });
+                    }));
+                    this.interpolate(item.promisSep[2].then(c=> {
+                        this.changeScale(c, true).then(cohort=> {
+                            let botc = cohort;
+                            this.drawPromisChart(cohort, 'bottom');
+                        });
+                    }));
+                   // events.fire('cohort_interpolated', [topc, midc, botc]);
 
+                }else{
+                    this.interpolate(this.cohortProInfo).then(c=> {
+                      //  events.fire('cohort_interpolated', c);
+                        this.changeScale(c, true).then( cohort=> {
+                            this.drawPromisChart(cohort, 'proLine');
+                        });
+                    });
+                }
+   
             }else{
 
                 this.changeScale(this.cohortProInfo, false).then( cohort=> {
-                    this.clearDiagram();
-                    this.clearAggDiagram();
                     this.drawPromisChart(cohort, 'proLine');
                 });
             }
@@ -348,9 +369,9 @@ export class similarityScoreDiagram {
             if(separated){
                 console.log('selected cohort separate');
                 console.log(this.cohortProInfo);
-                this.getDays(this.cohortProInfo[0], 'days').then(top => this.drawPromisChart(top, 'top'));
-                this.getDays(this.cohortProInfo[1], 'days').then(mid => this.drawPromisChart(mid, 'middle'));
-                this.getDays(this.cohortProInfo[2], 'days').then(bot => this.drawPromisChart(bot, 'bottom'));
+                this.getDays(item.promisSep[0], 'days').then(top => this.drawPromisChart(top, 'top'));
+                this.getDays(item.promisSep[1], 'days').then(mid => this.drawPromisChart(mid, 'middle'));
+                this.getDays(item.promisSep[2], 'days').then(bot => this.drawPromisChart(bot, 'bottom'));
                    
             }else{
                 this.getDays(this.cohortProInfo, 'days').then(co=> {
