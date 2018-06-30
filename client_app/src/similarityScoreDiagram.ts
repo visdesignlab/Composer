@@ -174,19 +174,7 @@ export class similarityScoreDiagram {
      */
     private attachListener() {
         //this is in plotkeeper
-        events.on('draw_aggs', (evt, item)=> {
-            if(item != null){
-               
-                this.clearDiagram();
-                this.frequencyTest(item[0], 'top');
-                this.frequencyTest(item[1], 'middle');
-                this.frequencyTest(item[2], 'bottom');
-               
-            }else {  
-                this.clearDiagram();
-                this.frequencyTest(this.cohortProInfo, 'all'); }
-           });
-
+      
         events.on('update_scale', (evt, item)=>{
             console.log(this.cohortProInfo);
 
@@ -241,21 +229,21 @@ export class similarityScoreDiagram {
             if(this.clumped){
                 //if it is aggregated
                 if(separated){
-                    this.frequencyTest(this.cohortProInfo[0], 'top');
-                    this.frequencyTest(this.cohortProInfo[1], 'middle');
-                    this.frequencyTest(this.cohortProInfo[2], 'bottom');
+                    this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
+                    this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
+                    this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
                 }else{
-                    console.log('not sep');
-                    this.frequencyTest(this.cohortProInfo, 'all');
+                  
+                    this.frequencyCalc(this.cohortProInfo, 'all').then(co=> this.drawAgg(co, 'all'));
                 }
 
             }else{
                 //if it is not aggregated
                 if(separated){
                     console.log(this.cohortProInfo);
-                    this.drawPromisChart(this.cohortProInfo[0], 'top');
-                    this.drawPromisChart(this.cohortProInfo[1], 'middle');
-                    this.drawPromisChart(this.cohortProInfo[2], 'bottom');
+                    this.drawPromisChart(item.promisSep[0], 'top');
+                    this.drawPromisChart(item.promisSep[1], 'middle');
+                    this.drawPromisChart(item.promisSep[2], 'bottom');
                 }else{
                     this.drawPromisChart(this.cohortProInfo, 'proLine');
                 }
@@ -867,7 +855,7 @@ export class similarityScoreDiagram {
 
     // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
-    private frequencyTest(cohort, clump){
+    private async frequencyCalc(cohort, clump){
         let cohortFiltered = cohort.filter(d=> d.value.length > 1);
 
         let negdiff = 0;
@@ -935,7 +923,6 @@ export class similarityScoreDiagram {
         
                 last.y = pat.value[pat.value.length-1].SCORE; }
 
-
             for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
               
                 let x = pat.bins[i].x;
@@ -949,8 +936,9 @@ export class similarityScoreDiagram {
                          };
             }
         });
-       
-        this.drawAgg(cohortFiltered, clump);
+        console.log(cohortFiltered);
+        return cohortFiltered;
+        //this.drawAgg(cohortFiltered, clump);
 
     }
     //draws the lines for the mean and standard deviation for the PROMIS scores

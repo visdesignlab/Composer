@@ -41,7 +41,7 @@ export class CohortManager {
         events.on('aggregate_button_clicked', ()=> {
 
             let clumped = this.cohortTree[this.cohortIndex].clumped;
-            console.log(clumped);
+      
             if (clumped){
                 clumped = false;
                 document.getElementById('aggToggle').classList.remove('btn-warning');
@@ -57,14 +57,12 @@ export class CohortManager {
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
 
-            console.log(this.selectedCohort);
             events.fire('update_chart', this.selectedCohort);
 
             });
 
         events.on('branch_cohort', ()=> {
 
-            console.log(this.cohortIndex);
             let branch;
             if(this.cohortTree[this.cohortIndex].branches.length == 0){
                 console.log('first branch');
@@ -92,6 +90,8 @@ export class CohortManager {
                 parentIndex: this.cohortIndex,
                 events: bfilter,
                 promis: b,
+                promisSep: null,
+                promisAgg: null,
                 cpt: bcpt,
                 separated: false,
                 clumped: false,
@@ -110,7 +110,6 @@ export class CohortManager {
             this.cohortIndex = item[0];
             let branchIndex = item[1];
             this.selectedCohort = this.cohortTree[this.cohortIndex].branches[branchIndex];
-            console.log(this.branchSelected);
             events.fire('update_filters', [this.cohortTree, this.branchSelected]);
             events.fire('selected_cohort_change', this.selectedCohort);
             //events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray]);
@@ -148,13 +147,11 @@ export class CohortManager {
             });
 
         events.on('cohort_selected', (evt, item)=>{
-            console.log(item);
+  
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
 
-            console.log(item[0]);
-           
             this.cohortTree[this.cohortIndex].promis = item[0].promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
            
@@ -164,12 +161,11 @@ export class CohortManager {
             events.fire('selected_cohort_change', this.selectedCohort);
            
             events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].events);
-            console.log('cohort_selected?');
+         
             events.fire('test', [this.cohortTree, [index]]);
           });
 
         events.on('cohort_stats', ()=>{
-         
             events.fire('send_cohort', this.selectedCohort);
           });
 
@@ -198,6 +194,7 @@ export class CohortManager {
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].separated = true;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
+            console.log(this.selectedCohort);
            events.fire('update_chart', this.selectedCohort);
           });
 
@@ -230,6 +227,8 @@ export class CohortManager {
                 parentIndex: null,
                 events: [],
                 promis: null,
+                promisSep: null,
+                promisAgg: null,
                 cpt: null,
                 separated: false,
                 clumped: false,
@@ -299,7 +298,6 @@ export class CohortManager {
           });
 
         events.on('filter_cohort_by_event', (evt, item)=> {
-             console.log(item);
 
               let cptfil = ['CPT', item[2], item[0].length];
 
@@ -336,16 +334,15 @@ export class CohortManager {
           });
 
         events.on('separate_aggregate', (evt, item)=> {
-            console.log(this.selectedCohort);
+    
             if(this.selectedCohort.separated){
-                console.log('sep!');
                 this.selectedCohort.separated = false;
                 document.getElementById('quartile-btn').classList.remove('btn-warning');
                 document.getElementById('checkDiv').classList.add('hidden');
                 events.fire('draw_plot', null);
 
             }else{
-                console.log('not sep');
+                console.log(this.selectedCohort);
                 this.selectedCohort.separated = true;
                 document.getElementById('quartile-btn').classList.add('btn-warning');
                 document.getElementById('checkDiv').classList.remove('hidden');
@@ -401,7 +398,7 @@ export class CohortManager {
           });
 
         events.on('cohort_interpolated', (evt, item)=> {
-            console.log('cohort interpolated');
+    
             if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].promis = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
