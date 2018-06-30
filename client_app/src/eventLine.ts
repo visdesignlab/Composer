@@ -329,8 +329,8 @@ export class EventLine {
             togglebutton.append('span').classed('caret', true);
     
                         let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
-                        let abs = ul.append('li').append('href').append('text').text('Absolute');
-                        let rel = ul.append('li').append('href').append('text').text('Relative');//.attr('value', 'Absolute');
+                        let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
+                        let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
               
             abs.on('click', () =>{
                             this.scoreLabel = 'Absolute Scale';
