@@ -174,34 +174,29 @@ export class similarityScoreDiagram {
      */
     private attachListener() {
         //this is in plotkeeper
-        events.on('draw_aggs', (evt, item)=> {
-            if(item != null){
-               
-                this.clearDiagram();
-                this.frequencyTest(item[0], 'top');
-                this.frequencyTest(item[1], 'middle');
-                this.frequencyTest(item[2], 'bottom');
-               
-            }else {  
-                this.clearDiagram();
-                this.frequencyTest(this.cohortProInfo, 'all'); }
-           });
-
-        events.on('change_promis_scale', (evt, item)=>{
+      
+        events.on('update_scale', (evt, item)=>{
             console.log(this.cohortProInfo);
-            /*
-            if(item == 'Relative Scale'){
-                this.scaleRelative = true;
+
+            let scaleRelative = item.scaleR;
+            if(scaleRelative){
                 this.interpolate(this.cohortProInfo).then(c=> {
                     events.fire('cohort_interpolated', c);
-                    this.changeScale(c);
-         });
+                    this.changeScale(c, true).then( cohort=> {
+                        this.clearDiagram();
+                        this.clearAggDiagram();
+                        this.drawPromisChart(cohort, 'proLine');
+                    });
+                });
+
+            }else{
+
+                this.changeScale(this.cohortProInfo, false).then( cohort=> {
+                    this.clearDiagram();
+                    this.clearAggDiagram();
+                    this.drawPromisChart(cohort, 'proLine');
+                });
             }
-            if(item == 'Absolute Scale'){
-                this.scaleRelative = false;
-                this.changeScale(this.cohortProInfo);
-            }
-  */
         });
 
         events.on('draw_plot', (evt, item)=> {
@@ -222,55 +217,15 @@ export class similarityScoreDiagram {
             this.drawPromisChart(this.cohortProInfo, 'proLine');
             this.yBrushSelection = true;
         });
-<<<<<<< HEAD
-/*
-        events.on('filtered_by_quant', (evt, item)=> {
-            this.cohortProInfo = item[0];
-            this.clearDiagram();
-            this.drawPromisChart(this.cohortProInfo, 'proLine');
-        });*/
-/*
-        events.on('separated_by_quant', (evt, item)=> {
-            this.clearDiagram();
-            this.clearAggDiagram();
-           
-            this.drawPromisChart(item[0], 'top');
-            this.drawPromisChart(item[1], 'middle');
-            this.drawPromisChart(item[2], 'bottom');
-        });*/
-
-        events.on('update_scale', (evt, item)=> {
-            this.cohortProInfo = item.promis;
-            this.scaleRelative = item.scaleR;
-            this.clumped = item.clumped;
-            let separated = item.separated;
-
-            if(!this.scaleRelative){
-                this.changeScale(this.cohortProInfo);
-            }else{
-                this.interpolate(this.cohortProInfo).then(c=> {
-                    events.fire('cohort_interpolated', c);
-                    this.changeScale(c);
-                });
-            }
-        });
 
         events.on('update_chart', (evt, item)=> {
            
-=======
-
-        events.on('update_chart', (evt, item)=> {
-           
->>>>>>> branch
             this.cohortProInfo = item.promis;
-
             this.scaleRelative = item.scaleR;
             this.clumped = item.clumped;
             let separated = item.separated;
             this.clearDiagram();
             this.clearAggDiagram();
-<<<<<<< HEAD
-<<<<<<< HEAD
 
             if(separated){
                 this.drawPromisChart(this.cohortProInfo[0], 'top');
@@ -279,20 +234,16 @@ export class similarityScoreDiagram {
             }else{
                 this.drawPromisChart(this.cohortProInfo, 'proLine');
             }
-           
-=======
-=======
-           
->>>>>>> compare
+
             if(this.clumped){
                 //if it is aggregated
                 if(separated){
-                    this.frequencyTest(item.promisSep[0], 'top');
-                    this.frequencyTest(item.promisSep[1], 'middle');
-                    this.frequencyTest(item.promisSep[2], 'bottom');
+                    this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
+                    this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
+                    this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
                 }else{
-                    console.log('not sep');
-                    this.frequencyTest(this.cohortProInfo, 'all');
+                  
+                    this.frequencyCalc(this.cohortProInfo, 'all').then(co=> this.drawAgg(co, 'all'));
                 }
 
             }else{
@@ -307,9 +258,7 @@ export class similarityScoreDiagram {
                 }
 
             }
-           
-           
->>>>>>> branch
+
         });
 
         events.on('event_selected', (evt, item)=> {
@@ -339,9 +288,13 @@ export class similarityScoreDiagram {
                     this.scaleRelative = false;
                     this.interpolate(this.cohortProInfo).then(c=> {
                         events.fire('cohort_interpolated', c);
-                        this.changeScale(c);
-             });
-                      }
+                        this.changeScale(c, true).then( cohort=> {
+                            this.clearDiagram();
+                            this.clearAggDiagram();
+                            this.drawPromisChart(cohort, 'proLine');
+                        });
+                    });
+                }
             }else{
                 console.log('updateStartButtoncLicked item is not null');
                 let cohort = item[0];
@@ -352,13 +305,19 @@ export class similarityScoreDiagram {
                     this.getBaselines(cohort).then(d=> {
                         this.interpolate(d).then(c=> {
                                    events.fire('cohort_interpolated', c);
-                                   this.changeScale(c);
+                                   this.changeScale(c, false).then( cohort=> {
+                                    this.clearDiagram();
+                                    this.clearAggDiagram();
+                                    this.drawPromisChart(cohort, 'proLine');
+                                });
                         });
                     });
 
                 });
                 this.eventDayBool = true;
-
+                //this.getBaselines(this.cohortProInfo);
+          
+                
             }
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
@@ -379,16 +338,6 @@ export class similarityScoreDiagram {
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-<<<<<<< HEAD
-           console.log(item);
-            this.cohortProInfo = item.promis;
-            this.scaleRelative = item.scaleR;
-            this.clearDiagram();
-            this.clearAggDiagram();
-            this.getDays(this.cohortProInfo);
-            if(this.scaleRelative){
-                this.scaleRelative = false;
-=======
           
             this.cohortProInfo = item.promis;
             let relativeScale = item.scaleR;
@@ -411,11 +360,16 @@ export class similarityScoreDiagram {
            
             if(relativeScale){
                // relativeScale = false;
->>>>>>> branch
                 this.interpolate(this.cohortProInfo).then(c=> {
-                   // events.fire('cohort_interpolated', c);
-                   // this.changeScale(c);
+                    events.fire('cohort_interpolated', c);
+                    this.changeScale(c, true).then( cohort=> {
+                        this.clearDiagram();
+                        this.clearAggDiagram();
+                        this.drawPromisChart(cohort, 'proLine');
+                    });
                 });
+                  }else{
+
                   }
                     });
 
@@ -606,9 +560,7 @@ export class similarityScoreDiagram {
                     value.b = b;
                     value.relScore = value.ogScore - b;
                 });
-
             }
-
         });
         console.log(cohort);
         this.cohortProInfo = cohort;
@@ -617,28 +569,28 @@ export class similarityScoreDiagram {
        // this.changeScale(cohort);
         return cohort;
     }
-    private changeScale(cohort) {
+    private async changeScale(cohort, scale) {
       
-        if(this.scaleRelative)  {
+        if(scale)  {
             this.scoreScale.domain([30, -30]);
-            this.cohortProInfo.forEach(patient => {
+            cohort.forEach(patient => {
                 patient.value.forEach(value => {
                     value.SCORE = +value.relScore;
                 });
             });
-            };
-        if(!this.scaleRelative) {
-            this.scoreScale.domain([80, 0]);
-            this.cohortProInfo.forEach(patient => {
-                patient.value.forEach(value => {
-                    value.SCORE = +value.ogScore;
+            }else{
+                this.scoreScale.domain([80, 0]);
+                cohort.forEach(patient => {
+                    patient.value.forEach(value => {
+                        value.SCORE = +value.ogScore;
                 });
             });
-        };
-        this.clearDiagram();
-        this.clearAggDiagram();
-        this.drawPromisChart(this.cohortProInfo, 'proLine');
+            }
 
+        return cohort;
+      //  this.clearDiagram();
+      //  this.clearAggDiagram();
+      //  this.drawPromisChart(this.cohortProInfo, 'proLine');
     }
     /**
      * Draw the diagram with the given data from getSimilarRows
@@ -911,7 +863,7 @@ export class similarityScoreDiagram {
 
     // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
-    private frequencyTest(cohort, clump){
+    private async frequencyCalc(cohort, clump){
         let cohortFiltered = cohort.filter(d=> d.value.length > 1);
 
         let negdiff = 0;
@@ -979,7 +931,6 @@ export class similarityScoreDiagram {
         
                 last.y = pat.value[pat.value.length-1].SCORE; }
 
-
             for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
               
                 let x = pat.bins[i].x;
@@ -993,8 +944,9 @@ export class similarityScoreDiagram {
                          };
             }
         });
-       
-        this.drawAgg(cohortFiltered, clump);
+        console.log(cohortFiltered);
+        return cohortFiltered;
+        //this.drawAgg(cohortFiltered, clump);
 
     }
     //draws the lines for the mean and standard deviation for the PROMIS scores
