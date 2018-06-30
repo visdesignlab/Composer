@@ -58,6 +58,7 @@ export class SideBar {
     
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
+    let compare = this.$node.append('div').attr('id', 'compareDiv').classed('hidden', true);
     this.$node.append('div').attr('id', 'cohortDiv');
     this.$node.append('div').attr('id', 'filterDiv');
     this.xScale = scaleLinear();
@@ -65,6 +66,8 @@ export class SideBar {
     this.svgWidth = 170;
     this.svgHeight = 40;
     this.branchSelected = null;
+
+    this.buildComparisonFilter(compare);
     
     this.attachListener();
   }
@@ -79,6 +82,10 @@ export class SideBar {
       let b = document.getElementsByClassName(cohortIndex);
       let branch = b[1];
       branch.classList.add('selected');*/
+    });
+    events.on('compare_cohorts', (evt, item)=> {
+      select('#compareDiv').classed('hidden', false);
+
     });
     
       events.on('filter_counted', (evt, item) => {//this get the count from the group
@@ -137,6 +144,32 @@ export class SideBar {
     this.buildDemoFilter();
 
           }
+
+  private buildComparisonFilter(compareDiv){
+    let toggle = compareDiv.append('div');
+    let togglebutton = toggle.append('button')
+                                        .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                        .classed('dropdown-toggle', true)
+                                        .attr('data-toggle', 'dropdown');
+    
+          togglebutton.append('span').classed('caret', true);
+    
+          let ul = toggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+          let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
+          let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
+
+    compareDiv.append('input').attr('type', 'button')
+    .classed('btn', true).classed('btn-primary', true)
+    .attr('value', 'Add a cohort to comparison').on('click', ()=> {
+      console.log('add a comparison');
+    });
+
+    compareDiv.append('input').attr('type', 'button')
+    .classed('btn', true).classed('btn-primary', true)
+    .attr('value', 'Clear Cohort Comparison').on('click', ()=> {
+      console.log('clear comparison');
+    });
+  }
 
   private buildDemoFilter() {
 
