@@ -43,15 +43,7 @@ export class DataManager {
     cohortIcdObjects;//ICD objects for cohort
     filteredPatPromis;
     patCPT;
-
     startDate;
-
-    //attempting to set up structure to hold filters
-    filterRequirements = {
-        'demo': null, //this is sent from sidebar
-        'icd': null,
-        'cpt': null
-       };
 
     constructor() {
         /* 
@@ -170,9 +162,11 @@ export class DataManager {
             startDateSelection.text(this.startDate);
         });
         events.on('separate_cohort_agg', (evt, item)=> {
+
             console.log(item);
         
             this.getQuant_Separate(item.promis).then(sep=> {
+                console.log(sep);
                 events.fire('separated_by_quant', sep);
             });
         });
@@ -493,6 +487,8 @@ export class DataManager {
         return cohort;
     }
 
+
+
     private async getQuant_Separate(cohort) {
 
         console.log(cohort)
@@ -534,54 +530,9 @@ export class DataManager {
                 patient.scorespan = [test];
             }
         });
-      
+        
         //events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
         return [topStart, middleStart, bottomStart];
-    }
-
-    private getQuant_Separate_Test(cohort) {
-
-        console.log(cohort)
-        let oneval = [];
-        let outofrange = [];
-        let topStart = [];
-        let middleStart = [];
-        let bottomStart = [];
-        let barray = [];
-        let maxPromisCount = 1;
-
-        cohort.forEach(patient => {
-
-            if(patient.value.length == 1){
-                if(patient.value[0].diff > Math.abs(90)){
-                    outofrange.push(patient);
-                }
-                oneval.push(patient.key);
-            }else {
-
-                if(patient.value.length > maxPromisCount) {
-
-                    maxPromisCount = patient.value.length;
-                }
-            }
-
-            if(patient.b != undefined) {
-                barray.push(patient.b);
-                if(patient.b >= 43){topStart.push(patient)};
-                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
-                if(patient.b <= 29){bottomStart.push(patient)};
-                patient.scorespan = [patient.b];
-            }else{
-                let test = patient.value[0].SCORE;
-                barray.push(test);
-                if(test >= 43){topStart.push(patient)};
-                if(test < 43 && test > 29){ middleStart.push(patient)};
-                if(test <= 29){bottomStart.push(patient)};
-                patient.scorespan = [test];
-            }
-        });
-      
-        events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
     }
 
     public async mapDemoData() {
