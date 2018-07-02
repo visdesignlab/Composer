@@ -86,6 +86,7 @@ export class CohortManager {
             let branchFirst = [{parentEvents: bfilter, parentLink: [this.cohortIndex, b.length - 2]}];
 
             let treeBranch = { 
+                label: "C-"+ String(this.cohortIndex + 1) + " Branch-" + String((this.cohortTree[this.cohortIndex].branches + 1)),
                 eventIndex: indexBranch,
                 parentIndex: this.cohortIndex,
                 events: bfilter,
@@ -194,7 +195,7 @@ export class CohortManager {
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].separated = true;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
-            console.log(this.selectedCohort);
+           console.log(this.selectedCohort);
            events.fire('update_chart', this.selectedCohort);
           });
 
@@ -223,6 +224,7 @@ export class CohortManager {
           events.on('create_button_down', ()=> {
 
             let newParent = {
+                label: 'Cohort-' + String((this.cohortTree.length + 1)),
                 eventIndex: 0,
                 parentIndex: null,
                 events: [],
