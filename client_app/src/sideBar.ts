@@ -67,22 +67,13 @@ export class SideBar {
     this.svgHeight = 40;
     this.branchSelected = null;
 
-    this.buildComparisonFilter(compare);
+    //this.buildComparisonFilter(compare);
     
     this.attachListener();
   }
 
   private attachListener () {
 
-    events.on('branch_selected', (evt, item)=> {
-   /*
-      let cohortIndex = item[0];
-   
-      this.$node.selectAll('.selected').classed('selected', false);
-      let b = document.getElementsByClassName(cohortIndex);
-      let branch = b[1];
-      branch.classList.add('selected');*/
-    });
     events.on('compare_cohorts', (evt, item)=> {
       select('#compareDiv').classed('hidden', false);
 
@@ -113,12 +104,6 @@ export class SideBar {
          this.filterDemo('demo_add');
        });
 
-      events.on('add_to_cohort_bar', (evt, item)=> {
-        console.log('add cohort');
-     
-      
-      });
-
       events.on('clear_cohorts', (evt, item)=> {
         this.cohortKeeper.selectAll('div').remove();
       });
@@ -131,10 +116,13 @@ export class SideBar {
       });
 
       events.on('test', (evt, item)=> {
+        console.log('test firing?');
         selectAll('.selected').classed('selected', false);
-        console.log(item);
+  
         this.selected = item[1];
-      //  this.drawCohortLabel(item[0]);
+        let compare = select('#compareDiv');
+        compare.selectAll('*').remove();
+        this.buildComparisonFilter(compare, item[0]);
       });
       }
 
@@ -145,29 +133,101 @@ export class SideBar {
 
           }
 
-  private buildComparisonFilter(compareDiv){
-    let toggle = compareDiv.append('div');
-    let togglebutton = toggle.append('button')
-                                        .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
-                                        .classed('dropdown-toggle', true)
-                                        .attr('data-toggle', 'dropdown');
+  private buildComparisonFilter(compareDiv, data) {
+
+    let comparisonKeeper = [{name: 'A', label: null, cohort: null, data: null},
+                            {name: 'B', label: null, cohort: null, data: null},
+                            {name: 'C', label: null, cohort: null, data: null},
+                            {name: 'D', label: null, cohort: null, data: null},
+                            {name: 'E', label: null, cohort: null, data: null}
+                          ];
+
+    let compareCount = 2;
+
+
+
+    let branchData = [];
     
-          togglebutton.append('span').classed('caret', true);
+    data.forEach(d => {
+   
+      if(d.branches.length != 0){ 
+        d.branches.forEach(b => {
+      
+          branchData.push(b);
+        });
+       };
+    });
+
+
+    let cohortToggle = compareDiv.append('div').classed('compare-toggle', true);
+
+function drawToggle(counter, labels) {    
+   
+    for(let i = 0; i < counter; i++ ){
+
+      let label; 
+      
+      if(labels[i].cohort == null){ label = 'Cohort ' + labels[i].name; }else{
+        label = labels[i].label;
+      }
+
+      let cohort = cohortToggle.append('div').attr('class', labels[i].name).classed('btn-group', true);
+      cohort.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                              .append('text').text(label);
+  
+      let togglebutton = cohort.append('button')
+      .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+      .classed('dropdown-toggle', true)
+      .attr('data-toggle', 'dropdown');
+  
+      togglebutton.append('span').classed('caret', true);
+  
+      let ul = cohort.append('ul').classed(labels[i].name, true).classed('dropdown-menu', true).attr('role', 'menu');
+      let li = ul.selectAll('.' + labels[i].name).data(data).enter().append('li').attr('class', labels[i].name).classed('choice', true).append('text').text((d, i)=> { return 'Cohort ' + (i + 1)});
+  
+      let liBranch = ul.selectAll('.branch-'+ labels[i].name).data(branchData).enter().append('li').classed('branch-'+ labels[i].name, true).classed('choice', true).append('text').text((d, i)=> d.label);
     
-          let ul = toggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
-          let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
-          let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
+      li.on('click', (d)=> {
+        labels[i].cohort = d;
+        labels[i].label = d.label;
+    
+        cohortToggle.selectAll('*').remove();
+        drawToggle(counter, labels);
+      });
+
+      
+      liBranch.on('click', (d)=> {
+        labels[i].cohort = d;
+        labels[i].label = d.label;
+ 
+        cohortToggle.selectAll('*').remove();
+        drawToggle(counter, labels);
+      });
+
+    }}
+
+    drawToggle(compareCount, comparisonKeeper);
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
     .attr('value', 'Add a cohort to comparison').on('click', ()=> {
-      console.log('add a comparison');
+    compareCount++;
+    cohortToggle.selectAll('*').remove();
+
+    drawToggle(compareCount, comparisonKeeper);
+
     });
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
     .attr('value', 'Clear Cohort Comparison').on('click', ()=> {
-      console.log('clear comparison');
+      compareCount = 2;
+      comparisonKeeper.forEach(d=> {
+        d.label = null;
+        d.cohort = null;
+      })
+      cohortToggle.selectAll('*').remove();
+      drawToggle(compareCount, comparisonKeeper);
     });
   }
 
@@ -182,7 +242,7 @@ export class SideBar {
     let that = this;
 
     let demopanel = this.$node.append('div').classed('panel', true).classed('panel-default', true);
-    let scorehead = demopanel.append('div').classed('panel-heading', true)
+    let scorehead = demopanel.append('div').classed('panel-heading', true);
     scorehead.append('text').text('Demographic Filters');
 
     let demobody = demopanel.append('div').classed('panel-body', true);
@@ -338,33 +398,7 @@ branch.on('click', (d, i)=> {
   this.$node.selectAll('.selected').classed('selected', false);
   branch.classed('selected', true);
 });
-/*
-cohortBox.nodes().forEach((cohort, i) => {
-console.log(cohort);
-  if(cohort.__data__.branches != undefined){
-   
-    let branch = select(cohort).selectAll('.branch').data(cohort.__data__.branch);
-    branch.exit().remove();
-    let branchEnter = branch.enter().append('div').classed('branch', true);
-    branch = branchEnter.merge(branch);
-    branch.classed(i, true);
-    let line = branch.append('svg').append('path').attr('d', stem([[5, 0], [20, 12], [48, 15]]))
-    .attr('stroke', '#212F3D').attr('fill', 'none').attr('stroke-width', .6);
 
-    branch.append('div').append('text').text((d)=> 'C' + (i + 1) +' branch');
-
-    branch.on('click', (d, j)=> {
-      events.fire('branch_selected', [i, j, d]);
-    
-      this.$node.selectAll('.selected').classed('selected', false);
-      branch.classed('selected', true);
-  });
-  }else{
-  
-  }
-});
-*/
-  
   if(this.selected == undefined){
       
       let cohortLabels = cohortBox.selectAll('.cohort-label').nodes();
