@@ -72,14 +72,17 @@ export class similarityScoreDiagram {
     private clumped = false;
     private yBrushSelection = false;
 
-    constructor(parent: Element, diagram, cohortData) {
+    constructor(parent: Element, diagram, cohortData, index) {
 
         const that = this;
+
+        console.log(cohortData);
 
         this.diagram = diagram;
         this.$node = select(parent)
             .append('div')
-            .classed('diagramDiv', true);
+            .classed('diagramDiv', true)
+          //  .classed(cohortData.label, true);
 
        // this.drawEventButtons();
        
@@ -609,9 +612,6 @@ export class similarityScoreDiagram {
             }
 
         return cohort;
-      //  this.clearDiagram();
-      //  this.clearAggDiagram();
-      //  this.drawPromisChart(this.cohortProInfo, 'proLine');
     }
     /**
      * Draw the diagram with the given data from getSimilarRows
@@ -1180,6 +1180,6 @@ export class similarityScoreDiagram {
 export let targetPatientOrders;
 
 
-export function create(parent: Element, diagram, cohortData) {
-    return new similarityScoreDiagram(parent, diagram, cohortData);
+export function create(parent: Element, diagram, cohortData, index) {
+    return new similarityScoreDiagram(parent, diagram, cohortData, index);
 }

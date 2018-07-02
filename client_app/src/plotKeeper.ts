@@ -32,7 +32,7 @@ export class PlotKeeper {
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-        this.buildPlot(this.cohortData);
+        this.buildPlot(this.plotDiv, this.cohortData);
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());
         this.attachListener();
@@ -44,27 +44,30 @@ export class PlotKeeper {
 
         events.on('compare_cohorts', ()=> {
             console.log(this.cohortData);
-           // this.buildPlot(this.cohortData);
+            this.buildPlot(this.plotDiv, this.cohortData);
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-            console.log('selected cohort change firing?')
+                console.log('selected cohort change firing?');
                 this.cohortData = item;
-                    });
+                console.log(this.cohortData);
+               // this.buildPlot(this.plotDiv, this.cohortData);
+          
+                });
 
         events.on('add_another_plot', (evt, item) => {  // called in parrallel on brush and 
 
             let cohort = item;
 
             for(let i = 0; i < cohort.length; i++){
-                similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort[i]);
+                similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort[i], null);
             }
         });
 }
 
-    private buildPlot(cohort) {
+    private buildPlot(container, cohort) {
 
-        similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort);
+        similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, null);
 
     }
 

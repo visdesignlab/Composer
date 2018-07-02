@@ -283,7 +283,6 @@ export class EventLine {
                     }
             }
 
-           
             filters = filters.filter(d=> {return d[0] != 'Branch' && d[0] != 'demographic'});
 
             filters.push(['First Promis Score']);
