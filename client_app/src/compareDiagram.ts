@@ -27,9 +27,6 @@ import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 import { stringify } from 'querystring';
 
-
-export const filteredOrders = this.filteredOrders;
-
 export class CompareDiagram {
 
     private $node;
@@ -39,14 +36,12 @@ export class CompareDiagram {
     private svg;
     private brush;
     private cohortProInfo;
-    private targetOrderInfo;
     private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
     private parseTime = dataCalc.parseTime;
     private setOrderScale = dataCalc.setOrderScale;
     private getClassAssignment = dataCalc.getClassAssignment;
     private orderHierarchy = dataCalc.orderHierarchy;
     private clicked;
-    private cptObjectLoadedBool;
     private cohortIndex;
 
     private maxDay;
@@ -54,12 +49,6 @@ export class CompareDiagram {
 
     private zeroEvent = 'First Promis Score';
     private targetOrder;
-    private codeArray;
-
-   filteredOrders = {
-       medGroup : [],
-       proGroup : [],
-   };
 
     height = 460;
     width = 600;
@@ -86,8 +75,6 @@ export class CompareDiagram {
          //   .classed('diagramDiv' + this.cohortIndex, true)
             .classed(cohortData.label, true);
 
-       // this.drawEventButtons();
-       
         this.svg = this.$node.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
@@ -208,8 +195,7 @@ export class CompareDiagram {
                             this.drawPromisChart(cohort, 'bottom', this.cohortIndex);
                         });
                     }));
-                   // events.fire('cohort_interpolated', [topc, midc, botc]);
-
+                  
                 }else{
                     this.interpolate(this.cohortProInfo).then(c=> {
                       //  events.fire('cohort_interpolated', c);
@@ -274,6 +260,7 @@ export class CompareDiagram {
                     this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
                     this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
                 }else{
+                    console.log('testing out all the stuff');
                    // this.getDays(this.cohortProInfo, 'days').then(co=> { this.drawPromisChart(co, 'proLine', this.cohortIndex); });
                     this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
                 }
@@ -294,56 +281,6 @@ export class CompareDiagram {
             this.$node.select('#eventLabel').text(this.targetOrder);
         });
 
-        events.on('update_start_button_clicked', (evt, item)=> {
-          
-      
-            this.clearDiagram();
-            this.clearAggDiagram();
-            if(item == null){
-                
-               this.zeroEvent = 'First Promis Score';
-             
-                this.getDays(this.cohortProInfo, null).then(co=> this.getBaselines(co));
-                this.eventDayBool = false;
-               
-                if(this.scaleRelative){
-                    this.scaleRelative = false;
-                    this.interpolate(this.cohortProInfo).then(c=> {
-                        events.fire('cohort_interpolated', c);
-                        this.changeScale(c, true).then( cohort=> {
-                            this.clearDiagram();
-                            this.clearAggDiagram();
-                            this.drawPromisChart(cohort, 'proLine', this.cohortIndex);
-                        });
-                    });
-                }
-            }else{
-             
-                let cohort = item[0];
-                let event = item[1];
-                this.zeroEvent = event[1][0].key;
-                this.getDays(cohort, 'days').then(co=> {
-
-                    this.getBaselines(cohort).then(d=> {
-                        this.interpolate(d).then(c=> {
-                                   events.fire('cohort_interpolated', c);
-                                   this.changeScale(c, false).then( cohort=> {
-                                    this.clearDiagram();
-                                    this.clearAggDiagram();
-                                    this.drawPromisChart(cohort, 'proLine', this.cohortIndex);
-                                });
-                        });
-                    });
-
-                });
-                this.eventDayBool = true;
-
-            }
-            
-            this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
-            events.fire('send_stats');
-        });
-
         events.on('filter_cohort_by_event', (evt, item)=> {
             this.targetOrder = item[1];
         });
@@ -359,7 +296,7 @@ export class CompareDiagram {
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-            
+            console.log('selected cohrot change');
             this.cohortProInfo = item.promis;
             let relativeScale = item.scaleR;
             let separated = item.separated;
@@ -373,10 +310,10 @@ export class CompareDiagram {
                 this.getDays(item.promisSep[2], 'days').then(bot => this.drawPromisChart(bot, 'bottom', this.cohortIndex));
                    
             }else{
-                /*
+                
                 this.getDays(this.cohortProInfo, 'days').then(co=> {
                     this.drawPromisChart(co, 'proLine', this.cohortIndex);
-                });*/
+                });
                 console.log('selected cohort change');
                 this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
             }
@@ -398,10 +335,6 @@ export class CompareDiagram {
 
         events.on('revert_to_promis', () =>{
             this.targetOrder = 'First Promis Score';
-        });
-        
-        events.on('selected_event_filter_change', (evt, item)=> {
-            this.codeArray = item;
         });
 
     }
