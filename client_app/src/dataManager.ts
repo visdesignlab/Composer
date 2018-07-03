@@ -87,8 +87,14 @@ export class DataManager {
         });
 
         events.on('event_selected', (evt, item)=> {
+
+            console.log(item);
            if(item == null){
                console.log('item is null');
+               this.getDays(this.filteredPatPromis, null).then(promis=> {
+                console.log(promis);
+                events.fire('min_day_calculated', promis);
+            });
             events.fire('update_start_button_clicked', null);
            }else{
                 this.searchByEvent(this.patCPT, item[0]).then((d)=> {
@@ -96,16 +102,20 @@ export class DataManager {
              
                 this.targetOrder = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
-                    events.fire('selected_promis_filtered', ob);
+                  
                     this.filteredPatPromis = ob;
-                
                     this.addMinDay(ob, d[1]).then(co=> {
-                        events.fire('min_day_added', co);
-                        events.fire('update_start_button_clicked', [co, item]);
+                 
+                        this.getDays(co, 'days').then(promis=> {
+                            console.log(promis);
+                            events.fire('min_day_calculated', promis);
+                        });
+                events.fire('update_start_button_clicked', [co, item]);
                     });
-                   })
+                 })
                 );
-            });}
+              });
+            }
         });
 
 
@@ -120,6 +130,10 @@ export class DataManager {
                     this.patCPT = orders;
                 });
             });
+            this.getDays(this.filteredPatPromis, null).then(prom=> {
+                events.fire('min_day_calculated', prom);
+            });
+            
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -143,7 +157,7 @@ export class DataManager {
                     });
                    })
                 );
-               // events.fire('filter_cohort_by_event', [this.patCPT, co, this.targetOrder]);
+               
             });
         });
         events.on('get_selected_demo', (evt, item)=> {
@@ -306,6 +320,50 @@ export class DataManager {
        });
        return [filter, count];
      //  events.fire('filtered_by_count', [filter, count]);
+    }
+
+    private async getDays(cohort, date) {
+     
+        // ----- add diff days to the data
+          
+            let maxDiff = 0;// this sets the score scale max.
+            //need to make this dynamic. 
+            let diffArray = [];
+            if (cohort != null) {
+                
+                cohort.forEach((g) => {
+                    let  minDate;
+            
+                    if(g.CPTtime != undefined && date != null ) {
+                        minDate = this.parseTime(g.CPTtime, null);
+                      
+                    }else minDate = g.min_date;
+                //these have already been parsed
+                let maxDate = g.max_date;
+                            g.value.forEach((d) => {
+                            try {
+                            d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                            maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
+                            }
+                            catch (typeError) {
+                            d.diff = -1;
+                            }
+                            });
+                            g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+                            diffArray.push(g.days + 1);
+
+                            g.value.sort((a, b) => ascending(a.diff, b.diff));
+
+                            });
+
+                            diffArray.sort((a, b) => ascending(a, b));
+                            events.fire('timeline_max_set', max(diffArray));
+                            events.fire('day_dist', cohort);
+                  
+                            return cohort;
+
+            }else{console.log('error'); }
+
     }
 
     private getQuant_Agg(cohort, quant) {
@@ -490,7 +548,6 @@ export class DataManager {
 
     private async getQuant_Separate(cohort) {
 
-       
         let oneval = [];
         let outofrange = [];
         let topStart = [];

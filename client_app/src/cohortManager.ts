@@ -195,7 +195,7 @@ export class CohortManager {
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].separated = true;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
-           console.log(this.selectedCohort);
+         
            events.fire('update_chart', this.selectedCohort);
           });
 
@@ -282,7 +282,8 @@ export class CohortManager {
           });
 
         events.on('filtered_patient_promis', (evt, item) => {
-          
+
+            
            this.cohortTree[this.cohortIndex].promis = item;
            
            this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -344,7 +345,7 @@ export class CohortManager {
                 events.fire('draw_plot', null);
 
             }else{
-                console.log(this.selectedCohort);
+               
                 this.selectedCohort.separated = true;
                 document.getElementById('quartile-btn').classList.add('btn-warning');
                 document.getElementById('checkDiv').classList.remove('hidden');
@@ -411,7 +412,7 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
           });
 
-        events.on('min_day_added', (evt, item)=> {
+          events.on('min_day_calculated', (evt, item)=> {
             if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].promis = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -420,7 +421,7 @@ export class CohortManager {
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
             events.fire('update_chart', this.selectedCohort);
-          });
+        });
 
         events.on('update_start_button_clicked', (evt, item)=> {
               let cpt = this.cohortTree[this.cohortIndex].cpt;
