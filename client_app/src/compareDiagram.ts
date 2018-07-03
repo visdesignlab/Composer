@@ -247,6 +247,7 @@ export class CompareDiagram {
         });
 
         events.on('update_chart', (evt, item)=> {
+
             console.log('update_chart');
             this.cohortProInfo = item.promis;
             this.scaleRelative = item.scaleR;
@@ -273,8 +274,8 @@ export class CompareDiagram {
                     this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
                     this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
                 }else{
-                    this.getDays(this.cohortProInfo, 'days').then(co=> { this.drawPromisChart(co, 'proLine', this.cohortIndex); });
-                  //  this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
+                   // this.getDays(this.cohortProInfo, 'days').then(co=> { this.drawPromisChart(co, 'proLine', this.cohortIndex); });
+                    this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
                 }
 
             }
@@ -336,10 +337,9 @@ export class CompareDiagram {
 
                 });
                 this.eventDayBool = true;
-                //this.getBaselines(this.cohortProInfo);
-          
-                
+
             }
+            
             this.$node.select('.zeroLine').select('text').text(this.zeroEvent);
             events.fire('send_stats');
         });
@@ -373,9 +373,12 @@ export class CompareDiagram {
                 this.getDays(item.promisSep[2], 'days').then(bot => this.drawPromisChart(bot, 'bottom', this.cohortIndex));
                    
             }else{
+                /*
                 this.getDays(this.cohortProInfo, 'days').then(co=> {
                     this.drawPromisChart(co, 'proLine', this.cohortIndex);
-                });
+                });*/
+                console.log('selected cohort change');
+                this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
             }
            
             if(relativeScale){
@@ -611,6 +614,8 @@ export class CompareDiagram {
      */
     private async drawPromisChart(cohort, clump, index) {
 
+        
+        this.svg.select('.voronoi').selectAll('*').remove();
 
             if(!this.maxDay){ this.minDay = -30; this.maxDay = 50 }
 
@@ -682,16 +687,21 @@ export class CompareDiagram {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 });
 
-            console.log(voronoiGroup);
-
                 let lines = promisScoreGroup.select('.lines')
                     .attr('transform', () => { return `translate(${this.margin.x},${this.margin.y})`; })   
                     .attr('clip-path','url(#clip)')
                      .selectAll('.'+ clump)
-                        .data(similarData)
+                        .data(similarData);
+
+                lines.exit().remove();
+
+                let lineEnter = lines
                         .enter().append('g').attr('class', d=> d['key'])
-                        .classed(clump, true)
-                        .append('path')
+                        .classed(clump, true);
+
+                lines = lineEnter.merge(lines);
+
+                lines.append('path')
                         .attr('class', d=> d['key'])
                         .classed(clump, true)
                         .attr('stroke-width', that.lineScale(lineCount))
@@ -703,16 +713,13 @@ export class CompareDiagram {
                         .on('mouseover', (d)=> this.addPromisDotsHover(d))
                         .on('mouseout', (d)=> this.removeDots());
 
-                        console.log(lines);
-                        
+                
                 if(cohort.length < 500) { 
-
-                    console.log(clump);
 
                     if(clump == 'proLine') {
 
                         let fakePatArray = [];
-                        lines.nodes().forEach((l, i) => {
+                        lines.select('path').nodes().forEach((l, i) => {
                             let fakeArray = [];
                             let bins = Math.floor(l.getTotalLength()/25);
 
@@ -720,7 +727,7 @@ export class CompareDiagram {
                                 let p = l.getPointAtLength(i * 25);
                                 fakeArray.push({x: p.x, y: p.y, pat: l.__data__});
                             }
-                            console.log(similarData[i]);
+                          
                             similarData[i].fakeArray = fakeArray;
                         });
 
@@ -729,11 +736,10 @@ export class CompareDiagram {
                         .y((d, i) => { return d.y })
                         .extent([[0, 0], [850, 350]]);
 
-                        console.log(similarData);
-
                         voronoiGroup.selectAll('g')
                         .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
                             return d.fakeArray; }))))
+
                             .enter().append('g')
                             .append('path')
                             .attr('d', function(d,i){return d ? 'M' + d.join('L') + 'Z' : null;})
@@ -745,10 +751,10 @@ export class CompareDiagram {
                             .on('click', (d)=>  voronoiClicked(d.data.pat));
                     }
 }
-               let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                     .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
 
-               zeroLine.append('line')
+                zeroLine.append('line')
                     .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
                     .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
@@ -763,7 +769,7 @@ export class CompareDiagram {
                     select(group).classed('hover-selected', false);
                   }
 
-                  function voronoiClicked(d) {
+                function voronoiClicked(d) {
           
                     let line = d.line;
                     if(line.classList.contains('selected')) {
@@ -778,10 +784,11 @@ export class CompareDiagram {
                         that.addPromisDotsClick(d);
                         events.fire('line_clicked', d);
                 };
-                    let lines = that.$node.select('.lines').selectAll('.selected').nodes();
+                    
+                let lines = that.$node.select('.lines').selectAll('.selected').nodes();
                  
-                    let idarray = [];
-                    lines.forEach(element => {
+                let idarray = [];
+                lines.forEach(element => {
                             idarray.push(+element.__data__.key);
                         });
                         events.fire('selected_line_array', idarray);
@@ -860,10 +867,10 @@ export class CompareDiagram {
      */
     private clearDiagram() {
 
-        this.svg.select('.scoreGroup').select('.lines').selectAll('*').remove();
-        this.svg.select('.scoreGroup').selectAll('.zeroLine').remove();
-        this.svg.select('.scoreGroup').select('.voronoi').selectAll('*').remove();
-        this.svg.select('.scoreGroup').selectAll('#clip').remove();
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
     }
         /**
      * clear the diagram
