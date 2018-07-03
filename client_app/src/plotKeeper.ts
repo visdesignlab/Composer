@@ -28,6 +28,7 @@ export class PlotKeeper {
     private plotDiv;
     private domain;
     private cohortIndex;
+    private initialLoadBool;
 
     constructor(parent: Element) {
 
@@ -66,8 +67,10 @@ export class PlotKeeper {
             console.log(item);
             this.cohortData = item[0];
             let selectedCohort = this.cohortData[item[1][0]];
-            if(this.cohortData.length == 1){
-                console.log('firs_load');
+
+            if(!this.initialLoadBool){
+                this.initialLoadBool = true;
+                console.log('first_load');
                 console.log(selectedCohort);
                 this.buildPlot(this.plotDiv, this.cohortData[0], this.cohortIndex);
             }
