@@ -30,7 +30,7 @@ import { stringify } from 'querystring';
 
 export const filteredOrders = this.filteredOrders;
 
-export class similarityScoreDiagram {
+export class CompareDiagram {
 
     private $node;
     private diagram;
@@ -83,6 +83,7 @@ export class similarityScoreDiagram {
         this.$node = select(parent)
             .append('div')
             .classed('diagramDiv-' + this.cohortIndex, true)
+         //   .classed('diagramDiv' + this.cohortIndex, true)
             .classed(cohortData.label, true);
 
        // this.drawEventButtons();
@@ -92,9 +93,9 @@ export class similarityScoreDiagram {
             .attr('width', this.promisDimension.width);
 
         let scoreGroup = this.svg.append('g').classed('scoreGroup-'+ this.cohortIndex, true);
-        let voronoiGroup = scoreGroup.append('g').classed('voronoi', true).classed(this.cohortIndex, true);
+        let voronoiGroup = scoreGroup.append('g').classed('voronoi', true);
 
-        let lineGroup = scoreGroup.append('g').classed('lines', true).classed(this.cohortIndex, true);
+        let lineGroup = scoreGroup.append('g').classed('lines', true);
 
         // scales
         this.timeScale = scaleLinear()
@@ -246,7 +247,7 @@ export class similarityScoreDiagram {
         });
 
         events.on('update_chart', (evt, item)=> {
-           
+            console.log('update_chart');
             this.cohortProInfo = item.promis;
             this.scaleRelative = item.scaleR;
             this.clumped = item.clumped;
@@ -272,7 +273,8 @@ export class similarityScoreDiagram {
                     this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
                     this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
                 }else{
-                    this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
+                    this.getDays(this.cohortProInfo, 'days').then(co=> { this.drawPromisChart(co, 'proLine', this.cohortIndex); });
+                  //  this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
                 }
 
             }
@@ -609,12 +611,10 @@ export class similarityScoreDiagram {
      */
     private async drawPromisChart(cohort, clump, index) {
 
-            console.log(cohort);
 
             if(!this.maxDay){ this.minDay = -30; this.maxDay = 50 }
 
             const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
-            console.log(promisScoreGroup);
 
             if(this.scaleRelative){
 
@@ -632,7 +632,7 @@ export class similarityScoreDiagram {
             let co = cohort.filter(g=> {return g.value.length > 1; });
 
             let similarData = co.map((d) => {
-                let data = {key: d.key, value: null, line: null};
+                let data = {key: d.key, value: null, line: null, fakeArray: []};
                 let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
                 return g['FORM'] == this.diagram;
                 });
@@ -682,11 +682,11 @@ export class similarityScoreDiagram {
                     return `translate(${this.margin.x},${this.margin.y})`;
                 });
 
+            console.log(voronoiGroup);
+
                 let lines = promisScoreGroup.select('.lines')
- 
-                    .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                })   .attr('clip-path','url(#clip)')
+                    .attr('transform', () => { return `translate(${this.margin.x},${this.margin.y})`; })   
+                    .attr('clip-path','url(#clip)')
                      .selectAll('.'+ clump)
                         .data(similarData)
                         .enter().append('g').attr('class', d=> d['key'])
@@ -703,7 +703,11 @@ export class similarityScoreDiagram {
                         .on('mouseover', (d)=> this.addPromisDotsHover(d))
                         .on('mouseout', (d)=> this.removeDots());
 
+                        console.log(lines);
+                        
                 if(cohort.length < 500) { 
+
+                    console.log(clump);
 
                     if(clump == 'proLine') {
 
@@ -716,6 +720,7 @@ export class similarityScoreDiagram {
                                 let p = l.getPointAtLength(i * 25);
                                 fakeArray.push({x: p.x, y: p.y, pat: l.__data__});
                             }
+                            console.log(similarData[i]);
                             similarData[i].fakeArray = fakeArray;
                         });
 
@@ -723,6 +728,8 @@ export class similarityScoreDiagram {
                         .x((d, i) => { return d.x })
                         .y((d, i) => { return d.y })
                         .extent([[0, 0], [850, 350]]);
+
+                        console.log(similarData);
 
                         voronoiGroup.selectAll('g')
                         .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
@@ -1178,5 +1185,5 @@ export let targetPatientOrders;
 
 
 export function create(parent: Element, diagram, cohortData, index) {
-    return new similarityScoreDiagram(parent, diagram, cohortData, index);
+    return new CompareDiagram(parent, diagram, cohortData, index);
 }
