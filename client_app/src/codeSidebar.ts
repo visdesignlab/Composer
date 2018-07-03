@@ -146,7 +146,7 @@ export class CodeSidebar {
     }
 
     private async histogrammer(cohort) {
-        console.log(cohort);
+  
         let totalPatients = cohort.length;
         let mapped = cohort.map(pat  => {return +pat.value.length});
  

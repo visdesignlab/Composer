@@ -124,7 +124,7 @@ export class DataManager {
 
         events.on('filtering_Promis_count', (evt, item)=> {
             this.filterByPromisCount(item[0], item[1]).then(d=> {
-                console.log(d);
+               
                 events.fire('filtered_by_count', d);
             });
         });
@@ -163,10 +163,8 @@ export class DataManager {
         });
         events.on('separate_cohort_agg', (evt, item)=> {
 
-            console.log(item);
-        
             this.getQuant_Separate(item.promis).then(sep=> {
-                console.log(sep);
+               
                 events.fire('separated_by_quant', sep);
             });
         });
@@ -196,10 +194,11 @@ export class DataManager {
             console.log('cpt loaded');
             this.totalCptObjects = item;
             events.fire('create_button_down');
+            events.fire('initial_cohort_load');
         });
 
         events.on('update_cpt_days', (evt, item)=>{
-            console.log(item);
+        
             this.updateDiff(this.targetOrder, item[0]).then(cpt=> {
                 this.patCPT = cpt;
                 events.fire('cpt_updated', cpt);
@@ -491,7 +490,7 @@ export class DataManager {
 
     private async getQuant_Separate(cohort) {
 
-        console.log(cohort)
+       
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -898,7 +897,7 @@ export class DataManager {
 
     private async updateDiff(code, patCPT){
 
-        console.log(code);
+    
        if(code!= undefined){
 
         code = code[0].map(c => +c);
@@ -917,7 +916,7 @@ export class DataManager {
         });
 
        }
-       console.log(patCPT);
+      
        return patCPT;
     }
 
