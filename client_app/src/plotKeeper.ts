@@ -17,14 +17,18 @@ import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
 import * as similarityScoreDiagram from './similarityScoreDiagram';
+import * as compareDiagram from './compareDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
 
 export class PlotKeeper {
 
     private $node;
-    private cohortData;
+    private cohortData = [];
     private plotDiv;
+    private domain;
+    private cohortIndex;
+    private initialLoadBool;
 
     constructor(parent: Element) {
 
@@ -32,9 +36,10 @@ export class PlotKeeper {
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-        this.buildPlot(this.plotDiv, this.cohortData);
+       // this.buildPlot(this.plotDiv, this.cohortData);
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());
+        this.cohortIndex = 1;
         this.attachListener();
     }
 
@@ -43,31 +48,43 @@ export class PlotKeeper {
         let that = this;
 
         events.on('compare_cohorts', ()=> {
-            console.log(this.cohortData);
-            this.buildPlot(this.plotDiv, this.cohortData);
+          
+            for(let i = 0; i < this.cohortIndex; i++){
+
+                this.buildPlot(this.plotDiv, this.cohortData[i], i);
+
+            }
+            this.cohortIndex++;
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-                console.log('selected cohort change firing?');
-                this.cohortData = item;
-                console.log(this.cohortData);
-               // this.buildPlot(this.plotDiv, this.cohortData);
-          
-                });
-
-        events.on('add_another_plot', (evt, item) => {  // called in parrallel on brush and 
-
-            let cohort = item;
-
-            for(let i = 0; i < cohort.length; i++){
-                similarityScoreDiagram.create(this.plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', cohort[i], null);
-            }
+    
+           
         });
+
+        events.on('test', (evt, item)=> {
+        
+            this.cohortData = item[0];
+            let selectedCohort = this.cohortData[item[1][0]];
+
+            if(!this.initialLoadBool){
+                this.initialLoadBool = true;
+          
+                this.buildPlot(this.plotDiv, selectedCohort, this.cohortIndex);
+            }
+           // this.buildPlot(this.plotDiv, this.cohortData[0], this.cohortIndex);
+        });
+
+        events.on('domain updated', (evt, item)=> {
+            this.domain = item;
+        });
+
 }
 
-    private buildPlot(container, cohort) {
+    private buildPlot(container, cohort, index) {
 
-        similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, null);
+        //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
+        compareDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
 
     }
 

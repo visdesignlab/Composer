@@ -46,6 +46,7 @@ export class CohortManager {
                 clumped = false;
                 document.getElementById('aggToggle').classList.remove('btn-warning');
             }else{
+                console.log('clumpin');
                 clumped = true;
                 document.getElementById('aggToggle').classList.add('btn-warning');
             }
@@ -113,7 +114,6 @@ export class CohortManager {
             this.selectedCohort = this.cohortTree[this.cohortIndex].branches[branchIndex];
             events.fire('update_filters', [this.cohortTree, this.branchSelected]);
             events.fire('selected_cohort_change', this.selectedCohort);
-            //events.fire('send_filter_to_codebar', [this.cohortfilterarray[this.cohortIndex].branch[branchIndex], this.cohortfilterarray]);
             events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].branches[branchIndex].events);
             events.fire('test', [this.cohortTree, this.branchSelected]);
             });
@@ -133,9 +133,7 @@ export class CohortManager {
                 
             }else{
                 scaleRelative = false;
-
             }
-
             this.selectedCohort.scaleR = scaleRelative;
             events.fire('update_scale', this.selectedCohort);
            
@@ -195,7 +193,7 @@ export class CohortManager {
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].separated = true;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
-           console.log(this.selectedCohort);
+         
            events.fire('update_chart', this.selectedCohort);
           });
 
@@ -225,6 +223,7 @@ export class CohortManager {
 
             let newParent = {
                 label: 'Cohort-' + String((this.cohortTree.length + 1)),
+                startEvent: null,
                 eventIndex: 0,
                 parentIndex: null,
                 events: [],
@@ -245,7 +244,6 @@ export class CohortManager {
            
           });
 
-          
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
             let filterReq = ['demographic', item[0], item[1]];
           
@@ -282,12 +280,11 @@ export class CohortManager {
           });
 
         events.on('filtered_patient_promis', (evt, item) => {
-          
-           this.cohortTree[this.cohortIndex].promis = item;
+
+            this.cohortTree[this.cohortIndex].promis = item;
            
-           this.selectedCohort = this.cohortTree[this.cohortIndex];
+            this.selectedCohort = this.cohortTree[this.cohortIndex];
           
-            // events.fire('cohort_selected', [this.selectedCohort, this.cohortIndex, this.cohortTree]);
              events.fire('selected_cohort_change', this.selectedCohort);
              events.fire('add_to_cohort_bar', this.cohortTree);
        
@@ -344,7 +341,7 @@ export class CohortManager {
                 events.fire('draw_plot', null);
 
             }else{
-                console.log(this.selectedCohort);
+               
                 this.selectedCohort.separated = true;
                 document.getElementById('quartile-btn').classList.add('btn-warning');
                 document.getElementById('checkDiv').classList.remove('hidden');
@@ -387,7 +384,6 @@ export class CohortManager {
                 events.fire('test', [this.cohortTree, this.branchSelected]);
             }
 
-            
             events.fire('update_chart', this.selectedCohort);
           });
 
@@ -411,7 +407,10 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
           });
 
-        events.on('min_day_added', (evt, item)=> {
+          events.on('min_day_calculated', (evt, item)=> {
+
+              console.log('min day calculated');
+              console.log(item);
             if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].promis = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -420,10 +419,21 @@ export class CohortManager {
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
             events.fire('update_chart', this.selectedCohort);
-          });
+        });
 
         events.on('update_start_button_clicked', (evt, item)=> {
-              let cpt = this.cohortTree[this.cohortIndex].cpt;
+            console.log(item);
+            let cpt;
+            if(this.branchSelected == null){
+                cpt = this.cohortTree[this.cohortIndex].cpt;
+                this.cohortTree[this.cohortIndex].startEvent = item[1];
+                //this.selectedCohort = this.cohortTree[this.cohortIndex];
+            }else{
+                cpt = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].cpt;
+                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].startEvent = item[1];
+             //   this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
+            }
+                console.log(this.cohortTree);
               events.fire('update_cpt_days', [cpt, null]);
           });
 
@@ -433,6 +443,7 @@ export class CohortManager {
                 this.cohortTree[this.cohortIndex].cpt = item;
             }else{
                 this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].cpt = item;
+            
             }
           });
 
