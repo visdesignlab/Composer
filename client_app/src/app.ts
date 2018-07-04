@@ -4,7 +4,6 @@
 
 import {select} from 'd3-selection';
 import * as sideBar from './sideBar';
-import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as events from 'phovea_core/src/event';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataManager from './dataManager';
@@ -15,7 +14,6 @@ import * as timelineKeeper from './timelinekeeper';
 import * as inStat from './individualStats';
 import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
-import * as cohortStat from './cohortStat';
 import * as codeside from './codeSidebar';
 import { selectAll } from 'd3';
 

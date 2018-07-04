@@ -14,7 +14,6 @@ import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import * as d3 from 'd3';
 import * as d3Voronoi from 'd3-voronoi';
-//import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
@@ -60,6 +59,7 @@ export class CompareDiagram {
     private scaleRelative = false;
     private clumped = false;
     private yBrushSelection = false;
+    private eventFilterHolder;
 
     constructor(parent: Element, diagram, cohortData, index) {
 
@@ -516,7 +516,7 @@ export class CompareDiagram {
             }
 
             let lineCount = cohort.length;
-
+            console.log(cohort);
             let co = cohort.filter(g=> {return g.value.length > 1; });
 
             let similarData = co.map((d) => {

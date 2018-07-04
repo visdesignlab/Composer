@@ -7,7 +7,8 @@ import { scaleLinear } from 'd3-scale';
 import { max, histogram } from 'd3-array';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { transition } from 'd3-transition';
-var distributionDiagram = (function () {
+
+var distributionDiagram = (function() {
     function distributionDiagram(parent) {
         this.distributionDimension = { height: 200, width: 300 };
         this.$node = select(parent)
@@ -35,10 +36,10 @@ var distributionDiagram = (function () {
     /**
      * Attach listeners
      */
-    distributionDiagram.prototype.attachListener = function () {
+    distributionDiagram.prototype.attachListener = function() {
         var _this = this;
         // item: pat_id, number of similar patients, DATA
-        events.on('update_similar', function (evt, item) {
+        events.on('update_similar', function(evt, item) {
             _this.distributionData = item[2]['all_scores'];
             _this.drawDiagram();
         });
@@ -46,101 +47,101 @@ var distributionDiagram = (function () {
     /**
      * Draw the diagram with the given data from getSimilarRows
      */
-    distributionDiagram.prototype.drawDiagram = function () {
+    distributionDiagram.prototype.drawDiagram = function() {
         var _this = this;
         var self = this;
         this.$node.classed('hidden', false);
-        var maxValue = max(this.distributionData, function (d) {
+        var maxValue = max(this.distributionData, function(d) {
             return d;
         });
         var normalize = scaleLinear().domain([0, maxValue + 0.01]).range([0, 1]);
-        var data = this.distributionData.map(function (d) { return normalize(d); });
-        this.xScale.domain([0, 1 /*maxValue*/]).nice();
+        var data = this.distributionData.map(function(d) { return normalize(d); });
+        this.xScale.domain([0, 1 /*maxValue*/ ]).nice();
         var bins = histogram()
-            .domain([0, 1 /*maxValue*/])
+            .domain([0, 1 /*maxValue*/ ])
             .thresholds(this.xScale.ticks(20))(data);
         var totalPatients = data.length;
-        var histogramData = bins.map(function (d) {
+        var histogramData = bins.map(function(d) {
             totalPatients -= d.length;
             return { x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length };
         });
-        this.yScale.domain([0, max(bins, function (d) {
-                return d.length;
-            })]);
+        this.yScale.domain([0, max(bins, function(d) {
+            return d.length;
+        })]);
         var barGroups = this.group.selectAll(".bar")
             .data(histogramData);
         barGroups.enter().append("g")
             .attr("class", "bar")
-            .attr("transform", function (d) {
-            return "translate(" + _this.xScale(d.x0) + ",0)";
-        })
+            .attr("transform", function(d) {
+                return "translate(" + _this.xScale(d.x0) + ",0)";
+            })
             .append("rect")
             .attr("x", 1)
-            .attr("y", function (d) {
-            return _this.distributionDimension.height - _this.yScale(d.length);
-        })
+            .attr("y", function(d) {
+                return _this.distributionDimension.height - _this.yScale(d.length);
+            })
             .attr("width", this.xScale(bins[0].x1) - this.xScale(bins[0].x0) - 3)
-            .attr("height", function (d) {
-            return _this.yScale(d.length);
-        })
-            .on("mouseover", function () {
-            var currElement = this.parentNode;
-            while (currElement) {
-                select(currElement).select('rect').classed('selectedRect', true);
-                currElement = currElement.nextSibling;
-            }
-            var totalPatients = (select(this.parentNode).datum())['totalPatients'];
-            var t = transition('t').duration(500);
-            select(".tooltip")
-                .html("Total patients: " + totalPatients)
-                .transition(t)
-                .style("opacity", 1)
-                .style("left", event.pageX + 10 + "px")
-                .style("top", event.pageY + 10 + "px");
-        })
-            .on("mouseout", function () {
-            var currElement = this.parentNode;
-            while (currElement) {
-                select(currElement).select('rect').classed('selectedRect', false);
-                currElement = currElement.nextSibling;
-            }
-            var t = transition('t').duration(500);
-            select(".tooltip").transition(t)
-                .style("opacity", 0);
-        })
-            .on('click', function () {
-            var totalPatients = (select(this.parentNode).datum())['totalPatients'];
-            select(this.parentNode.parentNode).selectAll('rect').classed('displayedRect', false);
-            var currElement = this.parentNode;
-            while (currElement) {
-                select(currElement).select('rect').classed('displayedRect', true);
-                currElement = currElement.nextSibling;
-            }
-            // received in queryBox
-            events.fire("number_of_similar_patients", [totalPatients]);
-        });
+            .attr("height", function(d) {
+                return _this.yScale(d.length);
+            })
+            .on("mouseover", function() {
+                var currElement = this.parentNode;
+                while (currElement) {
+                    select(currElement).select('rect').classed('selectedRect', true);
+                    currElement = currElement.nextSibling;
+                }
+                var totalPatients = (select(this.parentNode).datum())['totalPatients'];
+                var t = transition('t').duration(500);
+                select(".tooltip")
+                    .html("Total patients: " + totalPatients)
+                    .transition(t)
+                    .style("opacity", 1)
+                    .style("left", event.pageX + 10 + "px")
+                    .style("top", event.pageY + 10 + "px");
+            })
+            .on("mouseout", function() {
+                var currElement = this.parentNode;
+                while (currElement) {
+                    select(currElement).select('rect').classed('selectedRect', false);
+                    currElement = currElement.nextSibling;
+                }
+                var t = transition('t').duration(500);
+                select(".tooltip").transition(t)
+                    .style("opacity", 0);
+            })
+            .on('click', function() {
+                var totalPatients = (select(this.parentNode).datum())['totalPatients'];
+                select(this.parentNode.parentNode).selectAll('rect').classed('displayedRect', false);
+                var currElement = this.parentNode;
+                while (currElement) {
+                    select(currElement).select('rect').classed('displayedRect', true);
+                    currElement = currElement.nextSibling;
+                }
+                // received in queryBox
+                events.fire("number_of_similar_patients", [totalPatients]);
+            });
         var t = transition('t').duration(2000);
         barGroups
-            .attr("transform", function (d) {
-            return "translate(" + _this.xScale(d.x0) + ",0)";
-        })
+            .attr("transform", function(d) {
+                return "translate(" + _this.xScale(d.x0) + ",0)";
+            })
             .select("rect")
-            .attr("width", function () {
-            return select(this).attr("width");
-        })
-            .attr("height", function () {
-            return select(this).attr("height");
-        });
+            .attr("width", function() {
+                return select(this).attr("width");
+            })
+            .attr("height", function() {
+                return select(this).attr("height");
+            });
         barGroups.enter().merge(barGroups)
             .selectAll("rect")
             .transition(t)
-            .attr("y", function (d) {
-            return _this.distributionDimension.height - _this.yScale(d.length);
-        })
+            .attr("y", function(d) {
+                return _this.distributionDimension.height - _this.yScale(d.length);
+            })
             .attr("width", this.xScale(bins[0].x1) - this.xScale(bins[0].x0) - 3)
-            .attr("height", function (d) {
-            return _this.yScale(d.length);
-        });
+            .attr("height", function(d) {
+                return _this.yScale(d.length);
+            });
         // update the axis
         this.group.select(".axis--x")
             .transition(t)
@@ -148,10 +149,10 @@ var distributionDiagram = (function () {
         this.group.select(".axis--y")
             .transition(t)
             .call(axisLeft(scaleLinear()
-            .range([this.distributionDimension.height, 0])
-            .domain([0, max(bins, function (d) {
-                return d.length;
-            })])));
+                .range([this.distributionDimension.height, 0])
+                .domain([0, max(bins, function(d) {
+                    return d.length;
+                })])));
     };
     return distributionDiagram;
 }());

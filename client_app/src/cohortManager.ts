@@ -7,7 +7,6 @@ import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/
 import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
-import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalculations from './dataCalculations';
 import * as codeDict from './cptDictionary';
 
@@ -35,9 +34,7 @@ export class CohortManager {
         events.on('compare_cohorts', ()=> {
             console.log(this.cohortTree);
             });
-        events.on('add_cpt_to_filterArray', (evt, item)=>{
-   
-              });
+
         events.on('aggregate_button_clicked', ()=> {
 
             let clumped = this.cohortTree[this.cohortIndex].clumped;
@@ -142,7 +139,6 @@ export class CohortManager {
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
             events.fire('selected_cohort_change', null);
-            events.fire('selected_event_filter_change', []);
             });
 
         events.on('cohort_selected', (evt, item)=>{
@@ -212,38 +208,6 @@ export class CohortManager {
                 events.fire('selected_cohort_change', this.selectedCohort);
             });
 
-        events.on('add_demo_to_filter_array', (evt, item) => { // called in sidebar
-       
-            let filterReq = ['demographic', item[0], item[1]];
-            this.addCohortFilter(filterReq);
-           
-          });
-
-          events.on('create_button_down', ()=> {
-
-            let newParent = {
-                label: 'Cohort-' + String((this.cohortTree.length + 1)),
-                startEvent: null,
-                eventIndex: 0,
-                parentIndex: null,
-                events: [],
-                promis: null,
-                promisSep: null,
-                promisAgg: null,
-                cpt: null,
-                separated: false,
-                clumped: false,
-                scaleR: false,
-                branches: [] };
-
-            this.cohortTree.push(newParent);
-            this.selectedCohort = this.cohortTree[this.cohortIndex];
-          
-            this.branchSelected = null;
-            this.cohortIndex = this.cohortTree.length - 1;
-           
-          });
-
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
             let filterReq = ['demographic', item[0], item[1]];
           
@@ -267,34 +231,50 @@ export class CohortManager {
                 this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].promis = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]]
             }
-            events.fire('selected_cohort_change', this.selectedCohort);
+            events.fire('update_chart', this.selectedCohort);
 
           });
 
-        events.on('cpt_mapped', (evt, item)=>{
-              this.cohortTree[this.cohortIndex].cpt = item;
-          });
 
         events.on('show_distributions', ()=> {
               events.fire('cohort_stat_array', this.cohortTree);
           });
 
-        events.on('filtered_patient_promis', (evt, item) => {
+        events.on('new_cohort', (evt, item)=> {
 
-            this.cohortTree[this.cohortIndex].promis = item;
-           
+            console.log('new cohort created');
+            console.log(item);
+
+            let filterReq = ['demographic', item[2], item[0].length];
+
+            let newParent = {
+                label: 'Cohort-' + String((this.cohortTree.length + 1)),
+                startEvent: null,
+                eventIndex: 0,
+                parentIndex: null,
+                events: [],
+                promis: item[0],
+                promisSep: null,
+                promisAgg: null,
+                cpt: item[1],
+                separated: false,
+                clumped: false,
+                scaleR: false,
+                branches: [] };
+
+            newParent.events.push(filterReq);
+
+            this.cohortTree.push(newParent);
+            this.selectedCohort = this.cohortTree[this.cohortIndex];
+          
+            this.branchSelected = null;
+            this.cohortIndex = this.cohortTree.length - 1;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
           
              events.fire('selected_cohort_change', this.selectedCohort);
-             events.fire('add_to_cohort_bar', this.cohortTree);
-       
-             events.fire('selected_event_filter_change', this.cohortTree[this.cohortIndex]);
-           
-             //events.fire('update_cohort_description', [this.selectedCohort, this.selectedFilter]);
              events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].events);
              events.fire('test', [this.cohortTree, [this.cohortIndex]]);
-
-          });
+        });
 
         events.on('filter_cohort_by_event', (evt, item)=> {
 
