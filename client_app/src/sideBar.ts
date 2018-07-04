@@ -15,7 +15,6 @@ import {axisBottom} from 'd3-axis';
 import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
 import { all } from 'phovea_core/src/range';
 import {brushX} from 'd3-brush';
-import * as cohortStat from './cohortStat';
 import {transition} from 'd3-transition';
 import { stringify } from 'querystring';
 
@@ -106,13 +105,6 @@ export class SideBar {
 
       events.on('clear_cohorts', (evt, item)=> {
         this.cohortKeeper.selectAll('div').remove();
-      });
-
-      events.on('make_stat_node', (evt, item)=> {
-        let parent = document.getElementsByClassName('cohort ' + item[1])[0];
-        let view = parent.querySelector('.stat_view');
-        cohortStat.create(view, item[0], item[1]);
-        select('.cohort.' + item[1]);
       });
 
       events.on('test', (evt, item)=> {

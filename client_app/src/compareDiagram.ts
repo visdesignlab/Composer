@@ -14,7 +14,6 @@ import {axisBottom, axisLeft} from 'd3-axis';
 import {drag} from 'd3-drag';
 import * as d3 from 'd3';
 import * as d3Voronoi from 'd3-voronoi';
-//import {Constants} from './constants';
 import {transition} from 'd3-transition';
 import {brush, brushY} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
@@ -60,6 +59,7 @@ export class CompareDiagram {
     private scaleRelative = false;
     private clumped = false;
     private yBrushSelection = false;
+    private cohortLabel;
 
     constructor(parent: Element, diagram, cohortData, index) {
 
@@ -68,11 +68,13 @@ export class CompareDiagram {
        this.cohortIndex = String(index);
 
         this.diagram = diagram;
+        this.cohortLabel = cohortData.label;
+
         this.$node = select(parent)
             .append('div')
             .classed('diagramDiv-' + this.cohortIndex, true)
          //   .classed('diagramDiv' + this.cohortIndex, true)
-            .classed(cohortData.label, true);
+            //.classed(cohortData.label, true);
 
         this.svg = this.$node.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height', this.promisDimension.height)
@@ -169,9 +171,10 @@ export class CompareDiagram {
         //this is in plotkeeper
       
         events.on('update_scale', (evt, item)=>{
-       
+            console.log('update_scale');
             let separated = item.separated;
             let scaleRelative = item.scaleR;
+            
             this.clearDiagram();
             this.clearAggDiagram();
             if(scaleRelative){
@@ -196,12 +199,14 @@ export class CompareDiagram {
                     }));
                   
                 }else{
-                    this.interpolate(this.cohortProInfo).then(c=> {
-                      //  events.fire('cohort_interpolated', c);
-                        this.changeScale(c, true).then( cohort=> {
-                            this.drawPromisChart(cohort, 'proLine', this.cohortIndex);
-                        });
-                    });
+                    console.log('change that scale');
+                  
+                        this.interpolate(this.cohortProInfo).then(inter => {
+                              this.changeScale(inter, true).then(cohort=> {
+                                  this.drawPromisChart(cohort, 'proLine', this.cohortIndex);
+                              });
+                          });
+                    
                 }
    
             }else{
@@ -234,17 +239,16 @@ export class CompareDiagram {
         events.on('update_chart', (evt, item)=> {
 
             console.log('update_chart');
-            console.log(item);
-
+     
             this.cohortProInfo = item.promis;
             this.scaleRelative = item.scaleR;
             this.clumped = item.clumped;
             let separated = item.separated;
+            this.cohortLabel = item.label;
 
             if(item.startEvent == null){
                 this.zeroEvent = 'First Promis Score';
             }else{
-                console.log(item.startEvent[1][0].key);
                 this.zeroEvent = item.startEvent[1][0].key;
             }
             this.clearDiagram();
@@ -256,7 +260,7 @@ export class CompareDiagram {
                     this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
                     this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
                 }else{
-                    console.log('it has reached it');
+                    
                     this.frequencyCalc(this.cohortProInfo, 'all').then(co=> this.drawAgg(co, 'all'));
                 }
 
@@ -292,11 +296,12 @@ export class CompareDiagram {
             this.cohortProInfo = item.promis;
             let relativeScale = item.scaleR;
             let separated = item.separated;
+            this.cohortLabel = item.label;
 
             if(item.startEvent == null){
                 this.zeroEvent = 'First Promis Score';
             }else{
-                console.log(item.startEvent[1][0].key);
+               
                 this.zeroEvent = item.startEvent[1][0].key;
             }
             this.clearDiagram();
@@ -497,6 +502,11 @@ export class CompareDiagram {
      */
     private async drawPromisChart(cohort, clump, index) {
 
+        this.svg.select('.cohort-plot-label').remove();
+
+        let cohortLabel = this.svg.append('text')
+        .text(`${this.cohortLabel}`).classed('cohort-plot-label', true)
+        .attr('transform', `translate(50,20)`);
         
         this.svg.select('.voronoi').selectAll('*').remove();
 
@@ -516,7 +526,7 @@ export class CompareDiagram {
             }
 
             let lineCount = cohort.length;
-
+            console.log(cohort);
             let co = cohort.filter(g=> {return g.value.length > 1; });
 
             let similarData = co.map((d) => {
