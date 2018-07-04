@@ -83,7 +83,15 @@ export class EventLine {
             }
         });
 
-        events.on('selected_cohort_change', ()=> {
+        events.on('selected_cohort_change', (evt, item)=> {
+            console.log(item);
+            this.startEventLabel = 'Change Start to Event';
+            if(this.filter){
+
+                this.drawEventButtons(this.filter);
+
+            }
+          
           //  document.getElementById('aggToggle').classList.remove('btn-warning');
 
         });

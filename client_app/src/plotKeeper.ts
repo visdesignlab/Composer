@@ -48,7 +48,7 @@ export class PlotKeeper {
         let that = this;
 
         events.on('compare_cohorts', ()=> {
-            console.log(this.cohortData);
+          
             for(let i = 0; i < this.cohortIndex; i++){
 
                 this.buildPlot(this.plotDiv, this.cohortData[i], i);
@@ -63,22 +63,19 @@ export class PlotKeeper {
         });
 
         events.on('test', (evt, item)=> {
-            console.log('initial cohort load');
-            console.log(item);
+        
             this.cohortData = item[0];
             let selectedCohort = this.cohortData[item[1][0]];
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-                console.log('first_load');
-                console.log(selectedCohort);
-                this.buildPlot(this.plotDiv, this.cohortData[0], this.cohortIndex);
+          
+                this.buildPlot(this.plotDiv, selectedCohort, this.cohortIndex);
             }
            // this.buildPlot(this.plotDiv, this.cohortData[0], this.cohortIndex);
         });
 
         events.on('domain updated', (evt, item)=> {
-            console.log('domain is updated');
             this.domain = item;
         });
 

@@ -48,7 +48,6 @@ export class CompareDiagram {
     private minDay = 0;
 
     private zeroEvent = 'First Promis Score';
-    private targetOrder;
 
     height = 460;
     width = 600;
@@ -160,7 +159,7 @@ export class CompareDiagram {
 
         this.attachListener();
 
-        this.getDays(cohortData.promis, null).then(co=> { this.drawPromisChart(co, 'proLine', this.cohortIndex); });
+        this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex);
     }
 
     /**
@@ -235,10 +234,19 @@ export class CompareDiagram {
         events.on('update_chart', (evt, item)=> {
 
             console.log('update_chart');
+            console.log(item);
+
             this.cohortProInfo = item.promis;
             this.scaleRelative = item.scaleR;
             this.clumped = item.clumped;
             let separated = item.separated;
+
+            if(item.startEvent == null){
+                this.zeroEvent = 'First Promis Score';
+            }else{
+                console.log(item.startEvent[1][0].key);
+                this.zeroEvent = item.startEvent[1][0].key;
+            }
             this.clearDiagram();
             this.clearAggDiagram();
             if(this.clumped){
@@ -248,7 +256,7 @@ export class CompareDiagram {
                     this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
                     this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
                 }else{
-                  
+                    console.log('it has reached it');
                     this.frequencyCalc(this.cohortProInfo, 'all').then(co=> this.drawAgg(co, 'all'));
                 }
 
@@ -260,29 +268,13 @@ export class CompareDiagram {
                     this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
                     this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
                 }else{
-                    console.log('testing out all the stuff');
-                   // this.getDays(this.cohortProInfo, 'days').then(co=> { this.drawPromisChart(co, 'proLine', this.cohortIndex); });
+                  
                     this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
                 }
 
             }
            
            
-        });
-
-        events.on('event_selected', (evt, item)=> {
-           
-            if(item == null){
-                this.targetOrder = 'First Promis Score';
-            }else{
-                this.targetOrder = item[1];
-            }
-           
-            this.$node.select('#eventLabel').text(this.targetOrder);
-        });
-
-        events.on('filter_cohort_by_event', (evt, item)=> {
-            this.targetOrder = item[1];
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -300,22 +292,28 @@ export class CompareDiagram {
             this.cohortProInfo = item.promis;
             let relativeScale = item.scaleR;
             let separated = item.separated;
-           
+
+            if(item.startEvent == null){
+                this.zeroEvent = 'First Promis Score';
+            }else{
+                console.log(item.startEvent[1][0].key);
+                this.zeroEvent = item.startEvent[1][0].key;
+            }
             this.clearDiagram();
             this.clearAggDiagram();
+    
             if(separated){
      
-                this.getDays(item.promisSep[0], 'days').then(top => this.drawPromisChart(top, 'top', this.cohortIndex));
-                this.getDays(item.promisSep[1], 'days').then(mid => this.drawPromisChart(mid, 'middle', this.cohortIndex));
-                this.getDays(item.promisSep[2], 'days').then(bot => this.drawPromisChart(bot, 'bottom', this.cohortIndex));
+               this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
+               this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
+               this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
+
                    
             }else{
                 
-                this.getDays(this.cohortProInfo, 'days').then(co=> {
-                    this.drawPromisChart(co, 'proLine', this.cohortIndex);
-                });
-                console.log('selected cohort change');
+                
                 this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
+    
             }
            
             if(relativeScale){
@@ -332,54 +330,6 @@ export class CompareDiagram {
 
                   }
                     });
-
-        events.on('revert_to_promis', () =>{
-            this.targetOrder = 'First Promis Score';
-        });
-
-    }
-
-    private async getDays(cohort, date) {
-     
-        // ----- add diff days to the data
-          
-            let maxDiff = 0;// this sets the score scale max.
-            //need to make this dynamic. 
-            let diffArray = [];
-            if (cohort != null) {
-                
-                cohort.forEach((g) => {
-                    let  minDate;
-            
-                    if(g.CPTtime != undefined && date != null ) {
-                        minDate = this.parseTime(g.CPTtime, null);
-                      
-                    }else minDate = g.min_date;
-                //these have already been parsed
-                let maxDate = g.max_date;
-                            g.value.forEach((d) => {
-                            try {
-                            d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                            maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
-                            }
-                            catch (typeError) {
-                            d.diff = -1;
-                            }
-                            });
-                            g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
-                            diffArray.push(g.days + 1);
-
-                            g.value.sort((a, b) => ascending(a.diff, b.diff));
-
-                            });
-
-                            diffArray.sort((a, b) => ascending(a, b));
-                            events.fire('timeline_max_set', max(diffArray));
-                            events.fire('day_dist', cohort);
-                  
-                            return cohort;
-
-            }else{console.log('error'); }
 
     }
 //breaks each pat value scores into Original and relative score
@@ -829,11 +779,12 @@ export class CompareDiagram {
     // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
     private async frequencyCalc(cohort, clump){
+
         let cohortFiltered = cohort.filter(d=> d.value.length > 1);
 
         let negdiff = 0;
         let posdiff = 0;
-
+        console.log(cohortFiltered);
         //get the extreme diff values for each side of the zero event
         cohortFiltered.forEach(pat => {
 
@@ -1031,7 +982,7 @@ export class CompareDiagram {
         
 
         // ------- draw
-        const promisScoreGroup = this.svg.select('.scoreGroup');
+        const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
 
         promisScoreGroup.append('clipPath').attr('id', 'clip')
         .append('rect')
