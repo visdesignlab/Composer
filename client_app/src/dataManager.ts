@@ -954,7 +954,8 @@ export class DataManager {
 
     private async updateDiff(code, patCPT){
 
-    
+        console.log(patCPT);
+        console.log(code);
        if(code!= undefined){
 
         code = code[0].map(c => +c);
