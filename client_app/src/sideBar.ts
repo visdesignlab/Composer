@@ -116,7 +116,7 @@ export class SideBar {
       });
 
       events.on('test', (evt, item)=> {
-        console.log('test firing?');
+  
         selectAll('.selected').classed('selected', false);
   
         this.selected = item[1];
