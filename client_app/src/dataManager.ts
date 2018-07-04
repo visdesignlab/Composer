@@ -16,7 +16,6 @@ import {argFilter} from 'phovea_core/src/';
 import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
-import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalc from './dataCalculations';
 import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
 
@@ -89,6 +88,7 @@ export class DataManager {
         events.on('event_selected', (evt, item)=> {
 
             console.log(item);
+
            if(item == null){
                console.log('item is null');
                this.getDays(this.filteredPatPromis, null).then(promis=> {
@@ -124,15 +124,20 @@ export class DataManager {
         });
 
         events.on('filtered_patient_promis', (evt, item)=> {
+            console.log(item);
+            this.filteredPatPromis = item[0];
+            let filters = item[1];
+
             this.getCPT(this.cohortIdArray, this.totalCptObjects).then(d=> {
                 this.mapCPT(this.filteredPatPromis, d).then(orders=> {
-                    events.fire('cpt_mapped', orders);
+                  //  events.fire('cpt_mapped', orders);
                     this.patCPT = orders;
+                    this.getDays(this.filteredPatPromis, null).then(prom=> {
+                        events.fire('new_cohort', [prom, orders, filters]);
+                    });
                 });
             });
-            this.getDays(this.filteredPatPromis, null).then(prom=> {
-                events.fire('min_day_calculated', prom);
-            });
+            
             
         });
 
@@ -151,10 +156,10 @@ export class DataManager {
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
                     events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
-                    let cohort = this.addMinDay(ob, d[1]).then(co=> {
-                        let promis = co;
-                        events.fire('filter_cohort_by_event', [this.patCPT, promis, this.targetOrder]);
-                    });
+                  //  let cohort = this.addMinDay(ob, d[1]).then(co=> {
+                    //    let promis = co;
+                        events.fire('filter_cohort_by_event', [this.patCPT, ob, this.targetOrder]);
+                  //  });
                    })
                 );
                
@@ -171,10 +176,7 @@ export class DataManager {
         events.on('selected_line_array', (evt, item)=> {
             this.filterObjectByArray(item, this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
-        events.on('start_date_updated', (evt, item)=> {
-            this.startDate = item;
-            startDateSelection.text(this.startDate);
-        });
+ 
         events.on('separate_cohort_agg', (evt, item)=> {
 
             this.getQuant_Separate(item.promis).then(sep=> {
@@ -190,8 +192,8 @@ export class DataManager {
                 });
 
         events.on('selected_pat_array', (evt, item)=> {
-            this.cohortIdArray = item;
-            this.getCPT(this.cohortIdArray, this.totalCptObjects);
+           // this.cohortIdArray = item;
+          //  this.getCPT(this.cohortIdArray, this.totalCptObjects);
         });
 
         /* 
@@ -201,7 +203,7 @@ export class DataManager {
 
         events.on('pro_object', (evt, item)=> {//picked up by similarity diagram
             this.totalProObjects = item;
-            this.mapPromisScores(null, item, 'add');
+           // this.mapPromisScores(null, item, 'add', null);
         });
 
         events.on('cpt_object', (evt, item)=> {
@@ -302,7 +304,7 @@ export class DataManager {
             }else{
              //this is a test, manual array for filter
             events.fire('add_demo_to_filter_array', [sidebarFilter, this.cohortIdArray.length]);
-            this.mapPromisScores(this.cohortIdArray, this.totalProObjects, type);
+            this.mapPromisScores(this.cohortIdArray, this.totalProObjects, type, sidebarFilter);
            }
            
        }
@@ -640,7 +642,7 @@ export class DataManager {
 
 
     //uses Phovea to access PROMIS data and draw table for cohort
-    private async mapPromisScores(cohortIdArray, proObjects, type) {
+    private async mapPromisScores(cohortIdArray, proObjects, type, filter) {
 
         proObjects = proObjects.filter((d) => {
             return d['FORM_ID'] === 1123;
@@ -686,17 +688,9 @@ export class DataManager {
                 max_date: this.findMaxDate(d.value)
             };
         });
-        if (yayornay == 'nay'){
 
-            events.fire('got_promis_scores', patPromis);
 
-        };
-
-        this.filteredPatPromis = patPromis;
-
-        if (yayornay == 'yay'){
-
-            events.fire('filtered_patient_promis', patPromis);}
+        events.fire('filtered_patient_promis', [patPromis, filter]);
 
      };
 

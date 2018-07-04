@@ -15,7 +15,6 @@ import {argFilter} from 'phovea_core/src/';
 import * as events from 'phovea_core/src/event';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
-import { filteredOrders } from 'client_app/src/similarityScoreDiagram';
 import * as dataCalculations from './dataCalculations';
 
 

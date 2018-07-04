@@ -24,7 +24,6 @@ import {IAnyVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
 import { writeJson } from 'fs-extra';
 import * as dataCalc from './dataCalculations';
-import * as similarityScoreDiagram from './similarityScoreDiagram';
 import { Domain } from 'domain';
 import { path } from 'd3-path';
 
