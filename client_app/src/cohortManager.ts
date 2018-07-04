@@ -117,6 +117,7 @@ export class CohortManager {
 
         events.on('change_promis_scale', ()=> {
             let scaleRelative;
+            console.log(this.selectedCohort);
             if(this.branchSelected == null){
                 scaleRelative = this.cohortTree[this.cohortIndex].scaleR;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -140,9 +141,10 @@ export class CohortManager {
             this.removeCohortFilterArray();
             events.fire('selected_cohort_change', null);
             });
-
+        
+            //this comes directly from cohrot tree in eventline;
         events.on('cohort_selected', (evt, item)=>{
-  
+            
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
@@ -224,14 +226,22 @@ export class CohortManager {
 
         events.on('frequency', ()=> { events.fire('frequency_test', this.selectedCohort)});
         events.on('promis_from_demo_refiltered', (evt, item)=> {
+
+            let filterReq = ['demographic', item[1], item[0].length];
+
             if(this.branchSelected == null){
-                this.cohortTree[this.cohortIndex].promis = item;
+                this.cohortTree[this.cohortIndex].promis = item[0];
+                this.cohortTree[this.cohortIndex].events.push(filterReq);
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
+
             }else{
-                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].promis = item;
-                this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]]
+                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].promis = item[0];
+                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].events.push(filterReq);
+                this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
             }
+           
             events.fire('update_chart', this.selectedCohort);
+            events.fire('send_filter_to_codebar', this.selectedCohort.events);
 
           });
 
@@ -263,7 +273,6 @@ export class CohortManager {
                 branches: [] };
 
             newParent.events.push(filterReq);
-
             this.cohortTree.push(newParent);
             this.selectedCohort = this.cohortTree[this.cohortIndex];
           
