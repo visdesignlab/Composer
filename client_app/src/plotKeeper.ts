@@ -16,7 +16,6 @@ import { format } from 'd3-format';
 import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
-import * as similarityScoreDiagram from './similarityScoreDiagram';
 import * as compareDiagram from './compareDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';

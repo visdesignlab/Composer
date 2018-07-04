@@ -6,7 +6,6 @@ import * as ajax from 'phovea_core/src/ajax';
 //import {select, selectAll} from 'd3-selection';
 import * as events from 'phovea_core/src/event';
 import {BaseType, select, selectAll, event} from 'd3-selection';
-import * as cohortStat from './cohortStat';
 import * as dict from './cptDictionary';
 import {transition} from 'd3-transition';
 import { scaleLinear, scaleLog } from 'd3-scale';
@@ -79,12 +78,6 @@ export class CodeSidebar {
        events.on('send_filter_to_codebar', (evt, item)=> {
         this.selectedCohortFilters = item;
         this.DrawfilterDescriptionBox(item);
-       });
-
-        events.on('make_stat_node', (evt, item)=> {
-           let parent = document.getElementsByClassName('cohort ' + item[1])[0];
-           let view = parent.querySelector('.stat_view');
-           cohortStat.create(view, item[0], item[1]);
        });
 
         events.on('update_start_event', (evt, item)=>  {
