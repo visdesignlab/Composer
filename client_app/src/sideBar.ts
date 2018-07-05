@@ -73,10 +73,17 @@ export class SideBar {
 
   private attachListener () {
 
-    events.on('compare_cohorts', (evt, item)=> {
+    events.on('enter_comparison_view', ()=> {
+          
       select('#compareDiv').classed('hidden', false);
+  });
 
-    });
+  events.on('exit_comparison_view', ()=> {
+    
+    select('#compareDiv').classed('hidden', true);
+
+  });
+
     
       events.on('filter_counted', (evt, item) => {//this get the count from the group
 

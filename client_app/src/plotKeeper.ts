@@ -46,7 +46,7 @@ export class PlotKeeper {
 
         let that = this;
 
-        events.on('compare_cohorts', ()=> {
+        events.on('enter_comparison_view', ()=> {
           
             for(let i = 0; i < this.cohortIndex; i++){
 
@@ -54,6 +54,17 @@ export class PlotKeeper {
 
             }
             this.cohortIndex++;
+        });
+
+        events.on('exit_comparison_view', ()=> {
+          
+            this.plotDiv.selectAll('*').remove();
+
+            this.buildPlot(this.plotDiv, this.cohortData[0], 0);
+            
+            this.cohortIndex=1;
+
+            events.fire('cohort_selected', [this.cohortData[0], 0]);
         });
 
         events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 

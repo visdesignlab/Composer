@@ -25,7 +25,7 @@ export class CohortManager {
     constructor() {
         this.codes = codeDict.create();
         this.branchSelected = null;
-        this.comparisonBool = false;
+        
         this.attachListener();
     }
 
@@ -33,6 +33,13 @@ export class CohortManager {
 
         events.on('compare_cohorts', ()=> {
             console.log(this.cohortTree);
+                if(!this.comparisonBool){
+                    this.comparisonBool = true;
+                    events.fire('enter_comparison_view');
+                }else{
+                    this.comparisonBool = false;
+                    events.fire('exit_comparison_view');
+                }
             });
 
         events.on('aggregate_button_clicked', ()=> {
@@ -141,13 +148,25 @@ export class CohortManager {
             this.removeCohortFilterArray();
             events.fire('selected_cohort_change', null);
             });
+
+         events.on('cpt_filter_button', (evt, item)=> {
+
+            let fixed = item[0];
+            let cptFilterArray = item[1];
+             
+            events.fire('filter_by_cpt', [fixed, cptFilterArray, this.selectedCohort.cpt]);
+
+         });
+            // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
         
             //this comes directly from cohrot tree in eventline;
         events.on('cohort_selected', (evt, item)=>{
-            
+          
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
+
+            console.log(cohort);
 
             this.cohortTree[this.cohortIndex].promis = item[0].promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -177,8 +196,14 @@ export class CohortManager {
                 let branchIndex = this.branchSelected[1];
                 events.fire('get_selected_demo', [filters, this.cohortTree[index].branches[branchIndex].promis]);
             }
-            
+
           });
+
+        events.on('event_selected', (evt, item)=> {
+            let codes = item;
+           // console.log(this.selectedCohort);
+            events.fire('update_cohort_start', [codes, this.selectedCohort]);
+        });
 
         events.on('separated_by_quant', (evt, item)=> {
            // this.seperatedCohortArray = item;
