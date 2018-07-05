@@ -67,11 +67,6 @@ export class PlotKeeper {
             events.fire('cohort_selected', [this.cohortData[0], 0]);
         });
 
-        events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-    
-           
-        });
-
         events.on('test', (evt, item)=> {
         
             this.cohortData = item[0];
@@ -79,10 +74,10 @@ export class PlotKeeper {
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-          
+                console.log('make sure this only updates once');
                 this.buildPlot(this.plotDiv, selectedCohort, this.cohortIndex);
             }
-           // this.buildPlot(this.plotDiv, this.cohortData[0], this.cohortIndex);
+         
         });
 
         events.on('domain updated', (evt, item)=> {
