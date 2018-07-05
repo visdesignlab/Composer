@@ -770,7 +770,7 @@ export class CompareDiagram {
      */
     private clearAggDiagram() {
 
-        let aggline =  this.svg.select('.scoreGroup');
+        let aggline =  this.svg.select('.scoreGroup-'+ this.cohortIndex);
         aggline.select('.avLine').remove();
         aggline.select('.avLine_all').remove();
         aggline.select('.avLine_top').remove();

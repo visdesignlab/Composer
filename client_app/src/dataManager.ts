@@ -72,7 +72,7 @@ export class DataManager {
           });
 
         events.on('demo_add', (evt, item) => { // called in sidebar
-            console.log(item);
+          
             let filter = item;
             this.demoFilter(item, this.totalDemoObjects).then(ids=> {
                 let cohortIDs = ids;
@@ -91,38 +91,58 @@ export class DataManager {
           
         });
 
-        events.on('event_selected', (evt, item)=> {
+        events.on('update_cohort_start', (evt, item)=> {
 
-            console.log(item);
-
-           if(item == null){
-               console.log('item is null');
-               this.getDays(this.filteredPatPromis, null).then(promis=> {
-                console.log(promis);
-                events.fire('min_day_calculated', promis);
-            });
+            console.log('update start');
+            let codes = item[0];
+            let promis = item[1].promis;
+            let cpt = item[1].cpt;
+            
+            if(item[0] == null){
+              
+               this.getDays(promis, null).then(promisShifted=> {
+            
+                events.fire('min_day_calculated', promisShifted);
+                 });
             events.fire('update_start_button_clicked', null);
-           }else{
-                this.searchByEvent(this.patCPT, item[0]).then((d)=> {
-                this.patCPT = d[0];
-             
-                this.targetOrder = item;
-                this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
-                  
-                    this.filteredPatPromis = ob;
-                    this.addMinDay(ob, d[1]).then(co=> {
-                 
-                        this.getDays(co, 'days').then(promis=> {
-                            this.getBaselines(promis).then(based=> {
-                                console.log(promis);
-                            events.fire('min_day_calculated', promis);
+
+            }else{
+                console.log(codes);
+                this.searchByEvent(cpt, codes[0]).then((cptFiltered)=> {
+                    console.log('this is returning');
+                    let eventStartArray = cptFiltered[1];
+                    console.log(promis);
+                    console.log(eventStartArray);
+                    this.addMinDay(promis, eventStartArray).then(co=> {
+                        this.getDays(co, 'days').then(promisShifted=> {
+                            this.getBaselines(promisShifted).then(based=> {
+                            events.fire('min_day_calculated', based);
+                            events.fire('update_start_button_clicked', [co, item[0]]);
                             });
                         });
-                events.fire('update_start_button_clicked', [co, item]);
                     });
-                 })
-                );
+
+                });
+              /*
+                this.searchByEvent(cpt, codes).then((cptFiltered)=> {
+              //  this.patCPT = d[0];
+                let eventStartArray = cptFiltered[1];
+                    console.log(eventStartArray);
+         //       this.getCohortIdArrayAfterMap(cpt, 'cpt').then(id=> this.filterObjectByArray(id, promis, 'promis').then(ob=> {
+            
+                    this.addMinDay(promis, eventStartArray).then(co=> {
+                        this.getDays(co, 'days').then(promisShifted=> {
+                            this.getBaselines(promisShifted).then(based=> {
+                            events.fire('min_day_calculated', based);
+                            });
+                        });
+                    });
+               // events.fire('update_start_button_clicked', [co, item]);
+                   // });
+                // })
+              
               });
+              */
             }
         });
 
@@ -132,6 +152,7 @@ export class DataManager {
         });
 
         events.on('filtered_patient_promis', (evt, item)=> {
+            console.log('when does filtered pat promis happen?');
             console.log(item);
             let cohortIds = item[0];
             let filteredPatPromis = item[1];
@@ -156,16 +177,18 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-            this.searchByEvent(this.patCPT, item[0]).then((d)=> {
-                this.patCPT = d[0];
-               
+            console.log(item[0]);
+            this.searchByEvent(item[2], item[0]).then((d)=> {
+                let cpt = d[0];
+               console.log(cpt);
+               console.log(d[1]);
                 this.targetOrder = item;
-                this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
-                    events.fire('selected_promis_filtered', ob);
+                this.getCohortIdArrayAfterMap(cpt, 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
+                  //  events.fire('selected_promis_filtered', ob);
                     this.filteredPatPromis = ob;
                   //  let cohort = this.addMinDay(ob, d[1]).then(co=> {
                     //    let promis = co;
-                        events.fire('filter_cohort_by_event', [this.patCPT, ob, this.targetOrder]);
+                        events.fire('filter_cohort_by_event', [cpt, ob, this.targetOrder]);
                   //  });
                    })
                 );
