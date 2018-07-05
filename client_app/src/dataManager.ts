@@ -40,8 +40,7 @@ export class DataManager {
     //filteredCohortDemo;//demographic info as objects for defined cohort
     totalCptObjects;//CPT as objects for defined cohort
     cohortIcdObjects;//ICD objects for cohort
-    filteredPatPromis;
-    patCPT;
+
     startDate;
 
     constructor() {
@@ -72,12 +71,25 @@ export class DataManager {
           });
 
         events.on('demo_add', (evt, item) => { // called in sidebar
-          
+            console.log(this.totalProObjects);
             let filter = item;
             this.demoFilter(item, this.totalDemoObjects).then(ids=> {
                 let cohortIDs = ids;
-                this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(prom=> {
-                    events.fire('filtered_patient_promis', [cohortIDs, prom, filter]);
+                this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(promis=> {
+                 //   events.fire('filtered_patient_promis', [cohortIDs, prom, filter]);
+
+                    this.getCPT(cohortIDs, this.totalCptObjects).then(d=> {
+                        this.mapCPT(promis, d).then(orders=> {
+                         
+                            this.getDays(promis, null).then(promisShifted=> {
+                                this.getBaselines(promisShifted).then(based=> {
+                                    console.log('demo add firing');
+                                    events.fire('new_cohort', [based, orders, filter]);
+                                });
+                               
+                            });
+                        });
+                    });
                 });
             });
           });
@@ -101,73 +113,40 @@ export class DataManager {
             if(item[0] == null){
               
                this.getDays(promis, null).then(promisShifted=> {
-            
-                events.fire('min_day_calculated', promisShifted);
-                 });
+                console.log(promisShifted);
+                this.getBaselines(promisShifted).then(based=> {
+                    this.updateDiff(codes, cpt, promisShifted).then(cptShifted=> {           
+                        this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted]));
+                    });
+                });
+            });
+
             events.fire('update_start_button_clicked', null);
 
             }else{
-                console.log(codes);
+             
                 this.searchByEvent(cpt, codes[0]).then((cptFiltered)=> {
-                    console.log('this is returning');
+               
                     let eventStartArray = cptFiltered[1];
-                    console.log(promis);
-                    console.log(eventStartArray);
+             
                     this.addMinDay(promis, eventStartArray).then(co=> {
                         this.getDays(co, 'days').then(promisShifted=> {
                             this.getBaselines(promisShifted).then(based=> {
-                            events.fire('min_day_calculated', based);
-                            events.fire('update_start_button_clicked', [co, item[0]]);
+                                this.updateDiff(codes, cptFiltered[0], null).then(cptShifted=> {
+                                    this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted]));
+                                    
+                                });
                             });
                         });
                     });
 
                 });
-              /*
-                this.searchByEvent(cpt, codes).then((cptFiltered)=> {
-              //  this.patCPT = d[0];
-                let eventStartArray = cptFiltered[1];
-                    console.log(eventStartArray);
-         //       this.getCohortIdArrayAfterMap(cpt, 'cpt').then(id=> this.filterObjectByArray(id, promis, 'promis').then(ob=> {
-            
-                    this.addMinDay(promis, eventStartArray).then(co=> {
-                        this.getDays(co, 'days').then(promisShifted=> {
-                            this.getBaselines(promisShifted).then(based=> {
-                            events.fire('min_day_calculated', based);
-                            });
-                        });
-                    });
-               // events.fire('update_start_button_clicked', [co, item]);
-                   // });
-                // })
-              
-              });
-              */
             }
         });
 
 
         events.on('filter_cohort_agg', (evt, item)=> {
             this.getQuant_Agg(item[0], item[1]);
-        });
-
-        events.on('filtered_patient_promis', (evt, item)=> {
-            console.log('when does filtered pat promis happen?');
-            console.log(item);
-            let cohortIds = item[0];
-            let filteredPatPromis = item[1];
-            let filters = item[2];
-
-            this.getCPT(cohortIds, this.totalCptObjects).then(d=> {
-                this.mapCPT(filteredPatPromis, d).then(orders=> {
-                    this.patCPT = orders;
-                    this.getDays(filteredPatPromis, null).then(prom=> {
-                        events.fire('new_cohort', [prom, orders, filters]);
-                    });
-                });
-            });
-            
-            
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -177,17 +156,15 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-            console.log(item[0]);
-            this.searchByEvent(item[2], item[0]).then((d)=> {
-                let cpt = d[0];
-               console.log(cpt);
-               console.log(d[1]);
+            console.log(item);
+            let cpt = item[2].cpt;
+            let promis = item[2].promis;
+
+            this.searchByEvent(cpt, item[0]).then((d)=> {
+              //  let cpt = d[0];
+           
                 this.targetOrder = item;
-                this.getCohortIdArrayAfterMap(cpt, 'cpt').then(id=> this.filterObjectByArray(id, this.filteredPatPromis, 'promis').then(ob=> {
-                  //  events.fire('selected_promis_filtered', ob);
-                    this.filteredPatPromis = ob;
-                  //  let cohort = this.addMinDay(ob, d[1]).then(co=> {
-                    //    let promis = co;
+                this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, promis, 'promis').then(ob=> {
                         events.fire('filter_cohort_by_event', [cpt, ob, this.targetOrder]);
                   //  });
                    })
@@ -197,16 +174,25 @@ export class DataManager {
         });
         events.on('get_selected_demo', (evt, item)=> {
 
-            this.getCohortIdArrayAfterMap(item[1], 'demo')
+            let promis = item[1].promis;
+            let cpt = item[1].cpt;
+            let filters = item[0];
+
+            this.getCohortIdArrayAfterMap(promis, 'demo')
             .then(id=>  this.filterObjectByArray(id, this.totalDemoObjects, 'demo')
-            .then(ob => this.demoFilter(item[0], ob).then(ids=> {
-                this.filterObjectByArray(ids, this.filteredPatPromis, 'promis').then(pro => events.fire('promis_from_demo_refiltered', [pro, item[0]]));
+            .then(ob => this.demoFilter(filters, ob).then(ids=> {
+                this.filterObjectByArray(ids, promis, 'promis').then(pro => {
+                    this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
+                        events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered]);
+                    });
+                });
+                
             })));
  
          });
 
-        events.on('selected_line_array', (evt, item)=> {
-            this.filterObjectByArray(item, this.patCPT, 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
+        events.on('selected_line_with_cpt', (evt, item)=> {
+            this.filterObjectByArray(item[0], item[1], 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
  
         events.on('separate_cohort_agg', (evt, item)=> {
@@ -216,13 +202,6 @@ export class DataManager {
                 events.fire('separated_by_quant', sep);
             });
         });
-        events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-           
-            //change this back to added and selected. 
-            //when selected, the index changes. no need to map the cpt
-            this.filteredPatPromis = item.promis;
-           // this.getCPT(this.cohortIdArray, this.totalCptObjects);
-                });
 
         /* 
         // THESE SET VARIABLES TO OBJECTS AND SEND OBJECTS TO VIEWS
@@ -241,9 +220,9 @@ export class DataManager {
         });
 
         events.on('update_cpt_days', (evt, item)=>{
-        
-            this.updateDiff(this.targetOrder, item[0]).then(cpt=> {
-                this.patCPT = cpt;
+            console.log(item);
+            this.updateDiff(this.targetOrder, item[0], null).then(cpt=> {
+               
                 events.fire('cpt_updated', cpt);
             });
         });
@@ -311,7 +290,6 @@ export class DataManager {
                            
                         }else if(choice.length === 3){
                             filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
-
                         }
                 }
            }
@@ -663,7 +641,7 @@ export class DataManager {
     //uses Phovea to access PROMIS data and draw table for cohort
     private async mapPromisScores(cohortIdArray, proObjects, filter) {
 
-        proObjects = proObjects.filter((d) => {
+        let proObjectsFiltered = proObjects.filter((d) => {
             return d['FORM_ID'] === 1123;
         });
 
@@ -675,7 +653,7 @@ export class DataManager {
 
             yayornay = 'yay';
 
-            proObjects.forEach((d) => {
+            proObjectsFiltered.forEach((d) => {
 
                 if (cohortIdArray.indexOf(d.PAT_ID) !== -1) {
                         if (filteredPatOrders[d.PAT_ID] == undefined) {
@@ -687,7 +665,7 @@ export class DataManager {
             }
 
         if (cohortIdArray == null){
-            proObjects.forEach((d) => {
+            proObjectsFiltered.forEach((d) => {
 
                         if (filteredPatOrders[d.PAT_ID] == undefined) {
                                 filteredPatOrders[d.PAT_ID] = [];
@@ -709,7 +687,6 @@ export class DataManager {
         });
 
         return patPromis;
-      //  events.fire('filtered_patient_promis', [cohortIdArray, patPromis, filter]);
 
      };
 
@@ -965,11 +942,13 @@ export class DataManager {
         return [withQuery, queryDate];
     }
 
-    private async updateDiff(code, patCPT){
+    private async updateDiff(code, patCPT, patPromis){
+
+
 
         console.log(patCPT);
         console.log(code);
-       if(code!= undefined){
+       if(code!= null){
 
         code = code[0].map(c => +c);
         let filArray = []
@@ -986,6 +965,11 @@ export class DataManager {
             });
         });
 
+       }else{
+           let startDayArray = [];
+           patPromis.forEach(pat => {
+               console.log(pat);
+           });
        }
       
        return patCPT;

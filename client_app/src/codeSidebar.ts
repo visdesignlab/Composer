@@ -65,7 +65,7 @@ export class CodeSidebar {
      */
     private attachListener() {
 
-       events.on('selected_cohort_change', (evt, item)=> {
+       events.on('selected_cohort_update', (evt, item)=> {
         let cohortPromis = item.promis;
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
