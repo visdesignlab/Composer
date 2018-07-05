@@ -71,19 +71,17 @@ export class DataManager {
           });
 
         events.on('demo_add', (evt, item) => { // called in sidebar
-            console.log(this.totalProObjects);
             let filter = item;
             this.demoFilter(item, this.totalDemoObjects).then(ids=> {
                 let cohortIDs = ids;
                 this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(promis=> {
-                 //   events.fire('filtered_patient_promis', [cohortIDs, prom, filter]);
 
                     this.getCPT(cohortIDs, this.totalCptObjects).then(d=> {
                         this.mapCPT(promis, d).then(orders=> {
                          
                             this.getDays(promis, null).then(promisShifted=> {
                                 this.getBaselines(promisShifted).then(based=> {
-                                    console.log('demo add firing');
+                         
                                     events.fire('new_cohort', [based, orders, filter]);
                                 });
                                
@@ -113,7 +111,7 @@ export class DataManager {
             if(item[0] == null){
               
                this.getDays(promis, null).then(promisShifted=> {
-                console.log(promisShifted);
+              
                 this.getBaselines(promisShifted).then(based=> {
                     this.updateDiff(codes, cpt, promisShifted).then(cptShifted=> {           
                         this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted]));
@@ -156,7 +154,7 @@ export class DataManager {
         });
 
         events.on('filter_by_cpt', (evt, item)=> {
-            console.log(item);
+ 
             let cpt = item[2].cpt;
             let promis = item[2].promis;
 
@@ -220,7 +218,7 @@ export class DataManager {
         });
 
         events.on('update_cpt_days', (evt, item)=>{
-            console.log(item);
+    
             this.updateDiff(this.targetOrder, item[0], null).then(cpt=> {
                
                 events.fire('cpt_updated', cpt);
@@ -944,10 +942,6 @@ export class DataManager {
 
     private async updateDiff(code, patCPT, patPromis){
 
-
-
-        console.log(patCPT);
-        console.log(code);
        if(code!= null){
 
         code = code[0].map(c => +c);
@@ -968,7 +962,7 @@ export class DataManager {
        }else{
            let startDayArray = [];
            patPromis.forEach(pat => {
-               console.log(pat);
+             
            });
        }
       

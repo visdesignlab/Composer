@@ -28,6 +28,7 @@ export class PlotKeeper {
     private domain;
     private cohortIndex;
     private initialLoadBool;
+    selectedCohort;
 
     constructor(parent: Element) {
 
@@ -35,10 +36,11 @@ export class PlotKeeper {
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-       // this.buildPlot(this.plotDiv, this.cohortData);
+       
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());
         this.cohortIndex = 1;
+      //  this.buildPlot(this.plotDiv, this.cohortData, this.cohortIndex);
         this.attachListener();
     }
 
@@ -71,6 +73,8 @@ export class PlotKeeper {
         
             this.cohortData = item[0];
             let selectedCohort = this.cohortData[item[1][0]];
+
+            console.log(this.cohortData);
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;

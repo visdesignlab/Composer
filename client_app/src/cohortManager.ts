@@ -176,7 +176,7 @@ export class CohortManager {
             let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
             this.branchSelected = null;
 
-            events.fire('selected_cohort_change', this.selectedCohort);
+            events.fire('selected_cohort_update', this.selectedCohort);
            
             events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].events);
          
@@ -287,7 +287,6 @@ export class CohortManager {
 
             console.log(this.selectedCohort);
 
-       
             events.fire('selected_cohort_update', this.selectedCohort);
             events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].events);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
