@@ -158,7 +158,7 @@ export class CompareDiagram {
 
         this.attachListener();
 
-        this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex);
+        this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex, cohortData.scaleR);
     }
 
     /**
@@ -170,47 +170,40 @@ export class CompareDiagram {
         events.on('update_scale', (evt, item)=>{
       
             let separated = item.separated;
-            let scaleRelative = item.scaleR;
+            this.scaleRelative = item.scaleR;
             let promis = item.promis;
             
             this.clearDiagram();
             this.clearAggDiagram();
-            if(scaleRelative){
+            if(this.scaleRelative){
                 if(separated){
-                 //   this.interpolate(item.promisSep[0].then(c=> {
+             
                         this.changeScale(item.promisSep[0], true).then(cohort=> {
                             let topc = cohort;
-                            this.drawPromisChart(cohort, 'top', this.cohortIndex);
+                            this.drawPromisChart(cohort, 'top', this.cohortIndex, item.scalR);
                         });
-                 //   }));
-                 //   this.interpolate(item.promisSep[1].then(c=> {
+            
                         this.changeScale(item.promisSep[1], true).then(cohort=> {
                             let midc = cohort;
-                            this.drawPromisChart(cohort, 'middle', this.cohortIndex);
+                            this.drawPromisChart(cohort, 'middle', this.cohortIndex, item.scalR);
                         });
-                  //  }));
-                //    this.interpolate(item.promisSep[2].then(c=> {
+          
                         this.changeScale(item.promisSep[2], true).then(cohort=> {
                             let botc = cohort;
-                            this.drawPromisChart(cohort, 'bottom', this.cohortIndex);
+                            this.drawPromisChart(cohort, 'bottom', this.cohortIndex, item.scalR);
                         });
-                  //  }));
-                  
+
                 }else{
-              
-                      //  this.interpolate(promis).then(inter => {
                               this.changeScale(promis, true).then(cohort=> {
-                                  this.drawPromisChart(cohort, 'proLine', this.cohortIndex);
+                                  this.drawPromisChart(cohort, 'proLine', this.cohortIndex, item.scalR);
                                   events.fire('update_promis', cohort);
                               });
-                       //   });
-                    
                 }
    
             }else{
 
                 this.changeScale(promis, false).then( cohort=> {
-                    this.drawPromisChart(cohort, 'proLine', this.cohortIndex);
+                    this.drawPromisChart(cohort, 'proLine', this.cohortIndex, item.scalR);
                 });
             }
         });
@@ -225,7 +218,9 @@ export class CompareDiagram {
 
         events.on('update_chart', (evt, item)=> {
 
-          
+          console.log('updating chart');
+          console.log(item);
+
             let promis = item.promis;
             this.scaleRelative = item.scaleR;
             this.clumped = item.clumped;
@@ -254,17 +249,15 @@ export class CompareDiagram {
                 //if it is not aggregated
                 if(separated){
                    
-                    this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-                    this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-                    this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
+                    this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex, item.scalR);
+                    this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex, item.scalR);
+                    this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex, item.scalR);
                 }else{
                   
-                    this.drawPromisChart(promis, 'proLine', this.cohortIndex);
+                    this.drawPromisChart(promis, 'proLine', this.cohortIndex, item.scalR);
                 }
 
             }
-           
-           
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -275,14 +268,16 @@ export class CompareDiagram {
 
         events.on('selected_cohort_update', (evt, item) => {  // called in parrallel on brush and 
            // this.cohortProInfo = item.promis;
+           console.log('selected cohort update');
             let promis = item.promis;
-            let relativeScale = item.scaleR;
+            this.scaleRelative = item.scaleR;
          
             let separated = item.separated;
             this.cohortLabel = item.label;
-
+            
             this.clearDiagram();
             this.clearAggDiagram();
+            console.log(item);
 
             if(item.startEvent == null){
                 this.zeroEvent = 'First Promis Score';
@@ -290,19 +285,25 @@ export class CompareDiagram {
                 this.zeroEvent = item.startEvent[1][0].key;
             }
             if(separated){
-               this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-               this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-               this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
+               this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex, item.scalR);
+               this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex, item.scalR);
+               this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex, item.scalR);
             }else{
-                if(relativeScale){
+                if(this.scaleRelative){
                     events.fire('cohort_interpolated', promis);
                     this.changeScale(promis, true).then( cohort=> {
                         this.clearDiagram();
                         this.clearAggDiagram();
-                        this.drawPromisChart(cohort, 'proLine', this.cohortIndex);
+                        this.drawPromisChart(cohort, 'proLine', this.cohortIndex, item.scalR);
                         });
                 }else{
-                    this.drawPromisChart(promis, 'proLine', this.cohortIndex);
+                    console.log('change back to absolute');
+                    this.changeScale(promis, false).then(cohort=> {
+                        this.clearDiagram();
+                        this.clearAggDiagram();
+                        this.drawPromisChart(promis, 'proLine', this.cohortIndex, item.scalR);
+                    });
+                   // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
                 }
             }
         });
@@ -335,10 +336,9 @@ export class CompareDiagram {
      * Draw the diagram with the given data from getSimilarRows
      * @param args
      */
-    private async drawPromisChart(cohort, clump, index) {
+    private async drawPromisChart(cohort, clump, index, scale) {
 
         console.log(cohort);
-
         this.svg.select('.cohort-plot-label').remove();
 
         let cohortLabel = this.svg.append('text')
