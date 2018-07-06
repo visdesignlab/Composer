@@ -107,12 +107,12 @@ export class CohortManager {
                 branch = this.cohortTree[this.cohortIndex].branches;
                 console.log('other branch');
             }
-
-            let b = Object.assign([], this.cohortTree[this.cohortIndex].promis);
-         
-            let bcpt = Object.assign([], this.cohortTree[this.cohortIndex].cpt);
-           
-            let bfilter = Object.assign([], this.cohortTree[this.cohortIndex].filterArray);
+            let b = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].promis));
+           // let b = Object.assign([], this.cohortTree[this.cohortIndex].promis);
+            let bcpt = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].cpt));
+           // let bcpt = Object.assign([], this.cohortTree[this.cohortIndex].cpt);
+           let bfilter = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].filterArray));
+           // let bfilter = Object.assign([], this.cohortTree[this.cohortIndex].filterArray);
       
             branch.push(b);
           
@@ -281,7 +281,7 @@ export class CohortManager {
 
             console.log('new cohort created?????');
             console.log(item);
-            let promis = Object.assign([], item[0]);
+            let promis = item[0];
 
             let filterReq = ['demographic', item[2], item[0].length];
 
