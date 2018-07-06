@@ -26,7 +26,6 @@ export class PlotKeeper {
     private cohortData = [];
     private plotDiv;
     private domain;
-    private cohortIndex;
     private initialLoadBool;
     selectedCohort;
 
@@ -35,12 +34,10 @@ export class PlotKeeper {
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
-        this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
+        this.plotDiv = this.$node.append('div').classed('allDiagramDiv', true);
        
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());
-        this.cohortIndex = 1;
-      //  this.buildPlot(this.plotDiv, this.cohortData, this.cohortIndex);
         this.attachListener();
     }
 
@@ -48,24 +45,27 @@ export class PlotKeeper {
 
         let that = this;
 
+        events.on('comparison_update', (evt, item)=> {
+            console.log(item);
+            //this comes from the sidebar
+            let comparisonArray = item;
+   
+            this.plotDiv.selectAll('*').remove();
+
+            comparisonArray.forEach((cohort, i) => {
+                console.log(cohort);
+                this.buildPlot(this.plotDiv, cohort.selectedCohort, i);
+            });
+        });
+
         events.on('enter_comparison_view', ()=> {
-          
-            for(let i = 0; i < this.cohortIndex; i++){
-
-                this.buildPlot(this.plotDiv, this.cohortData[i], i);
-
-            }
-            this.cohortIndex++;
+            console.log('maybe put something here');
         });
 
         events.on('exit_comparison_view', ()=> {
           
             this.plotDiv.selectAll('*').remove();
-
             this.buildPlot(this.plotDiv, this.cohortData[0], 0);
-            
-            this.cohortIndex=1;
-
             events.fire('cohort_selected', [this.cohortData[0], 0]);
         });
 
@@ -79,7 +79,7 @@ export class PlotKeeper {
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
                 console.log('make sure this only updates once');
-                this.buildPlot(this.plotDiv, selectedCohort, this.cohortIndex);
+                this.buildPlot(this.plotDiv, selectedCohort, 0);
             }
          
         });
@@ -91,7 +91,6 @@ export class PlotKeeper {
 }
 
     private buildPlot(container, cohort, index) {
-
         //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
         promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
 
