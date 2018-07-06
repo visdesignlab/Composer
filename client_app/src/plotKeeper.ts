@@ -48,14 +48,20 @@ export class PlotKeeper {
 
         let that = this;
 
+        events.on('comparison_update', (evt, item)=> {
+            console.log(item);
+            let limit = item[0]
+            let selectedArray = item[1];
+            this.plotDiv.selectAll('*').remove();
+            selectedArray.forEach((cohort, i) => {
+                console.log(cohort);
+                this.buildPlot(this.plotDiv, cohort, i);
+            });
+        });
+
         events.on('enter_comparison_view', ()=> {
           
-            for(let i = 0; i < this.cohortIndex; i++){
-
-                this.buildPlot(this.plotDiv, this.cohortData[i], i);
-
-            }
-            this.cohortIndex++;
+            console.log('maybe put something here');
         });
 
         events.on('exit_comparison_view', ()=> {
@@ -91,7 +97,6 @@ export class PlotKeeper {
 }
 
     private buildPlot(container, cohort, index) {
-
         //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
         promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
 
