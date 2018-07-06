@@ -74,8 +74,9 @@ export class DataManager {
             let filter = item;
             this.demoFilter(item, this.totalDemoObjects).then(ids=> {
                 let cohortIDs = ids;
-                this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(promis=> {
-
+                //this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(promis=> {
+                this.loadPromisData(cohortIDs, filter).then(promis=> {
+                    console.log(promis);
                     this.getCPT(cohortIDs, this.totalCptObjects).then(d=> {
                         this.mapCPT(promis, d).then(orders=> {
                          
@@ -223,6 +224,13 @@ export class DataManager {
             });
         });
 
+    }
+
+    private async loadPromisData(cohortIDs, filter){
+
+        let promis = this.loadData('PROMIS_Scores').then((d)=>  this.getDataObjects('pro_object', d).then(ob=> (this.mapPromisScores(cohortIDs, ob, filter))));
+
+        return promis;
     }
 
     private async addMinDay(patients, eventArray) {
@@ -897,8 +905,9 @@ export class DataManager {
 
     public async getDataObjects(id: string, table: ITable) {
         let object = await table.objects();
+        let newOb = JSON.parse(JSON.stringify(object));
         events.fire(id, object);
-        return object;
+        return newOb;
     }
 
     //YOU NEED TO INTEGRATE THIS HERE AND REMOVE FROM QUERYBOX.TS
