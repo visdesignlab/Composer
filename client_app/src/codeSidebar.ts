@@ -65,7 +65,7 @@ export class CodeSidebar {
      */
     private attachListener() {
 
-       events.on('selected_cohort_change', (evt, item)=> {
+       events.on('selected_cohort_update', (evt, item)=> {
         let cohortPromis = item.promis;
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
@@ -400,8 +400,8 @@ export class CodeSidebar {
                 });
             }else{fixed.push(ch); };
         });
-
-        events.fire('filter_by_cpt', [fixed, cptFilterArray]);
+        events.fire('cpt_filter_button',  [fixed, cptFilterArray]);
+       // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
     
         select('.orderDiv').select('.codes').remove();
     });

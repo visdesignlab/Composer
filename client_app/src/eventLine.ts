@@ -81,7 +81,7 @@ export class EventLine {
             }
         });
 
-        events.on('selected_cohort_change', (evt, item)=> {
+        events.on('selected_cohort_update', (evt, item)=> {
             console.log(item);
             this.startEventLabel = 'Change Start to Event';
             if(this.filter){
@@ -326,12 +326,12 @@ export class EventLine {
                                     .append('text').text(this.scoreLabel);
 
             
-            let togglebutton = scaleToggle.append('button')
+            let scaletogglebutton = scaleToggle.append('button')
                                         .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                                         .classed('dropdown-toggle', true)
                                         .attr('data-toggle', 'dropdown');
     
-            togglebutton.append('span').classed('caret', true);
+                scaletogglebutton.append('span').classed('caret', true);
     
                         let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
                         let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
