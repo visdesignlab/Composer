@@ -16,7 +16,7 @@ import { format } from 'd3-format';
 import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
-import * as compareDiagram from './compareDiagram';
+import * as promisDiagram from './promisDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
 
@@ -93,7 +93,7 @@ export class PlotKeeper {
     private buildPlot(container, cohort, index) {
 
         //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
-        compareDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
+        promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
 
     }
 
