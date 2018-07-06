@@ -16,7 +16,7 @@ import { format } from 'd3-format';
 import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
-import * as compareDiagram from './compareDiagram';
+import * as promisDiagram from './promisDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
 
@@ -28,6 +28,7 @@ export class PlotKeeper {
     private domain;
     private cohortIndex;
     private initialLoadBool;
+    selectedCohort;
 
     constructor(parent: Element) {
 
@@ -35,10 +36,11 @@ export class PlotKeeper {
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
-       // this.buildPlot(this.plotDiv, this.cohortData);
+       
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());
         this.cohortIndex = 1;
+      //  this.buildPlot(this.plotDiv, this.cohortData, this.cohortIndex);
         this.attachListener();
     }
 
@@ -46,7 +48,7 @@ export class PlotKeeper {
 
         let that = this;
 
-        events.on('compare_cohorts', ()=> {
+        events.on('enter_comparison_view', ()=> {
           
             for(let i = 0; i < this.cohortIndex; i++){
 
@@ -56,9 +58,15 @@ export class PlotKeeper {
             this.cohortIndex++;
         });
 
-        events.on('selected_cohort_change', (evt, item) => {  // called in parrallel on brush and 
-    
-           
+        events.on('exit_comparison_view', ()=> {
+          
+            this.plotDiv.selectAll('*').remove();
+
+            this.buildPlot(this.plotDiv, this.cohortData[0], 0);
+            
+            this.cohortIndex=1;
+
+            events.fire('cohort_selected', [this.cohortData[0], 0]);
         });
 
         events.on('test', (evt, item)=> {
@@ -66,12 +74,14 @@ export class PlotKeeper {
             this.cohortData = item[0];
             let selectedCohort = this.cohortData[item[1][0]];
 
+            console.log(this.cohortData);
+
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-          
+                console.log('make sure this only updates once');
                 this.buildPlot(this.plotDiv, selectedCohort, this.cohortIndex);
             }
-           // this.buildPlot(this.plotDiv, this.cohortData[0], this.cohortIndex);
+         
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -83,7 +93,7 @@ export class PlotKeeper {
     private buildPlot(container, cohort, index) {
 
         //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
-        compareDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
+        promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
 
     }
 
