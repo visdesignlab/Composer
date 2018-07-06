@@ -122,7 +122,6 @@ export class SideBar {
   
         selectAll('.selected').classed('selected', false);
   
-        this.selected = item[1];
         let compare = select('#compareDiv');
         compare.selectAll('*').remove();
         this.buildComparisonFilter(compare, item[0], this.comparisonArray);
@@ -139,119 +138,177 @@ export class SideBar {
   private buildComparisonFilter(compareDiv, data, array) {
    
      array  = [];
-
-    console.log(this.comparisonArray);
-
+/*
     let comparisonKeeper = [{name: 'A', label: null, cohort: null, data: null},
                             {name: 'B', label: null, cohort: null, data: null},
                             {name: 'C', label: null, cohort: null, data: null},
                             {name: 'D', label: null, cohort: null, data: null},
                             {name: 'E', label: null, cohort: null, data: null}
                           ];
+*/
 
-    let branchData = [];
+
+   let toggleData = [];
     
     data.forEach(d => {
-     // branchData.push(d);
+      toggleData.unshift(d);
       if(d.branches.length != 0){ 
         d.branches.forEach(b => {
-      
-          branchData.push(b);
+          toggleData.push(b);
         });
        };
     });
 
+    console.log(toggleData);
+
+    for(let i = 0; i < this.comparisonNum; i++ ){
+
+      let cohortlabel;
+
+     let newtog = toggleData.map(tog=> {
+        let togmap = {data: tog, index: i}
+        return togmap;
+      })
+
+      if(toggleData[i] == undefined){
+       cohortlabel = {selectedCohort: toggleData[0], data: newtog, index: i};
+      }else{
+        cohortlabel = {selectedCohort: toggleData[i], data: newtog, index: i};
+      }
+     
+      array.push(cohortlabel);
+    }
+
+
     let cohortToggle = compareDiv.append('div').classed('compare-toggle', true);
 
-    drawToggle(this.comparisonNum, comparisonKeeper);
+    drawToggle(this.comparisonNum, array);
 
-      function drawToggle(counter, labels) {
+    function drawToggle(counter, labels) {
 
         console.log(array);
         console.log(counter);
     
-      for(let i = 0; i < counter; i++ ){
+      let toggle = cohortToggle.selectAll('.toggle-menu').data(labels);
 
-        let label; 
-        
-        if(labels[i].cohort == null){ label = 'Cohort ' + labels[i].name; }else{
-          label = labels[i].label;
-        }
+      toggle.exit().remove();
 
-        let cohort = cohortToggle.append('div').attr('class', labels[i].name).classed('btn-group', true);
-        cohort.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
-                                .append('text').text(label);
-    
-        let togglebutton = cohort.append('button')
-        .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
-        .classed('dropdown-toggle', true)
-        .attr('data-toggle', 'dropdown');
-    
-        togglebutton.append('span').classed('caret', true);
-    
-        let ul = cohort.append('ul').classed(labels[i].name, true).classed('dropdown-menu', true).attr('role', 'menu');
-        let li = ul.selectAll('.' + labels[i].name).data(data).enter().append('li').attr('class', labels[i].name).classed('choice', true).append('text').text((d, i)=> { return 'Cohort ' + (i + 1)});
-    
-        let liBranch = ul.selectAll('.branch-'+ labels[i].name).data(branchData).enter().append('li').classed('branch-'+ labels[i].name, true).classed('choice', true).append('text').text((d, i)=> d.label);
-        
-        let that = this;
+      let toggleEnter = toggle .enter().append('div').attr('class',d=> d.index).classed('toggle-menu', true).classed('btn-group', true);
 
-        li.on('click', (d)=> {
-          labels[i].cohort = d;
-          labels[i].label = d.label;
-          console.log(array);
-          console.log(i);
-          if(array.length = counter){
-            array.shift();
-            array.push(d);
-          }else{array.push(d);}
-         // array[i] = d;
-          events.fire('comparison_update', [counter, array]);
-          cohortToggle.selectAll('*').remove();
-          drawToggle(counter, labels);
-        });
+      toggle = toggleEnter.merge(toggle);
 
+      toggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+      .append('text').text(d=> d.selectedCohort.label);
 
-        liBranch.on('click', (d)=> {
-          labels[i].cohort = d;
-          labels[i].label = d.label;
-          if(array.length = counter){
-            array.shift();
-            array.push(d);
-          }else{array.push(d);}
-          events.fire('comparison_update', [counter, array]);
-          cohortToggle.selectAll('*').remove();
-          drawToggle(counter, labels);
-        });
+      let togglebutton = toggle.append('button')
+      .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+      .classed('dropdown-toggle', true)
+      .attr('data-toggle', 'dropdown');
+  
+      togglebutton.append('span').classed('caret', true);
 
-      }
-  }
+      let ul = toggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+      let li = ul.selectAll('.li-compare').data(d => d.data).enter().append('li').attr('class', 'li-compare').classed('choice', true).append('text').text(d=> d.data.label);
+     
+      li.on('click', (d)=> {
+       console.log(d);
+       console.log(li);
+       array[d.index].selectedCohort = d.data;
+       console.log(array);
+       events.fire('comparison_update', array);
+       cohortToggle.selectAll('*').remove();
+       drawToggle(counter, array);
+      });
+
+}
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
     .attr('value', 'Add a cohort to comparison').on('click', ()=> {
     
         this.comparisonNum++
-      
+        let array = [];
+        let toggleData = [];
+    
+        data.forEach(d => {
+          toggleData.unshift(d);
+          if(d.branches.length != 0){ 
+            d.branches.forEach(b => {
+              toggleData.push(b);
+            });
+           };
+        });
+    
+        console.log(toggleData);
+    
+        for(let i = 0; i < this.comparisonNum; i++ ){
+    
+          let cohortlabel;
+    
+         let newtog = toggleData.map(tog=> {
+            let togmap = {data: tog, index: i}
+            return togmap;
+          })
+    
+          if(toggleData[i] == undefined){
+           cohortlabel = {selectedCohort: toggleData[0], data: newtog, index: i};
+          }else{
+            cohortlabel = {selectedCohort: toggleData[i], data: newtog, index: i};
+          }
+         
+          array.push(cohortlabel);
+        }
+        console.log(array);
+        this.comparisonArray = array;
         cohortToggle.selectAll('*').remove();
-        drawToggle(this.comparisonNum, comparisonKeeper);
+        drawToggle(this.comparisonNum, array);
         
-        events.fire('comparison_update', [this.comparisonNum, array]);
+        events.fire('comparison_update', array);
     });
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
     .attr('value', 'Clear Cohort Comparison').on('click', ()=> {
       this.comparisonNum = 2;
-      comparisonKeeper.forEach(d=> {
-        d.label = null;
-        d.cohort = null;
-      })
+      let array = [];
+      let toggleData = [];
+  
+      data.forEach(d => {
+        toggleData.unshift(d);
+        if(d.branches.length != 0){ 
+          d.branches.forEach(b => {
+            toggleData.push(b);
+          });
+         };
+      });
+  
+      console.log(toggleData);
+  
+      for(let i = 0; i < this.comparisonNum; i++ ){
+  
+        let cohortlabel;
+  
+       let newtog = toggleData.map(tog=> {
+          let togmap = {data: tog, index: i}
+          return togmap;
+        })
+  
+        if(toggleData[i] == undefined){
+         cohortlabel = {selectedCohort: toggleData[0], data: newtog, index: i};
+        }else{
+          cohortlabel = {selectedCohort: toggleData[i], data: newtog, index: i};
+        }
+       
+        array.push(cohortlabel);
+      }
+      console.log(array);
+      this.comparisonArray = array;
       cohortToggle.selectAll('*').remove();
-      drawToggle(this.comparisonNum, comparisonKeeper);
-      events.fire('comparison_update', this.comparisonNum);
-    });
-  }
+      drawToggle(this.comparisonNum, array);
+      
+      events.fire('comparison_update', array);
+  });
+}
 
 private buildDemoFilter() {
 
