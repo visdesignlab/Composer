@@ -122,7 +122,7 @@ export class EventLine {
 
         let rows = [];
         cohort.forEach(c => {
-            let e = c.events.map((event, i) => {
+            let e = c.filterArray.map((event, i) => {
                let coord = {x: (i * 30.5) + 65, y: 6 };
                return coord;
             });
@@ -135,7 +135,7 @@ export class EventLine {
           if(c.branches.length != 0){
               c.branches.forEach((b, i) => {
                   b.rowData = [{x: -25, y: -18 }, {x: -15, y: -5 }];
-                  b.events.forEach((event, i) => {
+                  b.filterArray.forEach((event, i) => {
                       let coord = {x: (i * 30.5) + 5, y: 6 };
                       b.rowData.push(coord);
                    });
@@ -171,7 +171,7 @@ export class EventLine {
         let linegroups = cohorts.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
         linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
         
-        let cohortevents = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.events);
+        let cohortevents = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
         cohortevents.exit().remove();
 
         let eventEnter = cohortevents.enter().append('g').classed('events', true);
@@ -225,7 +225,7 @@ export class EventLine {
           //branchlines.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
           branchlines.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
 
-          let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.events);
+          let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.filterArray);
 
           branchEvents.exit().remove();
 

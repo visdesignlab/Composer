@@ -704,10 +704,7 @@ export class DataManager {
             }else{
             
             }
-
         });
-
-   
     }
 
      //uses Phovea to access PRO data and draw table
@@ -963,26 +960,6 @@ export class DataManager {
        }
       
        return patCPT;
-    }
-
-    private updatePromisDiff(code, pat){
-       
-        code = code.map(c => +c);
-        let filArray = []
-        pat.forEach(pat => {
-            let fil = pat.filter(visit=> {
-                return visit.value[0].some(r => code.includes(r));
-               });
-      
-            filArray.push(fil);
-            pat.eventDay = fil[0].time;
-
-            pat.forEach(visit => {
-                visit.diff = Math.ceil((this.parseTime(visit.time, null) - this.parseTime(pat.eventDay, null)) / (1000 * 60 * 60 * 24));
-            });
-        });
-        
-        return pat;
     }
 
   }

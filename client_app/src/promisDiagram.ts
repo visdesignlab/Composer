@@ -167,59 +167,18 @@ export class promisDiagram {
     private attachListener() {
         //this is in plotkeeper
       
-        events.on('update_scale', (evt, item)=>{
-            console.log(item);
-            let separated = item.separated;
-            this.scaleRelative = item.scaleR;
-            let promis = item.promis;
-            
-            this.clearDiagram();
-            this.clearAggDiagram();
-            if(item.startEvent == null){ this.zeroEvent = 'First Promis Score';
-        }else{
-            this.zeroEvent = item.startEvent[1][0].key;
-        }
-
-        if(this.scaleRelative){
-            console.log('change back rel');
-            this.scoreScale.domain([-30, 30]);
-         }else{ 
-            console.log('change back to absolute');
-            this.scoreScale.domain([80, 0]);
-         }
-
-        if(this.clumped){
-            //if it is aggregated
-            if(separated){
-                this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
-                this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
-                this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
-            }else{
-                
-                this.frequencyCalc(promis, 'all').then(co=> this.drawAgg(co, 'all'));
-            }
-
-        }else{
-            //if it is not aggregated
-            if(separated){
-               
-                this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-                this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-                this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
-            }else{
-              
-                this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-            }
-
-        }
-        });
-
         events.on('score_domain_change', (evt, item)=>{
             this.scoreScale.domain(item);
           //  this.clearDiagram();
           //  this.drawPromisChart(this.cohortProInfo, 'proLine', this.cohortIndex);
             events.fire('yBrush_reset');
             this.yBrushSelection = true;
+        });
+
+        events.on('domain updated', (evt, item)=> {
+            this.maxDay = item[1];
+            this.minDay = item[0];
+            events.fire('yBrush_reset');
         });
 
         events.on('update_chart', (evt, item)=> {
@@ -272,50 +231,6 @@ export class promisDiagram {
                     this.drawPromisChart(promis, 'proLine', this.cohortIndex);
                 }
 
-            }
-        });
-
-        events.on('domain updated', (evt, item)=> {
-            this.maxDay = item[1];
-            this.minDay = item[0];
-            events.fire('yBrush_reset');
-        });
-
-        events.on('selected_cohort_update', (evt, item) => {  // called in parrallel on brush and 
-           // this.cohortProInfo = item.promis;
-           console.log('selected cohort update');
-            let promis = item.promis;
-            this.scaleRelative = item.scaleR;
-         
-            let separated = item.separated;
-            this.cohortLabel = item.label;
-            
-            this.clearDiagram();
-            this.clearAggDiagram();
-            console.log(item);
-
-            if(item.startEvent == null){
-                this.zeroEvent = 'First Promis Score';
-            }else{
-                this.zeroEvent = item.startEvent[1][0].key;
-            }
-            if(this.scaleRelative){
-                console.log('change back rel');
-                 this.scoreScale.domain([-30, 30]);
-                // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-                   
-             }else{
-                 console.log('change back to absolute');
-                 this.scoreScale.domain([80, 0]);
-                // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-             }
-
-            if(separated){
-               this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-               this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-               this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
-            }else{
-               this.drawPromisChart(promis, 'proLine', this.cohortIndex);
             }
         });
 

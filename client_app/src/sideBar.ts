@@ -40,6 +40,8 @@ export class SideBar {
   private cohortKeeper;
   private selected;
   private branchSelected;
+  private comparisonNum;
+  comparisonArray;
 
       private header = [
         {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -65,6 +67,8 @@ export class SideBar {
     this.svgWidth = 170;
     this.svgHeight = 40;
     this.branchSelected = null;
+    this.comparisonNum = 2;
+    this.comparisonArray = [];
 
     //this.buildComparisonFilter(compare);
     
@@ -85,7 +89,7 @@ export class SideBar {
   });
 
     
-      events.on('filter_counted', (evt, item) => {//this get the count from the group
+  events.on('filter_counted', (evt, item) => {//this get the count from the group
 
          let allCount = item[0];
          let popCount = item[1];
@@ -100,28 +104,28 @@ export class SideBar {
 
        });
 
-      events.on('population demo loaded', (evt, item)=> {
+  events.on('population demo loaded', (evt, item)=> {
         this.populationDemo = item;
         this.distribute(item);
 
        });
 
-       events.on('create_button_down', ()=> {
+  events.on('create_button_down', ()=> {
          this.filterDemo('demo_add');
        });
 
-      events.on('clear_cohorts', (evt, item)=> {
+  events.on('clear_cohorts', (evt, item)=> {
         this.cohortKeeper.selectAll('div').remove();
       });
 
-      events.on('test', (evt, item)=> {
+  events.on('test', (evt, item)=> {
   
         selectAll('.selected').classed('selected', false);
   
         this.selected = item[1];
         let compare = select('#compareDiv');
         compare.selectAll('*').remove();
-        this.buildComparisonFilter(compare, item[0]);
+        this.buildComparisonFilter(compare, item[0], this.comparisonArray);
       });
       }
 
@@ -130,9 +134,13 @@ export class SideBar {
     this.buildCohortLabel();
     this.buildDemoFilter();
 
-          }
+    }
 
-  private buildComparisonFilter(compareDiv, data) {
+  private buildComparisonFilter(compareDiv, data, array) {
+   
+     array  = [];
+
+    console.log(this.comparisonArray);
 
     let comparisonKeeper = [{name: 'A', label: null, cohort: null, data: null},
                             {name: 'B', label: null, cohort: null, data: null},
@@ -141,14 +149,10 @@ export class SideBar {
                             {name: 'E', label: null, cohort: null, data: null}
                           ];
 
-    let compareCount = 2;
-
-
-
     let branchData = [];
     
     data.forEach(d => {
-   
+     // branchData.push(d);
       if(d.branches.length != 0){ 
         d.branches.forEach(b => {
       
@@ -157,80 +161,99 @@ export class SideBar {
        };
     });
 
-
     let cohortToggle = compareDiv.append('div').classed('compare-toggle', true);
 
-function drawToggle(counter, labels) {    
-   
-    for(let i = 0; i < counter; i++ ){
+    drawToggle(this.comparisonNum, comparisonKeeper);
 
-      let label; 
-      
-      if(labels[i].cohort == null){ label = 'Cohort ' + labels[i].name; }else{
-        label = labels[i].label;
+      function drawToggle(counter, labels) {
+
+        console.log(array);
+        console.log(counter);
+    
+      for(let i = 0; i < counter; i++ ){
+
+        let label; 
+        
+        if(labels[i].cohort == null){ label = 'Cohort ' + labels[i].name; }else{
+          label = labels[i].label;
+        }
+
+        let cohort = cohortToggle.append('div').attr('class', labels[i].name).classed('btn-group', true);
+        cohort.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                .append('text').text(label);
+    
+        let togglebutton = cohort.append('button')
+        .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+        .classed('dropdown-toggle', true)
+        .attr('data-toggle', 'dropdown');
+    
+        togglebutton.append('span').classed('caret', true);
+    
+        let ul = cohort.append('ul').classed(labels[i].name, true).classed('dropdown-menu', true).attr('role', 'menu');
+        let li = ul.selectAll('.' + labels[i].name).data(data).enter().append('li').attr('class', labels[i].name).classed('choice', true).append('text').text((d, i)=> { return 'Cohort ' + (i + 1)});
+    
+        let liBranch = ul.selectAll('.branch-'+ labels[i].name).data(branchData).enter().append('li').classed('branch-'+ labels[i].name, true).classed('choice', true).append('text').text((d, i)=> d.label);
+        
+        let that = this;
+
+        li.on('click', (d)=> {
+          labels[i].cohort = d;
+          labels[i].label = d.label;
+          console.log(array);
+          console.log(i);
+          if(array.length = counter){
+            array.shift();
+            array.push(d);
+          }else{array.push(d);}
+         // array[i] = d;
+          events.fire('comparison_update', [counter, array]);
+          cohortToggle.selectAll('*').remove();
+          drawToggle(counter, labels);
+        });
+
+
+        liBranch.on('click', (d)=> {
+          labels[i].cohort = d;
+          labels[i].label = d.label;
+          if(array.length = counter){
+            array.shift();
+            array.push(d);
+          }else{array.push(d);}
+          events.fire('comparison_update', [counter, array]);
+          cohortToggle.selectAll('*').remove();
+          drawToggle(counter, labels);
+        });
+
       }
-
-      let cohort = cohortToggle.append('div').attr('class', labels[i].name).classed('btn-group', true);
-      cohort.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
-                              .append('text').text(label);
-  
-      let togglebutton = cohort.append('button')
-      .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
-      .classed('dropdown-toggle', true)
-      .attr('data-toggle', 'dropdown');
-  
-      togglebutton.append('span').classed('caret', true);
-  
-      let ul = cohort.append('ul').classed(labels[i].name, true).classed('dropdown-menu', true).attr('role', 'menu');
-      let li = ul.selectAll('.' + labels[i].name).data(data).enter().append('li').attr('class', labels[i].name).classed('choice', true).append('text').text((d, i)=> { return 'Cohort ' + (i + 1)});
-  
-      let liBranch = ul.selectAll('.branch-'+ labels[i].name).data(branchData).enter().append('li').classed('branch-'+ labels[i].name, true).classed('choice', true).append('text').text((d, i)=> d.label);
-    
-      li.on('click', (d)=> {
-        labels[i].cohort = d;
-        labels[i].label = d.label;
-    
-        cohortToggle.selectAll('*').remove();
-        drawToggle(counter, labels);
-      });
-
-      
-      liBranch.on('click', (d)=> {
-        labels[i].cohort = d;
-        labels[i].label = d.label;
- 
-        cohortToggle.selectAll('*').remove();
-        drawToggle(counter, labels);
-      });
-
-    }}
-
-    drawToggle(compareCount, comparisonKeeper);
+  }
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
     .attr('value', 'Add a cohort to comparison').on('click', ()=> {
-    compareCount++;
-    cohortToggle.selectAll('*').remove();
-
-    drawToggle(compareCount, comparisonKeeper);
-
+    
+        this.comparisonNum++
+      
+        cohortToggle.selectAll('*').remove();
+        drawToggle(this.comparisonNum, comparisonKeeper);
+        
+        events.fire('comparison_update', [this.comparisonNum, array]);
     });
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
     .attr('value', 'Clear Cohort Comparison').on('click', ()=> {
-      compareCount = 2;
+      this.comparisonNum = 2;
       comparisonKeeper.forEach(d=> {
         d.label = null;
         d.cohort = null;
       })
       cohortToggle.selectAll('*').remove();
-      drawToggle(compareCount, comparisonKeeper);
+      drawToggle(this.comparisonNum, comparisonKeeper);
+      events.fire('comparison_update', this.comparisonNum);
     });
   }
 
-  private buildDemoFilter() {
+private buildDemoFilter() {
 
    // this.filters = [];
     this.bmiRange = null;
@@ -343,7 +366,7 @@ function drawToggle(counter, labels) {
         });
   }
 
-  private buildCohortLabel () {
+private buildCohortLabel () {
 
     let that = this;
 
@@ -354,76 +377,74 @@ function drawToggle(counter, labels) {
 
 private async drawCohortLabel(cohortTree) {
 
+    this.cohortKeeper.selectAll('div').remove();
+    let counter = -1;
+    let nodeArray = [];
+  //  let filters = filterKeeper;
 
+    let cohortBox = this.cohortKeeper.selectAll('.cohort').data(cohortTree);
 
-  this.cohortKeeper.selectAll('div').remove();
-  let counter = -1;
-  let nodeArray = [];
-//  let filters = filterKeeper;
+    cohortBox.exit().remove();
 
-  let cohortBox = this.cohortKeeper.selectAll('.cohort').data(cohortTree);
+    let cohortBoxEnter = cohortBox.enter().append('div').attr('class', (d, i)=> {return i;}).classed('cohort', true);
 
-  cohortBox.exit().remove();
+    cohortBox = cohortBoxEnter.merge(cohortBox);
 
-  let cohortBoxEnter = cohortBox.enter().append('div').attr('class', (d, i)=> {return i;}).classed('cohort', true);
+    let cohortlabel = cohortBox.append('div').classed('cohort-label', true);
+    let text = cohortlabel.append('div').append('text').text((d, i)=> {return 'Cohort  '+ (i+1);} );
 
-  cohortBox = cohortBoxEnter.merge(cohortBox);
+    cohortlabel.on('click', (d, i)=> {
+      this.selected = i;
+      this.$node.selectAll('.selected').classed('selected', false);
+      let label = cohortlabel.nodes();
+      label[i].classList.add('selected');
+      events.fire('cohort_selected', [d, i]);
+  });
 
-  let cohortlabel = cohortBox.append('div').classed('cohort-label', true);
-  let text = cohortlabel.append('div').append('text').text((d, i)=> {return 'Cohort  '+ (i+1);} );
+  const stem = line().curve(curveBasis)
+  .x((d) => { return +d[0]; })
+  .y((d) => { return +d[1]; });
 
-  cohortlabel.on('click', (d, i)=> {
-    this.selected = i;
+  let branch = cohortBox.selectAll('.branch').data(d => d.branches);
+  branch.exit().remove();
+  let branchEnter = branch.enter().append('div').attr('class', (d, i)=> i).classed('branch', true);
+  branch = branchEnter.merge(branch);
+  branch.append('div').append('text').text((d, i)=> 'C' + (d.parentIndex + 1) +' branch');
+
+  branch.on('click', (d, i)=> {
+  
+    events.fire('branch_selected', [d.parentIndex, i]);
+
     this.$node.selectAll('.selected').classed('selected', false);
-    let label = cohortlabel.nodes();
-    label[i].classList.add('selected');
-    events.fire('cohort_selected', [d, i]);
-});
+    branch.classed('selected', true);
+  });
 
-const stem = line().curve(curveBasis)
-.x((d) => { return +d[0]; })
-.y((d) => { return +d[1]; });
-
-let branch = cohortBox.selectAll('.branch').data(d => d.branches);
-branch.exit().remove();
-let branchEnter = branch.enter().append('div').attr('class', (d, i)=> i).classed('branch', true);
-branch = branchEnter.merge(branch);
-branch.append('div').append('text').text((d, i)=> 'C' + (d.parentIndex + 1) +' branch');
-
-branch.on('click', (d, i)=> {
- 
-  events.fire('branch_selected', [d.parentIndex, i]);
-
-  this.$node.selectAll('.selected').classed('selected', false);
-  branch.classed('selected', true);
-});
-
-  if(this.selected == undefined){
-      
-      let cohortLabels = cohortBox.selectAll('.cohort-label').nodes();
-      let number = cohortBox.size();
-      let picked = cohortLabels[number - 1];
-     
-      picked.classList.add('selected');
-
-  }else{
-      if(this.selected.length > 1){
-        let index = this.selected[0];
-   
-        let branchI = this.selected[1];
-        let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
-        let select = cohortLabels[index];
-        select.classList.add('selected');
- 
-      }else{
-        let cohortLabels = this.cohortKeeper.selectAll('.cohort').selectAll('.cohort-label').nodes();
-        let picked = cohortLabels[this.selected];
+    if(this.selected == undefined){
+        
+        let cohortLabels = cohortBox.selectAll('.cohort-label').nodes();
+        let number = cohortBox.size();
+        let picked = cohortLabels[number - 1];
       
         picked.classList.add('selected');
 
-      }
- 
-  }
+    }else{
+        if(this.selected.length > 1){
+          let index = this.selected[0];
+    
+          let branchI = this.selected[1];
+          let cohortLabels = this.cohortKeeper.selectAll('.cohort').nodes();
+          let select = cohortLabels[index];
+          select.classList.add('selected');
+  
+        }else{
+          let cohortLabels = this.cohortKeeper.selectAll('.cohort').selectAll('.cohort-label').nodes();
+          let picked = cohortLabels[this.selected];
+        
+          picked.classList.add('selected');
+
+        }
+  
+    }
 
 }
 
@@ -498,24 +519,24 @@ branch.on('click', (d, i)=> {
 
   private histogrammer(data, type, ticks){
 
-    let totalPatients = data.length;
-    let mapped = data.map((d: number)=> +d[type]);
-    let maxValue = max(mapped);
+      let totalPatients = data.length;
+      let mapped = data.map((d: number)=> +d[type]);
+      let maxValue = max(mapped);
 
- // if (type == 'BMI') mapped = mapped.filter(d => d > 0);
-    let x = this.xScale.domain([0, maxValue]).nice();
+      // if (type == 'BMI') mapped = mapped.filter(d => d > 0);
+      let x = this.xScale.domain([0, maxValue]).nice();
 
-    let bins = histogram()
-    .domain(x.domain())
-    .thresholds(x.ticks(ticks))
-    (mapped);
+      let bins = histogram()
+      .domain(x.domain())
+      .thresholds(x.ticks(ticks))
+      (mapped);
 
-    let histogramData = bins.map(function (d) {
-      totalPatients -= d.length;
-      return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, name: type};
-    });
+      let histogramData = bins.map(function (d) {
+        totalPatients -= d.length;
+        return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, name: type};
+      });
 
-    return histogramData;
+      return histogramData;
   }
 
   private distribute(data){
@@ -599,22 +620,22 @@ branch.on('click', (d, i)=> {
         return this.yScale(d.frequency);
    });
 
-  barGroupsALL.on("mouseover", (d) => {
-    let t = transition('t').duration(500);
-    select(".tooltip")
-      .html(() => {
-        return this.renderOrdersTooltip(d);
-      })
-      .transition(t)
-      .style("opacity", 1)
-      .style("left", `${event.pageX + 10}px`)
-      .style("top", `${event.pageY + 10}px`);
-  })
-  .on("mouseout", () => {
-    let t = transition('t').duration(500);
-    select(".tooltip").transition(t)
-    .style("opacity", 0);
-  });
+    barGroupsALL.on("mouseover", (d) => {
+      let t = transition('t').duration(500);
+      select(".tooltip")
+        .html(() => {
+          return this.renderOrdersTooltip(d);
+        })
+        .transition(t)
+        .style("opacity", 1)
+        .style("left", `${event.pageX + 10}px`)
+        .style("top", `${event.pageY + 10}px`);
+    })
+    .on("mouseout", () => {
+      let t = transition('t').duration(500);
+      select(".tooltip").transition(t)
+      .style("opacity", 0);
+    });
   }
 
   private drawDistributionBands(data) {
@@ -671,53 +692,53 @@ branch.on('click', (d, i)=> {
 
       this.bmiRange = [Dom1, Dom2];
     }
-  });
+    });
 
-  this.cciBrush =  brushX()
-  .extent([[0, 0], [this.svgWidth, 30]])
-  .handleSize(0)
-  .on("end", () => {
-    if (event.selection === null) {
+    this.cciBrush =  brushX()
+    .extent([[0, 0], [this.svgWidth, 30]])
+    .handleSize(0)
+    .on("end", () => {
+      if (event.selection === null) {
 
-    } else {
-      let start = CCIScale.invert(event.selection[0]);
-      let end = CCIScale.invert(event.selection[1]);
-      let Dom1 = Math.floor(start);
-      let Dom2 = Math.ceil(end);
-      this.cciRange = [Dom1, Dom2];
-    }
-  });
+      } else {
+        let start = CCIScale.invert(event.selection[0]);
+        let end = CCIScale.invert(event.selection[1]);
+        let Dom1 = Math.floor(start);
+        let Dom2 = Math.ceil(end);
+        this.cciRange = [Dom1, Dom2];
+      }
+    });
 
-  this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
-                  .on("end", () => {
-                    if (event.selection === null) {
+    this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
+                    .on("end", () => {
+                      if (event.selection === null) {
 
-                    } else {
-                      let start = AGEScale.invert(event.selection[0]);
-                      let end = AGEScale.invert(event.selection[1]);
+                      } else {
+                        let start = AGEScale.invert(event.selection[0]);
+                        let end = AGEScale.invert(event.selection[1]);
 
-                      let Dom1 = Math.floor((start+1)/10)*10;
-                      let Dom2 = Math.ceil((end+1)/10)*10;
-                      this.ageRange = [Dom1, Dom2];
-                    }
-                  });
-                  
-  this.$node.select('#BMI-Brush').call(this.bmiBrush);
+                        let Dom1 = Math.floor((start+1)/10)*10;
+                        let Dom2 = Math.ceil((end+1)/10)*10;
+                        this.ageRange = [Dom1, Dom2];
+                      }
+                    });
+                    
+    this.$node.select('#BMI-Brush').call(this.bmiBrush);
 
-  this.$node.select('#CCI-Brush').call(this.cciBrush);
-               
-  this.$node.select('#AGE-Brush').call(this.ageBrush);
+    this.$node.select('#CCI-Brush').call(this.cciBrush);
+                
+    this.$node.select('#AGE-Brush').call(this.ageBrush);
 
-   label.on('click', function(d){
+    label.on('click', function(d){
 
-    let svgLabel = (this.parentNode.parentNode).querySelector('.distDetail_svg');
-    if(svgLabel.classList.contains('hidden')) {
-      svgLabel.classList.remove('hidden');
-    }else{
-      svgLabel.classList.add('hidden');
-    }
+      let svgLabel = (this.parentNode.parentNode).querySelector('.distDetail_svg');
+      if(svgLabel.classList.contains('hidden')) {
+        svgLabel.classList.remove('hidden');
+      }else{
+        svgLabel.classList.add('hidden');
+      }
 
-   });
+    });
 
 
   }
