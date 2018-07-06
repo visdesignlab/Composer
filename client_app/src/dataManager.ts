@@ -114,12 +114,10 @@ export class DataManager {
               
                 this.getBaselines(promisShifted).then(based=> {
                     this.updateDiff(codes, cpt, promisShifted).then(cptShifted=> {           
-                        this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted]));
+                        this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted, codes]));
                     });
                 });
             });
-
-            events.fire('update_start_button_clicked', null);
 
             }else{
              
@@ -131,7 +129,7 @@ export class DataManager {
                         this.getDays(co, 'days').then(promisShifted=> {
                             this.getBaselines(promisShifted).then(based=> {
                                 this.updateDiff(codes, cptFiltered[0], null).then(cptShifted=> {
-                                    this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted]));
+                                    this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted, codes]));
                                     
                                 });
                             });

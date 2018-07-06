@@ -23,6 +23,7 @@ class Cohort {
         separated: any;
         clumped: any;
         scaleR: boolean;
+        startEvent: any;
         branches: any;
 
         constructor() {
@@ -31,6 +32,7 @@ class Cohort {
             this.separated = null;
             this.clumped = null;
             this.scaleR = false;
+            this.startEvent = null;
             this.branches = [];
             this.parentIndex = null;
             this.filterArray = [];
@@ -174,7 +176,7 @@ export class CohortManager {
 
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
-            events.fire('update_chart', null);
+            events.fire('clear_charts', null);
             });
 
          events.on('cpt_filter_button', (evt, item)=> {
@@ -435,11 +437,6 @@ export class CohortManager {
         events.on('filter_by_Promis_count', (evt, item)=> {
               events.fire('filtering_Promis_count', [this.selectedCohort, item]);
           });
-
-        events.on('send_stats', () => {
-           events.fire('calculate_aggregate', [this.selectedCohort, this.cohortIndex]);
-          });
-
         events.on('cohort_interpolated', (evt, item)=> {
     
             if(this.branchSelected == null){
@@ -449,33 +446,34 @@ export class CohortManager {
                 this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].promis = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
             }
-            events.fire('update_chart', this.selectedCohort);
+        events.fire('update_chart', this.selectedCohort);
           });
 
-          events.on('min_day_calculated', (evt, item)=> {
+        events.on('min_day_calculated', (evt, item)=> {
 
               console.log('min day calculated');
               console.log(item);
               let promis = item[0];
               let cpt = item[1];
+              let codes = item[2];
 
             if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].promis = promis;
                 this.cohortTree[this.cohortIndex].cpt = cpt;
+                this.cohortTree[this.cohortIndex].startEvent = codes;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
             }else{
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].promis = promis;
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].cpt = cpt;
+                this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].startEvent = codes;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
             events.fire('update_chart', this.selectedCohort);
         });
-
         events.on('selected_line_array', (evt, item)=> {
             console.log(item);
             events.fire('selected_line_with_cpt', [item, this.selectedCohort.cpt]);
         });
-
         events.on('update_promis', (evt, item)=> {
             let promis = item;
             if(this.branchSelected == null){
@@ -487,23 +485,6 @@ export class CohortManager {
             }
             console.log(this.selectedCohort);
         });
-
-        events.on('update_start_button_clicked', (evt, item)=> {
-            console.log(item);
-            let cpt;
-            if(this.branchSelected == null){
-                cpt = this.cohortTree[this.cohortIndex].cpt;
-                this.cohortTree[this.cohortIndex].startEvent = item[1];
-                //this.selectedCohort = this.cohortTree[this.cohortIndex];
-            }else{
-                cpt = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].cpt;
-                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].startEvent = item[1];
-             //   this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
-            }
-                console.log(this.cohortTree);
-              events.fire('update_cpt_days', [cpt, item[1]]);
-          });
-
         events.on('cpt_updated', (evt, item)=> {
 
              if(this.branchSelected == null){

@@ -159,8 +159,6 @@ export class SideBar {
        };
     });
 
-    console.log(toggleData);
-
     for(let i = 0; i < this.comparisonNum; i++ ){
 
       let cohortlabel;
@@ -185,10 +183,7 @@ export class SideBar {
     drawToggle(this.comparisonNum, array);
 
     function drawToggle(counter, labels) {
-
-        console.log(array);
-        console.log(counter);
-    
+      
       let toggle = cohortToggle.selectAll('.toggle-menu').data(labels);
 
       toggle.exit().remove();
@@ -211,10 +206,8 @@ export class SideBar {
       let li = ul.selectAll('.li-compare').data(d => d.data).enter().append('li').attr('class', 'li-compare').classed('choice', true).append('text').text(d=> d.data.label);
      
       li.on('click', (d)=> {
-       console.log(d);
-       console.log(li);
+      
        array[d.index].selectedCohort = d.data;
-       console.log(array);
        events.fire('comparison_update', array);
        cohortToggle.selectAll('*').remove();
        drawToggle(counter, array);
@@ -239,8 +232,6 @@ export class SideBar {
            };
         });
     
-        console.log(toggleData);
-    
         for(let i = 0; i < this.comparisonNum; i++ ){
     
           let cohortlabel;
@@ -258,7 +249,7 @@ export class SideBar {
          
           array.push(cohortlabel);
         }
-        console.log(array);
+       
         this.comparisonArray = array;
         cohortToggle.selectAll('*').remove();
         drawToggle(this.comparisonNum, array);
@@ -282,8 +273,6 @@ export class SideBar {
          };
       });
   
-      console.log(toggleData);
-  
       for(let i = 0; i < this.comparisonNum; i++ ){
   
         let cohortlabel;
@@ -301,7 +290,7 @@ export class SideBar {
        
         array.push(cohortlabel);
       }
-      console.log(array);
+    
       this.comparisonArray = array;
       cohortToggle.selectAll('*').remove();
       drawToggle(this.comparisonNum, array);

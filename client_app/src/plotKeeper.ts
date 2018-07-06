@@ -26,7 +26,6 @@ export class PlotKeeper {
     private cohortData = [];
     private plotDiv;
     private domain;
-    private cohortIndex;
     private initialLoadBool;
     selectedCohort;
 
@@ -35,12 +34,10 @@ export class PlotKeeper {
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
-        this.plotDiv = this.$node.append('Div').classed('allDiagramDiv', true);
+        this.plotDiv = this.$node.append('div').classed('allDiagramDiv', true);
        
         const timeline = this.$node.append('div').classed('timeline_view', true);
         timelineKeeper.create(timeline.node());
-        this.cohortIndex = 1;
-      //  this.buildPlot(this.plotDiv, this.cohortData, this.cohortIndex);
         this.attachListener();
     }
 
@@ -62,18 +59,13 @@ export class PlotKeeper {
         });
 
         events.on('enter_comparison_view', ()=> {
-          
             console.log('maybe put something here');
         });
 
         events.on('exit_comparison_view', ()=> {
           
             this.plotDiv.selectAll('*').remove();
-
             this.buildPlot(this.plotDiv, this.cohortData[0], 0);
-            
-            this.cohortIndex=1;
-
             events.fire('cohort_selected', [this.cohortData[0], 0]);
         });
 
@@ -87,7 +79,7 @@ export class PlotKeeper {
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
                 console.log('make sure this only updates once');
-                this.buildPlot(this.plotDiv, selectedCohort, this.cohortIndex);
+                this.buildPlot(this.plotDiv, selectedCohort, 0);
             }
          
         });

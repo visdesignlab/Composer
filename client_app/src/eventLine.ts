@@ -81,17 +81,24 @@ export class EventLine {
             }
         });
 
-        events.on('selected_cohort_update', (evt, item)=> {
+        events.on('clear_chart', (evt, item)=> {
+            let branchSvg =this.$node.select('.branch-wrapper').select('svg');;
+            branchSvg.selectAll('*').remove();
+           // this.$node.select('.event-buttons').remove();
+        });
+
+        events.on('update_chart', (evt, item)=> {
             console.log(item);
-            this.startEventLabel = 'Change Start to Event';
+            let startEvent = item.startEvent;
+            if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
+                this.startEventLabel = item.startEvent[1][0].key;
+            }
+            
             if(this.filter){
 
                 this.drawEventButtons(this.filter);
 
             }
-          
-          //  document.getElementById('aggToggle').classList.remove('btn-warning');
-
         });
 
     }
@@ -110,7 +117,6 @@ export class EventLine {
             selectAll(selected).selectAll('.event-rows').classed('selected-group', true);
         }
     }
-
 
     private async drawBranches(cohort){
     
@@ -163,7 +169,6 @@ export class EventLine {
            
             this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
-      
             thislabel[i].classList.add('selected');
             events.fire('cohort_selected', [d, i]);
         });
