@@ -137,7 +137,7 @@ export class promisDiagram {
                    
                     slider.call(this.brush)
                     .call(this.brush.move, this.scoreScale.range());
-                    console.log('yBrush_reset');
+           
                     this.yBrushSelection = false;
                 }
             });
@@ -167,53 +167,6 @@ export class promisDiagram {
     private attachListener() {
         //this is in plotkeeper
       
-        events.on('update_scale', (evt, item)=>{
-            console.log(item);
-            let separated = item.separated;
-            this.scaleRelative = item.scaleR;
-            let promis = item.promis;
-            
-            this.clearDiagram();
-            this.clearAggDiagram();
-            if(item.startEvent == null){ this.zeroEvent = 'First Promis Score';
-        }else{
-            this.zeroEvent = item.startEvent[1][0].key;
-        }
-
-        if(this.scaleRelative){
-            console.log('change back rel');
-            this.scoreScale.domain([-30, 30]);
-         }else{ 
-            console.log('change back to absolute');
-            this.scoreScale.domain([80, 0]);
-         }
-
-        if(this.clumped){
-            //if it is aggregated
-            if(separated){
-                this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
-                this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
-                this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
-            }else{
-                
-                this.frequencyCalc(promis, 'all').then(co=> this.drawAgg(co, 'all'));
-            }
-
-        }else{
-            //if it is not aggregated
-            if(separated){
-               
-                this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-                this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-                this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
-            }else{
-              
-                this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-            }
-
-        }
-        });
-
         events.on('score_domain_change', (evt, item)=>{
             this.scoreScale.domain(item);
           //  this.clearDiagram();
@@ -222,114 +175,78 @@ export class promisDiagram {
             this.yBrushSelection = true;
         });
 
-        events.on('update_chart', (evt, item)=> {
-
-          console.log('updating chart');
-          console.log(item);
-
-            let promis = item.promis;
-            this.scaleRelative = item.scaleR;
-            this.clumped = item.clumped;
-            let separated = item.separated;
-            this.cohortLabel = item.label;
-
-            this.clearDiagram();
-            this.clearAggDiagram();
-
-            if(item.startEvent == null){ this.zeroEvent = 'First Promis Score';
-            }else{
-                this.zeroEvent = item.startEvent[1][0].key;
-            }
-
-            if(this.scaleRelative){
-                console.log('change back rel');
-                this.scoreScale.domain([-30, 30]);
-             }else{ 
-                console.log('change back to absolute');
-                this.scoreScale.domain([80, 0]);
-             }
-
-            if(this.clumped){
-                //if it is aggregated
-                if(separated){
-                    this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
-                    this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
-                    this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
-                }else{
-                    
-                    this.frequencyCalc(promis, 'all').then(co=> this.drawAgg(co, 'all'));
-                }
-
-            }else{
-                //if it is not aggregated
-                if(separated){
-                   
-                    this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-                    this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-                    this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
-                }else{
-                  
-                    this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-                }
-
-            }
-        });
-
         events.on('domain updated', (evt, item)=> {
             this.maxDay = item[1];
             this.minDay = item[0];
             events.fire('yBrush_reset');
         });
 
-        events.on('selected_cohort_update', (evt, item) => {  // called in parrallel on brush and 
-           // this.cohortProInfo = item.promis;
-           console.log('selected cohort update');
-            let promis = item.promis;
-            this.scaleRelative = item.scaleR;
-         
-            let separated = item.separated;
-            this.cohortLabel = item.label;
-            
-            this.clearDiagram();
+        events.on('clear_chart', (evt, item)=> {
             this.clearAggDiagram();
-            console.log(item);
-
-            if(item.startEvent == null){
-                this.zeroEvent = 'First Promis Score';
-            }else{
-                this.zeroEvent = item.startEvent[1][0].key;
-            }
-            if(this.scaleRelative){
-                console.log('change back rel');
-                 this.scoreScale.domain([-30, 30]);
-                // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-                   
-             }else{
-                 console.log('change back to absolute');
-                 this.scoreScale.domain([80, 0]);
-                // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-             }
-
-            if(separated){
-               this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-               this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-               this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
-            }else{
-               this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-            }
+            this.clearDiagram();
         });
 
-    }
+        events.on('update_chart', (evt, item)=> {
+
+            this.clearDiagram();
+            this.clearAggDiagram();
+
+            if(item != null){
+
+                let promis = item.promis;
+                this.scaleRelative = item.scaleR;
+                this.clumped = item.clumped;
+                let separated = item.separated;
+                this.cohortLabel = item.label;
+    
+                if(item.startEvent == null){ this.zeroEvent = 'First Promis Score';
+                }else{
+                    this.zeroEvent = item.startEvent[1][0].key;
+                }
+    
+                if(this.scaleRelative){
+                    console.log('change back rel');
+                    this.scoreScale.domain([-30, 30]);
+                 }else{ 
+                    console.log('change back to absolute');
+                    this.scoreScale.domain([80, 0]);
+                 }
+    
+                if(this.clumped){
+                    //if it is aggregated
+                    if(separated){
+                        this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
+                        this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
+                        this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
+                    }else{
+                        
+                        this.frequencyCalc(promis, 'all').then(co=> this.drawAgg(co, 'all'));
+                    }
+    
+                }else{
+                    //if it is not aggregated
+                    if(separated){
+                       
+                        this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
+                        this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
+                        this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
+                    }else{
+                      
+                        this.drawPromisChart(promis, 'proLine', this.cohortIndex);
+                    }
+                }
+            }
+             
+        });
+    
+
+}
 
     /**
      * Draw the diagram with the given data from getSimilarRows
      * @param args
      */
     private async drawPromisChart(cohort, clump, index) {
-
-        console.log(cohort);
-
-        
 
         this.svg.select('.cohort-plot-label').remove();
 
@@ -404,7 +321,7 @@ export class promisDiagram {
             promisScoreGroup.append('clipPath').attr('id', 'clip')
             .append('rect')
             .attr('width', 850)
-            .attr('height', this.height - 20);
+            .attr('height', 340);
  
             let that = this;
 
@@ -532,7 +449,9 @@ export class promisDiagram {
             .attr('cx', (d, i)=> this.timeScale(d.diff))
             .attr('cy', (d)=> {
                 let score; 
-                score = d.SCORE;
+                if(this.scaleRelative){
+                    score = d.relScore;
+                }else{  score = d.SCORE; }
                 return this.scoreScale(score);
             }).attr('r', 5).attr('fill', '#21618C');
     
@@ -554,9 +473,8 @@ export class promisDiagram {
         .classed('clickdots', true)
         .attr('cx', (d, i)=> this.timeScale(d['diff']))
         .attr('cy', (d)=> {
-            let score; 
-            score = d['SCORE'];
-            return this.scoreScale(score);
+            if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
+                    }else{ return this.scoreScale(+d['SCORE']) }
         }).attr('r', 5).attr('fill', '#FF5733');
 
         this.clicked = true;
@@ -627,7 +545,7 @@ export class promisDiagram {
 
         let negdiff = 0;
         let posdiff = 0;
-        console.log(cohortFiltered);
+  
         //get the extreme diff values for each side of the zero event
         cohortFiltered.forEach(pat => {
 
@@ -650,12 +568,19 @@ export class promisDiagram {
             for (let i = 1; i < pat.value.length; i++) {
 
                 if(pat.value[i] != undefined) {
-
+                        
                         let x1 = pat.value[i-1].diff;
                         let x2 = pat.value[i].diff;
-                        let y1 = pat.value[i-1].SCORE;
-                        let y2 = pat.value[i].SCORE;
-
+                        let y1;
+                        let y2;
+                        if(this.scaleRelative){
+                            y1 = pat.value[i-1].relScore;
+                            y2 = pat.value[i].relScore;
+                        }else{
+                            y1 = pat.value[i-1].SCORE;
+                            y2 = pat.value[i].SCORE;
+                        }
+                    
                         pat.value[i].calc = [[x1, y1],[x2, y2]];
 
                         let slope = (y2 - y1) / (x2 - x1);
@@ -717,6 +642,8 @@ export class promisDiagram {
     
         return bin;
         });
+
+        console.log(patbin);
  
         let means = [];
         let devs = [];

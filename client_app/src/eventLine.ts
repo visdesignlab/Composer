@@ -81,17 +81,24 @@ export class EventLine {
             }
         });
 
-        events.on('selected_cohort_update', (evt, item)=> {
+        events.on('clear_chart', (evt, item)=> {
+            let branchSvg =this.$node.select('.branch-wrapper').select('svg');;
+            branchSvg.selectAll('*').remove();
+           // this.$node.select('.event-buttons').remove();
+        });
+
+        events.on('update_chart', (evt, item)=> {
             console.log(item);
-            this.startEventLabel = 'Change Start to Event';
+            let startEvent = item.startEvent;
+            if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
+                this.startEventLabel = item.startEvent[1][0].key;
+            }
+            
             if(this.filter){
 
                 this.drawEventButtons(this.filter);
 
             }
-          
-          //  document.getElementById('aggToggle').classList.remove('btn-warning');
-
         });
 
     }
@@ -111,7 +118,6 @@ export class EventLine {
         }
     }
 
-
     private async drawBranches(cohort){
     
         this.branchHeight = cohort.length * 50;
@@ -122,7 +128,7 @@ export class EventLine {
 
         let rows = [];
         cohort.forEach(c => {
-            let e = c.events.map((event, i) => {
+            let e = c.filterArray.map((event, i) => {
                let coord = {x: (i * 30.5) + 65, y: 6 };
                return coord;
             });
@@ -135,7 +141,7 @@ export class EventLine {
           if(c.branches.length != 0){
               c.branches.forEach((b, i) => {
                   b.rowData = [{x: -25, y: -18 }, {x: -15, y: -5 }];
-                  b.events.forEach((event, i) => {
+                  b.filterArray.forEach((event, i) => {
                       let coord = {x: (i * 30.5) + 5, y: 6 };
                       b.rowData.push(coord);
                    });
@@ -163,7 +169,6 @@ export class EventLine {
            
             this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
-      
             thislabel[i].classList.add('selected');
             events.fire('cohort_selected', [d, i]);
         });
@@ -171,7 +176,7 @@ export class EventLine {
         let linegroups = cohorts.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
         linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
         
-        let cohortevents = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.events);
+        let cohortevents = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
         cohortevents.exit().remove();
 
         let eventEnter = cohortevents.enter().append('g').classed('events', true);
@@ -225,7 +230,7 @@ export class EventLine {
           //branchlines.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
           branchlines.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
 
-          let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.events);
+          let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.filterArray);
 
           branchEvents.exit().remove();
 
