@@ -26,7 +26,7 @@ import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 import { stringify } from 'querystring';
 
-export class CompareDiagram {
+export class promisDiagram {
 
     private $node;
     private diagram;
@@ -158,7 +158,7 @@ export class CompareDiagram {
 
         this.attachListener();
 
-        this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex, cohortData.scaleR);
+        this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex);
     }
 
     /**
@@ -168,44 +168,50 @@ export class CompareDiagram {
         //this is in plotkeeper
       
         events.on('update_scale', (evt, item)=>{
-      
+            console.log(item);
             let separated = item.separated;
             this.scaleRelative = item.scaleR;
             let promis = item.promis;
             
             this.clearDiagram();
             this.clearAggDiagram();
-            if(this.scaleRelative){
-                if(separated){
-             
-                        this.changeScale(item.promisSep[0], true).then(cohort=> {
-                            let topc = cohort;
-                            this.drawPromisChart(cohort, 'top', this.cohortIndex, item.scalR);
-                        });
-            
-                        this.changeScale(item.promisSep[1], true).then(cohort=> {
-                            let midc = cohort;
-                            this.drawPromisChart(cohort, 'middle', this.cohortIndex, item.scalR);
-                        });
-          
-                        this.changeScale(item.promisSep[2], true).then(cohort=> {
-                            let botc = cohort;
-                            this.drawPromisChart(cohort, 'bottom', this.cohortIndex, item.scalR);
-                        });
+            if(item.startEvent == null){ this.zeroEvent = 'First Promis Score';
+        }else{
+            this.zeroEvent = item.startEvent[1][0].key;
+        }
 
-                }else{
-                              this.changeScale(promis, true).then(cohort=> {
-                                  this.drawPromisChart(cohort, 'proLine', this.cohortIndex, item.scalR);
-                                  events.fire('update_promis', cohort);
-                              });
-                }
-   
+        if(this.scaleRelative){
+            console.log('change back rel');
+            this.scoreScale.domain([-30, 30]);
+         }else{ 
+            console.log('change back to absolute');
+            this.scoreScale.domain([80, 0]);
+         }
+
+        if(this.clumped){
+            //if it is aggregated
+            if(separated){
+                this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
+                this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
+                this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
             }else{
-
-                this.changeScale(promis, false).then( cohort=> {
-                    this.drawPromisChart(cohort, 'proLine', this.cohortIndex, item.scalR);
-                });
+                
+                this.frequencyCalc(promis, 'all').then(co=> this.drawAgg(co, 'all'));
             }
+
+        }else{
+            //if it is not aggregated
+            if(separated){
+               
+                this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
+                this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
+                this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
+            }else{
+              
+                this.drawPromisChart(promis, 'proLine', this.cohortIndex);
+            }
+
+        }
         });
 
         events.on('score_domain_change', (evt, item)=>{
@@ -227,13 +233,22 @@ export class CompareDiagram {
             let separated = item.separated;
             this.cohortLabel = item.label;
 
-            if(item.startEvent == null){
-                this.zeroEvent = 'First Promis Score';
+            this.clearDiagram();
+            this.clearAggDiagram();
+
+            if(item.startEvent == null){ this.zeroEvent = 'First Promis Score';
             }else{
                 this.zeroEvent = item.startEvent[1][0].key;
             }
-            this.clearDiagram();
-            this.clearAggDiagram();
+
+            if(this.scaleRelative){
+                console.log('change back rel');
+                this.scoreScale.domain([-30, 30]);
+             }else{ 
+                console.log('change back to absolute');
+                this.scoreScale.domain([80, 0]);
+             }
+
             if(this.clumped){
                 //if it is aggregated
                 if(separated){
@@ -249,12 +264,12 @@ export class CompareDiagram {
                 //if it is not aggregated
                 if(separated){
                    
-                    this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex, item.scalR);
-                    this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex, item.scalR);
-                    this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex, item.scalR);
+                    this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
+                    this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
+                    this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
                 }else{
                   
-                    this.drawPromisChart(promis, 'proLine', this.cohortIndex, item.scalR);
+                    this.drawPromisChart(promis, 'proLine', this.cohortIndex);
                 }
 
             }
@@ -284,61 +299,38 @@ export class CompareDiagram {
             }else{
                 this.zeroEvent = item.startEvent[1][0].key;
             }
+            if(this.scaleRelative){
+                console.log('change back rel');
+                 this.scoreScale.domain([-30, 30]);
+                // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
+                   
+             }else{
+                 console.log('change back to absolute');
+                 this.scoreScale.domain([80, 0]);
+                // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
+             }
+
             if(separated){
-               this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex, item.scalR);
-               this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex, item.scalR);
-               this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex, item.scalR);
+               this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
+               this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
+               this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
             }else{
-                if(this.scaleRelative){
-                    events.fire('cohort_interpolated', promis);
-                    this.changeScale(promis, true).then( cohort=> {
-                        this.clearDiagram();
-                        this.clearAggDiagram();
-                        this.drawPromisChart(cohort, 'proLine', this.cohortIndex, item.scalR);
-                        });
-                }else{
-                    console.log('change back to absolute');
-                    this.changeScale(promis, false).then(cohort=> {
-                        this.clearDiagram();
-                        this.clearAggDiagram();
-                        this.drawPromisChart(promis, 'proLine', this.cohortIndex, item.scalR);
-                    });
-                   // this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-                }
+               this.drawPromisChart(promis, 'proLine', this.cohortIndex);
             }
         });
 
     }
 
-    private async changeScale(cohort, scale) {
-      console.log('change scale happening');
-        if(scale)  {
-            this.scoreScale.domain([30, -30]);
-            cohort.forEach(patient => {
-                patient.value.forEach(value => {
-                    value.SCORE = +value.relScore;
-                });
-            });
-            }else{
-                this.scoreScale.domain([80, 0]);
-                cohort.forEach(patient => {
-                    patient.value.forEach(value => {
-                        value.SCORE = +value.ogScore;
-                });
-            });
-            }
-
-        console.log(cohort);
-
-        return cohort;
-    }
     /**
      * Draw the diagram with the given data from getSimilarRows
      * @param args
      */
-    private async drawPromisChart(cohort, clump, index, scale) {
+    private async drawPromisChart(cohort, clump, index) {
 
         console.log(cohort);
+
+        
+
         this.svg.select('.cohort-plot-label').remove();
 
         let cohortLabel = this.svg.append('text')
@@ -347,11 +339,11 @@ export class CompareDiagram {
         
         this.svg.select('.voronoi').selectAll('*').remove();
 
-            if(!this.maxDay){ this.minDay = -30; this.maxDay = 50 }
+        if(!this.maxDay){ this.minDay = -30; this.maxDay = 50 }
 
             const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
 
-            if(this.scaleRelative){
+        if(this.scaleRelative){
 
                 let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                 .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
@@ -360,13 +352,13 @@ export class CompareDiagram {
                         .attr('x1', 0).attr('x2', 670)
                         .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
                         .attr('stroke', '#E67E22');
-            }
+        }
 
-            let lineCount = cohort.length;
+        let lineCount = cohort.length;
           
-            let co = cohort.filter(g=> {return g.value.length > 1; });
+        let co = cohort.filter(g=> {return g.value.length > 1; });
 
-            let similarData = co.map((d) => {
+        let similarData = co.map((d) => {
                 let data = {key: d.key, value: null, line: null, fakeArray: []};
                 let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
                 return g['FORM'] == this.diagram;
@@ -386,7 +378,7 @@ export class CompareDiagram {
                 return data;
             });
 
-            function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
+        function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
           
             // -----  set domains and axis
             // time scale
@@ -401,12 +393,14 @@ export class CompareDiagram {
             const lineFunc = line()
                 .curve(curveLinear)
                 .x((d) => { return this.timeScale(+d['diff']); })
-                .y((d) => { return this.scoreScale(+d['SCORE']); });
+                .y((d) => { 
+                    if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
+                    }else{ return this.scoreScale(+d['SCORE']); }
+                });
 
             // ------- draw
            // const promisScoreGroup = this.svg.select('.scoreGroup');
-                                   
-
+ 
             promisScoreGroup.append('clipPath').attr('id', 'clip')
             .append('rect')
             .attr('width', 850)
@@ -554,7 +548,6 @@ export class CompareDiagram {
 
         let promisData = d.value;
        
-      
         let dots = select(parent)
         .selectAll('circle').data(promisData);
         dots.enter().append('circle').attr('class', d.key + '-clickdots')
@@ -926,5 +919,5 @@ export let targetPatientOrders;
 
 
 export function create(parent: Element, diagram, cohortData, index) {
-    return new CompareDiagram(parent, diagram, cohortData, index);
+    return new promisDiagram(parent, diagram, cohortData, index);
 }

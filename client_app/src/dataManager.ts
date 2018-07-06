@@ -643,13 +643,9 @@ export class DataManager {
             return d['FORM_ID'] === 1123;
         });
 
-        let yayornay = 'nay';
-
         let filteredPatOrders = {};
 
         if (cohortIdArray != null ) {
-
-            yayornay = 'yay';
 
             proObjectsFiltered.forEach((d) => {
 

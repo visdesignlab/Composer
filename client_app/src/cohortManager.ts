@@ -142,13 +142,13 @@ export class CohortManager {
                 scaleRelative = false;
             }
             this.selectedCohort.scaleR = scaleRelative;
-            events.fire('update_scale', this.selectedCohort);
+            events.fire('update_chart', this.selectedCohort);
            
         });
 
         events.on('clear_cohorts', () => {
             this.removeCohortFilterArray();
-            events.fire('selected_cohort_change', null);
+            events.fire('update_chart', null);
             });
 
          events.on('cpt_filter_button', (evt, item)=> {
@@ -176,15 +176,11 @@ export class CohortManager {
             let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
             this.branchSelected = null;
 
-            events.fire('selected_cohort_update', this.selectedCohort);
+            events.fire('update_chart', this.selectedCohort);
            
             events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].events);
          
             events.fire('test', [this.cohortTree, [index]]);
-          });
-
-        events.on('cohort_stats', ()=>{
-            events.fire('send_cohort', this.selectedCohort);
           });
 
 //fired in sidebar. send the filter information to refine the sidebar
@@ -234,7 +230,7 @@ export class CohortManager {
                 this.selectedCohort = this.cohortTree[index].branches[indexBranch];
                 }
 
-                events.fire('selected_cohort_change', this.selectedCohort);
+                events.fire('update_chart', this.selectedCohort);
             });
 
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
@@ -274,7 +270,7 @@ export class CohortManager {
                 separated: false,
                 clumped: false,
                 scaleR: false,
-                branches: [] 
+                branches: []
             }
 
             newParent.events.push(filterReq);
@@ -287,7 +283,7 @@ export class CohortManager {
 
             console.log(this.selectedCohort);
 
-            events.fire('selected_cohort_update', this.selectedCohort);
+            events.fire('update_chart', this.selectedCohort);
             events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].events);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
             
