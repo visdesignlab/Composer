@@ -50,12 +50,14 @@ export class PlotKeeper {
 
         events.on('comparison_update', (evt, item)=> {
             console.log(item);
-            let limit = item[0]
-            let selectedArray = item[1];
+            //this comes from the sidebar
+            let comparisonArray = item;
+   
             this.plotDiv.selectAll('*').remove();
-            selectedArray.forEach((cohort, i) => {
+
+            comparisonArray.forEach((cohort, i) => {
                 console.log(cohort);
-                this.buildPlot(this.plotDiv, cohort, i);
+                this.buildPlot(this.plotDiv, cohort.selectedCohort, i);
             });
         });
 
