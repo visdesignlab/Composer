@@ -26,7 +26,7 @@ import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 import { stringify } from 'querystring';
 
-export class promisDiagram {
+export class TestPromisDiagram {
 
     private $node;
     private diagram;
@@ -209,12 +209,12 @@ export class promisDiagram {
                 if(this.clumped){
                     //if it is aggregated
                     if(separated){
-                        this.frequencyCalc(item.promisSep[0], 'top', this.domains);
-                        this.frequencyCalc(item.promisSep[1], 'middle', this.domains);//.then(co=> this.drawAgg(co, 'middle'));
-                        this.frequencyCalc(item.promisSep[2], 'bottom', this.domains);//.then(co=> this.drawAgg(co, 'bottom'));
+                        this.frequencyCalc(item.promisSep[0], 'top').then(co=> this.drawAgg(co, 'top'));
+                        this.frequencyCalc(item.promisSep[1], 'middle').then(co=> this.drawAgg(co, 'middle'));
+                        this.frequencyCalc(item.promisSep[2], 'bottom').then(co=> this.drawAgg(co, 'bottom'));
                     }else{
                         
-                        this.frequencyCalc(promis, 'all', this.domains);//.then(co=> this.drawAgg(co, 'all'));
+                        this.frequencyCalc(promis, 'all').then(co=> this.drawAgg(co, 'all'));
                     }
     
                 }else{
@@ -240,12 +240,416 @@ export class promisDiagram {
      * Draw the diagram with the given data from getSimilarRows
      * @param args
      */
-    private async drawPromisChart(cohort, clump, index) {
+ 
+    private addPromisDotsHover (d) {
+
+            let promisData = d;
+
+            let promisRect = this.svg.select('.scoreGroup').select('.lines');
+            let dots = promisRect
+            .selectAll('circle').data(promisData);
+            dots.enter().append('circle').attr('class', 'hoverdots')
+            .attr('cx', (d, i)=> this.timeScale(d.diff))
+            .attr('cy', (d)=> {
+                let score; 
+                if(this.scaleRelative){
+                    score = d.relScore;
+                }else{  score = d.SCORE; }
+                return this.scoreScale(score);
+            }).attr('r', 5).attr('fill', '#21618C');
+    
+            dots.append('circle').attr('cx', ()=> this.timeScale(0))
+            .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
+
+    }
+
+    private addPromisDotsClick (d) {
+
+        let n = select(d.line).node();
+        let parent = n.parentNode;
+
+        let promisData = d.value;
+       
+        let dots = select(parent)
+        .selectAll('circle').data(promisData);
+        dots.enter().append('circle').attr('class', d.key + '-clickdots')
+        .classed('clickdots', true)
+        .attr('cx', (d, i)=> this.timeScale(d['diff']))
+        .attr('cy', (d)=> {
+            if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
+                    }else{ return this.scoreScale(+d['SCORE']) }
+        }).attr('r', 5).attr('fill', '#FF5733');
+
+        this.clicked = true;
+}
+
+    private removeDots () {
+        selectAll('.hoverdots').remove();
+    }
+
+        /**
+     * Utility method
+     * @param start
+     * @param end
+     */
+    private updateSlider(start, end) {
+
+        let lowScore = this.scoreScale.invert(end);
+        let highScore = this.scoreScale.invert(start);
+
+        let med = this.svg.select('.scoreGroup')
+            .selectAll('path')
+            .style('opacity', 0);
+
+        med.filter(function (d) {
+            if (!d.length) return false;
+            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
+        }).style('opacity', 1);
+
+    }
+    /**
+     * clear the diagram
+     */
+    private clearDiagram() {
+
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
+       // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
+        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
+    }
+        /**
+     * clear the diagram
+     */
+    private clearAggDiagram() {
+
+        let aggline =  this.svg.select('.scoreGroup-'+ this.cohortIndex);
+        aggline.select('.avLine').remove();
+        aggline.select('.avLine_all').remove();
+        aggline.select('.avLine_top').remove();
+        aggline.select('.avLine_middle').remove();
+        aggline.select('.avLine_bottom').remove();
+        aggline.selectAll('.stLine_all').remove();
+        aggline.selectAll('.stLine_top').remove();
+        aggline.selectAll('.stLine_middle').remove();
+        aggline.selectAll('.stLine_bottom').remove();
+        aggline.selectAll('.qLine_all').remove();
+        aggline.selectAll('.qLine_top').remove();
+        aggline.selectAll('.qLine_middle').remove();
+        aggline.selectAll('.qLine_bottom').remove();
+    }
+
+    // creates bin array for each patient scores and calulates slope for each bin
+    //TODO : get rid of test in name and global variables?
+    private async frequencyCalc(cohort, clump){
+
+        let cohortFiltered = cohort.filter(d=> d.value.length > 1);
+
+        let negdiff = 0;
+        let posdiff = 0;
+  
+        //get the extreme diff values for each side of the zero event
+        cohortFiltered.forEach(pat => {
+
+            let patDiffArray = pat.value.map(d=> +d.diff);
+            let patneg = d3.min(patDiffArray);
+            let patpos = d3.max(patDiffArray);
+
+            if(patneg < negdiff) {negdiff = patneg;  };
+            if(patpos > posdiff) {posdiff = patpos;  };
+   
+        });
+        negdiff = Math.round(negdiff / 10) * 10;
+        posdiff = Math.round(posdiff / 10) * 10;
+        //get diff of days between maxneg diff and maxpos diff
+        let daydiff = posdiff - negdiff;
+        let bincount = Math.floor(daydiff/10);
+
+        cohortFiltered.forEach(pat=> {
+
+            for (let i = 1; i < pat.value.length; i++) {
+
+                if(pat.value[i] != undefined) {
+                        
+                        let x1 = pat.value[i-1].diff;
+                        let x2 = pat.value[i].diff;
+                        let y1;
+                        let y2;
+                        if(this.scaleRelative){
+                            y1 = pat.value[i-1].relScore;
+                            y2 = pat.value[i].relScore;
+                        }else{
+                            y1 = pat.value[i-1].SCORE;
+                            y2 = pat.value[i].SCORE;
+                        }
+                    
+                        pat.value[i].calc = [[x1, y1],[x2, y2]];
+
+                        let slope = (y2 - y1) / (x2 - x1);
+
+                        pat.value[i].slope = slope;
+                        pat.value[i].b = y1 - (slope * x1);
+                }
+            }
+
+            pat.bins = [];
+
+            pat.bins.push({'x': negdiff, 'y': null});
+            for (let i = 1; i < bincount; i++) {
+               let diffplus = negdiff + (i * 10);
+               pat.bins.push({'x': diffplus, 'y': null});
+            }
+            
+            let patstart = pat.value[0].diff;
+            patstart = Math.ceil(patstart / 10)* 10;
+            let patend = pat.value[pat.value.length-1].diff;
+            patend = Math.ceil(patend/10)* 10;
+          
+            let first = pat.bins.find((v)=> v.x == patstart);
+            let last = pat.bins.find((v)=> v.x == patend);
+
+            if(first != undefined){
+    
+                const startIndex = pat.bins.indexOf(first);
+                first.y = pat.value[0].SCORE; }
+
+            if(last != undefined){
+        
+                last.y = pat.value[pat.value.length-1].SCORE; }
+
+            for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
+              
+                let x = pat.bins[i].x;
+              
+                    pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
+                        let top = pat.value.find((v)=> v.diff > x);
+                
+                        if(top != undefined){
+                  
+                         pat.bins[i].y = (top.slope * x) + top.b;
+                         };
+            }
+        });
+   
+        return cohortFiltered;
+        //this.drawAgg(cohortFiltered, clump);
+
+    }
+    //draws the lines for the mean and standard deviation for the PROMIS scores
+    private drawAgg(cohort, clump){
+
+        let patbin = cohort.map((d)=> {
+        
+        let bin = d.bins;
+    
+        return bin;
+        });
+
+        console.log(patbin);
+ 
+        let means = [];
+        let devs = [];
+        
+        for(let i = 0; i < patbin[0].length; i++){
+            let mean = d3.mean(patbin.map(d => d[i].y));
+            let x = d3.mean(patbin.map(d => d[i].x));
+            let dev =  d3.deviation(patbin.map(d => d[i].y));
+            means.push([x, mean]);
+            devs.push(dev);
+        }
+
+        let botdev = means.map((d, i)=> {
+            let y = d[1] - devs[i];
+            let x = d[0];
+
+            return [x, y];
+        });
+
+        let topdev = means.map((d, i)=> {
+            
+           let y = d[1] + devs[i];
+           let x = d[0];
+
+           return [x, y];
+        
+        });
+
+        let quart = means.map((d, i)=> {
+            
+            let x = d[0];
+            let y1 = d[1] + devs[i];
+            let y2 = d[1] - devs[i];
+ 
+            return [x, y1, y2];
+         
+         });
+
+        quart[0] = [means[0][0], quart[1][1], quart[1][2]];
+        let quart2 = [];
+         
+         quart.forEach(d=> {
+            let arr = [];
+            d.forEach(q=> {
+                //let val = [];
+                if (isNaN(q)) {
+                   arr.push(45);
+                  }else{arr.push(q); }
+            });
+            quart2.push(arr);
+        });
+
+         botdev[0] = [means[0][0], botdev[1][1]];
+         let botdev2 = [];
+         
+         botdev.forEach(d=> {
+            let arr = [];
+            d.forEach(q=> {
+                //let val = [];
+                if (isNaN(q)) {
+                   arr.push(45);
+                  }else{arr.push(q); }
+            });
+            botdev2.push(arr);
+        });
+
+         topdev[0] = [means[0][0], topdev[1][1]];
+
+         let topdev2 = [];
+         
+         topdev.forEach(d=> {
+            let arr = [];
+            d.forEach(q=> {
+                //let val = [];
+                if (isNaN(q)) {
+                   arr.push(45);
+                  }else{arr.push(q); }
+            });
+            topdev2.push(arr);
+        });
+
+        let lineCount = cohort.length;
+
+        let data = means;
+        // -----  set domains and axis
+        // time scale
+        this.timeScale.domain([this.minDay, this.maxDay]);
+
+        this.svg.select('.xAxis')
+            .call(axisBottom(this.timeScale));
+
+        this.svg.select('.yAxis')
+            .call(axisLeft(this.scoreScale));
+        // -------  define line function
+        const lineFunc = line()
+            .curve(curveLinear)
+            .x((d, i) => { return this.timeScale(+d[0]); })
+            .y((d) => { return this.scoreScale(+d[1]); });
+
+        // -------- line function for quartiles 
+        
+        const drawPaths = area()
+              .x(d => { return this.timeScale(+d[0]); })
+              .y0(d => { return this.scoreScale(+d[2]); })
+              .y1(d => { return this.scoreScale(+d[1]); });
+        
+
+        // ------- draw
+        const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
+
+        promisScoreGroup.append('clipPath').attr('id', 'clip')
+        .append('rect')
+        .attr('width', 850)
+        .attr('height', this.height - 50);
+
+        let that = this;
+       
+        let group = promisScoreGroup.append('g').classed(clump, true);
+
+            group
+            .append('path')
+            .classed('qLine_' + clump, true)
+            .attr('clip-path','url(#clip)')
+            .data([quart2])
+            .attr('d', drawPaths)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
+            group
+            .append('path')
+            .classed('avLine_' + clump, true)
+            .attr('clip-path','url(#clip)')
+            .data([data])
+            .attr('d', lineFunc)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
+            group
+            .append('path')
+            .classed('stLine_' + clump, true)
+            .attr('clip-path','url(#clip)')
+            .data([topdev2])
+            .attr('d', lineFunc)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
+            group
+            .append('path')
+            .classed('stLine_' + clump, true)
+            .attr('clip-path','url(#clip)')
+            .data([botdev2])
+            .attr('d', lineFunc)
+            .attr('transform', () => {
+                return `translate(${this.margin.x},${this.margin.y})`;
+            });
+
+            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+            .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
+
+            zeroLine.append('line')//.attr('class', 'myLine')
+                    .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
+                    .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
+            zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
+    }
+
+    /**
+     * Get the data via API
+     * @param URL
+     * @returns {Promise<any>}
+     */
+    private async getData(URL) {
+        return await ajax.getAPIJSON(URL);
+    }
+
+
+    private renderOrdersTooltip(tooltip_data) {
+
+        let text = "<strong style='color:darkslateblue'>" + tooltip_data['ORDER_CATALOG_TYPE'] + "</strong></br>";
+        text += '<span>' + tooltip_data['ORDER_MNEMONIC'] + '</span></br>';
+        text += '<span>' + tooltip_data['ORDER_DTM'] + '</span></br>';
+        return text;
+    }
+
+    /**
+     * Show or hide the application loading indicator
+     * @param isBusy
+     */
+    setBusy(isBusy: boolean) {
+        let status = select('.busy').classed('hidden');
+        if (status == isBusy)
+            select('.busy').classed('hidden', !isBusy);
+    }
+
+}
+
+export function drawPlot(div, cohort, clump, domains) {
 
         this.svg.select('.cohort-plot-label').remove();
 
-        let maxDay = this.domains.maxDay;
-        let minDay = this.domains.minDay;
+        let maxDay = domains.maxDay;
+        let minDay = domains.minDay;
 
         let cohortLabel = this.svg.append('text')
         .text(`${this.cohortLabel}`).classed('cohort-plot-label', true)
@@ -253,9 +657,7 @@ export class promisDiagram {
         
         this.svg.select('.voronoi').selectAll('*').remove();
 
-
-
-            const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
+        const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
 
         if(this.scaleRelative){
 
@@ -433,414 +835,9 @@ export class promisDiagram {
                         });
                         events.fire('selected_line_array', idarray);
                     }
-        }
-
-    private addPromisDotsHover (d) {
-
-            let promisData = d;
-
-            let promisRect = this.svg.select('.scoreGroup').select('.lines');
-            let dots = promisRect
-            .selectAll('circle').data(promisData);
-            dots.enter().append('circle').attr('class', 'hoverdots')
-            .attr('cx', (d, i)=> this.timeScale(d.diff))
-            .attr('cy', (d)=> {
-                let score; 
-                if(this.scaleRelative){
-                    score = d.relScore;
-                }else{  score = d.SCORE; }
-                return this.scoreScale(score);
-            }).attr('r', 5).attr('fill', '#21618C');
-    
-            dots.append('circle').attr('cx', ()=> this.timeScale(0))
-            .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
-
-    }
-
-    private addPromisDotsClick (d) {
-
-        let n = select(d.line).node();
-        let parent = n.parentNode;
-
-        let promisData = d.value;
-       
-        let dots = select(parent)
-        .selectAll('circle').data(promisData);
-        dots.enter().append('circle').attr('class', d.key + '-clickdots')
-        .classed('clickdots', true)
-        .attr('cx', (d, i)=> this.timeScale(d['diff']))
-        .attr('cy', (d)=> {
-            if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
-                    }else{ return this.scoreScale(+d['SCORE']) }
-        }).attr('r', 5).attr('fill', '#FF5733');
-
-        this.clicked = true;
-}
-
-    private removeDots () {
-        selectAll('.hoverdots').remove();
-    }
-
-        /**
-     * Utility method
-     * @param start
-     * @param end
-     */
-    private updateSlider(start, end) {
-
-        let lowScore = this.scoreScale.invert(end);
-        let highScore = this.scoreScale.invert(start);
-
-        let med = this.svg.select('.scoreGroup')
-            .selectAll('path')
-            .style('opacity', 0);
-
-        med.filter(function (d) {
-            if (!d.length) return false;
-            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
-        }).style('opacity', 1);
-
-    }
-    /**
-     * clear the diagram
-     */
-    private clearDiagram() {
-
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
-       // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
-    }
-        /**
-     * clear the diagram
-     */
-    private clearAggDiagram() {
-
-        let aggline =  this.svg.select('.scoreGroup-'+ this.cohortIndex);
-        aggline.select('.avLine').remove();
-        aggline.select('.avLine_all').remove();
-        aggline.select('.avLine_top').remove();
-        aggline.select('.avLine_middle').remove();
-        aggline.select('.avLine_bottom').remove();
-        aggline.selectAll('.stLine_all').remove();
-        aggline.selectAll('.stLine_top').remove();
-        aggline.selectAll('.stLine_middle').remove();
-        aggline.selectAll('.stLine_bottom').remove();
-        aggline.selectAll('.qLine_all').remove();
-        aggline.selectAll('.qLine_top').remove();
-        aggline.selectAll('.qLine_middle').remove();
-        aggline.selectAll('.qLine_bottom').remove();
-    }
-
-    // creates bin array for each patient scores and calulates slope for each bin
-    //TODO : get rid of test in name and global variables?
-    private async frequencyCalc(cohort, clump, domain){
-
-        let minDay = domain.minDay;
-        let maxDay = domain.maxDay;
-
-        let cohortFiltered = cohort.filter(d=> d.value.length > 1);
-
-        let negdiff = 0;
-        let posdiff = 0;
-  
-        //get the extreme diff values for each side of the zero event
-        cohortFiltered.forEach(pat => {
-
-            let patDiffArray = pat.value.map(d=> +d.diff);
-            let patneg = d3.min(patDiffArray);
-            let patpos = d3.max(patDiffArray);
-
-            if(patneg < negdiff) {negdiff = patneg;  };
-            if(patpos > posdiff) {posdiff = patpos;  };
-   
-        });
-        negdiff = Math.round(negdiff / 10) * 10;
-        posdiff = Math.round(posdiff / 10) * 10;
-        //get diff of days between maxneg diff and maxpos diff
-        let daydiff = posdiff - negdiff;
-        let bincount = Math.floor(daydiff/10);
-
-        cohortFiltered.forEach(pat=> {
-
-            for (let i = 1; i < pat.value.length; i++) {
-
-                if(pat.value[i] != undefined) {
-                        
-                        let x1 = pat.value[i-1].diff;
-                        let x2 = pat.value[i].diff;
-                        let y1;
-                        let y2;
-                        if(this.scaleRelative){
-                            y1 = pat.value[i-1].relScore;
-                            y2 = pat.value[i].relScore;
-                        }else{
-                            y1 = pat.value[i-1].SCORE;
-                            y2 = pat.value[i].SCORE;
-                        }
-                    
-                        pat.value[i].calc = [[x1, y1],[x2, y2]];
-
-                        let slope = (y2 - y1) / (x2 - x1);
-
-                        pat.value[i].slope = slope;
-                        pat.value[i].b = y1 - (slope * x1);
-                }
-            }
-
-            pat.bins = [];
-
-            pat.bins.push({'x': negdiff, 'y': null});
-            for (let i = 1; i < bincount; i++) {
-               let diffplus = negdiff + (i * 10);
-               pat.bins.push({'x': diffplus, 'y': null});
-            }
-            
-            let patstart = pat.value[0].diff;
-            patstart = Math.ceil(patstart / 10)* 10;
-            let patend = pat.value[pat.value.length-1].diff;
-            patend = Math.ceil(patend/10)* 10;
-          
-            let first = pat.bins.find((v)=> v.x == patstart);
-            let last = pat.bins.find((v)=> v.x == patend);
-
-            if(first != undefined){
-    
-                const startIndex = pat.bins.indexOf(first);
-                first.y = pat.value[0].SCORE; }
-
-            if(last != undefined){
-        
-                last.y = pat.value[pat.value.length-1].SCORE; }
-
-            for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
-              
-                let x = pat.bins[i].x;
-              
-                    pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
-                        let top = pat.value.find((v)=> v.diff > x);
-                
-                        if(top != undefined){
-                  
-                         pat.bins[i].y = (top.slope * x) + top.b;
-                         };
-            }
-        });
-   
-       // return cohortFiltered;
-        //this.drawAgg(cohortFiltered, clump);
-        let patbin = cohortFiltered.map((d)=> {
-            let bin = d.bins;
-            return bin;
-            });
-    
-            let means = [];
-            let devs = [];
-            
-            for(let i = 0; i < patbin[0].length; i++){
-                let mean = d3.mean(patbin.map(d => d[i].y));
-                let x = d3.mean(patbin.map(d => d[i].x));
-                let dev =  d3.deviation(patbin.map(d => d[i].y));
-                means.push([x, mean]);
-                devs.push(dev);
-            }
-    
-            let botdev = means.map((d, i)=> {
-                let y = d[1] - devs[i];
-                let x = d[0];
-    
-                return [x, y];
-            });
-    
-            let topdev = means.map((d, i)=> {
-                
-               let y = d[1] + devs[i];
-               let x = d[0];
-    
-               return [x, y];
-            
-            });
-    
-            let quart = means.map((d, i)=> {
-                
-                let x = d[0];
-                let y1 = d[1] + devs[i];
-                let y2 = d[1] - devs[i];
-     
-                return [x, y1, y2];
-             
-             });
-    
-            quart[0] = [means[0][0], quart[1][1], quart[1][2]];
-            let quart2 = [];
-             
-             quart.forEach(d=> {
-                let arr = [];
-                d.forEach(q=> {
-                    //let val = [];
-                    if (isNaN(q)) {
-                       arr.push(45);
-                      }else{arr.push(q); }
-                });
-                quart2.push(arr);
-            });
-    
-             botdev[0] = [means[0][0], botdev[1][1]];
-             let botdev2 = [];
-             
-             botdev.forEach(d=> {
-                let arr = [];
-                d.forEach(q=> {
-                    //let val = [];
-                    if (isNaN(q)) {
-                       arr.push(45);
-                      }else{arr.push(q); }
-                });
-                botdev2.push(arr);
-            });
-    
-             topdev[0] = [means[0][0], topdev[1][1]];
-    
-             let topdev2 = [];
-             
-             topdev.forEach(d=> {
-                let arr = [];
-                d.forEach(q=> {
-                    //let val = [];
-                    if (isNaN(q)) {
-                       arr.push(45);
-                      }else{arr.push(q); }
-                });
-                topdev2.push(arr);
-            });
-    
-            let lineCount = cohort.length;
-    
-            let data = means;
-            // -----  set domains and axis
-            // time scale
-            this.timeScale.domain([minDay, maxDay]);
-    
-            this.svg.select('.xAxis')
-                .call(axisBottom(this.timeScale));
-    
-            this.svg.select('.yAxis')
-                .call(axisLeft(this.scoreScale));
-            // -------  define line function
-            const lineFunc = line()
-                .curve(curveLinear)
-                .x((d, i) => { return this.timeScale(+d[0]); })
-                .y((d) => { return this.scoreScale(+d[1]); });
-    
-            // -------- line function for quartiles 
-            
-            const drawPaths = area()
-                  .x(d => { return this.timeScale(+d[0]); })
-                  .y0(d => { return this.scoreScale(+d[2]); })
-                  .y1(d => { return this.scoreScale(+d[1]); });
-            
-    
-            // ------- draw
-            const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
-    
-            promisScoreGroup.append('clipPath').attr('id', 'clip')
-            .append('rect')
-            .attr('width', 850)
-            .attr('height', this.height - 50);
-    
-            let that = this;
-           
-            let group = promisScoreGroup.append('g').classed(clump, true);
-    
-                group
-                .append('path')
-                .classed('qLine_' + clump, true)
-                .attr('clip-path','url(#clip)')
-                .data([quart2])
-                .attr('d', drawPaths)
-                .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                });
-    
-                group
-                .append('path')
-                .classed('avLine_' + clump, true)
-                .attr('clip-path','url(#clip)')
-                .data([data])
-                .attr('d', lineFunc)
-                .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                });
-    
-                group
-                .append('path')
-                .classed('stLine_' + clump, true)
-                .attr('clip-path','url(#clip)')
-                .data([topdev2])
-                .attr('d', lineFunc)
-                .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                });
-    
-                group
-                .append('path')
-                .classed('stLine_' + clump, true)
-                .attr('clip-path','url(#clip)')
-                .data([botdev2])
-                .attr('d', lineFunc)
-                .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                });
-    
-                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-                .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
-    
-                zeroLine.append('line')//.attr('class', 'myLine')
-                        .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
-                        .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
-                zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
-
-    }
-    //draws the lines for the mean and standard deviation for the PROMIS scores
-   // private drawAgg(cohort, clump){
-
-       
- //   }
-
-    /**
-     * Get the data via API
-     * @param URL
-     * @returns {Promise<any>}
-     */
-    private async getData(URL) {
-        return await ajax.getAPIJSON(URL);
-    }
-
-
-    private renderOrdersTooltip(tooltip_data) {
-
-        let text = "<strong style='color:darkslateblue'>" + tooltip_data['ORDER_CATALOG_TYPE'] + "</strong></br>";
-        text += '<span>' + tooltip_data['ORDER_MNEMONIC'] + '</span></br>';
-        text += '<span>' + tooltip_data['ORDER_DTM'] + '</span></br>';
-        return text;
-    }
-
-    /**
-     * Show or hide the application loading indicator
-     * @param isBusy
-     */
-    setBusy(isBusy: boolean) {
-        let status = select('.busy').classed('hidden');
-        if (status == isBusy)
-            select('.busy').classed('hidden', !isBusy);
-    }
 
 }
-
-export let targetPatientOrders;
-
 
 export function create(parent: Element, diagram, cohortData, index, domains) {
-    return new promisDiagram(parent, diagram, cohortData, index, domains);
+    return new TestPromisDiagram(parent, diagram, cohortData, index, domains);
 }

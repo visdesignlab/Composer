@@ -28,8 +28,16 @@ export class PlotKeeper {
     private domain;
     private initialLoadBool;
     selectedCohort;
+    private compareBool;
+    comparisonArray;
 
     constructor(parent: Element) {
+
+        this.domain = {
+
+            maxDay: 50,
+            minDay: -30,
+        }
 
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
@@ -48,25 +56,27 @@ export class PlotKeeper {
         events.on('comparison_update', (evt, item)=> {
             console.log(item);
             //this comes from the sidebar
-            let comparisonArray = item;
+            this.comparisonArray = item;
    
             this.plotDiv.selectAll('*').remove();
 
-            comparisonArray.forEach((cohort, i) => {
+            this.comparisonArray.forEach((cohort, i) => {
                 console.log(cohort);
-                this.buildPlot(this.plotDiv, cohort.selectedCohort, i);
+                this.buildPlot(this.plotDiv, cohort.selectedCohort, i, this.domain);
             });
         });
 
         events.on('enter_comparison_view', ()=> {
             console.log('maybe put something here');
+            this.compareBool = true;
         });
 
         events.on('exit_comparison_view', ()=> {
           
             this.plotDiv.selectAll('*').remove();
-            this.buildPlot(this.plotDiv, this.cohortData[0], 0);
+            this.buildPlot(this.plotDiv, this.cohortData[0], 0, this.domain);
             events.fire('cohort_selected', [this.cohortData[0], 0]);
+            this.compareBool = false;
         });
 
         events.on('test', (evt, item)=> {
@@ -79,20 +89,33 @@ export class PlotKeeper {
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
                 console.log('make sure this only updates once');
-                this.buildPlot(this.plotDiv, selectedCohort, 0);
+                this.buildPlot(this.plotDiv, selectedCohort, 0, this.domain);
             }
          
         });
 
         events.on('domain updated', (evt, item)=> {
-            this.domain = item;
+            this.domain.minDay = item[0];
+            this.domain.maxDay = item[1];
+            if(!this.compareBool){
+                events.fire('yBrush_reset');
+            }else{
+                this.plotDiv.selectAll('*').remove();
+
+            this.comparisonArray.forEach((cohort, i) => {
+                console.log(cohort);
+                this.buildPlot(this.plotDiv, cohort.selectedCohort, i, this.domain);
+            });
+            }
+            
+
         });
 
 }
 
-    private buildPlot(container, cohort, index) {
+    private buildPlot(container, cohort, index, domain) {
         //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
-        promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
+        promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index, domain);
 
     }
 
