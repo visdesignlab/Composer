@@ -30,7 +30,7 @@ class Cohort {
             this.promisSep = null;
             this.promisAgg = null;
             this.separated = null;
-            this.clumped = null;
+            this.clumped = false;
             this.scaleR = false;
             this.startEvent = null;
             this.branches = [];
@@ -74,27 +74,21 @@ export class CohortManager {
             });
 
         events.on('aggregate_button_clicked', ()=> {
-
-            let clumped = this.cohortTree[this.cohortIndex].clumped;
-      
-            if (clumped){
+            
+            let clumped = this.selectedCohort.clumped;
+            if(clumped){
                 clumped = false;
+                this.selectedCohort.clumped = false;
                 document.getElementById('aggToggle').classList.remove('btn-warning');
+                
             }else{
                 console.log('clumpin');
                 clumped = true;
+                this.selectedCohort.clumped = true;
                 document.getElementById('aggToggle').classList.add('btn-warning');
             }
-            if(this.branchSelected == null){
-                this.cohortTree[this.cohortIndex].clumped = clumped;
-                this.selectedCohort = this.cohortTree[this.cohortIndex];
-            }else{
-                this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].clumped = clumped;
-                this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
-            }
-
+            
             events.fire('update_chart', this.selectedCohort);
-
             });
 
         events.on('branch_cohort', ()=> {
@@ -107,12 +101,17 @@ export class CohortManager {
                 branch = this.cohortTree[this.cohortIndex].branches;
                 console.log('other branch');
             }
-            let b = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].promis));
+
+            let promis = this.selectedCohort.promis;
+            let cpt = this.selectedCohort.cpt;
+            let filterArray = this.selectedCohort.filterArray;
+           // let b = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].promis));
            // let b = Object.assign([], this.cohortTree[this.cohortIndex].promis);
-            let bcpt = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].cpt));
-           // let bcpt = Object.assign([], this.cohortTree[this.cohortIndex].cpt);
-           let bfilter = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].filterArray));
-           // let bfilter = Object.assign([], this.cohortTree[this.cohortIndex].filterArray);
+           // let bcpt = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].cpt));
+            let bcpt = JSON.parse(JSON.stringify(cpt));
+          // let bfilter = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].filterArray));
+            let bfilter = Object.assign([], this.cohortTree[this.cohortIndex].filterArray);
+            let b = JSON.parse(JSON.stringify(promis));
       
             branch.push(b);
           
@@ -279,8 +278,6 @@ export class CohortManager {
 
         events.on('new_cohort', (evt, item)=> {
 
-            console.log('new cohort created?????');
-            console.log(item);
             let promis = item[0];
 
             let filterReq = ['demographic', item[2], item[0].length];
@@ -292,8 +289,6 @@ export class CohortManager {
             newParent.cpt = item[1];
             newParent.promis = promis;
 
-            console.log(newParent);
-
             newParent.filterArray.push(filterReq);
             this.cohortTree.push(newParent);
             this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -301,8 +296,6 @@ export class CohortManager {
             this.branchSelected = null;
             this.cohortIndex = this.cohortTree.length - 1;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-
-            console.log(this.selectedCohort);
 
             events.fire('update_chart', this.selectedCohort);
             events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].filterArray);
