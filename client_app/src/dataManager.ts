@@ -352,7 +352,12 @@ export class DataManager {
                             d.diff = -1;
                             }
                             });
-                            g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+                            try { 
+                                g.days = (Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+                            }catch (typeError){
+                                g.days = -1;
+                            }
+                           
                             diffArray.push(g.days + 1);
 
                             g.value.sort((a, b) => ascending(a.diff, b.diff));
