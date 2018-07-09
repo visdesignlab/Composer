@@ -28,7 +28,6 @@ import { stringify } from 'querystring';
 
 export class promisDiagram {
 
-    private $node;
     private diagram;
     private timeScale;
     scoreScale;
@@ -71,12 +70,8 @@ export class promisDiagram {
       //  this.cohortLabel = cohortData.label;
         this.domains = domains;
 
-        this.$node = select(parent);
-            
-        let plotDiv = this.$node.append('div')
-            .classed('diagramDiv-' + this.cohortIndex, true);
-
-       // plotDiv.attr('id', this.cohortLabel);
+        let plotDiv = select(parent).append('div')
+        .classed('diagramDiv-' + this.cohortIndex, true);;
 
         this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height', this.promisDimension.height)
@@ -451,6 +446,8 @@ export async function drawPromisChart(promis, clump, node, cohort) {
          function removeDots () {
             selectAll('.hoverdots').remove();
          }
+
+         console.log(node);
          
             /**
          * Utility method
@@ -478,9 +475,9 @@ export async function drawPromisChart(promis, clump, node, cohort) {
 */
 export function clearDiagram(node, cohortIndex) {
 
-    node.select('.scoreGroup-'+ cohortIndex).select('.lines').selectAll('*').remove();
+  node.select('.scoreGroup-'+ cohortIndex).select('.lines').selectAll('*').remove();
   // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
-    node.select('.scoreGroup-'+ cohortIndex).selectAll('.zeroLine').remove();
+  node.select('.scoreGroup-'+ cohortIndex).selectAll('.zeroLine').remove();
   node.select('.scoreGroup-'+ cohortIndex).select('.voronoi').selectAll('*').remove();
   node.select('.scoreGroup-'+ cohortIndex).selectAll('#clip').remove();
 
@@ -506,8 +503,10 @@ export function frequencyCalc(promis, clump, node, cohort) {
     //TODO : get rid of test in name and global variables?
 
     console.log(node);
-       // let minDay = domain.minDay;
-       // let maxDay = domain.maxDay;
+        let minDay = node.domains.minDay;
+        let maxDay = node.domains.maxDay;
+
+        let scaleRelative = cohort.scaleR;
 
         let cohortFiltered = promis.filter(d=> d.value.length > 1);
 
@@ -541,7 +540,7 @@ export function frequencyCalc(promis, clump, node, cohort) {
                         let x2 = pat.value[i].diff;
                         let y1;
                         let y2;
-                        if(this.scaleRelative){
+                        if(scaleRelative){
                             y1 = pat.value[i-1].relScore;
                             y2 = pat.value[i].relScore;
                         }else{
@@ -687,13 +686,13 @@ export function frequencyCalc(promis, clump, node, cohort) {
             let data = means;
             // -----  set domains and axis
             // time scale
-            node.timeScale.domain([node.minDay, node.maxDay]);
+            node.timeScale.domain([minDay, maxDay]);
     
             node.svg.select('.xAxis')
-                .call(axisBottom(this.timeScale));
+                .call(axisBottom(node.timeScale));
     
             node.svg.select('.yAxis')
-                .call(axisLeft(this.scoreScale));
+                .call(axisLeft(node.scoreScale));
             // -------  define line function
             const lineFunc = line()
                 .curve(curveLinear)
@@ -716,8 +715,6 @@ export function frequencyCalc(promis, clump, node, cohort) {
             .attr('width', 850)
             .attr('height', node.height - 50);
     
-            let that = this;
-           
             let group = promisScoreGroup.append('g').classed(clump, true);
     
                 group
@@ -747,7 +744,7 @@ export function frequencyCalc(promis, clump, node, cohort) {
                 .data([topdev2])
                 .attr('d', lineFunc)
                 .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
+                    return `translate(${node.margin.x},${node.margin.y})`;
                 });
     
                 group

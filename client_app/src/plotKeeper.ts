@@ -116,6 +116,7 @@ export class PlotKeeper {
             console.log('domain updated');
             this.domain.minDay = item[0];
             this.domain.maxDay = item[1];
+           /* 
             if(!this.compareBool){
                 events.fire('yBrush_reset');
             }else{
@@ -125,7 +126,7 @@ export class PlotKeeper {
                 console.log(cohort);
                 this.buildPlot(this.plotDiv, i, this.domain);
             });
-            }
+            }*/
             
 
         });
@@ -139,7 +140,7 @@ export class PlotKeeper {
            console.log(this.selectedNode);
            if(this.selectedNode != undefined){
             this.clearDiagram(this.selectedNode.svg, this.selectedNode.cohortIndex);
-            this.drawPromisChart(item, 'proLine', this.selectedNode, item);
+          //  this.drawPromisChart(item, 'proLine', this.selectedNode, item);
 
             let promis = item.promis;
             let scaleRelative = item.scaleR;
@@ -154,7 +155,7 @@ export class PlotKeeper {
                     this.frequencyCalc(item.promisSep[2], 'bottom', this.selectedNode, item);//.then(co=> this.drawAgg(co, 'bottom'));
                 }else{
                     
-                    this.frequencyCalc(promis, 'all', this.domain);//.then(co=> this.drawAgg(co, 'all'));
+                    this.frequencyCalc(promis, 'all', this.selectedNode, item);//.then(co=> this.drawAgg(co, 'all'));
                 }
 
             }else{
