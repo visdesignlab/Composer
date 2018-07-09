@@ -29,6 +29,7 @@ export class PlotKeeper {
     private domain;
     private initialLoadBool;
     selectedCohort;
+    selectedNode;
     private compareBool;
     comparisonArray;
     drawPromisChart;
@@ -43,9 +44,8 @@ export class PlotKeeper {
 
             maxDay: 50,
             minDay: -30,
-        }
 
-        this.scoreScale = scaleLinear().range()
+        }
 
         this.drawPromisChart = promisDiagram.drawPromisChart;
         this.frequencyCalc = promisDiagram.frequencyCalc;
@@ -94,20 +94,26 @@ export class PlotKeeper {
         events.on('test', (evt, item)=> {
         
             this.cohortData = item[0];
-            let selectedCohort = this.cohortData[item[1][0]];
+            this.selectedCohort = this.cohortData[item[1][0]];
 
             console.log(this.cohortData);
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
                 console.log('make sure this only updates once');
-                let cohort = this.buildPlot(this.plotDiv, selectedCohort, 0, this.domain);
-                console.log(cohort);
+                this.selectedNode = this.buildPlot(this.plotDiv, this.selectedCohort, 0, this.domain);
+                console.log(this.selectedNode);
+                this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
             }
-         
+
+            this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
+
+           
+
         });
 
         events.on('domain updated', (evt, item)=> {
+            console.log('domain updated');
             this.domain.minDay = item[0];
             this.domain.maxDay = item[1];
             if(!this.compareBool){
@@ -123,12 +129,18 @@ export class PlotKeeper {
             
 
         });
-
+        //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
 
-            this.clearDiagram();
+          //  this.clearDiagram();
            // this.clearAggDiagram();
-
+           console.log('updating');
+           console.log(item);
+           if(this.selectedNode != undefined){
+            this.drawPromisChart(item, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
+           }
+         
+/*
             if(item != null){
 
                 let promis = item.promis;
@@ -174,7 +186,8 @@ export class PlotKeeper {
                         this.drawPromisChart(promis, 'proLine', cohortLabel);
                     }
                 }
-            }
+                
+            }*/
              
         });
     
