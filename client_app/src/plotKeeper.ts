@@ -74,7 +74,7 @@ export class PlotKeeper {
 
             this.comparisonArray.forEach((cohort, i) => {
                 console.log(cohort);
-                this.buildPlot(this.plotDiv, cohort.selectedCohort, i, this.domain);
+                this.buildPlot(this.plotDiv, i, this.domain);
             });
         });
 
@@ -86,7 +86,7 @@ export class PlotKeeper {
         events.on('exit_comparison_view', ()=> {
           
             this.plotDiv.selectAll('*').remove();
-            this.buildPlot(this.plotDiv, this.cohortData[0], 0, this.domain);
+            this.buildPlot(this.plotDiv, 0, this.domain);
             events.fire('cohort_selected', [this.cohortData[0], 0]);
             this.compareBool = false;
         });
@@ -101,12 +101,12 @@ export class PlotKeeper {
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
                 console.log('make sure this only updates once');
-                this.selectedNode = this.buildPlot(this.plotDiv, this.selectedCohort, 0, this.domain);
+                this.selectedNode = this.buildPlot(this.plotDiv, 0, this.domain);
                 console.log(this.selectedNode);
-                this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
+                this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedNode, this.selectedCohort);
             }
 
-            this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
+          //  this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
 
            
 
@@ -123,7 +123,7 @@ export class PlotKeeper {
 
             this.comparisonArray.forEach((cohort, i) => {
                 console.log(cohort);
-                this.buildPlot(this.plotDiv, cohort.selectedCohort, i, this.domain);
+                this.buildPlot(this.plotDiv, i, this.domain);
             });
             }
             
@@ -132,12 +132,45 @@ export class PlotKeeper {
         //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
 
-          //  this.clearDiagram();
+        
            // this.clearAggDiagram();
            console.log('updating');
            console.log(item);
+           console.log(this.selectedNode);
            if(this.selectedNode != undefined){
-            this.drawPromisChart(item, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
+            this.clearDiagram(this.selectedNode.svg, this.selectedNode.cohortIndex);
+            this.drawPromisChart(item, 'proLine', this.selectedNode, item);
+
+            let promis = item.promis;
+            let scaleRelative = item.scaleR;
+            let clumped = item.clumped;
+            let separated = item.separated;
+         
+            if(clumped){
+                //if it is aggregated
+                if(separated){
+                    this.frequencyCalc(item.promisSep[0], 'top', this.selectedNode, item);
+                    this.frequencyCalc(item.promisSep[1], 'middle', this.selectedNode, item);//.then(co=> this.drawAgg(co, 'middle'));
+                    this.frequencyCalc(item.promisSep[2], 'bottom', this.selectedNode, item);//.then(co=> this.drawAgg(co, 'bottom'));
+                }else{
+                    
+                    this.frequencyCalc(promis, 'all', this.domain);//.then(co=> this.drawAgg(co, 'all'));
+                }
+
+            }else{
+                //if it is not aggregated
+                if(separated){
+                   
+                    this.drawPromisChart(item.promisSep[0], 'top', this.selectedNode, item);
+                    this.drawPromisChart(item.promisSep[1], 'middle', this.selectedNode, item);
+                    this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedNode, item);
+                }else{
+                  
+                    this.drawPromisChart(promis, 'proLine', this.selectedNode, item);
+                }
+            }
+            
+        
            }
          
 /*
@@ -194,9 +227,9 @@ export class PlotKeeper {
 
 }
 
-    private buildPlot(container, cohort, index, domain) {
+    private buildPlot(container, index, domain) {
         //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
-       return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index, domain);
+       return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain);
 
     }
 

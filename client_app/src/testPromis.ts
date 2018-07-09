@@ -61,14 +61,14 @@ export class promisDiagram {
     private cohortLabel;
     private domains;
 
-    constructor(parent: Element, diagram, cohortData, index, domains) {
+    constructor(parent: Element, diagram, index, domains) {
 
         const that = this;
 
         this.cohortIndex = String(index);
 
         this.diagram = diagram;
-        this.cohortLabel = cohortData.label;
+      //  this.cohortLabel = cohortData.label;
         this.domains = domains;
 
         this.$node = select(parent);
@@ -76,7 +76,7 @@ export class promisDiagram {
         let plotDiv = this.$node.append('div')
             .classed('diagramDiv-' + this.cohortIndex, true);
 
-        plotDiv.attr('id', this.cohortLabel);
+       // plotDiv.attr('id', this.cohortLabel);
 
         this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height', this.promisDimension.height)
@@ -190,9 +190,8 @@ export class promisDiagram {
     }
 }
 
-export async function drawPromisChart(cohort, clump, node, index) {
+export async function drawPromisChart(promis, clump, node, cohort) {
 
-    let promis = cohort.promis;
     let scaleRelative = cohort.scaleR;
     let clumped = cohort.clumped;
     let separated = cohort.separated;
@@ -200,6 +199,7 @@ export async function drawPromisChart(cohort, clump, node, index) {
     let zeroEvent;
     let scoreScale = node.scoreScale;
     let svg = node.svg;
+    let index = node.cohortIndex;
 
     console.log(scoreScale);
 
@@ -236,7 +236,7 @@ export async function drawPromisChart(cohort, clump, node, index) {
 
            zeroLine.append('line')
                    .attr('x1', 0).attr('x2', 670)
-                   .attr('y1', this.scoreScale(0)).attr('y2', scoreScale(0)).attr('stroke-width', .5)
+                   .attr('y1', scoreScale(0)).attr('y2', scoreScale(0)).attr('stroke-width', .5)
                    .attr('stroke', '#E67E22');
    }
 
@@ -303,7 +303,7 @@ export async function drawPromisChart(cohort, clump, node, index) {
                .attr('transform', () => { return `translate(${node.margin.x},${node.margin.y})`; })   
                .attr('clip-path','url(#clip)')
                 .selectAll('.'+ clump)
-                   .data(similarData);
+                .data(similarData);
 
            lines.exit().remove();
 
@@ -478,11 +478,11 @@ export async function drawPromisChart(cohort, clump, node, index) {
 */
 export function clearDiagram(node, cohortIndex) {
 
-    node.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
+    node.select('.scoreGroup-'+ cohortIndex).select('.lines').selectAll('*').remove();
   // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
-    node.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
-  node.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
-  node.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
+    node.select('.scoreGroup-'+ cohortIndex).selectAll('.zeroLine').remove();
+  node.select('.scoreGroup-'+ cohortIndex).select('.voronoi').selectAll('*').remove();
+  node.select('.scoreGroup-'+ cohortIndex).selectAll('#clip').remove();
 
    let aggline =  node.select('.scoreGroup-'+ cohortIndex);
    aggline.select('.avLine').remove();
@@ -500,14 +500,16 @@ export function clearDiagram(node, cohortIndex) {
    aggline.selectAll('.qLine_bottom').remove();
 }
 
-export function frequencyCalc(cohort, clump, domain) {
-
+export function frequencyCalc(promis, clump, node, cohort) {
+//item.promisSep[0], 'top', this.selectedNode, item
   // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
-        let minDay = domain.minDay;
-        let maxDay = domain.maxDay;
 
-        let cohortFiltered = cohort.filter(d=> d.value.length > 1);
+    console.log(node);
+       // let minDay = domain.minDay;
+       // let maxDay = domain.maxDay;
+
+        let cohortFiltered = promis.filter(d=> d.value.length > 1);
 
         let negdiff = 0;
         let posdiff = 0;
@@ -680,39 +682,39 @@ export function frequencyCalc(cohort, clump, domain) {
                 topdev2.push(arr);
             });
     
-            let lineCount = cohort.length;
+            let lineCount = promis.length;
     
             let data = means;
             // -----  set domains and axis
             // time scale
-            this.timeScale.domain([minDay, maxDay]);
+            node.timeScale.domain([node.minDay, node.maxDay]);
     
-            this.svg.select('.xAxis')
+            node.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
     
-            this.svg.select('.yAxis')
+            node.svg.select('.yAxis')
                 .call(axisLeft(this.scoreScale));
             // -------  define line function
             const lineFunc = line()
                 .curve(curveLinear)
-                .x((d, i) => { return this.timeScale(+d[0]); })
-                .y((d) => { return this.scoreScale(+d[1]); });
+                .x((d, i) => { return node.timeScale(+d[0]); })
+                .y((d) => { return node.scoreScale(+d[1]); });
     
             // -------- line function for quartiles 
             
             const drawPaths = area()
-                  .x(d => { return this.timeScale(+d[0]); })
-                  .y0(d => { return this.scoreScale(+d[2]); })
-                  .y1(d => { return this.scoreScale(+d[1]); });
+                  .x(d => { return node.timeScale(+d[0]); })
+                  .y0(d => { return node.scoreScale(+d[2]); })
+                  .y1(d => { return node.scoreScale(+d[1]); });
             
     
             // ------- draw
-            const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
+            const promisScoreGroup = node.svg.select('.scoreGroup-'+ node.cohortIndex);
     
             promisScoreGroup.append('clipPath').attr('id', 'clip')
             .append('rect')
             .attr('width', 850)
-            .attr('height', this.height - 50);
+            .attr('height', node.height - 50);
     
             let that = this;
            
@@ -725,7 +727,7 @@ export function frequencyCalc(cohort, clump, domain) {
                 .data([quart2])
                 .attr('d', drawPaths)
                 .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
+                    return `translate(${node.margin.x},${node.margin.y})`;
                 });
     
                 group
@@ -735,7 +737,7 @@ export function frequencyCalc(cohort, clump, domain) {
                 .data([data])
                 .attr('d', lineFunc)
                 .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
+                    return `translate(${node.margin.x},${node.margin.y})`;
                 });
     
                 group
@@ -755,19 +757,19 @@ export function frequencyCalc(cohort, clump, domain) {
                 .data([botdev2])
                 .attr('d', lineFunc)
                 .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
+                    return `translate(${node.margin.x},${node.margin.y})`;
                 });
     
                 let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-                .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
+                .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
     
                 zeroLine.append('line')//.attr('class', 'myLine')
-                        .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
+                        .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
                         .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
-                zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
+                zeroLine.append('text').text(node.zeroEvent).attr('x', node.timeScale(0));
 
 }
 
-export function create(parent: Element, diagram, cohortData, index, domains) {
-    return new promisDiagram(parent, diagram, cohortData, index, domains);
+export function create(parent: Element, diagram, index, domains) {
+    return new promisDiagram(parent, diagram, index, domains);
 }
