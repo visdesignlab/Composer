@@ -31,8 +31,8 @@ export class promisDiagram {
     private $node;
     private diagram;
     private timeScale;
-    private scoreScale;
-    private svg;
+    scoreScale;
+    svg;
     private brush;
     private findMinDate = dataCalc.findMinDate;//function for calculating the minDate for given patient record
     private parseTime = dataCalc.parseTime;
@@ -51,6 +51,7 @@ export class promisDiagram {
     width = 600;
     promisDimension = {height: 460, width: 700};
     margin = {x: 80, y: 40};
+
     private sliderWidth = 10;
     private lineScale;
     private lineOpacity;
@@ -70,11 +71,14 @@ export class promisDiagram {
         this.cohortLabel = cohortData.label;
         this.domains = domains;
 
-        this.$node = select(parent)
-            .append('div')
+        this.$node = select(parent);
+            
+        let plotDiv = this.$node.append('div')
             .classed('diagramDiv-' + this.cohortIndex, true);
 
-        this.svg = this.$node.append('svg').classed('svg-' + this.cohortIndex, true)
+        plotDiv.attr('id', this.cohortLabel);
+
+        this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
 
@@ -155,38 +159,7 @@ export class promisDiagram {
             )
             .selectAll('text').remove();
 
-        this.attachListener();
-
-      //  this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex);
     }
-
-    /**
-     * Attach listeners
-     */
-    private attachListener() {
-        //this is in plotkeeper
-      
-        events.on('score_domain_change', (evt, item)=>{
-            this.scoreScale.domain(item);
-        
-            events.fire('yBrush_reset');
-            this.yBrushSelection = true;
-        });
-
-        events.on('clear_chart', (evt, item)=> {
-          //  this.clearAggDiagram();
-          //  this.clearDiagram();
-        });
-
-    }
-
-  
-    
-    //draws the lines for the mean and standard deviation for the PROMIS scores
-   // private drawAgg(cohort, clump){
-
-       
- //   }
 
     /**
      * Get the data via API
@@ -217,40 +190,64 @@ export class promisDiagram {
     }
 }
 
-export async function drawPromisChart(cohort, clump, index) {
+export async function drawPromisChart(cohort, clump, node, index) {
 
-   this.svg.select('.cohort-plot-label').remove();
+    let promis = cohort.promis;
+    let scaleRelative = cohort.scaleR;
+    let clumped = cohort.clumped;
+    let separated = cohort.separated;
+    let cohortName = cohort.label;
+    let zeroEvent;
+    let scoreScale = node.scoreScale;
+    let svg = node.svg;
 
-   let maxDay = this.domains.maxDay;
-   let minDay = this.domains.minDay;
+    console.log(scoreScale);
 
-   let cohortLabel = this.svg.append('text')
-   .text(`${this.cohortLabel}`).classed('cohort-plot-label', true)
+    if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
+    }else{
+        zeroEvent = cohort.startEvent[1][0].key;
+    }
+
+    if(scaleRelative){
+        console.log('change back rel');
+        scoreScale.domain([30, -30]);
+     }else{ 
+        console.log('change back to absolute');
+        scoreScale.domain([80, 0]);
+     }
+
+   svg.select('.cohort-plot-label').remove();
+
+   let maxDay = node.domains.maxDay;
+   let minDay = node.domains.minDay;
+
+   let cohortLabel = svg.append('text')
+   .text(`${cohortName}`).classed('cohort-plot-label', true)
    .attr('transform', `translate(50,20)`);
    
-   this.svg.select('.voronoi').selectAll('*').remove();
+   svg.select('.voronoi').selectAll('*').remove();
 
-   const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
+   const promisScoreGroup = svg.select('.scoreGroup-'+ index);
 
-   if(this.scaleRelative){
+   if(scaleRelative){
 
            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-           .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
+           .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
 
            zeroLine.append('line')
                    .attr('x1', 0).attr('x2', 670)
-                   .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
+                   .attr('y1', this.scoreScale(0)).attr('y2', scoreScale(0)).attr('stroke-width', .5)
                    .attr('stroke', '#E67E22');
    }
 
-   let lineCount = cohort.length;
+   let lineCount = promis.length;
      
-   let co = cohort.filter(g=> {return g.value.length > 1; });
+   let co = promis.filter(g=> {return g.value.length > 1; });
 
    let similarData = co.map((d) => {
            let data = {key: d.key, value: null, line: null, fakeArray: []};
            let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
-           return g['FORM'] == this.diagram;
+           return g['FORM'] == node.diagram;
            });
            res.sort((a, b) => ascending(a.diff, b.diff));
            res.forEach(r=> r.maxday = d.days);
@@ -271,20 +268,20 @@ export async function drawPromisChart(cohort, clump, index) {
      
        // -----  set domains and axis
        // time scale
-       this.timeScale.domain([minDay, maxDay]);
+       node.timeScale.domain([minDay, maxDay]);
 
-       this.svg.select('.xAxis')
-           .call(axisBottom(this.timeScale));
+       svg.select('.xAxis')
+           .call(axisBottom(node.timeScale));
 
-       this.svg.select('.yAxis')
-           .call(axisLeft(this.scoreScale));
+       svg.select('.yAxis')
+           .call(axisLeft(scoreScale));
        // -------  define line function
        const lineFunc = line()
            .curve(curveLinear)
-           .x((d) => { return this.timeScale(+d['diff']); })
+           .x((d) => { return node.timeScale(+d['diff']); })
            .y((d) => { 
-               if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
-               }else{ return this.scoreScale(+d['SCORE']); }
+               if(scaleRelative){  return scoreScale(+d['relScore']);
+               }else{ return scoreScale(+d['SCORE']); }
            });
 
        // ------- draw
@@ -297,13 +294,13 @@ export async function drawPromisChart(cohort, clump, index) {
 
        let that = this;
 
-       let voronoiGroup = this.svg.select('.voronoi')
+       let voronoiGroup = svg.select('.voronoi')
            .attr('transform', () => {
-               return `translate(${this.margin.x},${this.margin.y})`;
+               return `translate(${node.margin.x},${node.margin.y})`;
            });
 
            let lines = promisScoreGroup.select('.lines')
-               .attr('transform', () => { return `translate(${this.margin.x},${this.margin.y})`; })   
+               .attr('transform', () => { return `translate(${node.margin.x},${node.margin.y})`; })   
                .attr('clip-path','url(#clip)')
                 .selectAll('.'+ clump)
                    .data(similarData);
@@ -319,17 +316,17 @@ export async function drawPromisChart(cohort, clump, index) {
            lines.append('path')
                    .attr('class', d=> d['key'])
                    .classed(clump, true)
-                   .attr('stroke-width', that.lineScale(lineCount))
-                   .attr('stroke-opacity', that.lineScale(lineCount))
+                   .attr('stroke-width', node.lineScale(lineCount))
+                   .attr('stroke-opacity', node.lineScale(lineCount))
                    .attr('d', function (d) {
                                d['line'] = this;
                                return lineFunc(d.value);})
                    .on('click', function (d) { voronoiClicked(d); } )
-                   .on('mouseover', (d)=> this.addPromisDotsHover(d))
-                   .on('mouseout', (d)=> this.removeDots());
+                   .on('mouseover', (d)=> addPromisDotsHover(d))
+                   .on('mouseout', (d)=> removeDots());
 
            
-           if(cohort.length < 500) { 
+           if(promis.length < 500) { 
 
                if(clump == 'proLine') {
 
@@ -367,12 +364,12 @@ export async function drawPromisChart(cohort, clump, index) {
                }
 }
            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-               .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
+               .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
 
            zeroLine.append('line')
-               .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
+               .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
                .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
-           zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
+           zeroLine.append('text').text(node.zeroEvent).attr('x', node.timeScale(0));
 
            function mouseover(d) {
                let group = d.data.pat.line;
@@ -400,7 +397,7 @@ export async function drawPromisChart(cohort, clump, index) {
                    events.fire('line_clicked', d);
            };
                
-           let lines = that.$node.select('.lines').selectAll('.selected').nodes();
+           let lines = svg.select('.lines').selectAll('.selected').nodes();
             
            let idarray = [];
            lines.forEach(element => {
@@ -413,7 +410,7 @@ export async function drawPromisChart(cohort, clump, index) {
 
                 let promisData = d;
          
-                let promisRect = this.svg.select('.scoreGroup').select('.lines');
+                let promisRect = svg.select('.scoreGroup').select('.lines');
                 let dots = promisRect
                 .selectAll('circle').data(promisData);
                 dots.enter().append('circle').attr('class', 'hoverdots')
@@ -427,7 +424,7 @@ export async function drawPromisChart(cohort, clump, index) {
                 }).attr('r', 5).attr('fill', '#21618C');
          
                 dots.append('circle').attr('cx', ()=> this.timeScale(0))
-                .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
+                .attr('cy', (d)=> node.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
          
          }
          
@@ -479,15 +476,15 @@ export async function drawPromisChart(cohort, clump, index) {
 /**
 * clear the diagram
 */
-export function clearDiagram(cohortIndex) {
+export function clearDiagram(node, cohortIndex) {
 
-   this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
+    node.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
   // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
-   this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
-   this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
-   this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
+    node.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
+  node.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
+  node.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
 
-   let aggline =  this.svg.select('.scoreGroup-'+ cohortIndex);
+   let aggline =  node.select('.scoreGroup-'+ cohortIndex);
    aggline.select('.avLine').remove();
    aggline.select('.avLine_all').remove();
    aggline.select('.avLine_top').remove();

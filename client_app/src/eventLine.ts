@@ -334,7 +334,7 @@ export class EventLine {
                                         .classed('dropdown-toggle', true)
                                         .attr('data-toggle', 'dropdown');
     
-                scaletogglebutton.append('span').classed('caret', true);
+            scaletogglebutton.append('span').classed('caret', true);
     
                         let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
                         let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
