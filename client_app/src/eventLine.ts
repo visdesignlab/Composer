@@ -59,29 +59,13 @@ export class EventLine {
     private attachListener() {
 
         events.on('test', (evt, item)=> {
+
+            console.log(item);
            
             this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
         });
 
-        events.on('send_filter_to_codebar', (evt, item)=> {
-            
-                let eventButtonData = item;
-                this.filter = item;
-
-                this.drawEventButtons(item);
-        
-                let eventIndex =  eventButtonData.length;
-                let event =  eventButtonData[eventIndex - 1];
-                
-            if(eventButtonData.length != 0 || eventButtonData[1] != undefined){
-                this.startCodes = event[1];
-            }else{
-                this.startCodes = null;
-                this.startEventLabel = 'First Promis Score';
-            }
-        });
-
-        events.on('clear_chart', (evt, item)=> {
+        events.on('clear_cohorts', (evt, item)=> {
             let branchSvg =this.$node.select('.branch-wrapper').select('svg');;
             branchSvg.selectAll('*').remove();
            // this.$node.select('.event-buttons').remove();
@@ -89,6 +73,13 @@ export class EventLine {
 
         events.on('update_chart', (evt, item)=> {
             console.log(item);
+            console.log(item.filterArray)
+            this.filter = item.filterArray;
+
+            
+            
+          //  this.drawEventButtons(this.filter);
+
             let startEvent = item.startEvent;
             if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
                 this.startEventLabel = item.startEvent[1][0].key;
@@ -96,8 +87,7 @@ export class EventLine {
             
             if(this.filter){
 
-                this.drawEventButtons(this.filter);
-
+                this.drawEventButtons(item);
             }
         });
 
@@ -261,7 +251,16 @@ export class EventLine {
 
     }
 
-    private drawEventButtons(filters){
+    private drawEventButtons(cohort){
+            console.log(cohort);
+            let filters = cohort.filterArray;
+            let scaleRelative = cohort.scaleR;
+            let separated = cohort.separated;
+            let clumped = cohort.clumped;
+
+            if(!scaleRelative){  this.scoreLabel = 'Absolute Scale';
+            }else{ this.scoreLabel = 'Relative Scale'; }
+
             let that = this;
 
             function filText(d){
@@ -276,7 +275,6 @@ export class EventLine {
                     }
                 }else{ console.log('Branch filter passed')};
             }
-
             function labelClick(d){
               
                 let rec = select(d);
@@ -289,7 +287,7 @@ export class EventLine {
                         that.startCodes = d[1];
                         let label = d[1][1];
                         that.startEventLabel = label[0].parent;
-                        that.drawEventButtons(that.filter);
+                        that.drawEventButtons(cohort);
                         events.fire('event_selected', that.startCodes);
                     }
             }
@@ -343,24 +341,29 @@ export class EventLine {
                         let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
               
             abs.on('click', () =>{
-                            this.scoreLabel = 'Absolute Scale';
-                            this.drawEventButtons(this.filter);
+                          //  this.scoreLabel = 'Absolute Scale';
+                            this.drawEventButtons(cohort);
                            // this.drawScoreFilterBox(this.scoreBox);
                             events.fire('change_promis_scale', this.scoreLabel)});
     
             rel.on('click', () =>{
-                                this.scoreLabel = 'Relative Scale';
-                                this.drawEventButtons(this.filter);
+                               // this.scoreLabel = 'Relative Scale';
+                                this.drawEventButtons(cohort);
                             
                                 events.fire('change_promis_scale', this.scoreLabel)});
     
-            let aggToggle = div.append('div').classed('aggDiv', true).append('input')
+            let aggToggle = div.append('div').classed('aggDiv', true);
+            
+            let aggButton = aggToggle.append('input')
                             .attr('type', 'button').attr('id', 'aggToggle')
                             .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                             .attr('value', 'Aggregate Scores')
                             .on('click', () => {
                                 events.fire('aggregate_button_clicked');
                             });
+
+            if(!clumped){  aggButton.classed('btn-warning', false);  }
+            else{ aggButton.classed('btn-warning', true); }
             
             let quartDiv = div.append('div').classed('quartDiv', true);
                 quartDiv.append('input').attr('type', 'button').attr('id', 'quartile-btn')
@@ -370,7 +373,7 @@ export class EventLine {
                         events.fire('separate_aggregate');
                           ///radio aggregation
                     });
-                    let checkDiv = quartDiv.append('div').attr('id', 'checkDiv').classed('hidden', true);
+                    let checkDiv = quartDiv.append('div').attr('id', 'checkDiv')//.classed('hidden', true);
                     let tCheck = checkDiv.append('div');
                     tCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleT').attr('checked', true)
                     .attr('value', 'top').on('click', () => {
@@ -408,6 +411,10 @@ export class EventLine {
                         }
                     });
                     bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
+
+                    if(!separated){  checkDiv.classed('hidden', true); }
+                    else{ checkDiv.classed('hidden', false); }
+
             }
 
     private renderOrdersTooltip(tooltip_data) {
