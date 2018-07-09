@@ -200,7 +200,7 @@ export class promisDiagram {
     
                 if(this.scaleRelative){
                     console.log('change back rel');
-                    this.scoreScale.domain([-30, 30]);
+                    this.scoreScale.domain([30, -30]);
                  }else{ 
                     console.log('change back to absolute');
                     this.scoreScale.domain([80, 0]);
