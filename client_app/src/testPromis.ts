@@ -72,9 +72,7 @@ export class promisDiagram {
 
         this.$node = select(parent)
             .append('div')
-            .classed('diagramDiv-' + this.cohortIndex, true)
-         //   .classed('diagramDiv' + this.cohortIndex, true)
-            //.classed(cohortData.label, true);
+            .classed('diagramDiv-' + this.cohortIndex, true);
 
         this.svg = this.$node.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height', this.promisDimension.height)
@@ -159,7 +157,7 @@ export class promisDiagram {
 
         this.attachListener();
 
-        this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex);
+      //  this.drawPromisChart(cohortData.promis, 'proLine', this.cohortIndex);
     }
 
     /**
@@ -176,367 +174,339 @@ export class promisDiagram {
         });
 
         events.on('clear_chart', (evt, item)=> {
-            this.clearAggDiagram();
-            this.clearDiagram();
+          //  this.clearAggDiagram();
+          //  this.clearDiagram();
         });
-
-        events.on('update_chart', (evt, item)=> {
-
-            this.clearDiagram();
-            this.clearAggDiagram();
-
-            if(item != null){
-
-                let promis = item.promis;
-                this.scaleRelative = item.scaleR;
-                this.clumped = item.clumped;
-                let separated = item.separated;
-                this.cohortLabel = item.label;
-    
-                if(item.startEvent == null){ this.zeroEvent = 'First Promis Score';
-                }else{
-                    this.zeroEvent = item.startEvent[1][0].key;
-                }
-    
-                if(this.scaleRelative){
-                    console.log('change back rel');
-                    this.scoreScale.domain([30, -30]);
-                 }else{ 
-                    console.log('change back to absolute');
-                    this.scoreScale.domain([80, 0]);
-                 }
-    
-                if(this.clumped){
-                    //if it is aggregated
-                    if(separated){
-                        this.frequencyCalc(item.promisSep[0], 'top', this.domains);
-                        this.frequencyCalc(item.promisSep[1], 'middle', this.domains);//.then(co=> this.drawAgg(co, 'middle'));
-                        this.frequencyCalc(item.promisSep[2], 'bottom', this.domains);//.then(co=> this.drawAgg(co, 'bottom'));
-                    }else{
-                        
-                        this.frequencyCalc(promis, 'all', this.domains);//.then(co=> this.drawAgg(co, 'all'));
-                    }
-    
-                }else{
-                    //if it is not aggregated
-                    if(separated){
-                       
-                        this.drawPromisChart(item.promisSep[0], 'top', this.cohortIndex);
-                        this.drawPromisChart(item.promisSep[1], 'middle', this.cohortIndex);
-                        this.drawPromisChart(item.promisSep[2], 'bottom', this.cohortIndex);
-                    }else{
-                      
-                        this.drawPromisChart(promis, 'proLine', this.cohortIndex);
-                    }
-                }
-            }
-             
-        });
-    
-
-}
-
-    /**
-     * Draw the diagram with the given data from getSimilarRows
-     * @param args
-     */
-    private async drawPromisChart(cohort, clump, index) {
-
-        this.svg.select('.cohort-plot-label').remove();
-
-        let maxDay = this.domains.maxDay;
-        let minDay = this.domains.minDay;
-
-        let cohortLabel = this.svg.append('text')
-        .text(`${this.cohortLabel}`).classed('cohort-plot-label', true)
-        .attr('transform', `translate(50,20)`);
-        
-        this.svg.select('.voronoi').selectAll('*').remove();
-
-
-
-            const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
-
-        if(this.scaleRelative){
-
-                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-                .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
-
-                zeroLine.append('line')
-                        .attr('x1', 0).attr('x2', 670)
-                        .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
-                        .attr('stroke', '#E67E22');
-        }
-
-        let lineCount = cohort.length;
-          
-        let co = cohort.filter(g=> {return g.value.length > 1; });
-
-        let similarData = co.map((d) => {
-                let data = {key: d.key, value: null, line: null, fakeArray: []};
-                let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
-                return g['FORM'] == this.diagram;
-                });
-                res.sort((a, b) => ascending(a.diff, b.diff));
-                res.forEach(r=> r.maxday = d.days);
-                res = res.map((r, i)=> {return {
-                                            PAT_ID: r.PAT_ID,
-                                            diff: +r.diff,
-                                            SCORE: r.SCORE,
-                                            relScore: r.relScore,
-                                            ogScore : r.ogScore,
-                                            pat : data
-                                            };
-                                        });
-                data.value = res;
-                return data;
-            });
-
-        function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
-          
-            // -----  set domains and axis
-            // time scale
-            this.timeScale.domain([minDay, maxDay]);
-
-            this.svg.select('.xAxis')
-                .call(axisBottom(this.timeScale));
-
-            this.svg.select('.yAxis')
-                .call(axisLeft(this.scoreScale));
-            // -------  define line function
-            const lineFunc = line()
-                .curve(curveLinear)
-                .x((d) => { return this.timeScale(+d['diff']); })
-                .y((d) => { 
-                    if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
-                    }else{ return this.scoreScale(+d['SCORE']); }
-                });
-
-            // ------- draw
-           // const promisScoreGroup = this.svg.select('.scoreGroup');
- 
-            promisScoreGroup.append('clipPath').attr('id', 'clip')
-            .append('rect')
-            .attr('width', 850)
-            .attr('height', 340);
- 
-            let that = this;
-
-            let voronoiGroup = this.svg.select('.voronoi')
-                .attr('transform', () => {
-                    return `translate(${this.margin.x},${this.margin.y})`;
-                });
-
-                let lines = promisScoreGroup.select('.lines')
-                    .attr('transform', () => { return `translate(${this.margin.x},${this.margin.y})`; })   
-                    .attr('clip-path','url(#clip)')
-                     .selectAll('.'+ clump)
-                        .data(similarData);
-
-                lines.exit().remove();
-
-                let lineEnter = lines
-                        .enter().append('g').attr('class', d=> d['key'])
-                        .classed(clump, true);
-
-                lines = lineEnter.merge(lines);
-
-                lines.append('path')
-                        .attr('class', d=> d['key'])
-                        .classed(clump, true)
-                        .attr('stroke-width', that.lineScale(lineCount))
-                        .attr('stroke-opacity', that.lineScale(lineCount))
-                        .attr('d', function (d) {
-                                    d['line'] = this;
-                                    return lineFunc(d.value);})
-                        .on('click', function (d) { voronoiClicked(d); } )
-                        .on('mouseover', (d)=> this.addPromisDotsHover(d))
-                        .on('mouseout', (d)=> this.removeDots());
-
-                
-                if(cohort.length < 500) { 
-
-                    if(clump == 'proLine') {
-
-                        let fakePatArray = [];
-                        lines.select('path').nodes().forEach((l, i) => {
-                            let fakeArray = [];
-                            let bins = Math.floor(l.getTotalLength()/25);
-
-                            for(let i = 0; i < bins; i++) {
-                                let p = l.getPointAtLength(i * 25);
-                                fakeArray.push({x: p.x, y: p.y, pat: l.__data__});
-                            }
-                          
-                            similarData[i].fakeArray = fakeArray;
-                        });
-
-                        let voronoi = d3Voronoi.voronoi()
-                        .x((d, i) => { return d.x })
-                        .y((d, i) => { return d.y })
-                        .extent([[0, 0], [850, 350]]);
-
-                        voronoiGroup.selectAll('g')
-                        .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
-                            return d.fakeArray; }))))
-
-                            .enter().append('g')
-                            .append('path')
-                            .attr('d', function(d,i){return d ? 'M' + d.join('L') + 'Z' : null;})
-                            .attr("class", function(d,i) { return "voronoi-" + i; })
-                            .style("fill", "none")
-                            .style('pointer-events', 'all')
-                            .on('mouseover', mouseover)
-                            .on('mouseout', mouseout)
-                            .on('click', (d)=>  voronoiClicked(d.data.pat));
-                    }
-}
-                let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-                    .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
-
-                zeroLine.append('line')
-                    .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
-                    .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
-                zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
-
-                function mouseover(d) {
-                    let group = d.data.pat.line;
-                    select(group).classed('hover-selected', true);
-                  }
-                
-                function mouseout(d) {
-                    let group = d.data.pat.line;
-                    select(group).classed('hover-selected', false);
-                  }
-
-                function voronoiClicked(d) {
-          
-                    let line = d.line;
-                    if(line.classList.contains('selected')) {
-                        line.classList.remove('selected');
-                        let dots = document.getElementsByClassName([d.key] + '-clickdots');
-                        for (var i = dots.length; i--; ) {
-                            dots[i].remove();
-                         }
-                       events.fire('line_unclicked', d);
-                    }else {
-                        line.classList.add('selected');
-                        that.addPromisDotsClick(d);
-                        events.fire('line_clicked', d);
-                };
-                    
-                let lines = that.$node.select('.lines').selectAll('.selected').nodes();
-                 
-                let idarray = [];
-                lines.forEach(element => {
-                            idarray.push(+element.__data__.key);
-                        });
-                        events.fire('selected_line_array', idarray);
-                    }
-        }
-
-    private addPromisDotsHover (d) {
-
-            let promisData = d;
-
-            let promisRect = this.svg.select('.scoreGroup').select('.lines');
-            let dots = promisRect
-            .selectAll('circle').data(promisData);
-            dots.enter().append('circle').attr('class', 'hoverdots')
-            .attr('cx', (d, i)=> this.timeScale(d.diff))
-            .attr('cy', (d)=> {
-                let score; 
-                if(this.scaleRelative){
-                    score = d.relScore;
-                }else{  score = d.SCORE; }
-                return this.scoreScale(score);
-            }).attr('r', 5).attr('fill', '#21618C');
-    
-            dots.append('circle').attr('cx', ()=> this.timeScale(0))
-            .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
 
     }
 
-    private addPromisDotsClick (d) {
+  
+    
+    //draws the lines for the mean and standard deviation for the PROMIS scores
+   // private drawAgg(cohort, clump){
 
-        let n = select(d.line).node();
-        let parent = n.parentNode;
-
-        let promisData = d.value;
        
-        let dots = select(parent)
-        .selectAll('circle').data(promisData);
-        dots.enter().append('circle').attr('class', d.key + '-clickdots')
-        .classed('clickdots', true)
-        .attr('cx', (d, i)=> this.timeScale(d['diff']))
-        .attr('cy', (d)=> {
-            if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
-                    }else{ return this.scoreScale(+d['SCORE']) }
-        }).attr('r', 5).attr('fill', '#FF5733');
+ //   }
 
-        this.clicked = true;
+    /**
+     * Get the data via API
+     * @param URL
+     * @returns {Promise<any>}
+     */
+    private async getData(URL) {
+        return await ajax.getAPIJSON(URL);
+    }
+
+
+    private renderOrdersTooltip(tooltip_data) {
+
+        let text = "<strong style='color:darkslateblue'>" + tooltip_data['ORDER_CATALOG_TYPE'] + "</strong></br>";
+        text += '<span>' + tooltip_data['ORDER_MNEMONIC'] + '</span></br>';
+        text += '<span>' + tooltip_data['ORDER_DTM'] + '</span></br>';
+        return text;
+    }
+
+    /**
+     * Show or hide the application loading indicator
+     * @param isBusy
+     */
+    setBusy(isBusy: boolean) {
+        let status = select('.busy').classed('hidden');
+        if (status == isBusy)
+            select('.busy').classed('hidden', !isBusy);
+    }
 }
 
-    private removeDots () {
-        selectAll('.hoverdots').remove();
-    }
+export async function drawPromisChart(cohort, clump, index) {
 
-        /**
-     * Utility method
-     * @param start
-     * @param end
-     */
-    private updateSlider(start, end) {
+   this.svg.select('.cohort-plot-label').remove();
 
-        let lowScore = this.scoreScale.invert(end);
-        let highScore = this.scoreScale.invert(start);
+   let maxDay = this.domains.maxDay;
+   let minDay = this.domains.minDay;
 
-        let med = this.svg.select('.scoreGroup')
-            .selectAll('path')
-            .style('opacity', 0);
+   let cohortLabel = this.svg.append('text')
+   .text(`${this.cohortLabel}`).classed('cohort-plot-label', true)
+   .attr('transform', `translate(50,20)`);
+   
+   this.svg.select('.voronoi').selectAll('*').remove();
 
-        med.filter(function (d) {
-            if (!d.length) return false;
-            return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
-        }).style('opacity', 1);
+   const promisScoreGroup = this.svg.select('.scoreGroup-'+ this.cohortIndex);
 
-    }
-    /**
-     * clear the diagram
-     */
-    private clearDiagram() {
+   if(this.scaleRelative){
 
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
-       // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
-        this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
-    }
-        /**
-     * clear the diagram
-     */
-    private clearAggDiagram() {
+           let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+           .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
 
-        let aggline =  this.svg.select('.scoreGroup-'+ this.cohortIndex);
-        aggline.select('.avLine').remove();
-        aggline.select('.avLine_all').remove();
-        aggline.select('.avLine_top').remove();
-        aggline.select('.avLine_middle').remove();
-        aggline.select('.avLine_bottom').remove();
-        aggline.selectAll('.stLine_all').remove();
-        aggline.selectAll('.stLine_top').remove();
-        aggline.selectAll('.stLine_middle').remove();
-        aggline.selectAll('.stLine_bottom').remove();
-        aggline.selectAll('.qLine_all').remove();
-        aggline.selectAll('.qLine_top').remove();
-        aggline.selectAll('.qLine_middle').remove();
-        aggline.selectAll('.qLine_bottom').remove();
-    }
+           zeroLine.append('line')
+                   .attr('x1', 0).attr('x2', 670)
+                   .attr('y1', this.scoreScale(0)).attr('y2', this.scoreScale(0)).attr('stroke-width', .5)
+                   .attr('stroke', '#E67E22');
+   }
 
-    // creates bin array for each patient scores and calulates slope for each bin
+   let lineCount = cohort.length;
+     
+   let co = cohort.filter(g=> {return g.value.length > 1; });
+
+   let similarData = co.map((d) => {
+           let data = {key: d.key, value: null, line: null, fakeArray: []};
+           let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
+           return g['FORM'] == this.diagram;
+           });
+           res.sort((a, b) => ascending(a.diff, b.diff));
+           res.forEach(r=> r.maxday = d.days);
+           res = res.map((r, i)=> {return {
+                                       PAT_ID: r.PAT_ID,
+                                       diff: +r.diff,
+                                       SCORE: r.SCORE,
+                                       relScore: r.relScore,
+                                       ogScore : r.ogScore,
+                                       pat : data
+                                       };
+                                   });
+           data.value = res;
+           return data;
+       });
+
+   function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
+     
+       // -----  set domains and axis
+       // time scale
+       this.timeScale.domain([minDay, maxDay]);
+
+       this.svg.select('.xAxis')
+           .call(axisBottom(this.timeScale));
+
+       this.svg.select('.yAxis')
+           .call(axisLeft(this.scoreScale));
+       // -------  define line function
+       const lineFunc = line()
+           .curve(curveLinear)
+           .x((d) => { return this.timeScale(+d['diff']); })
+           .y((d) => { 
+               if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
+               }else{ return this.scoreScale(+d['SCORE']); }
+           });
+
+       // ------- draw
+      // const promisScoreGroup = this.svg.select('.scoreGroup');
+
+       promisScoreGroup.append('clipPath').attr('id', 'clip')
+       .append('rect')
+       .attr('width', 850)
+       .attr('height', 340);
+
+       let that = this;
+
+       let voronoiGroup = this.svg.select('.voronoi')
+           .attr('transform', () => {
+               return `translate(${this.margin.x},${this.margin.y})`;
+           });
+
+           let lines = promisScoreGroup.select('.lines')
+               .attr('transform', () => { return `translate(${this.margin.x},${this.margin.y})`; })   
+               .attr('clip-path','url(#clip)')
+                .selectAll('.'+ clump)
+                   .data(similarData);
+
+           lines.exit().remove();
+
+           let lineEnter = lines
+                   .enter().append('g').attr('class', d=> d['key'])
+                   .classed(clump, true);
+
+           lines = lineEnter.merge(lines);
+
+           lines.append('path')
+                   .attr('class', d=> d['key'])
+                   .classed(clump, true)
+                   .attr('stroke-width', that.lineScale(lineCount))
+                   .attr('stroke-opacity', that.lineScale(lineCount))
+                   .attr('d', function (d) {
+                               d['line'] = this;
+                               return lineFunc(d.value);})
+                   .on('click', function (d) { voronoiClicked(d); } )
+                   .on('mouseover', (d)=> this.addPromisDotsHover(d))
+                   .on('mouseout', (d)=> this.removeDots());
+
+           
+           if(cohort.length < 500) { 
+
+               if(clump == 'proLine') {
+
+                   let fakePatArray = [];
+                   lines.select('path').nodes().forEach((l, i) => {
+                       let fakeArray = [];
+                       let bins = Math.floor(l.getTotalLength()/25);
+
+                       for(let i = 0; i < bins; i++) {
+                           let p = l.getPointAtLength(i * 25);
+                           fakeArray.push({x: p.x, y: p.y, pat: l.__data__});
+                       }
+                     
+                       similarData[i].fakeArray = fakeArray;
+                   });
+
+                   let voronoi = d3Voronoi.voronoi()
+                   .x((d, i) => { return d.x })
+                   .y((d, i) => { return d.y })
+                   .extent([[0, 0], [850, 350]]);
+
+                   voronoiGroup.selectAll('g')
+                   .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
+                       return d.fakeArray; }))))
+
+                       .enter().append('g')
+                       .append('path')
+                       .attr('d', function(d,i){return d ? 'M' + d.join('L') + 'Z' : null;})
+                       .attr("class", function(d,i) { return "voronoi-" + i; })
+                       .style("fill", "none")
+                       .style('pointer-events', 'all')
+                       .on('mouseover', mouseover)
+                       .on('mouseout', mouseout)
+                       .on('click', (d)=>  voronoiClicked(d.data.pat));
+               }
+}
+           let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+               .attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);
+
+           zeroLine.append('line')
+               .attr('x1', this.timeScale(0)).attr('x2', this.timeScale(0))
+               .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
+           zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
+
+           function mouseover(d) {
+               let group = d.data.pat.line;
+               select(group).classed('hover-selected', true);
+             }
+           
+           function mouseout(d) {
+               let group = d.data.pat.line;
+               select(group).classed('hover-selected', false);
+             }
+
+           function voronoiClicked(d) {
+     
+               let line = d.line;
+               if(line.classList.contains('selected')) {
+                   line.classList.remove('selected');
+                   let dots = document.getElementsByClassName([d.key] + '-clickdots');
+                   for (var i = dots.length; i--; ) {
+                       dots[i].remove();
+                    }
+                  events.fire('line_unclicked', d);
+               }else {
+                   line.classList.add('selected');
+                   that.addPromisDotsClick(d);
+                   events.fire('line_clicked', d);
+           };
+               
+           let lines = that.$node.select('.lines').selectAll('.selected').nodes();
+            
+           let idarray = [];
+           lines.forEach(element => {
+                       idarray.push(+element.__data__.key);
+                   });
+                   events.fire('selected_line_array', idarray);
+               }
+
+        function addPromisDotsHover (d) {
+
+                let promisData = d;
+         
+                let promisRect = this.svg.select('.scoreGroup').select('.lines');
+                let dots = promisRect
+                .selectAll('circle').data(promisData);
+                dots.enter().append('circle').attr('class', 'hoverdots')
+                .attr('cx', (d, i)=> this.timeScale(d.diff))
+                .attr('cy', (d)=> {
+                    let score; 
+                    if(this.scaleRelative){
+                        score = d.relScore;
+                    }else{  score = d.SCORE; }
+                    return this.scoreScale(score);
+                }).attr('r', 5).attr('fill', '#21618C');
+         
+                dots.append('circle').attr('cx', ()=> this.timeScale(0))
+                .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
+         
+         }
+         
+        function addPromisDotsClick (d) {
+         
+            let n = select(d.line).node();
+            let parent = n.parentNode;
+         
+            let promisData = d.value;
+           
+            let dots = select(parent)
+            .selectAll('circle').data(promisData);
+            dots.enter().append('circle').attr('class', d.key + '-clickdots')
+            .classed('clickdots', true)
+            .attr('cx', (d, i)=> this.timeScale(d['diff']))
+            .attr('cy', (d)=> {
+                if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
+                        }else{ return this.scoreScale(+d['SCORE']) }
+            }).attr('r', 5).attr('fill', '#FF5733');
+         
+            this.clicked = true;
+         }
+         
+         function removeDots () {
+            selectAll('.hoverdots').remove();
+         }
+         
+            /**
+         * Utility method
+         * @param start
+         * @param end
+         */
+        function updateSlider(start, end) {
+         
+            let lowScore = this.scoreScale.invert(end);
+            let highScore = this.scoreScale.invert(start);
+         
+            let med = this.svg.select('.scoreGroup')
+                .selectAll('path')
+                .style('opacity', 0);
+         
+            med.filter(function (d) {
+                if (!d.length) return false;
+                return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
+            }).style('opacity', 1);
+         }
+   }
+
+/**
+* clear the diagram
+*/
+export function clearDiagram(cohortIndex) {
+
+   this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.lines').selectAll('*').remove();
+  // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
+   this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('.zeroLine').remove();
+   this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.voronoi').selectAll('*').remove();
+   this.svg.select('.scoreGroup-'+ this.cohortIndex).selectAll('#clip').remove();
+
+   let aggline =  this.svg.select('.scoreGroup-'+ cohortIndex);
+   aggline.select('.avLine').remove();
+   aggline.select('.avLine_all').remove();
+   aggline.select('.avLine_top').remove();
+   aggline.select('.avLine_middle').remove();
+   aggline.select('.avLine_bottom').remove();
+   aggline.selectAll('.stLine_all').remove();
+   aggline.selectAll('.stLine_top').remove();
+   aggline.selectAll('.stLine_middle').remove();
+   aggline.selectAll('.stLine_bottom').remove();
+   aggline.selectAll('.qLine_all').remove();
+   aggline.selectAll('.qLine_top').remove();
+   aggline.selectAll('.qLine_middle').remove();
+   aggline.selectAll('.qLine_bottom').remove();
+}
+
+export function frequencyCalc(cohort, clump, domain) {
+
+  // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
-    private async frequencyCalc(cohort, clump, domain){
-
         let minDay = domain.minDay;
         let maxDay = domain.maxDay;
 
@@ -628,8 +598,6 @@ export class promisDiagram {
             }
         });
    
-       // return cohortFiltered;
-        //this.drawAgg(cohortFiltered, clump);
         let patbin = cohortFiltered.map((d)=> {
             let bin = d.bins;
             return bin;
@@ -801,45 +769,7 @@ export class promisDiagram {
                         .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
                 zeroLine.append('text').text(this.zeroEvent).attr('x', this.timeScale(0));
 
-    }
-    //draws the lines for the mean and standard deviation for the PROMIS scores
-   // private drawAgg(cohort, clump){
-
-       
- //   }
-
-    /**
-     * Get the data via API
-     * @param URL
-     * @returns {Promise<any>}
-     */
-    private async getData(URL) {
-        return await ajax.getAPIJSON(URL);
-    }
-
-
-    private renderOrdersTooltip(tooltip_data) {
-
-        let text = "<strong style='color:darkslateblue'>" + tooltip_data['ORDER_CATALOG_TYPE'] + "</strong></br>";
-        text += '<span>' + tooltip_data['ORDER_MNEMONIC'] + '</span></br>';
-        text += '<span>' + tooltip_data['ORDER_DTM'] + '</span></br>';
-        return text;
-    }
-
-    /**
-     * Show or hide the application loading indicator
-     * @param isBusy
-     */
-    setBusy(isBusy: boolean) {
-        let status = select('.busy').classed('hidden');
-        if (status == isBusy)
-            select('.busy').classed('hidden', !isBusy);
-    }
-
 }
-
-export let targetPatientOrders;
-
 
 export function create(parent: Element, diagram, cohortData, index, domains) {
     return new promisDiagram(parent, diagram, cohortData, index, domains);
