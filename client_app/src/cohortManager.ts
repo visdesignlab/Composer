@@ -79,13 +79,13 @@ export class CohortManager {
             if(clumped){
                 clumped = false;
                 this.selectedCohort.clumped = false;
-                document.getElementById('aggToggle').classList.remove('btn-warning');
+               // document.getElementById('aggToggle').classList.remove('btn-warning');
                 
             }else{
                 console.log('clumpin');
                 clumped = true;
                 this.selectedCohort.clumped = true;
-                document.getElementById('aggToggle').classList.add('btn-warning');
+              //  document.getElementById('aggToggle').classList.add('btn-warning');
             }
             
             events.fire('update_chart', this.selectedCohort);

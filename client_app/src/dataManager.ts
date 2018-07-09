@@ -76,7 +76,7 @@ export class DataManager {
                 let cohortIDs = ids;
                 //this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(promis=> {
                 this.loadPromisData(cohortIDs, filter).then(promis=> {
-                    console.log(promis);
+                   
                     this.getCPT(cohortIDs, this.totalCptObjects).then(d=> {
                         this.mapCPT(promis, d).then(orders=> {
                          
