@@ -454,12 +454,12 @@ export async function drawPromisChart(promis, clump, node, cohort) {
          * @param start
          * @param end
          */
-        function updateSlider(start, end) {
+        function updateSlider(start, end, cohortIndex) {
          
             let lowScore = this.scoreScale.invert(end);
             let highScore = this.scoreScale.invert(start);
          
-            let med = this.svg.select('.scoreGroup')
+            let med = this.svg.select('.scoreGroup-'+ cohortIndex)
                 .selectAll('path')
                 .style('opacity', 0);
          

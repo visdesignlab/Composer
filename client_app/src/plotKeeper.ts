@@ -29,7 +29,8 @@ export class PlotKeeper {
     private domain;
     private initialLoadBool;
     selectedCohort;
-    selectedNode;
+    selectedPlot;
+    plotArray;
     private compareBool;
     comparisonArray;
     drawPromisChart;
@@ -63,24 +64,28 @@ export class PlotKeeper {
 
     private attachListener(){
 
-        let that = this;
-
         events.on('comparison_update', (evt, item)=> {
-            console.log(item);
+          
             //this comes from the sidebar
             this.comparisonArray = item;
-   
+            this.plotArray = [];
+    
             this.plotDiv.selectAll('*').remove();
 
             this.comparisonArray.forEach((cohort, i) => {
                 console.log(cohort);
-                this.buildPlot(this.plotDiv, i, this.domain);
+                let plot = this.buildPlot(this.plotDiv, i, this.domain);
+                this.plotArray.push(plot);
+                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
             });
+
+            this.selectedPlot = this.plotArray[0];
         });
 
         events.on('enter_comparison_view', ()=> {
             console.log('maybe put something here');
             this.compareBool = true;
+           
         });
 
         events.on('exit_comparison_view', ()=> {
@@ -101,12 +106,12 @@ export class PlotKeeper {
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
                 console.log('make sure this only updates once');
-                this.selectedNode = this.buildPlot(this.plotDiv, 0, this.domain);
-                console.log(this.selectedNode);
-                this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedNode, this.selectedCohort);
+                this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
+                console.log(this.selectedPlot);
+                this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort);
             }
 
-          //  this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedNode, this.selectedNode.cohortIndex);
+          //  this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedPlot, this.selectedPlot.cohortIndex);
 
            
 
@@ -116,7 +121,8 @@ export class PlotKeeper {
             console.log('domain updated');
             this.domain.minDay = item[0];
             this.domain.maxDay = item[1];
-           /* 
+            this.plotArray = [];
+           
             if(!this.compareBool){
                 events.fire('yBrush_reset');
             }else{
@@ -124,23 +130,20 @@ export class PlotKeeper {
 
             this.comparisonArray.forEach((cohort, i) => {
                 console.log(cohort);
-                this.buildPlot(this.plotDiv, i, this.domain);
+                let plot = this.buildPlot(this.plotDiv, i, this.domain);
+                this.plotArray.push(plot);
+                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
             });
-            }*/
+            }
             
 
         });
         //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
 
-        
-           // this.clearAggDiagram();
-           console.log('updating');
-           console.log(item);
-           console.log(this.selectedNode);
-           if(this.selectedNode != undefined){
-            this.clearDiagram(this.selectedNode.svg, this.selectedNode.cohortIndex);
-          //  this.drawPromisChart(item, 'proLine', this.selectedNode, item);
+           if(this.selectedPlot != undefined){
+            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+          //  this.drawPromisChart(item, 'proLine', this.selectedPlot, item);
 
             let promis = item.promis;
             let scaleRelative = item.scaleR;
@@ -150,78 +153,28 @@ export class PlotKeeper {
             if(clumped){
                 //if it is aggregated
                 if(separated){
-                    this.frequencyCalc(item.promisSep[0], 'top', this.selectedNode, item);
-                    this.frequencyCalc(item.promisSep[1], 'middle', this.selectedNode, item);//.then(co=> this.drawAgg(co, 'middle'));
-                    this.frequencyCalc(item.promisSep[2], 'bottom', this.selectedNode, item);//.then(co=> this.drawAgg(co, 'bottom'));
+                    this.frequencyCalc(item.promisSep[0], 'top', this.selectedPlot, item);
+                    this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'middle'));
+                    this.frequencyCalc(item.promisSep[2], 'bottom', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
                 }else{
                     
-                    this.frequencyCalc(promis, 'all', this.selectedNode, item);//.then(co=> this.drawAgg(co, 'all'));
+                    this.frequencyCalc(promis, 'all', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
                 }
 
             }else{
                 //if it is not aggregated
                 if(separated){
                    
-                    this.drawPromisChart(item.promisSep[0], 'top', this.selectedNode, item);
-                    this.drawPromisChart(item.promisSep[1], 'middle', this.selectedNode, item);
-                    this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedNode, item);
+                    this.drawPromisChart(item.promisSep[0], 'top', this.selectedPlot, item);
+                    this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item);
+                    this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedPlot, item);
                 }else{
                   
-                    this.drawPromisChart(promis, 'proLine', this.selectedNode, item);
+                    this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
                 }
             }
-            
-        
            }
-         
-/*
-            if(item != null){
-
-                let promis = item.promis;
-                let scaleRelative = item.scaleR;
-                let clumped = item.clumped;
-                let separated = item.separated;
-                let cohortLabel = item.label;
-                let zeroEvent;
-    
-                if(item.startEvent == null){ zeroEvent = 'First Promis Score';
-                }else{
-                    zeroEvent = item.startEvent[1][0].key;
-                }
-    
-                if(scaleRelative){
-                    console.log('change back rel');
-                    this.scoreScale.domain([30, -30]);
-                 }else{ 
-                    console.log('change back to absolute');
-                    this.scoreScale.domain([80, 0]);
-                 }
-    
-                if(clumped){
-                    //if it is aggregated
-                    if(separated){
-                        this.frequencyCalc(item.promisSep[0], 'top', this.domain);
-                        this.frequencyCalc(item.promisSep[1], 'middle', this.domain);//.then(co=> this.drawAgg(co, 'middle'));
-                        this.frequencyCalc(item.promisSep[2], 'bottom', this.domain);//.then(co=> this.drawAgg(co, 'bottom'));
-                    }else{
-                        
-                        this.frequencyCalc(promis, 'all', this.domain);//.then(co=> this.drawAgg(co, 'all'));
-                    }
-    
-                }else{
-                    //if it is not aggregated
-                    if(separated){
-                       
-                        this.drawPromisChart(item.promisSep[0], 'top', cohortLabel, this.domain);
-                        this.drawPromisChart(item.promisSep[1], 'middle', cohortLabel, this.domain);
-                        this.drawPromisChart(item.promisSep[2], 'bottom', cohortLabel, this.domain);
-                    }else{
-                      
-                        this.drawPromisChart(promis, 'proLine', cohortLabel);
-                    }
-                }
-                
-            }*/
+ 
              
         });
     
