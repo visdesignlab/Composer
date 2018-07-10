@@ -75,15 +75,20 @@ export class PlotKeeper {
             this.comparisonArray.forEach((cohort, i) => {
                 console.log(cohort);
                 let plot = this.buildPlot(this.plotDiv, i, this.domain);
+                plot.svg.select(parent).on('click', (d, i)=> {console.log(d); console.log(i)});
+
                 this.plotArray.push(plot);
                 this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
             });
+
+            let plotSvg = this.plotArray.selectAll('svg');
+
+            console.log(plotSvg);
 
             this.selectedPlot = this.plotArray[0];
         });
 
         events.on('enter_comparison_view', ()=> {
-            console.log('maybe put something here');
             this.compareBool = true;
            
         });
@@ -101,13 +106,13 @@ export class PlotKeeper {
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
 
-            console.log(this.cohortData);
+          
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-                console.log('make sure this only updates once');
+               
                 this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
-                console.log(this.selectedPlot);
+               
                 this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort);
             }
 
@@ -129,7 +134,7 @@ export class PlotKeeper {
                 this.plotDiv.selectAll('*').remove();
 
             this.comparisonArray.forEach((cohort, i) => {
-                console.log(cohort);
+            
                 let plot = this.buildPlot(this.plotDiv, i, this.domain);
                 this.plotArray.push(plot);
                 this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
