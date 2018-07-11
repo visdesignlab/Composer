@@ -90,7 +90,7 @@ export class SideBar {
   });
 
   events.on('enter_layer_view', ()=> {
-          
+    console.log('is this firing??');
     select('#layerDiv').classed('hidden', false);
     let array = [];
 
@@ -111,7 +111,6 @@ export class SideBar {
   select('#layerDiv').classed('hidden', true);
 
 });
-
     
   events.on('filter_counted', (evt, item) => {//this get the count from the group
 
@@ -145,6 +144,8 @@ export class SideBar {
   events.on('test', (evt, item)=> {
   
         selectAll('.selected').classed('selected', false);
+
+        //need to update comparison array
   
         let compare = select('#compareDiv');
         compare.selectAll('*').remove();
@@ -154,6 +155,7 @@ export class SideBar {
         layer.selectAll('*').remove();
 
         this.buildLayerFilter(layer, item[0], this.comparisonArray);
+
       });
       }
 
@@ -221,6 +223,18 @@ export class SideBar {
           events.fire('update_layers', array);
         
         });
+
+    
+        let selected = this.$node.selectAll('.fill');
+      
+        selected.nodes().forEach(sel => {
+          let entry = {class: sel.classList[0], data: sel.__data__ }
+          array.push(entry);
+        });
+    
+        console.log(array);
+    
+        events.fire('update_layers', array);
     
   }
 

@@ -89,13 +89,24 @@ export class PlotKeeper {
         events.on('update_layers', (evt, item)=> {
           
             //this comes from the sidebar
+        if(this.selectedPlot != undefined){    
+            
             this.comparisonArray = item;
      
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
             this.comparisonArray.forEach((cohort, i) => {
-                console.log(cohort);
-                this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
-            });
+                console.log(cohort.data.clumped);
+                if(cohort.data.clumped){
+                    //if it is aggregated
+                   console.log('is this working??');
+                        this.frequencyCalc(cohort.data.promis, 'all', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                    
+                }else{
+                    this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
+                }
+               
+              //  this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
+            });}
         });
 
         events.on('enter_comparison_view', ()=> {
@@ -164,10 +175,30 @@ export class PlotKeeper {
 
            if(this.selectedPlot != undefined){
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-               if(this.layerBool){
+               if(this.layerBool == true){
+                
+                console.log(this.layerBool);
+                console.log(this.comparisonArray);
                 this.comparisonArray.forEach((cohort) => {
                     console.log(cohort);
-                    this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
+
+                    if(cohort.data.clumped){
+                        //if it is aggregated
+                        if(cohort.separated){
+                            cohort.data.forEach(promis => {
+                                this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item);
+                            });
+                           // this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item);
+                           // this.frequencyCalc(cohort.data.promisSep[1], cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'middle'));
+                           // this.frequencyCalc(cohort.data.promisSep[2], cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
+                        }else{
+                            console.log('is this working??');
+                            this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                        }
+                    }else{
+                        this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
+                    }
+                   
                     
                 });
 

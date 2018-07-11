@@ -87,7 +87,7 @@ export class CohortManager {
                // document.getElementById('aggToggle').classList.remove('btn-warning');
                 
             }else{
-                console.log('clumpin');
+             
                 clumped = true;
                 this.selectedCohort.clumped = true;
               //  document.getElementById('aggToggle').classList.add('btn-warning');
@@ -100,21 +100,18 @@ export class CohortManager {
 
             let branch;
             if(this.cohortTree[this.cohortIndex].branches.length == 0){
-                console.log('first branch');
+              
                 branch = [];
             }else{ 
                 branch = this.cohortTree[this.cohortIndex].branches;
-                console.log('other branch');
+            
             }
 
             let promis = this.selectedCohort.promis;
             let cpt = this.selectedCohort.cpt;
             let filterArray = this.selectedCohort.filterArray;
-           // let b = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].promis));
-           // let b = Object.assign([], this.cohortTree[this.cohortIndex].promis);
-           // let bcpt = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].cpt));
+         
             let bcpt = JSON.parse(JSON.stringify(cpt));
-          // let bfilter = JSON.parse(JSON.stringify(this.cohortTree[this.cohortIndex].filterArray));
             let bfilter = Object.assign([], this.cohortTree[this.cohortIndex].filterArray);
             let b = JSON.parse(JSON.stringify(promis));
       
@@ -133,8 +130,6 @@ export class CohortManager {
             treeBranch.filterArray = bfilter;
             treeBranch.promis = b;
             treeBranch.cpt = bcpt;
-
-            console.log(treeBranch);
 
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
            
@@ -157,7 +152,7 @@ export class CohortManager {
 
         events.on('change_promis_scale', ()=> {
             let scaleRelative;
-            console.log(this.selectedCohort);
+
             if(this.branchSelected == null){
                 scaleRelative = this.cohortTree[this.cohortIndex].scaleR;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -167,7 +162,6 @@ export class CohortManager {
             }
 
             if(!scaleRelative){
-                console.log(scaleRelative);
                 scaleRelative = true;
                 
             }else{
@@ -200,8 +194,6 @@ export class CohortManager {
             let index = item[1];
             this.cohortIndex = index;
 
-            console.log(cohort);
-
             this.cohortTree[this.cohortIndex].promis = item[0].promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
            
@@ -216,7 +208,7 @@ export class CohortManager {
           });
 
           events.on('compare_button_down', ()=> {
-            console.log(this.cohortTree);
+    
                 if(!this.comparisonBool){
                     this.comparisonBool = true;
                     events.fire('enter_comparison_view');
@@ -242,12 +234,11 @@ export class CohortManager {
 
         events.on('event_selected', (evt, item)=> {
             let codes = item;
-           // console.log(this.selectedCohort);
             events.fire('update_cohort_start', [codes, this.selectedCohort]);
         });
 
         events.on('layer_button_down', (evt, item)=> {
-            console.log(this.cohortTree);
+           
             if(!this.layerBool){
                 this.layerBool = true;
                 events.fire('enter_layer_view');
@@ -477,7 +468,6 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
         });
         events.on('selected_line_array', (evt, item)=> {
-            console.log(item);
             events.fire('selected_line_with_cpt', [item, this.selectedCohort.cpt]);
         });
         events.on('update_promis', (evt, item)=> {
@@ -489,7 +479,6 @@ export class CohortManager {
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].promis = promis;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
-            console.log(this.selectedCohort);
         });
         events.on('cpt_updated', (evt, item)=> {
 
