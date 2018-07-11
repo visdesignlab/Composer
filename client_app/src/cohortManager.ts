@@ -51,6 +51,7 @@ export class CohortManager {
     branchSelected;
     cohortTree = [];
     comparisonBool;
+    layerBool
     initialCohort;
 
     constructor() {
@@ -62,16 +63,20 @@ export class CohortManager {
 
     private attachListener(){
 
-        events.on('compare_cohorts', ()=> {
-            console.log(this.cohortTree);
-                if(!this.comparisonBool){
-                    this.comparisonBool = true;
-                    events.fire('enter_comparison_view');
+        events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
+                let filterReq = ['demographic', item[0], item[1]];
+              
+                if(this.branchSelected == null){
+                    this.cohortTree[this.cohortIndex].filterArray.push(filterReq);
+                    events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].filterArray);
+                    events.fire('test', [this.cohortTree, [this.cohortIndex]]);
                 }else{
-                    this.comparisonBool = false;
-                    events.fire('exit_comparison_view');
+                    this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].filterArray.push(filterReq);
+                    events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].filterArray);
+                    events.fire('test', [this.cohortTree, [this.branchSelected]]);
                 }
-            });
+        });
+    
 
         events.on('aggregate_button_clicked', ()=> {
             
@@ -210,6 +215,17 @@ export class CohortManager {
             events.fire('test', [this.cohortTree, [index]]);
           });
 
+          events.on('compare_button_down', ()=> {
+            console.log(this.cohortTree);
+                if(!this.comparisonBool){
+                    this.comparisonBool = true;
+                    events.fire('enter_comparison_view');
+                }else{
+                    this.comparisonBool = false;
+                    events.fire('exit_comparison_view');
+                }
+            });
+
 //fired in sidebar. send the filter information to refine the sidebar
         events.on('demo_refine', (evt, item)=> {
      
@@ -228,6 +244,17 @@ export class CohortManager {
             let codes = item;
            // console.log(this.selectedCohort);
             events.fire('update_cohort_start', [codes, this.selectedCohort]);
+        });
+
+        events.on('layer_button_down', (evt, item)=> {
+            console.log(this.cohortTree);
+            if(!this.layerBool){
+                this.layerBool = true;
+                events.fire('enter_layer_view');
+            }else{
+                this.layerBool = false;
+                events.fire('exit_layer_view');
+            }
         });
 
         events.on('separated_by_quant', (evt, item)=> {
@@ -259,20 +286,6 @@ export class CohortManager {
 
                 events.fire('update_chart', this.selectedCohort);
             });
-
-        events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
-            let filterReq = ['demographic', item[0], item[1]];
-          
-            if(this.branchSelected == null){
-                this.cohortTree[this.cohortIndex].filterArray.push(filterReq);
-                events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].filterArray);
-                events.fire('test', [this.cohortTree, [this.cohortIndex]]);
-            }else{
-                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].filterArray.push(filterReq);
-                events.fire('send_filter_to_codebar', this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].filterArray);
-                events.fire('test', [this.cohortTree, [this.branchSelected]]);
-            }
-          });
 
         events.on('frequency', ()=> { events.fire('frequency_test', this.selectedCohort)});
 

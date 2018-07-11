@@ -7,7 +7,7 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
-import {area, line, curveMonotoneX, curveLinear} from 'd3-shape';
+import {area, line, curveMonotoneX, curveLinear, curveMonotoneY} from 'd3-shape';
 import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
@@ -272,7 +272,7 @@ export async function drawPromisChart(promis, clump, node, cohort) {
            .call(axisLeft(scoreScale));
        // -------  define line function
        const lineFunc = line()
-           .curve(curveLinear)
+           .curve(curveMonotoneX)
            .x((d) => { return node.timeScale(+d['diff']); })
            .y((d) => { 
                if(scaleRelative){  return scoreScale(+d['relScore']);
@@ -317,7 +317,7 @@ export async function drawPromisChart(promis, clump, node, cohort) {
                                d['line'] = this;
                                return lineFunc(d.value);})
                    .on('click', function (d) { voronoiClicked(d); } )
-                   .on('mouseover', (d)=> addPromisDotsHover(d))
+                   .on('mouseover', (d)=> addPromisDotsHover(d, scaleRelative))
                    .on('mouseout', (d)=> removeDots());
 
            
@@ -388,7 +388,7 @@ export async function drawPromisChart(promis, clump, node, cohort) {
                   events.fire('line_unclicked', d);
                }else {
                    line.classList.add('selected');
-                   that.addPromisDotsClick(d);
+                   addPromisDotsClick(d, scaleRelative);
                    events.fire('line_clicked', d);
            };
                
@@ -401,7 +401,7 @@ export async function drawPromisChart(promis, clump, node, cohort) {
                    events.fire('selected_line_array', idarray);
                }
 
-        function addPromisDotsHover (d) {
+        function addPromisDotsHover (d, scale) {
 
                 let promisData = d;
          
@@ -412,7 +412,7 @@ export async function drawPromisChart(promis, clump, node, cohort) {
                 .attr('cx', (d, i)=> this.timeScale(d.diff))
                 .attr('cy', (d)=> {
                     let score; 
-                    if(this.scaleRelative){
+                    if(scale){
                         score = d.relScore;
                     }else{  score = d.SCORE; }
                     return this.scoreScale(score);
@@ -423,7 +423,9 @@ export async function drawPromisChart(promis, clump, node, cohort) {
          
          }
          
-        function addPromisDotsClick (d) {
+        function addPromisDotsClick (d, scale) {
+
+            console.log(d);
          
             let n = select(d.line).node();
             let parent = n.parentNode;
@@ -434,13 +436,12 @@ export async function drawPromisChart(promis, clump, node, cohort) {
             .selectAll('circle').data(promisData);
             dots.enter().append('circle').attr('class', d.key + '-clickdots')
             .classed('clickdots', true)
-            .attr('cx', (d, i)=> this.timeScale(d['diff']))
+            .attr('cx', (d, i)=> node.timeScale(d['diff']))
             .attr('cy', (d)=> {
-                if(this.scaleRelative){  return this.scoreScale(+d['relScore']);
-                        }else{ return this.scoreScale(+d['SCORE']) }
+                if(scale){  return node.scoreScale(+d['relScore']);
+                        }else{ return node.scoreScale(+d['SCORE']) }
             }).attr('r', 5).attr('fill', '#FF5733');
          
-            this.clicked = true;
          }
          
          function removeDots () {
