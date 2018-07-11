@@ -60,6 +60,7 @@ export class SideBar {
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
     let compare = this.$node.append('div').attr('id', 'compareDiv').classed('hidden', true);
+    let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     this.$node.append('div').attr('id', 'cohortDiv');
     this.$node.append('div').attr('id', 'filterDiv');
     this.xScale = scaleLinear();
@@ -87,6 +88,29 @@ export class SideBar {
     select('#compareDiv').classed('hidden', true);
 
   });
+
+  events.on('enter_layer_view', ()=> {
+          
+    select('#layerDiv').classed('hidden', false);
+    let array = [];
+
+    let selected = this.$node.selectAll('.fill');
+  
+    selected.nodes().forEach(sel => {
+      let entry = {class: sel.classList[0], data: sel.__data__ }
+      array.push(entry);
+    });
+
+    console.log(array);
+
+    events.fire('update_layers', array);
+});
+
+  events.on('exit_layer_view', ()=> {
+  
+  select('#layerDiv').classed('hidden', true);
+
+});
 
     
   events.on('filter_counted', (evt, item) => {//this get the count from the group
@@ -125,6 +149,11 @@ export class SideBar {
         let compare = select('#compareDiv');
         compare.selectAll('*').remove();
         this.buildComparisonFilter(compare, item[0], this.comparisonArray);
+
+        let layer = select('#layerDiv');
+        layer.selectAll('*').remove();
+
+        this.buildLayerFilter(layer, item[0], this.comparisonArray);
       });
       }
 
@@ -135,20 +164,71 @@ export class SideBar {
 
     }
 
-  private buildComparisonFilter(compareDiv, data, array) {
+  private buildLayerFilter(compareDiv, data, array){
+    array  = [];
+
+
+    let toggleData = [];
+        
+    data.forEach(d => {
+          toggleData.unshift(d);
+          if(d.branches.length != 0){ 
+            d.branches.forEach(b => {
+              toggleData.push(b);
+            });
+           };
+        });
+
+        console.log(toggleData);
+
+     //   events.fire('layer_update', array);
+
+        let layerDivs = compareDiv.selectAll('.layers').data(toggleData);
+
+        let layerenter = layerDivs.enter().append('div').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
+
+        layerDivs = layerenter.merge(layerDivs);
+
+        let svg = layerDivs.append('svg');
+
+        let rect = svg.append('rect').attr('width', 20).attr('height', 20).attr('class', (d,i)=> 'layer-' + String(i)).classed('fill', true);
+
+        let text = svg.append('text').text(d=> d.label);
+
+        text.attr('transform', 'translate(25, 10)');
+        rect.classed('fill', true);
+
+        rect.on('click', (d, i)=> {
+          let array = [];
+          console.log(i);
+          let r = rect.nodes()[i];
+          if(r.classList.contains('clear')){
+            r.classList.remove('clear');
+            r.classList.add('fill');
+          }else{ 
+            r.classList.remove('fill');
+            r.classList.add('clear'); }
+           
+          let selected = compareDiv.selectAll('.fill');
+          
+          selected.nodes().forEach(sel => {
+            let entry = {class: sel.classList[0], data: sel.__data__ }
+            array.push(entry);
+          });
+
+          console.log(array);
+
+          events.fire('update_layers', array);
+        
+        });
+    
+  }
+
+private buildComparisonFilter(compareDiv, data, array) {
    
-     array  = [];
-/*
-    let comparisonKeeper = [{name: 'A', label: null, cohort: null, data: null},
-                            {name: 'B', label: null, cohort: null, data: null},
-                            {name: 'C', label: null, cohort: null, data: null},
-                            {name: 'D', label: null, cohort: null, data: null},
-                            {name: 'E', label: null, cohort: null, data: null}
-                          ];
-*/
+    array  = [];
 
-
-   let toggleData = [];
+    let toggleData = [];
     
     data.forEach(d => {
       toggleData.unshift(d);
@@ -178,7 +258,7 @@ export class SideBar {
     }
 
 
-    let cohortToggle = compareDiv.append('div').classed('compare-toggle', true);
+    let cohortToggle = compareDiv.append('div').classed('layer-toggle', true);
 
     drawToggle(this.comparisonNum, array);
 
@@ -208,12 +288,12 @@ export class SideBar {
       li.on('click', (d)=> {
       
        array[d.index].selectedCohort = d.data;
-       events.fire('comparison_update', array);
+       events.fire('layer_update', array);
        cohortToggle.selectAll('*').remove();
        drawToggle(counter, array);
       });
 
-}
+    }
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
@@ -296,7 +376,7 @@ export class SideBar {
       drawToggle(this.comparisonNum, array);
       
       events.fire('comparison_update', array);
-  });
+    });
 }
 
 private buildDemoFilter() {

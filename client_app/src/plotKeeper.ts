@@ -32,6 +32,7 @@ export class PlotKeeper {
     selectedPlot;
     plotArray;
     private compareBool;
+    private layerBool;
     comparisonArray;
     drawPromisChart;
     frequencyCalc;
@@ -81,11 +82,20 @@ export class PlotKeeper {
                 this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
             });
 
-            let plotSvg = this.plotArray.selectAll('svg');
-
-            console.log(plotSvg);
-
             this.selectedPlot = this.plotArray[0];
+        });
+
+        
+        events.on('update_layers', (evt, item)=> {
+          
+            //this comes from the sidebar
+            this.comparisonArray = item;
+     
+            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            this.comparisonArray.forEach((cohort, i) => {
+                console.log(cohort);
+                this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
+            });
         });
 
         events.on('enter_comparison_view', ()=> {
@@ -101,12 +111,24 @@ export class PlotKeeper {
             this.compareBool = false;
         });
 
+        
+        events.on('enter_layer_view', ()=> {
+            this.layerBool = true;
+           
+        });
+
+        events.on('exit_layer_view', ()=> {
+          
+            this.plotDiv.selectAll('*').remove();
+            this.buildPlot(this.plotDiv, 0, this.domain);
+            events.fire('cohort_selected', [this.cohortData[0], 0]);
+            this.layerBool = false;
+        });
+
         events.on('test', (evt, item)=> {
         
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
-
-          
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
@@ -115,11 +137,6 @@ export class PlotKeeper {
                
                 this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort);
             }
-
-          //  this.drawPromisChart(this.selectedCohort, 'proLine', this.selectedPlot, this.selectedPlot.cohortIndex);
-
-           
-
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -134,11 +151,10 @@ export class PlotKeeper {
                 this.plotDiv.selectAll('*').remove();
 
             this.comparisonArray.forEach((cohort, i) => {
-            
                 let plot = this.buildPlot(this.plotDiv, i, this.domain);
                 this.plotArray.push(plot);
                 this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
-            });
+              });
             }
             
 
@@ -148,39 +164,49 @@ export class PlotKeeper {
 
            if(this.selectedPlot != undefined){
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-          //  this.drawPromisChart(item, 'proLine', this.selectedPlot, item);
-
-            let promis = item.promis;
-            let scaleRelative = item.scaleR;
-            let clumped = item.clumped;
-            let separated = item.separated;
-         
-            if(clumped){
-                //if it is aggregated
-                if(separated){
-                    this.frequencyCalc(item.promisSep[0], 'top', this.selectedPlot, item);
-                    this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'middle'));
-                    this.frequencyCalc(item.promisSep[2], 'bottom', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
-                }else{
+               if(this.layerBool){
+                this.comparisonArray.forEach((cohort) => {
+                    console.log(cohort);
+                    this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
                     
-                    this.frequencyCalc(promis, 'all', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
-                }
+                });
 
-            }else{
-                //if it is not aggregated
-                if(separated){
-                   
-                    this.drawPromisChart(item.promisSep[0], 'top', this.selectedPlot, item);
-                    this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item);
-                    this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedPlot, item);
-                }else{
-                  
-                    this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
-                }
-            }
-           }
- 
-             
+               }else{
+               
+                //  this.drawPromisChart(item, 'proLine', this.selectedPlot, item);
+      
+                  let promis = item.promis;
+                  let scaleRelative = item.scaleR;
+                  let clumped = item.clumped;
+                  let separated = item.separated;
+               
+                  if(clumped){
+                      //if it is aggregated
+                      if(separated){
+                          this.frequencyCalc(item.promisSep[0], 'top', this.selectedPlot, item);
+                          this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'middle'));
+                          this.frequencyCalc(item.promisSep[2], 'bottom', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
+                      }else{
+                          
+                          this.frequencyCalc(promis, 'all', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                      }
+      
+                  }else{
+                      //if it is not aggregated
+                      if(separated){
+                         
+                          this.drawPromisChart(item.promisSep[0], 'top', this.selectedPlot, item);
+                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item);
+                          this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedPlot, item);
+                      }else{
+                        
+                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
+                      }
+                  }
+                 }
+
+               }
+
         });
     
 
