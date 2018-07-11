@@ -196,8 +196,6 @@ export async function drawPromisChart(promis, clump, node, cohort) {
     let svg = node.svg;
     let index = node.cohortIndex;
 
-    console.log(scoreScale);
-
     if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
     }else{
         zeroEvent = cohort.startEvent[1][0].key;
@@ -424,8 +422,6 @@ export async function drawPromisChart(promis, clump, node, cohort) {
          }
          
         function addPromisDotsClick (d, scale) {
-
-            console.log(d);
          
             let n = select(d.line).node();
             let parent = n.parentNode;
@@ -447,8 +443,6 @@ export async function drawPromisChart(promis, clump, node, cohort) {
          function removeDots () {
             selectAll('.hoverdots').remove();
          }
-
-         console.log(node);
          
             /**
          * Utility method
@@ -502,8 +496,6 @@ export function frequencyCalc(promis, clump, node, cohort) {
 //item.promisSep[0], 'top', this.selectedNode, item
   // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
-
-    console.log(node);
         let minDay = node.domains.minDay;
         let maxDay = node.domains.maxDay;
 
