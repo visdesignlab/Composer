@@ -87,6 +87,10 @@ ul {
     min-height: 20px;
 }
 
+.chosen {
+    fill: #E67E22;
+}
+
 .labelWrapper {
     margin-top: 15px;
 }
@@ -94,6 +98,10 @@ ul {
 .layers {
     height: 30px;
     width: 100%;
+}
+
+.layers svg:hover {
+    cursor: pointer;
 }
 
 .layer-0 svg rect {
@@ -115,21 +123,21 @@ ul {
 }
 
 .layer-2 svg rect {
-    fill: rgb(109, 174, 218);
+    fill: rgb(156, 223, 130);
 }
 
 .layer-2 svg rect.clear {
     fill: white;
-    stroke: rgb(109, 174, 218);
+    stroke: rgb(156, 223, 130);
 }
 
 .layer-3 svg rect {
-    fill: rgb(156, 223, 130);
+    fill: rgb(109, 174, 218);
 }
 
 .layer-3 svg rect.clear {
     fill: white;
-    stroke: rgb(156, 223, 130);
+    stroke: rgb(109, 174, 218);
 }
 
 .distDetail_svg {

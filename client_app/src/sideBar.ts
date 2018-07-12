@@ -110,7 +110,7 @@ export class SideBar {
   events.on('exit_layer_view', ()=> {
   
     this.layerBool = false;
-  select('#layerDiv').classed('hidden', true);
+    select('#layerDiv').classed('hidden', true);
 
 });
     
@@ -193,13 +193,13 @@ export class SideBar {
 
         layerDivs = layerenter.merge(layerDivs);
 
-        let svg = layerDivs.append('svg');
+        let svg = layerDivs.append('svg').attr('width', 150).attr('height', 30);
 
         let rect = svg.append('rect').attr('width', 20).attr('height', 20).attr('class', (d,i)=> 'layer-' + String(i)).classed('fill', true);
 
         let text = svg.append('text').text(d=> d.label);
 
-        text.attr('transform', 'translate(25, 10)');
+        text.attr('transform', 'translate(25, 12)');
         rect.classed('fill', true);
 
         rect.on('click', (d, i)=> {
@@ -223,6 +223,21 @@ export class SideBar {
           if(this.layerBool == true){
             events.fire('update_layers', array);
           }
+
+        });
+
+        text.on('click', (d, i)=> {
+          console.log(d);
+          if(d.parentIndex == null){
+            events.fire('cohort_selected', [d, i]);
+          }else{
+            events.fire('branch_selected', [d.parentIndex, i]);
+          }
+
+          svg.classed('chosen', false);
+          let labels = layerDivs.nodes();
+          console.log(labels[i]);
+          select(labels[i]).select('svg').classed('chosen', true);
 
         });
 

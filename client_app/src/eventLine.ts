@@ -58,10 +58,15 @@ export class EventLine {
 
     private attachListener() {
 
-        events.on('test', (evt, item)=> {
+        events.on('cohort_selected',(evt, item)=> {
+            console.log('item');
+        });
 
-            console.log(item);
-           
+        events.on('branch_selected',(evt, item)=> {
+            console.log('item');
+        });
+
+        events.on('test', (evt, item)=> {
             this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
         });
 
@@ -72,8 +77,7 @@ export class EventLine {
         });
 
         events.on('update_chart', (evt, item)=> {
-            console.log(item);
-            console.log(item.filterArray);
+         
             this.filter = item.filterArray;
 
             let startEvent = item.startEvent;
@@ -243,7 +247,6 @@ export class EventLine {
     }
 
     private drawEventButtons(cohort){
-            console.log(cohort);
             let filters = cohort.filterArray;
             let scaleRelative = cohort.scaleR;
             let separated = cohort.separated;
@@ -283,7 +286,7 @@ export class EventLine {
                     }
             }
 
-            filters = filters.filter(d=> {return d[0] != 'Branch' && d[0] != 'demographic'});
+            filters = filters.filter(d=> {return d[0] != 'Branch' && d[0] != 'demographic' && d[0] != 'Score Count'});
 
             filters.push(['First Promis Score']);
         

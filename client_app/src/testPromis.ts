@@ -1,6 +1,3 @@
-/**
- * Created by saharmehrpour on 4/20/17.
- */
 
 import * as ajax from 'phovea_core/src/ajax';
 import {BaseType, select, selectAll, event} from 'd3-selection';
