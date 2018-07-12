@@ -73,12 +73,8 @@ export class EventLine {
 
         events.on('update_chart', (evt, item)=> {
             console.log(item);
-            console.log(item.filterArray)
+            console.log(item.filterArray);
             this.filter = item.filterArray;
-
-            
-            
-          //  this.drawEventButtons(this.filter);
 
             let startEvent = item.startEvent;
             if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
@@ -98,11 +94,9 @@ export class EventLine {
             selectAll('.selected-group').classed('selected-group', false);
 
         if(index.length > 1){ 
-
             let selected = document.getElementsByClassName(String(index[0]) + ' cohort-lines');
             selectAll(selected).selectAll('.branches').classed('selected-group', true);
         }else{
-         
             let selected = document.getElementsByClassName(String(index) + ' cohort-lines');
             selectAll(selected).selectAll('.event-rows').classed('selected-group', true);
         }
@@ -206,13 +200,10 @@ export class EventLine {
           blabel.append('text').text((d, i)=> {return 'B-' + (i + 1)});
           blabel.attr('transform', 'translate(0, 10)');
           blabel.on('click', (d, i)=> {
-             
             events.fire('branch_selected', [d.parentIndex, i]);
- 
           });
 
           blabel.attr('transform', (d, i) => 'translate(-60,'+ ((i * 10) + 8) + ')');
-          
 
           branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 22) + ')');
 

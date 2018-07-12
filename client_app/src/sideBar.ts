@@ -187,14 +187,6 @@ export class SideBar {
            };
         });
 
-    /*
-        toggleData.sort((a, b)=>{
-          return a.cohortIndex - b.Index;
-        });*/
-
-        console.log(toggleData);
-
-
         let layerDivs = compareDiv.selectAll('.layers').data(toggleData);
 
         let layerenter = layerDivs.enter().append('div').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
