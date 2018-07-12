@@ -12,7 +12,8 @@ import * as codeDict from './cptDictionary';
 
 class Cohort {
 
-        label: string; 
+        label: string;
+        cohortIndex: any;
         eventIndex: any;
         parentIndex: any;
         promis: any;
@@ -53,10 +54,12 @@ export class CohortManager {
     comparisonBool;
     layerBool
     initialCohort;
+    counter;
 
     constructor() {
         this.codes = codeDict.create();
         this.branchSelected = null;
+        this.counter = 0;
         
         this.attachListener();
     }
@@ -130,7 +133,8 @@ export class CohortManager {
             treeBranch.filterArray = bfilter;
             treeBranch.promis = b;
             treeBranch.cpt = bcpt;
-
+            treeBranch.cohortIndex = this.counter;
+            this.counter++;
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
            
             events.fire('branch_selected', [this.cohortIndex, newSpot]);
@@ -294,13 +298,15 @@ export class CohortManager {
             newParent.eventIndex = 0;
             newParent.cpt = item[1];
             newParent.promis = promis;
+            newParent.cohortIndex = this.cohortTree.length;
 
             newParent.filterArray.push(filterReq);
             this.cohortTree.push(newParent);
             this.selectedCohort = this.cohortTree[this.cohortIndex];
           
             this.branchSelected = null;
-            this.cohortIndex = this.cohortTree.length - 1;
+            this.cohortIndex = this.counter;
+            this.counter++;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
 
             events.fire('update_chart', this.selectedCohort);
