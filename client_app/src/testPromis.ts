@@ -479,6 +479,10 @@ export function clearDiagram(node, cohortIndex) {
   node.select('.scoreGroup-'+ cohortIndex).selectAll('#clip').remove();
 
    let aggline =  node.select('.scoreGroup-'+ cohortIndex);
+   aggline.selectAll('.layer-0').remove();
+   aggline.selectAll('.layer-1').remove();
+   aggline.selectAll('.layer-2').remove();
+   aggline.selectAll('.layer-3').remove();
    aggline.select('.avLine').remove();
    aggline.select('.avLine_all').remove();
    aggline.select('.avLine_top').remove();
