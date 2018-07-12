@@ -147,7 +147,7 @@ export class DataManager {
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
-            this.filterByPromisCount(item[0], item[1]).then(d=> {
+            this.filterByPromisCount(item[0].promis, item[1]).then(d=> {
                 events.fire('filtered_by_count', d);
             });
         });
@@ -158,12 +158,10 @@ export class DataManager {
             let promis = item[2].promis;
 
             this.searchByEvent(cpt, item[0]).then((d)=> {
-              //  let cpt = d[0];
-           
-                this.targetOrder = item;
+
+                let order = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, promis, 'promis').then(ob=> {
-                        events.fire('filter_cohort_by_event', [cpt, ob, this.targetOrder]);
-                  //  });
+                        events.fire('filter_cohort_by_event', [cpt, ob, order]);
                    })
                 );
                
@@ -313,6 +311,8 @@ export class DataManager {
     private async filterByPromisCount(cohort, count) {
     
         let filter = [];
+
+        console.log(cohort);
 
         cohort.forEach(patient => {
             if(patient.value.length > count){

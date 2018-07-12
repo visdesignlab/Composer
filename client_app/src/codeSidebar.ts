@@ -16,15 +16,8 @@ export class CodeSidebar {
 
     private $node;
     private dataset;
-    private startDay;
-    private startBool;
-    private cohortKeeper;
-    private targetOrder;
-    private selectedCohort;
-    private currentlySelectedName;
     private selected;
     private dictionary;
-    private selectedCohortFilters;
     private filterArray;
     private scoreLabel;
     private scoreBox;
@@ -65,36 +58,20 @@ export class CodeSidebar {
      */
     private attachListener() {
 
-       events.on('selected_cohort_update', (evt, item)=> {
+       events.on('update_chart', (evt, item)=> {
+        console.log(item);
+        let selectedFilters = item.filterArray;
         let cohortPromis = item.promis;
+
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
         this.$node.select('.distributionWrapper').selectAll('*').remove();
     
         this.histogrammer(cohortPromis).then(d=> this.drawHistogram(d));
-    
-       });
 
-       events.on('send_filter_to_codebar', (evt, item)=> {
-        this.selectedCohortFilters = item;
         this.DrawfilterDescriptionBox(item);
+
        });
-
-        events.on('update_start_event', (evt, item)=>  {
-            let startLabel = select('#start_date_label').style('color', 'black');
-            this.startBool = '0 date determined by event';
-            let startLabelBool = select('#pat_or_event').text(this.startBool);
-        });
-
-        events.on('start_date_patient', (evt, item)=> {
-            this.startBool = '0 date determined by patient';
-            this.startDay = item;
-            let startLabel = select('#start_date_label').text(item);
-            let startLabelBool = select('#pat_or_event').text(this.startBool);
-        });
-        events.on('test', (evt, item) => {
- 
-        });
 
     }
 
@@ -407,16 +384,18 @@ export class CodeSidebar {
     });
 }
 
-    private DrawfilterDescriptionBox(filter){
+    private DrawfilterDescriptionBox(cohort){
 
-        filter = filter.filter(d=> {return d[0] != 'Branch'});
+
+
+        let filter = cohort.filterArray.filter(d=> {return d[0] != 'Branch'});
         
         let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
         select('.descriptionDiv').selectAll('div').remove();
 
         const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
-        box.append('div').classed('panel-heading', true).append('text').text('Filter Layers');
+        box.append('div').classed('panel-heading', true).append('text').text(cohort.label + ' Filter Layers');
 
         let body = box.append('div').classed('panel-body', true);
 
