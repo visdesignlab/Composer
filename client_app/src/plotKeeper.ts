@@ -74,7 +74,7 @@ export class PlotKeeper {
             this.plotDiv.selectAll('*').remove();
 
             this.comparisonArray.forEach((cohort, i) => {
-                console.log(cohort);
+               
                 let plot = this.buildPlot(this.plotDiv, i, this.domain);
                 plot.svg.select(parent).on('click', (d, i)=> {console.log(d); console.log(i)});
 
@@ -95,11 +95,11 @@ export class PlotKeeper {
      
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
             this.comparisonArray.forEach((cohort, i) => {
-                console.log(cohort.data.clumped);
+              
                 if(cohort.data.clumped){
                     //if it is aggregated
                    console.log('is this working??');
-                        this.frequencyCalc(cohort.data.promis, 'all', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                        this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
                     
                 }else{
                     this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
@@ -129,11 +129,13 @@ export class PlotKeeper {
         });
 
         events.on('exit_layer_view', ()=> {
-          
+          console.log(this.cohortData);
+          this.layerBool = false;
             this.plotDiv.selectAll('*').remove();
             this.buildPlot(this.plotDiv, 0, this.domain);
+          
             events.fire('cohort_selected', [this.cohortData[0], 0]);
-            this.layerBool = false;
+         
         });
 
         events.on('test', (evt, item)=> {
@@ -172,25 +174,22 @@ export class PlotKeeper {
         });
         //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
-
+            console.log('chart updating');
+            console.log(this.selectedPlot);
+        
            if(this.selectedPlot != undefined){
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            console.log(this.layerBool);
                if(this.layerBool == true){
-                
-                console.log(this.layerBool);
-                console.log(this.comparisonArray);
+           
                 this.comparisonArray.forEach((cohort) => {
-                    console.log(cohort);
-
+           
                     if(cohort.data.clumped){
                         //if it is aggregated
                         if(cohort.separated){
                             cohort.data.forEach(promis => {
                                 this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item);
                             });
-                           // this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item);
-                           // this.frequencyCalc(cohort.data.promisSep[1], cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'middle'));
-                           // this.frequencyCalc(cohort.data.promisSep[2], cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
                         }else{
                             console.log('is this working??');
                             this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
@@ -198,14 +197,15 @@ export class PlotKeeper {
                     }else{
                         this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
                     }
-                   
-                    
+
                 });
 
                }else{
                
                 //  this.drawPromisChart(item, 'proLine', this.selectedPlot, item);
-      
+                console.log('this is firing');
+
+                console.log(item);
                   let promis = item.promis;
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
@@ -230,7 +230,9 @@ export class PlotKeeper {
                           this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item);
                           this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedPlot, item);
                       }else{
-                        
+                        console.log('home stretchwhy')
+                        console.log(promis);
+                        console.log(this.selectedPlot);
                           this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
                       }
                   }

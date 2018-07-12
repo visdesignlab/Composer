@@ -189,10 +189,12 @@ export class CohortManager {
         
             //this comes directly from cohrot tree in eventline;
         events.on('cohort_selected', (evt, item)=>{
-          
+          console.log(item);
             let cohort = item[0];
             let index = item[1];
             this.cohortIndex = index;
+
+            console.log(cohort);
 
             this.cohortTree[this.cohortIndex].promis = item[0].promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];

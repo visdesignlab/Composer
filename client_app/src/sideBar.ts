@@ -101,8 +101,6 @@ export class SideBar {
       array.push(entry);
     });
 
-    console.log(array);
-
     events.fire('update_layers', array);
 });
 
@@ -181,7 +179,7 @@ export class SideBar {
            };
         });
 
-        console.log(toggleData);
+      
 
      //   events.fire('layer_update', array);
 
@@ -218,7 +216,6 @@ export class SideBar {
             array.push(entry);
           });
 
-          console.log(array);
 
           events.fire('update_layers', array);
         
@@ -232,7 +229,7 @@ export class SideBar {
           array.push(entry);
         });
     
-        console.log(array);
+   
     
         events.fire('update_layers', array);
     
