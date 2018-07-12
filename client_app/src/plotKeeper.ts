@@ -132,13 +132,15 @@ export class PlotKeeper {
           console.log(this.cohortData);
           this.layerBool = false;
             this.plotDiv.selectAll('*').remove();
-            this.buildPlot(this.plotDiv, 0, this.domain);
+            this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
           
             events.fire('cohort_selected', [this.cohortData[0], 0]);
          
         });
 
         events.on('test', (evt, item)=> {
+
+            console.log('is test firing?');
         
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
@@ -231,9 +233,7 @@ export class PlotKeeper {
                           this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedPlot, item);
                       }else{
                         console.log('home stretchwhy')
-                        console.log(promis);
-                        console.log(this.selectedPlot);
-                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
+                        this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
                       }
                   }
                  }

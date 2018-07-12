@@ -41,6 +41,7 @@ export class SideBar {
   private selected;
   private branchSelected;
   private comparisonNum;
+  private layerBool;
   comparisonArray;
 
       private header = [
@@ -70,6 +71,7 @@ export class SideBar {
     this.branchSelected = null;
     this.comparisonNum = 2;
     this.comparisonArray = [];
+    this.layerBool = false;
 
     //this.buildComparisonFilter(compare);
     
@@ -91,6 +93,7 @@ export class SideBar {
 
   events.on('enter_layer_view', ()=> {
     console.log('is this firing??');
+    this.layerBool = true;
     select('#layerDiv').classed('hidden', false);
     let array = [];
 
@@ -106,6 +109,7 @@ export class SideBar {
 
   events.on('exit_layer_view', ()=> {
   
+    this.layerBool = false;
   select('#layerDiv').classed('hidden', true);
 
 });
@@ -152,7 +156,11 @@ export class SideBar {
         let layer = select('#layerDiv');
         layer.selectAll('*').remove();
 
-        this.buildLayerFilter(layer, item[0], this.comparisonArray);
+        this.buildLayerFilter(layer, item[0], this.comparisonArray).then((array)=> {
+          if(this.layerBool == true){
+            events.fire('update_layers', array);
+          }
+        });
 
       });
       }
@@ -164,14 +172,14 @@ export class SideBar {
 
     }
 
-  private buildLayerFilter(compareDiv, data, array){
+  private async buildLayerFilter(compareDiv, data, array){
     array  = [];
 
 
     let toggleData = [];
         
     data.forEach(d => {
-          toggleData.unshift(d);
+          toggleData.push(d);
           if(d.branches.length != 0){ 
             d.branches.forEach(b => {
               toggleData.push(b);
@@ -179,9 +187,13 @@ export class SideBar {
            };
         });
 
-      
+    /*
+        toggleData.sort((a, b)=>{
+          return a.cohortIndex - b.Index;
+        });*/
 
-     //   events.fire('layer_update', array);
+        console.log(toggleData);
+
 
         let layerDivs = compareDiv.selectAll('.layers').data(toggleData);
 
@@ -216,9 +228,10 @@ export class SideBar {
             array.push(entry);
           });
 
+          if(this.layerBool == true){
+            events.fire('update_layers', array);
+          }
 
-          events.fire('update_layers', array);
-        
         });
 
     
@@ -229,9 +242,8 @@ export class SideBar {
           array.push(entry);
         });
     
-   
-    
-        events.fire('update_layers', array);
+        return array;
+      //  events.fire('update_layers', array);
     
   }
 

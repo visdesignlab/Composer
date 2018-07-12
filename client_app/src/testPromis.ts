@@ -196,6 +196,8 @@ export async function drawPromisChart(promis, clump, node, cohort) {
     let svg = node.svg;
     let index = node.cohortIndex;
 
+    console.log(clump);
+
     if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
     }else{
         zeroEvent = cohort.startEvent[1][0].key;
