@@ -41,6 +41,7 @@ export class SideBar {
   private selected;
   private branchSelected;
   private comparisonNum;
+  private layerBool;
   comparisonArray;
 
       private header = [
@@ -60,8 +61,7 @@ export class SideBar {
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
     let compare = this.$node.append('div').attr('id', 'compareDiv').classed('hidden', true);
-    this.$node.append('div').attr('id', 'cohortDiv');
-    this.$node.append('div').attr('id', 'filterDiv');
+    let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     this.xScale = scaleLinear();
     this.yScale = scaleLinear().range([0, 30]);
     this.svgWidth = 170;
@@ -69,6 +69,7 @@ export class SideBar {
     this.branchSelected = null;
     this.comparisonNum = 2;
     this.comparisonArray = [];
+    this.layerBool = false;
 
     //this.buildComparisonFilter(compare);
     
@@ -78,16 +79,35 @@ export class SideBar {
   private attachListener () {
 
     events.on('enter_comparison_view', ()=> {
-          
       select('#compareDiv').classed('hidden', false);
   });
 
-  events.on('exit_comparison_view', ()=> {
-    
-    select('#compareDiv').classed('hidden', true);
-
+    events.on('exit_comparison_view', ()=> {
+      select('#compareDiv').classed('hidden', true);
   });
 
+    events.on('enter_layer_view', ()=> {
+      console.log('is this firing??');
+      this.layerBool = true;
+      select('#layerDiv').classed('hidden', false);
+      let array = [];
+
+      let selected = this.$node.selectAll('.fill');
+    
+      selected.nodes().forEach(sel => {
+        let entry = {class: sel.classList[0], data: sel.__data__ }
+        array.push(entry);
+    });
+
+    events.fire('update_layers', array);
+});
+
+  events.on('exit_layer_view', ()=> {
+  
+    this.layerBool = false;
+    select('#layerDiv').classed('hidden', true);
+
+});
     
   events.on('filter_counted', (evt, item) => {//this get the count from the group
 
@@ -121,10 +141,22 @@ export class SideBar {
   events.on('test', (evt, item)=> {
   
         selectAll('.selected').classed('selected', false);
+
+        //need to update comparison array
   
         let compare = select('#compareDiv');
         compare.selectAll('*').remove();
         this.buildComparisonFilter(compare, item[0], this.comparisonArray);
+
+        let layer = select('#layerDiv');
+        layer.selectAll('*').remove();
+
+        this.buildLayerFilter(layer, item[0], this.comparisonArray).then((array)=> {
+          if(this.layerBool == true){
+            events.fire('update_layers', array);
+          }
+        });
+
       });
       }
 
@@ -135,20 +167,93 @@ export class SideBar {
 
     }
 
-  private buildComparisonFilter(compareDiv, data, array) {
+  private async buildLayerFilter(compareDiv, data, array){
+    array  = [];
+
+
+    let toggleData = [];
+        
+    data.forEach(d => {
+          toggleData.push(d);
+          if(d.branches.length != 0){ 
+            d.branches.forEach(b => {
+              toggleData.push(b);
+            });
+           };
+        });
+
+        let layerDivs = compareDiv.selectAll('.layers').data(toggleData);
+
+        let layerenter = layerDivs.enter().append('div').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
+
+        layerDivs = layerenter.merge(layerDivs);
+
+        let svg = layerDivs.append('svg').attr('width', 150).attr('height', 30);
+
+        let rect = svg.append('rect').attr('width', 20).attr('height', 20).attr('class', (d,i)=> 'layer-' + String(i)).classed('fill', true);
+
+        let text = svg.append('text').text(d=> d.label);
+
+        text.attr('transform', 'translate(25, 12)');
+        rect.classed('fill', true);
+
+        rect.on('click', (d, i)=> {
+          let array = [];
+          console.log(i);
+          let r = rect.nodes()[i];
+          if(r.classList.contains('clear')){
+            r.classList.remove('clear');
+            r.classList.add('fill');
+          }else{ 
+            r.classList.remove('fill');
+            r.classList.add('clear'); }
+           
+          let selected = compareDiv.selectAll('.fill');
+          
+          selected.nodes().forEach(sel => {
+            let entry = {class: sel.classList[0], data: sel.__data__ }
+            array.push(entry);
+          });
+
+          if(this.layerBool == true){
+            events.fire('update_layers', array);
+          }
+
+        });
+
+        text.on('click', (d, i)=> {
+          console.log(d);
+          if(d.parentIndex == null){
+            events.fire('cohort_selected', [d, i]);
+          }else{
+            events.fire('branch_selected', [d.parentIndex, i]);
+          }
+
+          svg.classed('chosen', false);
+          let labels = layerDivs.nodes();
+          console.log(labels[i]);
+          select(labels[i]).select('svg').classed('chosen', true);
+
+        });
+
+    
+        let selected = this.$node.selectAll('.fill');
+      
+        selected.nodes().forEach(sel => {
+          let entry = {class: sel.classList[0], data: sel.__data__ }
+          array.push(entry);
+        });
+    
+        return array;
+      //  events.fire('update_layers', array);
+    
+  }
+
+private buildComparisonFilter(compareDiv, data, array) {
    
-     array  = [];
-/*
-    let comparisonKeeper = [{name: 'A', label: null, cohort: null, data: null},
-                            {name: 'B', label: null, cohort: null, data: null},
-                            {name: 'C', label: null, cohort: null, data: null},
-                            {name: 'D', label: null, cohort: null, data: null},
-                            {name: 'E', label: null, cohort: null, data: null}
-                          ];
-*/
+    array  = [];
 
-
-   let toggleData = [];
+    let toggleData = [];
     
     data.forEach(d => {
       toggleData.unshift(d);
@@ -178,7 +283,7 @@ export class SideBar {
     }
 
 
-    let cohortToggle = compareDiv.append('div').classed('compare-toggle', true);
+    let cohortToggle = compareDiv.append('div').classed('layer-toggle', true);
 
     drawToggle(this.comparisonNum, array);
 
@@ -208,12 +313,12 @@ export class SideBar {
       li.on('click', (d)=> {
       
        array[d.index].selectedCohort = d.data;
-       events.fire('comparison_update', array);
+       events.fire('layer_update', array);
        cohortToggle.selectAll('*').remove();
        drawToggle(counter, array);
       });
 
-}
+    }
 
     compareDiv.append('input').attr('type', 'button')
     .classed('btn', true).classed('btn-primary', true)
@@ -296,7 +401,7 @@ export class SideBar {
       drawToggle(this.comparisonNum, array);
       
       events.fire('comparison_update', array);
-  });
+    });
 }
 
 private buildDemoFilter() {

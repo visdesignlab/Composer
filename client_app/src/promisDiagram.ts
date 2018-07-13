@@ -410,7 +410,7 @@ export class promisDiagram {
                   }
 
                 function voronoiClicked(d) {
-          
+                    console.log('voronoi clicked!!')
                     let line = d.line;
                     if(line.classList.contains('selected')) {
                         line.classList.remove('selected');
