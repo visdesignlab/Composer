@@ -139,6 +139,46 @@
     position: relative;
 }
 
+.layer-0 path {
+    fill: none;
+    stroke: #2874A6;
+}
+
+path.qLine_layer-0 {
+    fill: #2874A6;
+    opacity: .5;
+}
+
+.layer-1 path {
+    fill: none;
+    stroke: rgb(193, 109, 218);
+}
+
+path.qLine_layer-1 {
+    fill: rgb(193, 109, 218);
+    opacity: .5;
+}
+
+.layer-2 path {
+    fill: none;
+    stroke: rgb(156, 223, 130);
+}
+
+path.qLine_layer-2 {
+    fill: rgb(156, 223, 130);
+    opacity: .5;
+}
+
+.layer-3 path {
+    fill: none;
+    stroke: rgb(109, 174, 218);
+}
+
+path.qLine_layer-3 {
+    fill: rgb(109, 174, 218);
+    opacity: .5;
+}
+
 .top {
     fill: none;
     stroke: #2874A6;
@@ -155,9 +195,9 @@
 }
 
 .selected {
-    stroke: #FF5733;
-    stroke-width: 3px;
-    fill: none;
+    //  stroke: #FF5733;
+    // stroke-width: 3px;
+    //  fill: none;
 }
 
 .hover-selected {

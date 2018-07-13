@@ -25,11 +25,11 @@
 }
 
 .selected {
-    padding: 2px;
-    color: #E67E22;
+    // padding: 2px;
+    //  color: #E67E22;
     // border: #E67E22;
-    background-color: #E67E22;
-    opacity: .8;
+    //  background-color: #E67E22;
+    //  opacity: .8;
     // border-radius: 2px;
 }
 
@@ -87,8 +87,57 @@ ul {
     min-height: 20px;
 }
 
+.chosen {
+    fill: #E67E22;
+}
+
 .labelWrapper {
     margin-top: 15px;
+}
+
+.layers {
+    height: 30px;
+    width: 100%;
+}
+
+.layers svg:hover {
+    cursor: pointer;
+}
+
+.layer-0 svg rect {
+    fill: #2874A6;
+}
+
+.layer-0 svg rect.clear {
+    fill: white;
+    stroke: #2874A6;
+}
+
+.layer-1 svg rect {
+    fill: rgb(193, 109, 218);
+}
+
+.layer-1 svg rect.clear {
+    fill: white;
+    stroke: rgb(193, 109, 218);
+}
+
+.layer-2 svg rect {
+    fill: rgb(156, 223, 130);
+}
+
+.layer-2 svg rect.clear {
+    fill: white;
+    stroke: rgb(156, 223, 130);
+}
+
+.layer-3 svg rect {
+    fill: rgb(109, 174, 218);
+}
+
+.layer-3 svg rect.clear {
+    fill: white;
+    stroke: rgb(109, 174, 218);
 }
 
 .distDetail_svg {
@@ -126,12 +175,12 @@ ul {
 }
 
 .cohort-label.selected div {
-    padding: 2px;
-    color: white;
-    border: #E67E22;
-    background-color: #E67E22;
-    opacity: .8;
-    border-radius: 2px;
+    //  padding: 2px;
+    //   color: white;
+    //  border: #E67E22;
+    //   background-color: #E67E22;
+    //  opacity: .8;
+    //  border-radius: 2px;
 }
 
 .cohort-label div {
