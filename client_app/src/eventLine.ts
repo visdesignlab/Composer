@@ -59,11 +59,11 @@ export class EventLine {
     private attachListener() {
 
         events.on('cohort_selected',(evt, item)=> {
-            console.log('item');
+      
         });
 
         events.on('branch_selected',(evt, item)=> {
-            console.log('item');
+      
         });
 
         events.on('test', (evt, item)=> {
@@ -73,11 +73,11 @@ export class EventLine {
         events.on('clear_cohorts', (evt, item)=> {
             let branchSvg =this.$node.select('.branch-wrapper').select('svg');;
             branchSvg.selectAll('*').remove();
-           // this.$node.select('.event-buttons').remove();
+         
         });
 
         events.on('update_chart', (evt, item)=> {
-            console.log(item);
+         
             this.filter = item.filterArray;
 
             let startEvent = item.startEvent;

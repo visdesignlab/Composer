@@ -103,8 +103,6 @@ export class DataManager {
         });
 
         events.on('update_cohort_start', (evt, item)=> {
-
-            console.log('update start');
             let codes = item[0];
             let promis = item[1].promis;
             let cpt = item[1].cpt;
@@ -191,9 +189,7 @@ export class DataManager {
          });
  
         events.on('separate_cohort_agg', (evt, item)=> {
-
-            this.getQuant_Separate(item.promis).then(sep=> {
-               
+            this.getQuant_Separate(item.promis, 3, false).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
         });
@@ -312,8 +308,6 @@ export class DataManager {
     
         let filter = [];
 
-        console.log(cohort);
-
         cohort.forEach(patient => {
             if(patient.value.length > count){
 
@@ -375,6 +369,55 @@ export class DataManager {
     }
 
     private getQuant_Agg(cohort, quant) {
+
+        let oneval = [];
+        let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+        let barray = [];
+        let selected;
+        let maxPromisCount = 1;
+
+        cohort.forEach(patient => {
+
+            if(patient.value.length == 1){
+                if(patient.value[0].diff > Math.abs(90)){
+                    outofrange.push(patient);
+                }
+                oneval.push(patient.key);
+            }else {
+
+                if(patient.value.length > maxPromisCount) {
+
+                    maxPromisCount = patient.value.length;
+                }
+
+            }
+
+            if(patient.b != undefined) {
+                barray.push(patient.b);
+                if(patient.b >= 43){topStart.push(patient)};
+                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
+                if(patient.b <= 29){bottomStart.push(patient)};
+                patient.scorespan = [patient.b];
+
+            }else{
+            }
+            
+            if(quant == 'bottom'){ selected = bottomStart };
+            if(quant == 'middle'){ selected = middleStart };
+            if(quant == 'top'){ selected = topStart };
+
+            
+        });
+
+
+        events.fire('filtered_by_quant', [selected, quant]);
+
+    }
+
+    private getQuant_test(cohort, quant) {
 
         let oneval = [];
         let outofrange = [];
@@ -522,6 +565,9 @@ export class DataManager {
                    //let b;
                    if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
                    if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
+                   pat.b = b;
+                   console.log(pat);
+
                }else{
                     let x1 = pat.window.neg[0];
                     let x2 = pat.window.pos[0];
@@ -549,54 +595,94 @@ export class DataManager {
 
         });
 
+        console.log(cohort);
+
         return cohort;
     }
 
 
 
-    private async getQuant_Separate(cohort) {
+    private async getQuant_Separate(cohort, binNum, relativeChange) {
 
-        let oneval = [];
-        let outofrange = [];
-        let topStart = [];
-        let middleStart = [];
-        let bottomStart = [];
-        let barray = [];
-        let maxPromisCount = 1;
+        let arrayofArrays = [];
 
-        cohort.forEach(patient => {
+        if(relativeChange == true){
 
-            if(patient.value.length == 1){
-                if(patient.value[0].diff > Math.abs(90)){
-                    outofrange.push(patient);
+            cohort.forEach(pat => {
+                let scores = pat.value.map(s=> s.relScore);
+                 let avs = scores.reduce((a, b) => parseFloat(a) + parseFloat(b)) / scores.length;
+                 pat.avChange = avs;
+             });
+     
+             let avsArray = cohort.map(d=> d.avChange);
+           
+             avsArray = avsArray.sort((a,b)=> a-b);
+         
+             let thresholdArray = Array.from(new Set(avsArray));
+     
+             let num = Math.floor(thresholdArray.length / binNum);
+     
+             let thresholds = [];
+     
+             for(let i = 0; i < (binNum - 1); i++){
+               thresholds.push(thresholdArray[num]);
+               num = num + num;  }
+               
+             for(let i = 0; i < binNum; i++){
+                 if(i == 0){ 
+                     arrayofArrays.push(cohort.filter(c=> c.avChange < thresholds[i]));
+                 }else if(i == (binNum - 1)) {
+                     arrayofArrays.push(cohort.filter(c=> c.avChange > thresholds[i-1]));
+                 }else {
+                     arrayofArrays.push(cohort.filter(c=> c.avChange < thresholds[i] && c.avChange > thresholds[i-1] ));
+                 }
+             }
+        }else {
+     
+            let barray = cohort.map(pat=> {
+                if(pat.b != undefined){return pat.b;
+                }else { return pat.value[0].SCORE; }
+            });
+
+       
+            barray = barray.sort((a,b)=> a-b);
+         
+            let thresholdArray = Array.from(new Set(barray));
+    
+            let num = Math.floor(thresholdArray.length / binNum);
+    
+            let thresholds = [];
+
+            for(let i = 0; i < (binNum - 1); i++){
+                thresholds.push(thresholdArray[num]);
+                num = num + num;  }
+
+  
+            if(cohort[0].b != undefined){
+                for(let i = 0; i < binNum; i++){
+                    if(i == 0){ 
+                        arrayofArrays.push(cohort.filter(c=> c.b < thresholds[i]));
+                    }else if(i == (binNum - 1)) {
+                        arrayofArrays.push(cohort.filter(c=> c.b > thresholds[i-1]));
+                    }else {
+                        arrayofArrays.push(cohort.filter(c=> c.b < thresholds[i] && c.b > thresholds[i-1] ));
+                    }
                 }
-                oneval.push(patient.key);
             }else {
-
-                if(patient.value.length > maxPromisCount) {
-
-                    maxPromisCount = patient.value.length;
+                console.log('no b');
+                for(let i = 0; i < binNum; i++){
+                    if(i == 0){ 
+                        arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE < thresholds[i]));
+                    }else if(i == (binNum - 1)) {
+                        arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE > thresholds[i-1]));
+                    }else {
+                        arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE < thresholds[i] && c.value[0].SCORE > thresholds[i-1] ));
+                    }
                 }
             }
-
-            if(patient.b != undefined) {
-                barray.push(patient.b);
-                if(patient.b >= 43){topStart.push(patient)};
-                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
-                if(patient.b <= 29){bottomStart.push(patient)};
-                patient.scorespan = [patient.b];
-            }else{
-                let test = patient.value[0].SCORE;
-                barray.push(test);
-                if(test >= 43){topStart.push(patient)};
-                if(test < 43 && test > 29){ middleStart.push(patient)};
-                if(test <= 29){bottomStart.push(patient)};
-                patient.scorespan = [test];
-            }
-        });
-        
-        //events.fire('separated_by_quant', [topStart, middleStart, bottomStart]);
-        return [topStart, middleStart, bottomStart];
+        }
+            
+        return arrayofArrays;
     }
 
     public async mapDemoData() {

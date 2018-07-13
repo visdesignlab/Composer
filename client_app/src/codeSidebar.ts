@@ -59,7 +59,7 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('update_chart', (evt, item)=> {
-        console.log(item);
+  
         let selectedFilters = item.filterArray;
         let cohortPromis = item.promis;
 
@@ -474,14 +474,14 @@ private renderHistogramTooltip(tooltip_data) {
 }
 
 private renderFilterTooltip(data) {
-    console.log(data);
+   
     let text;
     if(data[0]== 'demographic'){
         if(data[1].length == 0){ text = 'All Patients'; 
         }else{
                 text = ' ';
                 data[1].forEach(f=> {
-                    console.log(f);
+                   
                     text = text + f.attributeName + ": " + f.checkedOptions[0] + "</br>";
                 });
         }

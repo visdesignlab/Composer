@@ -210,9 +210,9 @@ export class PlotKeeper {
                   if(clumped){
                       //if it is aggregated
                       if(separated){
-                          this.frequencyCalc(item.promisSep[0], 'top', this.selectedPlot, item);
+                          this.frequencyCalc(item.promisSep[0], 'bottom', this.selectedPlot, item);
                           this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'middle'));
-                          this.frequencyCalc(item.promisSep[2], 'bottom', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
+                          this.frequencyCalc(item.promisSep[2], 'top', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
                       }else{
                           
                           this.frequencyCalc(promis, 'all', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
@@ -222,9 +222,9 @@ export class PlotKeeper {
                       //if it is not aggregated
                       if(separated){
                          
-                          this.drawPromisChart(item.promisSep[0], 'top', this.selectedPlot, item);
+                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item);
                           this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item);
-                          this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedPlot, item);
+                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item);
                       }else{
                         this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
                       }
