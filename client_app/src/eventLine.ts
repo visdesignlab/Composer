@@ -77,7 +77,7 @@ export class EventLine {
         });
 
         events.on('update_chart', (evt, item)=> {
-         
+            console.log(item);
             this.filter = item.filterArray;
 
             let startEvent = item.startEvent;

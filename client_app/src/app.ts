@@ -17,7 +17,6 @@ import * as PlotKeeper from './plotKeeper';
 import * as codeside from './codeSidebar';
 import { selectAll } from 'd3';
 
-
 /**
  * The main class for the App app
  */
