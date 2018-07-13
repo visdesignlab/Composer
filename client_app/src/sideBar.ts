@@ -62,8 +62,6 @@ export class SideBar {
     this.popRectScale = scaleLinear().range([0,150]);
     let compare = this.$node.append('div').attr('id', 'compareDiv').classed('hidden', true);
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
-    this.$node.append('div').attr('id', 'cohortDiv');
-    this.$node.append('div').attr('id', 'filterDiv');
     this.xScale = scaleLinear();
     this.yScale = scaleLinear().range([0, 30]);
     this.svgWidth = 170;
@@ -81,27 +79,24 @@ export class SideBar {
   private attachListener () {
 
     events.on('enter_comparison_view', ()=> {
-          
       select('#compareDiv').classed('hidden', false);
   });
 
-  events.on('exit_comparison_view', ()=> {
-    
-    select('#compareDiv').classed('hidden', true);
-
+    events.on('exit_comparison_view', ()=> {
+      select('#compareDiv').classed('hidden', true);
   });
 
-  events.on('enter_layer_view', ()=> {
-    console.log('is this firing??');
-    this.layerBool = true;
-    select('#layerDiv').classed('hidden', false);
-    let array = [];
+    events.on('enter_layer_view', ()=> {
+      console.log('is this firing??');
+      this.layerBool = true;
+      select('#layerDiv').classed('hidden', false);
+      let array = [];
 
-    let selected = this.$node.selectAll('.fill');
-  
-    selected.nodes().forEach(sel => {
-      let entry = {class: sel.classList[0], data: sel.__data__ }
-      array.push(entry);
+      let selected = this.$node.selectAll('.fill');
+    
+      selected.nodes().forEach(sel => {
+        let entry = {class: sel.classList[0], data: sel.__data__ }
+        array.push(entry);
     });
 
     events.fire('update_layers', array);

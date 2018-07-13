@@ -205,10 +205,10 @@ export class CohortManager {
             this.cohortTree[this.cohortIndex].promis = item[0].promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
            
-            let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
+           // let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
             this.branchSelected = null;
             events.fire('update_chart', this.selectedCohort);
-            //events.fire('test', [this.cohortTree, [index]]);
+            events.fire('test', [this.cohortTree, [index]]);
           });
 
           events.on('compare_button_down', ()=> {

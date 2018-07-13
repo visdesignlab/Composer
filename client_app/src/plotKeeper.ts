@@ -98,8 +98,7 @@ export class PlotKeeper {
               
                 if(cohort.data.clumped){
                     //if it is aggregated
-                   console.log('is this working??');
-                        this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                    this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
                     
                 }else{
                     this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
@@ -131,8 +130,8 @@ export class PlotKeeper {
         });
 
         events.on('exit_layer_view', ()=> {
-          console.log(this.cohortData);
-          this.layerBool = false;
+       
+            this.layerBool = false;
             this.plotDiv.selectAll('*').remove();
             this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
             document.getElementById('layerButton').classList.remove('btn-warning');
@@ -143,8 +142,6 @@ export class PlotKeeper {
 
         events.on('test', (evt, item)=> {
 
-            console.log('is test firing?');
-        
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
 
@@ -158,7 +155,7 @@ export class PlotKeeper {
         });
 
         events.on('domain updated', (evt, item)=> {
-            console.log('domain updated');
+          
             this.domain.minDay = item[0];
             this.domain.maxDay = item[1];
             this.plotArray = [];
@@ -179,12 +176,10 @@ export class PlotKeeper {
         });
         //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
-            console.log('chart updating');
-            console.log(this.selectedPlot);
-        
+          
            if(this.selectedPlot != undefined){
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-            console.log(this.layerBool);
+        
                if(this.layerBool == true){
            
                 this.comparisonArray.forEach((cohort) => {
@@ -196,7 +191,7 @@ export class PlotKeeper {
                                 this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item);
                             });
                         }else{
-                            console.log('is this working??');
+                       
                             this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
                         }
                     }else{
@@ -207,10 +202,6 @@ export class PlotKeeper {
 
                }else{
                
-                //  this.drawPromisChart(item, 'proLine', this.selectedPlot, item);
-                console.log('this is firing');
-
-                console.log(item);
                   let promis = item.promis;
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
@@ -235,7 +226,6 @@ export class PlotKeeper {
                           this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item);
                           this.drawPromisChart(item.promisSep[2], 'bottom', this.selectedPlot, item);
                       }else{
-                        console.log('home stretchwhy')
                         this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
                       }
                   }
