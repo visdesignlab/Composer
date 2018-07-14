@@ -83,21 +83,27 @@ export class CohortManager {
     
 
         events.on('aggregate_button_clicked', ()=> {
-            
-            let clumped = this.selectedCohort.clumped;
-            if(clumped){
-                clumped = false;
-                this.selectedCohort.clumped = false;
-               // document.getElementById('aggToggle').classList.remove('btn-warning');
+
+            if(this.layerBool == true){
+                console.log('layer bool on!');
+
                 
             }else{
-             
-                clumped = true;
-                this.selectedCohort.clumped = true;
-              //  document.getElementById('aggToggle').classList.add('btn-warning');
+
+                let clumped = this.selectedCohort.clumped;
+                if(clumped){
+                    clumped = false;
+                    this.selectedCohort.clumped = false;
+                }else{
+                 
+                    clumped = true;
+                    this.selectedCohort.clumped = true;
+                }
+
+                events.fire('update_chart', this.selectedCohort);
             }
-            
-            events.fire('update_chart', this.selectedCohort);
+        
+          
             });
 
         events.on('branch_cohort', ()=> {
@@ -195,12 +201,10 @@ export class CohortManager {
         
             //this comes directly from cohrot tree in eventline;
         events.on('cohort_selected', (evt, item)=>{
-          console.log(item);
-          console.log('selected!');
+      
             let cohort = item[0];
             let index = item[1];
    
-               
             this.cohortIndex = index;
             this.cohortTree[this.cohortIndex].promis = item[0].promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -453,8 +457,6 @@ export class CohortManager {
 
         events.on('min_day_calculated', (evt, item)=> {
 
-            console.log('min day calculated');
-            console.log(item);
             let promis = item[0];
             let cpt = item[1];
             let codes = item[2];
@@ -476,7 +478,7 @@ export class CohortManager {
             events.fire('selected_line_with_cpt', [item, this.selectedCohort.cpt]);
         });
         events.on('update_promis', (evt, item)=> {
-            console.log('promis updated');
+  
             let promis = item;
             if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].promis = promis;
@@ -488,7 +490,7 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
         });
         events.on('cpt_updated', (evt, item)=> {
-            console.log('cpt updated');
+   
              if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].cpt = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
