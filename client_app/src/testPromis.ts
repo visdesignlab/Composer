@@ -41,8 +41,6 @@ export class promisDiagram {
     private maxDay;
     private minDay = 0;
 
-    private zeroEvent = 'First Promis Score';
-
     height = 460;
     width = 600;
     promisDimension = {height: 460, width: 700};
@@ -258,21 +256,21 @@ export async function drawPromisChart(promis, clump, node, cohort) {
      
        // -----  set domains and axis
        // time scale
-       node.timeScale.domain([minDay, maxDay]);
+        node.timeScale.domain([minDay, maxDay]);
 
-       svg.select('.xAxis')
-           .call(axisBottom(node.timeScale));
+        svg.select('.xAxis')
+            .call(axisBottom(node.timeScale));
 
-       svg.select('.yAxis')
-           .call(axisLeft(scoreScale));
-       // -------  define line function
-       const lineFunc = line()
-           .curve(curveLinear)
-           .x((d) => { return node.timeScale(+d['diff']); })
-           .y((d) => { 
-               if(scaleRelative){  return scoreScale(+d['relScore']);
-               }else{ return scoreScale(+d['SCORE']); }
-           });
+        svg.select('.yAxis')
+            .call(axisLeft(scoreScale));
+        // -------  define line function
+        const lineFunc = line()
+            .curve(curveLinear)
+            .x((d) => { return node.timeScale(+d['diff']); })
+            .y((d) => { 
+                if(scaleRelative){  return scoreScale(+d['relScore']);
+                }else{ return scoreScale(+d['SCORE']); }
+            });
 
        // ------- draw
       // const promisScoreGroup = this.svg.select('.scoreGroup');
@@ -359,7 +357,7 @@ export async function drawPromisChart(promis, clump, node, cohort) {
            zeroLine.append('line')
                .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
                .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
-           zeroLine.append('text').text(node.zeroEvent).attr('x', node.timeScale(0));
+           zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
 
            function mouseover(d) {
                let group = d.data.pat.line;
@@ -497,6 +495,8 @@ export function frequencyCalc(promis, clump, node, cohort) {
 //item.promisSep[0], 'top', this.selectedNode, item
   // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
+    console.log(promis);
+    
         let minDay = node.domains.minDay;
         let maxDay = node.domains.maxDay;
 

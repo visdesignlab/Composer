@@ -86,8 +86,8 @@ export class SideBar {
       select('#compareDiv').classed('hidden', true);
   });
 
-    events.on('enter_layer_view', ()=> {
-      console.log('is this firing??');
+  events.on('enter_layer_view', ()=> {
+
       this.layerBool = true;
       select('#layerDiv').classed('hidden', false);
       let array = [];
@@ -103,7 +103,6 @@ export class SideBar {
 });
 
   events.on('exit_layer_view', ()=> {
-  
     this.layerBool = false;
     select('#layerDiv').classed('hidden', true);
 
@@ -199,7 +198,7 @@ export class SideBar {
 
         rect.on('click', (d, i)=> {
           let array = [];
-          console.log(i);
+
           let r = rect.nodes()[i];
           if(r.classList.contains('clear')){
             r.classList.remove('clear');
@@ -222,7 +221,7 @@ export class SideBar {
         });
 
         text.on('click', (d, i)=> {
-          console.log(d);
+         
           if(d.parentIndex == null){
             events.fire('cohort_selected', [d, i]);
           }else{
@@ -231,7 +230,7 @@ export class SideBar {
 
           svg.classed('chosen', false);
           let labels = layerDivs.nodes();
-          console.log(labels[i]);
+         
           select(labels[i]).select('svg').classed('chosen', true);
 
         });
