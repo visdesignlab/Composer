@@ -267,7 +267,7 @@ export async function drawPromisChart(promis, clump, node, cohort) {
            .call(axisLeft(scoreScale));
        // -------  define line function
        const lineFunc = line()
-           .curve(curveMonotoneX)
+           .curve(curveLinear)
            .x((d) => { return node.timeScale(+d['diff']); })
            .y((d) => { 
                if(scaleRelative){  return scoreScale(+d['relScore']);
