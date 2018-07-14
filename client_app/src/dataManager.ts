@@ -112,8 +112,8 @@ export class DataManager {
                this.getDays(promis, null).then(promisShifted=> {
               
                 this.getBaselines(promisShifted).then(based=> {
-                    this.updateDiff(codes, cpt, promisShifted).then(cptShifted=> {           
-                        this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted, codes]));
+                    this.updateDiff(codes, cpt, promisShifted).then(cptShifted=> {  
+                        events.fire('min_day_calculated', [based, cptShifted, codes]);
                     });
                 });
             });
@@ -128,8 +128,7 @@ export class DataManager {
                         this.getDays(co, 'days').then(promisShifted=> {
                             this.getBaselines(promisShifted).then(based=> {
                                 this.updateDiff(codes, cptFiltered[0], null).then(cptShifted=> {
-                                    this.interpolate(based).then(interpolated=> events.fire('min_day_calculated', [interpolated, cptShifted, codes]));
-                                    
+                                    events.fire('min_day_calculated', [based, cptShifted, codes]);
                                 });
                             });
                         });
@@ -189,7 +188,14 @@ export class DataManager {
          });
  
         events.on('separate_cohort_agg', (evt, item)=> {
-            this.getQuant_Separate(item.promis, 3, false).then(sep=> {
+            let sepBool;
+            if(item.separated == true){
+                sepBool = true;
+            }else{
+                sepBool = false;
+            }
+            console.log(sepBool);
+            this.getQuant_Separate(item.promis, 3, sepBool).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
         });
@@ -467,7 +473,74 @@ export class DataManager {
     }
     //breaks each pat value scores into Original and relative score
     private async getBaselines(cohort)  {
+        
+        cohort.forEach(pat => {
+        
+            pat.value = pat.value.sort((a, b)=> a.diff - b.diff);
 
+            let pos = pat.value.filter(v=> v.diff > 0).map(m=> [m.diff, m.SCORE]);
+
+            let neg = pat.value.filter(v=> v.diff < 0).map(m=> [m.diff, m.SCORE]);
+
+            let zeroScore = pat.value.filter(v=> v.diff == 0).map(m=> [m.diff, m.SCORE]);
+          
+            if(zeroScore.length > 0 ){ 
+                pat.b = zeroScore[0][1];
+                pat.value.forEach(val => {
+                    val.relScore = val.SCORE - pat.b;
+                });
+            }else{
+                console.log('have to calculate baselines');
+        
+                let array1;
+                let array2;
+
+                if(neg.length == 0){ 
+                    array1 = pos[0];
+                }else{
+                    array1 = neg[neg.length - 1];
+                }
+
+                if(pos.length == 0){ 
+                    array2 = neg[neg.length - 1];
+                }else{
+                    array2 = pos[0];
+                }
+
+                console.log(array1);
+                console.log(array2);
+
+                if(array1 == array2){
+                    console.log('no window');
+                    pat.b = array1[1];
+                }else{
+                    console.log('window');
+                    let x1 = array1[0];
+                    let x2 = array2[0];
+                    let y1 = array1[1];
+                    let y2 = array2[1];
+                    
+                    let slope = (y2 - y1) / (x2 - x1);
+                    console.log(slope);
+                    let b = y1 - (slope * x1);
+                    pat.slope = slope;
+                    pat.b = +b;
+                }
+
+                pat.value.forEach(val => {
+                    val.relScore = val.SCORE - pat.b;
+                });
+            }
+
+        });
+        console.log(cohort);
+
+        return cohort;
+    }
+
+    private async getBaselines_test(cohort)  {
+        console.log(cohort);
+        
         cohort.forEach(patient => {
             let negative = 0;
             let positive = 0;
@@ -509,7 +582,6 @@ export class DataManager {
                     if(value.diff < 0) {
                         if(negMin != null) {
                             if(Math.abs(value.diff) < Math.abs(negMin)) {
-
                                 negMin = value.diff;
                             }};
                         }
@@ -554,54 +626,7 @@ export class DataManager {
         return cohort;
     }
     //estimates 
-    private async interpolate(cohort) {
-
-     cohort.forEach(pat => {
-            if(pat.window != null && pat.window != undefined) {
-                let b;
-               
-               if((pat.window.neg[0] == Math.abs(0)) || (pat.window.pos[0] == Math.abs(0))) {
-                
-                   //let b;
-                   if(pat.window.neg[0] == 0){b = pat.window.neg[1]; }
-                   if(pat.window.pos[0] == 0){b = pat.window.pos[1]; }
-                   pat.b = b;
-                   console.log(pat);
-
-               }else{
-                    let x1 = pat.window.neg[0];
-                    let x2 = pat.window.pos[0];
-                    let y1 = pat.window.neg[1];
-                    let y2 = pat.window.pos[1];
-                    let X;
-                    let Y;
-
-                    if (x1 < x2){X = x1; Y = y1;}
-                    else {X = x2; Y = y2;};
-
-                    let slope = (y2 - y1) / (x2 - x1);
-                    b = Y - (slope * X);
-                    pat.slope = slope;
-                    pat.b = +b;
-               }
-
-                pat.value.forEach((value) => {
-                    value.b = b;
-                    value.relScore = value.ogScore - b;
-
-                });
-
-            }
-
-        });
-
-        console.log(cohort);
-
-        return cohort;
-    }
-
-
-
+ 
     private async getQuant_Separate(cohort, binNum, relativeChange) {
 
         let arrayofArrays = [];
