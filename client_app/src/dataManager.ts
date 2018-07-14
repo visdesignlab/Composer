@@ -82,7 +82,6 @@ export class DataManager {
                          
                             this.getDays(promis, null).then(promisShifted=> {
                                 this.getBaselines(promisShifted).then(based=> {
-                         
                                     events.fire('new_cohort', [based, orders, filter]);
                                 });
                                
@@ -133,7 +132,6 @@ export class DataManager {
                             });
                         });
                     });
-
                 });
             }
         });
@@ -219,7 +217,6 @@ export class DataManager {
         events.on('update_cpt_days', (evt, item)=>{
     
             this.updateDiff(this.targetOrder, item[0], null).then(cpt=> {
-               
                 events.fire('cpt_updated', cpt);
             });
         });
@@ -316,7 +313,6 @@ export class DataManager {
 
         cohort.forEach(patient => {
             if(patient.value.length > count){
-
                 filter.push(patient);
             }
 
@@ -336,7 +332,6 @@ export class DataManager {
                 
                 cohort.forEach((g) => {
                     let  minDate;
-            
                     if(g.CPTtime != undefined && date != null ) {
                         minDate = this.parseTime(g.CPTtime, null);
                       
@@ -373,8 +368,57 @@ export class DataManager {
             }else{console.log('error'); }
 
     }
+    
+    private async getQuant_Agg(cohort, quant) {
+        console.log(cohort);
+        console.log(quant);
+        let oneval = [];
+        let outofrange = [];
+        let topStart = [];
+        let middleStart = [];
+        let bottomStart = [];
+        let barray = [];
+        let selected;
+        let maxPromisCount = 1;
 
-    private getQuant_Agg(cohort, quant) {
+        cohort.forEach(patient => {
+
+            if(patient.value.length == 1){
+                if(patient.value[0].diff > Math.abs(90)){
+                    outofrange.push(patient);
+                }
+                oneval.push(patient.key);
+            }else {
+
+                if(patient.value.length > maxPromisCount) {
+
+                    maxPromisCount = patient.value.length;
+                }
+
+            }
+
+            if(patient.b != undefined) {
+                barray.push(patient.b);
+                if(patient.b >= 43){topStart.push(patient)};
+                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
+                if(patient.b <= 29){bottomStart.push(patient)};
+                patient.scorespan = [patient.b];
+
+            }else{
+            }
+            
+            if(quant == 'bottom'){ selected = bottomStart };
+            if(quant == 'middle'){ selected = middleStart };
+            if(quant == 'top'){ selected = topStart };
+
+            
+        });
+
+        events.fire('filtered_by_quant', [selected, quant]);
+
+    }
+
+    private getQuant_Agg_Test(cohort, quant) {
 
         let oneval = [];
         let outofrange = [];
@@ -418,59 +462,10 @@ export class DataManager {
             
         });
 
-
         events.fire('filtered_by_quant', [selected, quant]);
 
     }
 
-    private getQuant_test(cohort, quant) {
-
-        let oneval = [];
-        let outofrange = [];
-        let topStart = [];
-        let middleStart = [];
-        let bottomStart = [];
-        let barray = [];
-        let selected;
-        let maxPromisCount = 1;
-
-        cohort.forEach(patient => {
-
-            if(patient.value.length == 1){
-                if(patient.value[0].diff > Math.abs(90)){
-                    outofrange.push(patient);
-                }
-                oneval.push(patient.key);
-            }else {
-
-                if(patient.value.length > maxPromisCount) {
-
-                    maxPromisCount = patient.value.length;
-                }
-
-            }
-
-            if(patient.b != undefined) {
-                barray.push(patient.b);
-                if(patient.b >= 43){topStart.push(patient)};
-                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
-                if(patient.b <= 29){bottomStart.push(patient)};
-                patient.scorespan = [patient.b];
-
-            }else{
-            }
-            
-            if(quant == 'bottom'){ selected = bottomStart };
-            if(quant == 'middle'){ selected = middleStart };
-            if(quant == 'top'){ selected = topStart };
-
-            
-        });
-
-
-        events.fire('filtered_by_quant', [selected, quant]);
-
-    }
     //breaks each pat value scores into Original and relative score
     private async getBaselines(cohort)  {
         
@@ -537,95 +532,6 @@ export class DataManager {
 
         return cohort;
     }
-
-    private async getBaselines_test(cohort)  {
-        console.log(cohort);
-        
-        cohort.forEach(patient => {
-            let negative = 0;
-            let positive = 0;
-            let zeroValue = false;
-            let negMin;
-            let posMin;
-            let absMin;
-
-            patient.value.forEach((value) => {
-                if(value.diff < 0) { negative = negative + 1;    }
-                if(value.diff > 0) { positive = positive + 1;    }
-                if(value.diff == Math.abs(0)) {
-                    zeroValue = true;
-                    value.diff = 0;   }
-            });
-
-            absMin = patient.value[0].diff;
-            let baseStart;
-            let baseEnd;
-            let baseline;
-            patient.window = {'neg' : null, 'pos': null };
-
-            if(negative == 0){ negMin = null; posMin = 6000;
-            }else if(positive == 0){ posMin = null; negMin = patient.value[0].diff;
-            }else {
-                negMin = patient.value[0].diff;
-                posMin = 6000;
-            }
-            if(zeroValue)  {
-               
-                posMin = 0;
-                negMin = 0;
-                absMin = 0;
-            }
-
-            patient.value.forEach(value => {
-                if(absMin != 0) {
-                //if(value.diff != Math.abs(0)){
-                    if(value.diff < 0) {
-                        if(negMin != null) {
-                            if(Math.abs(value.diff) < Math.abs(negMin)) {
-                                negMin = value.diff;
-                            }};
-                        }
-                    if(value.diff > 0) {
-                        if(posMin != null) {
-                        if(value.diff < posMin) {
-                        posMin = value.diff;
-                        }};
-                    }}
-
-                if(absMin != 0) {
-                    if(Math.abs(value.diff) < Math.abs(absMin)) {
-                        absMin = +value.diff;
-                            };
-                }else {
-
-                }
-
-                if(value.diff == absMin) {baseline = value.SCORE; };
-                if(value.diff == negMin) {baseStart = value.SCORE; };
-                if(value.diff == posMin) {baseEnd = value.SCORE; };
-
-            });
-
-         patient.value.forEach((value) => {
-             if(posMin == null || negMin == null) {
-                 patient.window = null;
-                
-                 value.ogScore = value.SCORE;
-                 value.relScore = value.SCORE - baseline;
-   
-             }else {
-                value.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
-                patient.window = {'neg': [negMin, baseStart], 'pos': [posMin, baseEnd]};
-                value.ogScore = value.SCORE;
-                value.relScore = value.SCORE - baseline;
-             }
-
-         });
-        });
-
-        return cohort;
-    }
-    //estimates 
  
     private async getQuant_Separate(cohort, binNum, relativeChange) {
 

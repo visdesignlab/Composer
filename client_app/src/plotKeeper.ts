@@ -126,6 +126,7 @@ export class PlotKeeper {
             this.layerBool = true;
 
             document.getElementById('layerButton').classList.add('btn-warning');
+            document.getElementById('quartile-btn').classList.add('disabled');
            
         });
 
@@ -135,6 +136,7 @@ export class PlotKeeper {
             this.plotDiv.selectAll('*').remove();
             this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
             document.getElementById('layerButton').classList.remove('btn-warning');
+            document.getElementById('quartile-btn').classList.remove('disabled');
           
             events.fire('cohort_selected', [this.cohortData[0], 0]);
          
