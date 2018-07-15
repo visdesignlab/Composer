@@ -86,7 +86,9 @@ export class PlotKeeper {
         });
 
         
-        events.on('update_layers', (evt, item)=> {
+        events.on('draw_layers', (evt, item)=> {
+
+            console.log(item);
           
             //this comes from the sidebar
         if(this.selectedPlot != undefined){    
