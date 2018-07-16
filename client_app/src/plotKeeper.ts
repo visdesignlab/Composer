@@ -65,6 +65,12 @@ export class PlotKeeper {
 
     private attachListener(){
 
+        events.on('clear_cohorts', (evt, item)=> {
+            this.layerBool = false;
+            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+
+        });
+
         events.on('comparison_update', (evt, item)=> {
           
             //this comes from the sidebar
@@ -79,7 +85,7 @@ export class PlotKeeper {
                 plot.svg.select(parent).on('click', (d, i)=> {console.log(d); console.log(i)});
 
                 this.plotArray.push(plot);
-                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
+                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort, i);
             });
 
             this.selectedPlot = this.plotArray[0];
@@ -100,52 +106,41 @@ export class PlotKeeper {
               
                 if(cohort.data.clumped){
                     //if it is aggregated
-                    this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                    this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item, i);//.then(co=> this.drawAgg(co, 'all'));
                     
                 }else{
-                    this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
+                    this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
+                    console.log(cohort.class);
                 }
                
-              //  this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
             });}
         });
 
         events.on('enter_comparison_view', ()=> {
             this.compareBool = true;
-           
         });
 
         events.on('exit_comparison_view', ()=> {
-          
             this.plotDiv.selectAll('*').remove();
             this.buildPlot(this.plotDiv, 0, this.domain);
             events.fire('cohort_selected', [this.cohortData[0], 0]);
             this.compareBool = false;
         });
 
-        
         events.on('enter_layer_view', ()=> {
             this.layerBool = true;
-
-            document.getElementById('layerButton').classList.add('btn-warning');
-            document.getElementById('quartile-btn').classList.add('disabled');
-           
         });
 
         events.on('exit_layer_view', ()=> {
-       
             this.layerBool = false;
             this.plotDiv.selectAll('*').remove();
             this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
             document.getElementById('layerButton').classList.remove('btn-warning');
-            document.getElementById('quartile-btn').classList.remove('disabled');
-          
             events.fire('cohort_selected', [this.cohortData[0], 0]);
-         
         });
 
         events.on('test', (evt, item)=> {
-
+            console.log('test firing?');
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
 
@@ -153,8 +148,14 @@ export class PlotKeeper {
                 this.initialLoadBool = true;
                
                 this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
+
+                if(this.layerBool){
+                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, this.selectedCohort.cohortIndex);
+                }else{
+                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
+                }
                
-                this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort);
+             
             }
         });
 
@@ -172,7 +173,7 @@ export class PlotKeeper {
             this.comparisonArray.forEach((cohort, i) => {
                 let plot = this.buildPlot(this.plotDiv, i, this.domain);
                 this.plotArray.push(plot);
-                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort);
+                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort, i);
               });
             }
             
@@ -186,20 +187,20 @@ export class PlotKeeper {
         
                if(this.layerBool == true){
            
-                this.comparisonArray.forEach((cohort) => {
+                this.comparisonArray.forEach((cohort, i) => {
            
                     if(cohort.data.clumped){
                         //if it is aggregated
                         if(cohort.separated){
                             cohort.data.forEach(promis => {
-                                this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item);
+                                this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item, i);
                             });
                         }else{
                        
-                            this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                            this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item, i);//.then(co=> this.drawAgg(co, 'all'));
                         }
                     }else{
-                        this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data);
+                        this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
                     }
 
                 });
@@ -214,23 +215,23 @@ export class PlotKeeper {
                   if(clumped){
                       //if it is aggregated
                       if(separated){
-                          this.frequencyCalc(item.promisSep[0], 'bottom', this.selectedPlot, item);
-                          this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'middle'));
-                          this.frequencyCalc(item.promisSep[2], 'top', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'bottom'));
+                          this.frequencyCalc(item.promisSep[0], 'bottom', this.selectedPlot, item, null);
+                          this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'middle'));
+                          this.frequencyCalc(item.promisSep[2], 'top', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'bottom'));
                       }else{
                           
-                          this.frequencyCalc(promis, 'all', this.selectedPlot, item);//.then(co=> this.drawAgg(co, 'all'));
+                          this.frequencyCalc(promis, 'all', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'all'));
                       }
       
                   }else{
                       //if it is not aggregated
                       if(separated){
                          
-                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item);
-                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item);
-                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item);
+                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item, null);
+                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null);
+                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null);
                       }else{
-                        this.drawPromisChart(promis, 'proLine', this.selectedPlot, item);
+                        this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null);
                       }
                   }
                  }
