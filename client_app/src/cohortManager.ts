@@ -225,6 +225,7 @@ export class CohortManager {
             this.removeCohortFilterArray();
             this.counter = 0;
             events.fire('clear_charts', null);
+            this.layerBool = false;
             });
 
          events.on('cpt_filter_button', (evt, item)=> {
