@@ -52,6 +52,7 @@ export class CohortManager {
     comparisonBool;
     layerBool;
     counter;
+    layerKeeper;
 
     constructor() {
         this.codes = codeDict.create();
@@ -80,13 +81,32 @@ export class CohortManager {
 
                 events.fire('update_chart', this.selectedCohort);
         });
+
+        events.on('update_layers', (evt, item)=> {
+            this.layerKeeper = item;
+            events.fire('draw_layers', this.layerKeeper);
+        });
     
 
         events.on('aggregate_button_clicked', ()=> {
 
             if(this.layerBool == true){
                 console.log('layer bool on!');
-
+                if(!this.layerKeeper.clumped){
+                    this.layerKeeper.forEach(layer => {
+                        layer.data.clumped = true;
+                    });
+                    this.layerKeeper.clumped = true;
+                }else{
+                 
+                        this.layerKeeper.forEach(layer => {
+                            layer.data.clumped = false;
+                        });
+                        this.layerKeeper.clumped = false;
+                    }
+                
+                events.fire('draw_layers', this.layerKeeper);
+            
                 
             }else{
 
@@ -162,7 +182,24 @@ export class CohortManager {
             });
 
         events.on('change_promis_scale', ()=> {
-            let scaleRelative;
+
+            if(this.layerBool == true){
+                console.log('layer bool on!');
+                if(!this.layerKeeper.scaleR){
+                    this.layerKeeper.forEach(layer => {
+                        layer.data.scaleR = true;
+                    });
+                    this.layerKeeper.scaleR = true;
+                }else{
+                        this.layerKeeper.forEach(layer => {
+                            layer.data.scaleR = false;
+                        });
+                        this.layerKeeper.scaleR = false;
+                    }
+                
+                events.fire('draw_layers', this.layerKeeper);
+        }else{  
+              let scaleRelative;
 
             if(this.branchSelected == null){
                 scaleRelative = this.cohortTree[this.cohortIndex].scaleR;
@@ -180,6 +217,7 @@ export class CohortManager {
             }
             this.selectedCohort.scaleR = scaleRelative;
             events.fire('update_chart', this.selectedCohort);
+        }
            
         });
 
@@ -187,6 +225,7 @@ export class CohortManager {
             this.removeCohortFilterArray();
             this.counter = 0;
             events.fire('clear_charts', null);
+            this.layerBool = false;
             });
 
          events.on('cpt_filter_button', (evt, item)=> {

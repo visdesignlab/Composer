@@ -116,7 +116,6 @@ export class promisDiagram {
                 let end = that.scoreScale.invert(event.selection[1]);
 
                 events.fire('score_domain_change', [+start, +end]);
-               
             });
  
         slider.call(this.brush)
@@ -180,7 +179,7 @@ export class promisDiagram {
     }
 }
 
-export async function drawPromisChart(promis, clump, node, cohort) {
+export async function drawPromisChart(promis, clump, node, cohort, i) {
 
     let scaleRelative = cohort.scaleR;
     let clumped = cohort.clumped;
@@ -357,7 +356,13 @@ export async function drawPromisChart(promis, clump, node, cohort) {
            zeroLine.append('line')
                .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
                .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
-           zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
+
+           let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
+
+           if(i != null){
+            console.log(i);
+            zeroText.attr('transform', 'translate(0,'+ i * 12 +')').classed(clump, true);
+        }
 
            function mouseover(d) {
                let group = d.data.pat.line;
@@ -491,7 +496,7 @@ export function clearDiagram(node, cohortIndex) {
    aggline.selectAll('.qLine_bottom').remove();
 }
 
-export function frequencyCalc(promis, clump, node, cohort) {
+export function frequencyCalc(promis, clump, node, cohort, i) {
 //item.promisSep[0], 'top', this.selectedNode, item
   // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?

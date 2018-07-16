@@ -66,34 +66,30 @@ export class CodeSidebar {
         select('.orderDiv').select('.codes').remove();
         select('.checkDiv').remove();
         this.$node.select('.distributionWrapper').selectAll('*').remove();
-    
         this.histogrammer(cohortPromis).then(d=> this.drawHistogram(d));
-
         this.DrawfilterDescriptionBox(item);
-
        });
 
+       events.on('clear_cohorts', (evt, item)=> {
+        this.$node.select('.distributionWrapper').selectAll('*').remove();
+       });
     }
 
     private searchDictionary(value, type){
 
         if(type == 'dict') {
             for(let prop in this.dictionary){
-            
                 if (prop == value){
                     let orderarray = [];
                     for(let p in this.dictionary[prop]){
                         let order = {'key': p, 'value' : this.dictionary[prop][p], 'parent': prop};
                         orderarray.push(order);
                     }
-                   
                     this.drawOrderSearchBar(orderarray);
                 }else{
                     for(let p in this.dictionary[prop]){
-                        
                         if(p == value){
                             let order = {'key': p, 'value': this.dictionary[prop][p], 'parent': prop};
-                           
                             this.drawOrderSearchBar([order]);
                         }
                     }

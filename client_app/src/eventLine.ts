@@ -33,6 +33,7 @@ export class EventLine {
     private startEventLabel;
     private eventToggleLabels;
     private branchHeight;
+    private layerBool;
 
     constructor(parent: Element, cohort) {
 
@@ -58,14 +59,16 @@ export class EventLine {
 
     private attachListener() {
 
-        events.on('cohort_selected',(evt, item)=> {
-      
+        events.on('enter_layer_view', ()=> {
+            this.layerBool = true;
+            document.getElementById('quartile-btn').classList.add('disabled');
         });
 
-        events.on('branch_selected',(evt, item)=> {
-      
+        events.on('exit_layer_view', ()=> {
+            this.layerBool = false;
+            document.getElementById('quartile-btn').classList.remove('disabled');
         });
-
+      
         events.on('test', (evt, item)=> {
             this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
         });
@@ -73,6 +76,8 @@ export class EventLine {
         events.on('clear_cohorts', (evt, item)=> {
             let branchSvg =this.$node.select('.branch-wrapper').select('svg');;
             branchSvg.selectAll('*').remove();
+
+            this.layerBool = false;
          
         });
 
@@ -212,7 +217,7 @@ export class EventLine {
           branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 22) + ')');
 
           let branchlines = branchGroups.append('g').classed('rows', true);
-          //branchlines.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 15) + ')');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+      
           branchlines.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
 
           let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.filterArray);
@@ -230,18 +235,18 @@ export class EventLine {
           branchCircle.on("mouseover", (d) => {
             let t = transition('t').duration(500);
             select(".tooltip")
-              .html(() => {
+            .html(() => {
                 return this.renderOrdersTooltip(d);
-              })
-              .transition(t)
-              .style("opacity", 1)
-              .style("left", `${event.pageX + 10}px`)
-              .style("top", `${event.pageY + 10}px`);
+            })
+            .transition(t)
+            .style("opacity", 1)
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY + 10}px`);
           })
           .on("mouseout", () => {
-            let t = transition('t').duration(500);
-            select(".tooltip").transition(t)
-            .style("opacity", 0);
+              let t = transition('t').duration(500);
+              select(".tooltip").transition(t)
+              .style("opacity", 0);
           });
 
     }
@@ -322,7 +327,6 @@ export class EventLine {
             scaleToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                                     .append('text').text(this.scoreLabel);
 
-            
             let scaletogglebutton = scaleToggle.append('button')
                                         .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                                         .classed('dropdown-toggle', true)
@@ -343,7 +347,6 @@ export class EventLine {
             rel.on('click', () =>{
                                // this.scoreLabel = 'Relative Scale';
                                 this.drawEventButtons(cohort);
-                            
                                 events.fire('change_promis_scale', this.scoreLabel)});
     
             let aggToggle = div.append('div').classed('aggDiv', true);
@@ -408,6 +411,12 @@ export class EventLine {
 
                     if(!separated){  checkDiv.classed('hidden', true); }
                     else{ checkDiv.classed('hidden', false); }
+
+                    if(this.layerBool){
+                        //document.getElementById('quartile-btn').classList.add('disabled');
+                        quartDiv.select('#quartile-btn').classed('disabled', true);
+                    }
+                 
 
             }
 
