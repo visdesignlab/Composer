@@ -78,6 +78,18 @@ export class SideBar {
 
   private attachListener () {
 
+    events.on('clear_cohorts', (evt, item)=> {
+      this.cohortKeeper.selectAll('div').remove();
+      let compare = select('#compareDiv');
+      compare.selectAll('*').remove();
+      let layer = select('#layerDiv');
+      layer.selectAll('*').remove();
+      layer.classed('hidden', true);
+      this.layerBool = false;
+      
+      
+    });
+
     events.on('enter_comparison_view', ()=> {
       select('#compareDiv').classed('hidden', false);
   });
@@ -126,16 +138,11 @@ export class SideBar {
   events.on('population demo loaded', (evt, item)=> {
         this.populationDemo = item;
         this.distribute(item);
-
        });
 
   events.on('create_button_down', ()=> {
          this.filterDemo('demo_add');
        });
-
-  events.on('clear_cohorts', (evt, item)=> {
-        this.cohortKeeper.selectAll('div').remove();
-      });
 
   events.on('test', (evt, item)=> {
   
@@ -149,6 +156,8 @@ export class SideBar {
 
         let layer = select('#layerDiv');
         layer.selectAll('*').remove();
+
+        console.log(this.layerBool);
 
         this.buildLayerFilter(layer, item[0], this.comparisonArray).then((array)=> {
           if(this.layerBool == true){

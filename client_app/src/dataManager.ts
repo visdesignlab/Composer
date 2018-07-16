@@ -192,7 +192,7 @@ export class DataManager {
             }else{
                 sepBool = false;
             }
-            console.log(sepBool);
+        
             this.getQuant_Separate(item.promis, 3, sepBool).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
@@ -370,8 +370,7 @@ export class DataManager {
     }
     
     private async getQuant_Agg(cohort, quant) {
-        console.log(cohort);
-        console.log(quant);
+    
         let oneval = [];
         let outofrange = [];
         let topStart = [];
@@ -485,7 +484,6 @@ export class DataManager {
                     val.relScore = val.SCORE - pat.b;
                 });
             }else{
-                console.log('have to calculate baselines');
         
                 let array1;
                 let array2;
@@ -502,21 +500,17 @@ export class DataManager {
                     array2 = pos[0];
                 }
 
-                console.log(array1);
-                console.log(array2);
-
                 if(array1 == array2){
-                    console.log('no window');
+              
                     pat.b = array1[1];
                 }else{
-                    console.log('window');
                     let x1 = array1[0];
                     let x2 = array2[0];
                     let y1 = array1[1];
                     let y2 = array2[1];
                     
                     let slope = (y2 - y1) / (x2 - x1);
-                    console.log(slope);
+          
                     let b = y1 - (slope * x1);
                     pat.slope = slope;
                     pat.b = +b;
@@ -526,9 +520,7 @@ export class DataManager {
                     val.relScore = val.SCORE - pat.b;
                 });
             }
-
         });
-        console.log(cohort);
 
         return cohort;
     }
@@ -660,9 +652,7 @@ export class DataManager {
             this.totalDemoObjects = popdemo;
     
             return popdemo;
-  
        }
-
 
     //uses Phovea to access PROMIS data and draw table for cohort
     private async mapPromisScores(cohortIdArray, proObjects, filter) {
@@ -693,7 +683,6 @@ export class DataManager {
                                 filteredPatOrders[d.PAT_ID] = [];
                                 }
                                 filteredPatOrders[d.PAT_ID].push(d);
-                            //  }
             });
 
         }
