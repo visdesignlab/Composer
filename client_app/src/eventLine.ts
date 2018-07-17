@@ -47,7 +47,7 @@ export class EventLine {
     this.scoreLabel = 'Absolute Scale';
     this.startEventLabel = 'Change Start to Event';
     this.branchHeight = 20;
-
+    let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
     branchWrapper.append('svg').attr('height', this.branchHeight);
    
@@ -58,15 +58,29 @@ export class EventLine {
     }
 
     private attachListener() {
+          
 
         events.on('enter_layer_view', ()=> {
             this.layerBool = true;
             document.getElementById('quartile-btn').classList.add('disabled');
+            document.getElementById('layerButton').classList.add('btn-warning');
+            select('#layerDiv').classed('hidden', false);
+            let array = [];
+      
+            let selected = this.$node.selectAll('.fill');
+          
+            selected.nodes().forEach(sel => {
+              let entry = {class: sel.classList[0], data: sel.__data__ }
+              array.push(entry);
+          });
+      
+          events.fire('update_layers', array);
         });
 
         events.on('exit_layer_view', ()=> {
             this.layerBool = false;
             document.getElementById('quartile-btn').classList.remove('disabled');
+            select('#layerDiv').classed('hidden', true);
         });
       
         events.on('test', (evt, item)=> {
@@ -82,8 +96,23 @@ export class EventLine {
               
                 this.drawBranches(cohortTree).then(d=> this.classingSelected(item[0][item[1]]));
             }
-           
-        });
+
+            selectAll('.selected').classed('selected', false);
+
+            //need to update comparison array
+    
+            let layer = select('#layerDiv');
+            layer.selectAll('*').remove();
+    
+            console.log(this.layerBool);
+    
+            this.buildLayerFilter(layer, item[0]).then((array)=> {
+              if(this.layerBool == true){
+                events.fire('update_layers', array);
+              }
+            });
+    
+          });
 
         events.on('clear_cohorts', (evt, item)=> {
             let branchSvg =this.$node.select('.branch-wrapper').select('svg');
@@ -115,20 +144,80 @@ export class EventLine {
 
     }
 
+    private async buildLayerFilter(compareDiv, data){
+
+        let flatData  = [];
+        let array = [];
+     
+            
+        data.forEach(d => {
+            flatData.push(d);
+              if(d.branches.length != 0){ 
+                d.branches.forEach(b => {
+                    flatData.push(b);
+                });
+               };
+            });
+    
+            let layerDivs = compareDiv.selectAll('.layers').data(flatData);
+    
+            let layerenter = layerDivs.enter().append('div').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
+    
+            layerDivs = layerenter.merge(layerDivs);
+    
+            let svg = layerDivs.append('svg').attr('width', 150);
+    
+            let rect = svg.append('rect').attr('width', 20).attr('height', 20).attr('class', (d,i)=> 'layer-' + String(i)).classed('fill', true);
+    
+          //  rect.attr('transform', 'translate(5, 5)');
+            rect.classed('fill', true);
+    
+            rect.on('click', (d, i)=> {
+              let array = [];
+    
+              let r = rect.nodes()[i];
+              if(r.classList.contains('clear')){
+                r.classList.remove('clear');
+                r.classList.add('fill');
+              }else{ 
+                r.classList.remove('fill');
+                r.classList.add('clear'); }
+               
+              let selected = compareDiv.selectAll('.fill');
+              
+              selected.nodes().forEach(sel => {
+                let entry = {class: sel.classList[0], data: sel.__data__ }
+                array.push(entry);
+              });
+    
+              if(this.layerBool == true){
+                events.fire('update_layers', array);
+              }
+    
+            });
+    
+            let selected = this.$node.selectAll('.fill');
+          
+            selected.nodes().forEach(sel => {
+              let entry = {class: sel.classList[0], data: sel.__data__ }
+              array.push(entry);
+            });
+        
+            return array;
+          //  events.fire('update_layers', array);
+        
+      }
+
     private async classingSelected(cohort){
             
             selectAll('.selected-group').classed('selected-group', false);
-
-     //   if(index.length > 1){ 
-        //    let selected = document.getElementsByClassName(String(index[0]) + ' cohort-lines');
-        //    selectAll(selected).selectAll('.branches').classed('selected-group', true);
-     //   }else{
             let selected = document.getElementsByClassName(cohort.label);
             selectAll(selected).selectAll('.event-rows').classed('selected-group', true);
-    //    }
+
     }
 
     private async drawBranches(cohort){
+        
         let flat = [];
 
         cohort.forEach(group => {
@@ -568,6 +657,23 @@ export class EventLine {
 
             }
 
+    private async flattenCohort(cohort) {
+
+        let flat = [];
+
+        cohort.forEach(group => {
+            flat.push(group);
+            if(group.branches.length > 0){
+                group.branches.forEach(branch => {
+                    flat.push(branch);
+                });
+            }
+        });
+
+        console.log(flat);
+        return flat;
+    }
+    
     private renderOrdersTooltip(tooltip_data) {
 
             let text;

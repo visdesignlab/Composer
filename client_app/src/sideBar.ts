@@ -61,7 +61,7 @@ export class SideBar {
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
     let compare = this.$node.append('div').attr('id', 'compareDiv').classed('hidden', true);
-    let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
+   // let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     this.xScale = scaleLinear();
     this.yScale = scaleLinear().range([0, 30]);
     this.svgWidth = 170;
@@ -97,7 +97,7 @@ export class SideBar {
     events.on('exit_comparison_view', ()=> {
       select('#compareDiv').classed('hidden', true);
   });
-
+/*
   events.on('enter_layer_view', ()=> {
 
       this.layerBool = true;
@@ -118,7 +118,7 @@ export class SideBar {
     this.layerBool = false;
     select('#layerDiv').classed('hidden', true);
 
-});
+});*/
     
   events.on('filter_counted', (evt, item) => {//this get the count from the group
 
