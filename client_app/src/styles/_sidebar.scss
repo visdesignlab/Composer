@@ -91,13 +91,23 @@ ul {
     fill: #E67E22;
 }
 
+#layerDiv {
+    width: 50px;
+    display: inline-block;
+    float: left;
+}
+
 .labelWrapper {
-    margin-top: 15px;
+    //  margin-top: 15px;
 }
 
 .layers {
-    height: 30px;
+    height: 35px;
     width: 100%;
+}
+
+.layers svg {
+    height: 35px;
 }
 
 .layers svg:hover {

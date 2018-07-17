@@ -54,11 +54,16 @@
     display: inline;
     float: left;
     margin-right: 2px;
-    padding-top: 5px;
+    // padding-top: 5px;
+}
+
+.branch-wrapper {
+    display: inline-block;
+    margin-top: 5px;
 }
 
 .branch-wrapper svg {
-    width: 700px;
+    width: 500px;
     //  min-height: 50px;
 }
 
