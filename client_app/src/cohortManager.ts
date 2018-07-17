@@ -160,7 +160,7 @@ export class CohortManager {
             treeBranch.filterArray = bfilter;
             treeBranch.promis = b;
             treeBranch.cpt = bcpt;
-            treeBranch.cohortIndex = this.counter;
+            treeBranch.cohortIndex = this.cohortTree.length;
             this.counter++;
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
            
@@ -240,7 +240,7 @@ export class CohortManager {
         
             //this comes directly from cohrot tree in eventline;
         events.on('cohort_selected', (evt, item)=>{
-      
+            console.log(item);
             let cohort = item[0];
             let index = item[1];
    
@@ -340,20 +340,20 @@ export class CohortManager {
             newParent.cpt = item[1];
             newParent.promis = promis;
             newParent.cohortIndex = this.cohortTree.length;
+            this.cohortIndex = this.cohortTree.length;
 
             newParent.filterArray.push(filterReq);
             this.cohortTree.push(newParent);
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-          
+     
             this.branchSelected = null;
-            this.cohortIndex = this.counter;
+            
             this.counter++;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-
+         
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
-            
-          
+
         });
 
         events.on('promis_from_demo_refiltered', (evt, item)=> {
