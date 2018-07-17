@@ -63,7 +63,6 @@ export class EventLine {
         events.on('enter_layer_view', ()=> {
             this.layerBool = true;
             document.getElementById('quartile-btn').classList.add('disabled');
-            document.getElementById('layerButton').classList.add('btn-warning');
             select('#layerDiv').classed('hidden', false);
             let array = [];
       
@@ -93,7 +92,6 @@ export class EventLine {
                 this.drawBranches(cohortTree).then(d=> this.classingSelected(cohortTree[cohortIndex[0]].branches[cohortIndex[1]]));
                
             }else{
-              
                 this.drawBranches(cohortTree).then(d=> this.classingSelected(item[0][item[1]]));
             }
 
@@ -148,6 +146,7 @@ export class EventLine {
 
         let flatData  = [];
         let array = [];
+        let rows = [];
      
             
         data.forEach(d => {
@@ -158,18 +157,27 @@ export class EventLine {
                 });
                };
             });
+
     
-            let layerDivs = compareDiv.selectAll('.layers').data(flatData);
+            let svg = compareDiv.append('svg').attr('width', 150).attr('height', this.branchHeight);
+
+            let labelLine = svg.append('line').attr('x1', 5).attr('y1', 10).attr('x2', 5).attr('y2', this.branchHeight - 36).attr('stroke-width', 1).attr('stroke', 'grey');
     
-            let layerenter = layerDivs.enter().append('div').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
+            let layerG = svg.selectAll('.layers').data(flatData);
     
-            layerDivs = layerenter.merge(layerDivs);
+            let layerenter = layerG.enter().append('g').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
     
-            let svg = layerDivs.append('svg').attr('width', 150);
+            layerG = layerenter.merge(layerG);
+
+            layerG.attr('transform', (d, i) => 'translate(5, '+ i * 35 +')');
+
+            let lines = layerG.append('line').attr('x1', 0).attr('y1', 10).attr('x2', 15).attr('y2', 10).attr('stroke-width', 1).attr('stroke', 'grey');
     
-            let rect = svg.append('rect').attr('width', 20).attr('height', 20).attr('class', (d,i)=> 'layer-' + String(i)).classed('fill', true);
+          //  let svg = layerDivs.append('svg').attr('width', 150);
     
-          //  rect.attr('transform', 'translate(5, 5)');
+            let rect = layerG.append('rect').attr('width', 20).attr('height', 20).attr('class', (d,i)=> 'layer-' + String(i)).classed('fill', true);
+    
+            rect.attr('transform', 'translate(5, 0)');
             rect.classed('fill', true);
     
             rect.on('click', (d, i)=> {

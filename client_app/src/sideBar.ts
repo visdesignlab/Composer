@@ -81,13 +81,7 @@ export class SideBar {
     events.on('clear_cohorts', (evt, item)=> {
       this.cohortKeeper.selectAll('div').remove();
       let compare = select('#compareDiv');
-      compare.selectAll('*').remove();
-      let layer = select('#layerDiv');
-      layer.selectAll('*').remove();
-      layer.classed('hidden', true);
-      this.layerBool = false;
-      
-      
+      compare.selectAll('*').remove();  
     });
 
     events.on('enter_comparison_view', ()=> {
@@ -97,28 +91,7 @@ export class SideBar {
     events.on('exit_comparison_view', ()=> {
       select('#compareDiv').classed('hidden', true);
   });
-/*
-  events.on('enter_layer_view', ()=> {
 
-      this.layerBool = true;
-      select('#layerDiv').classed('hidden', false);
-      let array = [];
-
-      let selected = this.$node.selectAll('.fill');
-    
-      selected.nodes().forEach(sel => {
-        let entry = {class: sel.classList[0], data: sel.__data__ }
-        array.push(entry);
-    });
-
-    events.fire('update_layers', array);
-});
-
-  events.on('exit_layer_view', ()=> {
-    this.layerBool = false;
-    select('#layerDiv').classed('hidden', true);
-
-});*/
     
   events.on('filter_counted', (evt, item) => {//this get the count from the group
 
@@ -154,16 +127,7 @@ export class SideBar {
         compare.selectAll('*').remove();
         this.buildComparisonFilter(compare, item[0], this.comparisonArray);
 
-        let layer = select('#layerDiv');
-        layer.selectAll('*').remove();
-
         console.log(this.layerBool);
-
-        this.buildLayerFilter(layer, item[0], this.comparisonArray).then((array)=> {
-          if(this.layerBool == true){
-            events.fire('update_layers', array);
-          }
-        });
 
       });
       }
@@ -174,88 +138,6 @@ export class SideBar {
     this.buildDemoFilter();
 
     }
-
-  private async buildLayerFilter(compareDiv, data, array){
-    array  = [];
-
-
-    let toggleData = [];
-        
-    data.forEach(d => {
-          toggleData.push(d);
-          if(d.branches.length != 0){ 
-            d.branches.forEach(b => {
-              toggleData.push(b);
-            });
-           };
-        });
-
-        let layerDivs = compareDiv.selectAll('.layers').data(toggleData);
-
-        let layerenter = layerDivs.enter().append('div').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
-
-        layerDivs = layerenter.merge(layerDivs);
-
-        let svg = layerDivs.append('svg').attr('width', 150).attr('height', 30);
-
-        let rect = svg.append('rect').attr('width', 20).attr('height', 20).attr('class', (d,i)=> 'layer-' + String(i)).classed('fill', true);
-
-        let text = svg.append('text').text(d=> d.label);
-
-        text.attr('transform', 'translate(25, 12)');
-        rect.classed('fill', true);
-
-        rect.on('click', (d, i)=> {
-          let array = [];
-
-          let r = rect.nodes()[i];
-          if(r.classList.contains('clear')){
-            r.classList.remove('clear');
-            r.classList.add('fill');
-          }else{ 
-            r.classList.remove('fill');
-            r.classList.add('clear'); }
-           
-          let selected = compareDiv.selectAll('.fill');
-          
-          selected.nodes().forEach(sel => {
-            let entry = {class: sel.classList[0], data: sel.__data__ }
-            array.push(entry);
-          });
-
-          if(this.layerBool == true){
-            events.fire('update_layers', array);
-          }
-
-        });
-
-        text.on('click', (d, i)=> {
-         
-          if(d.parentIndex == null){
-            events.fire('cohort_selected', [d, i]);
-          }else{
-            events.fire('branch_selected', [d.parentIndex, i]);
-          }
-
-          svg.classed('chosen', false);
-          let labels = layerDivs.nodes();
-         
-          select(labels[i]).select('svg').classed('chosen', true);
-
-        });
-
-    
-        let selected = this.$node.selectAll('.fill');
-      
-        selected.nodes().forEach(sel => {
-          let entry = {class: sel.classList[0], data: sel.__data__ }
-          array.push(entry);
-        });
-    
-        return array;
-      //  events.fire('update_layers', array);
-    
-  }
 
 private buildComparisonFilter(compareDiv, data, array) {
    
