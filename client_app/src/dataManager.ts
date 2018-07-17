@@ -483,6 +483,7 @@ export class DataManager {
                 pat.value.forEach(val => {
                     val.relScore = val.SCORE - pat.b;
                 });
+
             }else{
         
                 let array1;
@@ -532,7 +533,9 @@ export class DataManager {
         if(relativeChange == true){
 
             cohort.forEach(pat => {
+                let afterEvent = pat.value.filter(v=> v.diff > -1);
                 let scores = pat.value.map(s=> s.relScore);
+                // let scores = afterEvent.map(s=> s.relScore);
                  let avs = scores.reduce((a, b) => parseFloat(a) + parseFloat(b)) / scores.length;
                  pat.avChange = avs;
              });
@@ -592,7 +595,6 @@ export class DataManager {
                     }
                 }
             }else {
-                console.log('no b');
                 for(let i = 0; i < binNum; i++){
                     if(i == 0){ 
                         arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE < thresholds[i]));
@@ -601,6 +603,7 @@ export class DataManager {
                     }else {
                         arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE < thresholds[i] && c.value[0].SCORE > thresholds[i-1] ));
                     }
+
                 }
             }
         }
