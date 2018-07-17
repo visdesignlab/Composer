@@ -163,12 +163,12 @@ export class CohortManager {
             treeBranch.cohortIndex = [this.cohortIndex, newSpot];
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
            
-            events.fire('branch_selected', [this.cohortIndex, newSpot]);
+            events.fire('branch_selected', treeBranch.cohortIndex);
 
             });
 
         events.on('branch_selected', (evt, item)=> {
-    
+            console.log(item);
             this.branchSelected = item;
             this.cohortIndex = item[0];
             let branchIndex = item[1];

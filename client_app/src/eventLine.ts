@@ -76,7 +76,7 @@ export class EventLine {
 
             if(item[1].length > 1){
                 console.log(cohortTree[cohortIndex[0]].branches[cohortIndex[0]]);
-                this.drawBranches(cohortTree).then(d=> this.classingSelected(cohortTree[cohortIndex[0]].branches[cohortIndex[0]]));
+                this.drawBranches(cohortTree).then(d=> this.classingSelected(cohortTree[cohortIndex[0]].branches[cohortIndex[1]]));
                
             }else{
               
