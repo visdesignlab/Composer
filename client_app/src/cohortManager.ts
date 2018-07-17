@@ -376,6 +376,7 @@ export class CohortManager {
             }
            
             events.fire('update_chart', this.selectedCohort);
+            events.fire('test', [this.cohortTree, this.selectedCohort.cohortIndex]);
 
           });
 
