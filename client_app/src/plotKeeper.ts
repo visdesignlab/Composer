@@ -43,10 +43,8 @@ export class PlotKeeper {
     constructor(parent: Element) {
 
         this.domain = {
-
             maxDay: 50,
             minDay: -30,
-
         }
 
         this.drawPromisChart = promisDiagram.drawPromisChart;
@@ -68,6 +66,10 @@ export class PlotKeeper {
         events.on('clear_cohorts', (evt, item)=> {
             this.layerBool = false;
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            let layer = select('#layerDiv');
+            layer.selectAll('*').remove();
+            layer.classed('hidden', true);
+            this.layerBool = false;
 
         });
 
@@ -123,12 +125,13 @@ export class PlotKeeper {
         events.on('exit_comparison_view', ()=> {
             this.plotDiv.selectAll('*').remove();
             this.buildPlot(this.plotDiv, 0, this.domain);
-            events.fire('cohort_selected', [this.cohortData[0], 0]);
+            events.fire('cohort_selected', this.cohortData[0]);
             this.compareBool = false;
         });
 
         events.on('enter_layer_view', ()=> {
             this.layerBool = true;
+            document.getElementById('layerButton').classList.add('btn-warning');
         });
 
         events.on('exit_layer_view', ()=> {
@@ -136,7 +139,7 @@ export class PlotKeeper {
             this.plotDiv.selectAll('*').remove();
             this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
             document.getElementById('layerButton').classList.remove('btn-warning');
-            events.fire('cohort_selected', [this.cohortData[0], 0]);
+            events.fire('cohort_selected', this.cohortData[0]);
         });
 
         events.on('test', (evt, item)=> {
