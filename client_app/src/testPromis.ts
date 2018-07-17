@@ -251,7 +251,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
            return data;
        });
 
-   function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
+    function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
      
        // -----  set domains and axis
        // time scale
@@ -286,37 +286,34 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                return `translate(${node.margin.x},${node.margin.y})`;
            });
 
-           let lines = promisScoreGroup.select('.lines')
+        let lines = promisScoreGroup.select('.lines')
                .attr('transform', () => { return `translate(${node.margin.x},${node.margin.y})`; })   
                .attr('clip-path','url(#clip)')
                 .selectAll('.'+ clump)
                 .data(similarData);
 
-           lines.exit().remove();
+        lines.exit().remove();
 
-           let lineEnter = lines
+        let lineEnter = lines
                    .enter().append('g').attr('class', d=> d['key'])
                    .classed(clump, true);
 
-           lines = lineEnter.merge(lines);
+        lines = lineEnter.merge(lines);
 
-           lines.append('path')
-                   .attr('class', d=> d['key'])
-                   .classed(clump, true)
-                   .attr('stroke-width', node.lineScale(lineCount))
-                   .attr('stroke-opacity', node.lineScale(lineCount))
-                   .attr('d', function (d) {
-                               d['line'] = this;
-                               return lineFunc(d.value);})
-                   .on('click', function (d) { voronoiClicked(d); } )
-                   .on('mouseover', (d)=> addPromisDotsHover(d, scaleRelative))
-                   .on('mouseout', (d)=> removeDots());
+        lines.append('path')
+            .attr('class', d=> d['key'])
+            .classed(clump, true)
+            .attr('stroke-width', node.lineScale(lineCount))
+            .attr('stroke-opacity', node.lineScale(lineCount))
+            .attr('d', function (d) {
+                        d['line'] = this;
+                        return lineFunc(d.value);})
+            .on('click', function (d) { voronoiClicked(d); } )
+            .on('mouseover', (d)=> addPromisDotsHover(d, scaleRelative))
+            .on('mouseout', (d)=> removeDots());
 
-           
            if(promis.length < 500) { 
-
                if(clump == 'proLine') {
-
                    let fakePatArray = [];
                    lines.select('path').nodes().forEach((l, i) => {
                        let fakeArray = [];
@@ -330,12 +327,12 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                        similarData[i].fakeArray = fakeArray;
                    });
 
-                   let voronoi = d3Voronoi.voronoi()
+                let voronoi = d3Voronoi.voronoi()
                    .x((d, i) => { return d.x })
                    .y((d, i) => { return d.y })
                    .extent([[0, 0], [850, 350]]);
 
-                   voronoiGroup.selectAll('g')
+                voronoiGroup.selectAll('g')
                    .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
                        return d.fakeArray; }))))
 
@@ -350,29 +347,28 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                        .on('click', (d)=>  voronoiClicked(d.data.pat));
                }
 }
-           let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
                .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
 
-           zeroLine.append('line')
+            zeroLine.append('line')
                .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
                .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
 
-           let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
+            let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
 
-           if(i != null){
-            console.log(i);
+            if(i != null){
             zeroText.attr('transform', 'translate(0,'+ i * 12 +')').classed(clump, true);
-        }
+            }
 
-           function mouseover(d) {
+            function mouseover(d) {
                let group = d.data.pat.line;
                select(group).classed('hover-selected', true);
-             }
+            }
            
-           function mouseout(d) {
+            function mouseout(d) {
                let group = d.data.pat.line;
                select(group).classed('hover-selected', false);
-             }
+            }
 
            function voronoiClicked(d) {
      
@@ -384,22 +380,22 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                        dots[i].remove();
                     }
                   events.fire('line_unclicked', d);
-               }else {
+                }else {
                    line.classList.add('selected');
                    addPromisDotsClick(d, scaleRelative);
                    events.fire('line_clicked', d);
-           };
-               
-           let lines = svg.select('.lines').selectAll('.selected').nodes();
+            };
+
+            let lines = svg.select('.lines').selectAll('.selected').nodes();
             
-           let idarray = [];
-           lines.forEach(element => {
+            let idarray = [];
+            lines.forEach(element => {
                        idarray.push(+element.__data__.key);
                    });
                    events.fire('selected_line_array', idarray);
                }
 
-        function addPromisDotsHover (d, scale) {
+            function addPromisDotsHover (d, scale) {
 
                 let promisData = d;
          
@@ -511,18 +507,19 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
 
         let negdiff = 0;
         let posdiff = 0;
-  
+
         //get the extreme diff values for each side of the zero event
         cohortFiltered.forEach(pat => {
-
+            let patZero = pat.value.filter(p=> p.diff == 0);
+            console.log(patZero);
             let patDiffArray = pat.value.map(d=> +d.diff);
             let patneg = d3.min(patDiffArray);
             let patpos = d3.max(patDiffArray);
-
             if(patneg < negdiff) {negdiff = patneg;  };
             if(patpos > posdiff) {posdiff = patpos;  };
-   
         });
+       
+
         negdiff = Math.round(negdiff / 10) * 10;
         posdiff = Math.round(posdiff / 10) * 10;
         //get diff of days between maxneg diff and maxpos diff
@@ -552,7 +549,11 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                         let slope = (y2 - y1) / (x2 - x1);
 
                         pat.value[i].slope = slope;
-                        pat.value[i].b = y1 - (slope * x1);
+                        if(scaleRelative){
+                            pat.value[i].b = 0;
+                        }else{
+                            pat.value[i].b = y1 - (slope * x1);
+                        } 
                 }
             }
 
@@ -575,11 +576,16 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
             if(first != undefined){
     
                 const startIndex = pat.bins.indexOf(first);
-                first.y = pat.value[0].SCORE; }
+                if(scaleRelative){ 
+                    first.y = pat.value[0].relScore;
+                }else{
+                    first.y = pat.value[0].SCORE; 
+                }
+            }
 
             if(last != undefined){
-        
-                last.y = pat.value[pat.value.length-1].SCORE; }
+                if(scaleRelative){  last.y = pat.value[pat.value.length-1].relScore; }else{  last.y = pat.value[pat.value.length-1].SCORE; }
+                }
 
             for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
               
@@ -599,7 +605,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
             let bin = d.bins;
             return bin;
             });
-    
+
             let means = [];
             let devs = [];
             
@@ -645,7 +651,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                       arr.push(45);
+                        if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
                       }else{arr.push(q); }
                 });
                 quart2.push(arr);
@@ -659,7 +665,8 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                       arr.push(45);
+                        if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
+                       
                       }else{arr.push(q); }
                 });
                 botdev2.push(arr);
@@ -674,7 +681,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                       arr.push(45);
+                        if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
                       }else{arr.push(q); }
                 });
                 topdev2.push(arr);
@@ -765,6 +772,275 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 zeroLine.append('text').text(node.zeroEvent).attr('x', node.timeScale(0));
 
 }
+
+export function frequencyCalc_test(promis, clump, node, cohort, i) {
+    //item.promisSep[0], 'top', this.selectedNode, item
+      // creates bin array for each patient scores and calulates slope for each bin
+        //TODO : get rid of test in name and global variables?
+    
+        
+            let minDay = node.domains.minDay;
+            let maxDay = node.domains.maxDay;
+    
+            let scaleRelative = cohort.scaleR;
+    
+            let cohortFiltered = promis.filter(d=> d.value.length > 1);
+    
+            let negdiff = 0;
+            let posdiff = 0;
+      
+            //get the extreme diff values for each side of the zero event
+            cohortFiltered.forEach(pat => {
+                let patDiffArray = pat.value.map(d=> +d.diff);
+                let patneg = d3.min(patDiffArray);
+                let patpos = d3.max(patDiffArray);
+                if(patneg < negdiff) {negdiff = patneg;  };
+                if(patpos > posdiff) {posdiff = patpos;  };
+            });
+            
+            negdiff = Math.round(negdiff / 10) * 10;
+            posdiff = Math.round(posdiff / 10) * 10;
+            //get diff of days between maxneg diff and maxpos diff
+            let daydiff = posdiff - negdiff;
+            let bincount = Math.floor(daydiff/10);
+    
+            cohortFiltered.forEach(pat=> {
+    
+                for (let i = 1; i < pat.value.length; i++) {
+    
+                    if(pat.value[i] != undefined) {
+                            
+                            let x1 = pat.value[i-1].diff;
+                            let x2 = pat.value[i].diff;
+                            let y1;
+                            let y2;
+                            if(scaleRelative){
+                                y1 = pat.value[i-1].relScore;
+                                y2 = pat.value[i].relScore;
+                            }else{
+                                y1 = pat.value[i-1].SCORE;
+                                y2 = pat.value[i].SCORE;
+                            }
+                        
+                            pat.value[i].calc = [[x1, y1],[x2, y2]];
+    
+                            let slope = (y2 - y1) / (x2 - x1);
+    
+                            pat.value[i].slope = slope;
+                            pat.value[i].b = y1 - (slope * x1);
+                    }
+                }
+    
+                pat.bins = [];
+    
+                pat.bins.push({'x': negdiff, 'y': null});
+                for (let i = 1; i < bincount; i++) {
+                   let diffplus = negdiff + (i * 10);
+                   pat.bins.push({'x': diffplus, 'y': null});
+                }
+                
+                let patstart = pat.value[0].diff;
+                patstart = Math.ceil(patstart / 10)* 10;
+                let patend = pat.value[pat.value.length-1].diff;
+                patend = Math.ceil(patend/10)* 10;
+              
+                let first = pat.bins.find((v)=> v.x == patstart);
+                let last = pat.bins.find((v)=> v.x == patend);
+    
+                if(first != undefined){
+        
+                    const startIndex = pat.bins.indexOf(first);
+                    first.y = pat.value[0].SCORE; }
+    
+                if(last != undefined){
+            
+                    last.y = pat.value[pat.value.length-1].SCORE; }
+    
+                for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
+                  
+                    let x = pat.bins[i].x;
+                  
+                        pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
+                            let top = pat.value.find((v)=> v.diff > x);
+                    
+                            if(top != undefined){
+                      
+                             pat.bins[i].y = (top.slope * x) + top.b;
+                             };
+                }
+            });
+       
+            let patbin = cohortFiltered.map((d)=> {
+                let bin = d.bins;
+                return bin;
+                });
+        
+                let means = [];
+                let devs = [];
+                
+                for(let i = 0; i < patbin[0].length; i++){
+                    let mean = d3.mean(patbin.map(d => d[i].y));
+                    let x = d3.mean(patbin.map(d => d[i].x));
+                    let dev =  d3.deviation(patbin.map(d => d[i].y));
+                    means.push([x, mean]);
+                    devs.push(dev);
+                }
+        
+                let botdev = means.map((d, i)=> {
+                    let y = d[1] - devs[i];
+                    let x = d[0];
+        
+                    return [x, y];
+                });
+        
+                let topdev = means.map((d, i)=> {
+                    
+                   let y = d[1] + devs[i];
+                   let x = d[0];
+        
+                   return [x, y];
+                
+                });
+        
+                let quart = means.map((d, i)=> {
+                    
+                    let x = d[0];
+                    let y1 = d[1] + devs[i];
+                    let y2 = d[1] - devs[i];
+         
+                    return [x, y1, y2];
+                 
+                 });
+        
+                quart[0] = [means[0][0], quart[1][1], quart[1][2]];
+                let quart2 = [];
+                 
+                 quart.forEach(d=> {
+                    let arr = [];
+                    d.forEach(q=> {
+                        //let val = [];
+                        if (isNaN(q)) {
+                           arr.push(45);
+                          }else{arr.push(q); }
+                    });
+                    quart2.push(arr);
+                });
+        
+                 botdev[0] = [means[0][0], botdev[1][1]];
+                 let botdev2 = [];
+                 
+                 botdev.forEach(d=> {
+                    let arr = [];
+                    d.forEach(q=> {
+                        //let val = [];
+                        if (isNaN(q)) {
+                           arr.push(45);
+                          }else{arr.push(q); }
+                    });
+                    botdev2.push(arr);
+                });
+        
+                 topdev[0] = [means[0][0], topdev[1][1]];
+        
+                 let topdev2 = [];
+                 
+                 topdev.forEach(d=> {
+                    let arr = [];
+                    d.forEach(q=> {
+                        //let val = [];
+                        if (isNaN(q)) {
+                           arr.push(45);
+                          }else{arr.push(q); }
+                    });
+                    topdev2.push(arr);
+                });
+        
+                let lineCount = promis.length;
+        
+                let data = means;
+                // -----  set domains and axis
+                // time scale
+                node.timeScale.domain([minDay, maxDay]);
+        
+                node.svg.select('.xAxis')
+                    .call(axisBottom(node.timeScale));
+        
+                node.svg.select('.yAxis')
+                    .call(axisLeft(node.scoreScale));
+                // -------  define line function
+                const lineFunc = line()
+                    .curve(curveLinear)
+                    .x((d, i) => { return node.timeScale(+d[0]); })
+                    .y((d) => { return node.scoreScale(+d[1]); });
+        
+                // -------- line function for quartiles 
+                
+                const drawPaths = area()
+                      .x(d => { return node.timeScale(+d[0]); })
+                      .y0(d => { return node.scoreScale(+d[2]); })
+                      .y1(d => { return node.scoreScale(+d[1]); });
+                
+        
+                // ------- draw
+                const promisScoreGroup = node.svg.select('.scoreGroup-'+ node.cohortIndex);
+        
+                promisScoreGroup.append('clipPath').attr('id', 'clip')
+                .append('rect')
+                .attr('width', 850)
+                .attr('height', node.height - 50);
+        
+                let group = promisScoreGroup.append('g').classed(clump, true);
+        
+                    group
+                    .append('path')
+                    .classed('qLine_' + clump, true)
+                    .attr('clip-path','url(#clip)')
+                    .data([quart2])
+                    .attr('d', drawPaths)
+                    .attr('transform', () => {
+                        return `translate(${node.margin.x},${node.margin.y})`;
+                    });
+        
+                    group
+                    .append('path')
+                    .classed('avLine_' + clump, true)
+                    .attr('clip-path','url(#clip)')
+                    .data([data])
+                    .attr('d', lineFunc)
+                    .attr('transform', () => {
+                        return `translate(${node.margin.x},${node.margin.y})`;
+                    });
+        
+                    group
+                    .append('path')
+                    .classed('stLine_' + clump, true)
+                    .attr('clip-path','url(#clip)')
+                    .data([topdev2])
+                    .attr('d', lineFunc)
+                    .attr('transform', () => {
+                        return `translate(${node.margin.x},${node.margin.y})`;
+                    });
+        
+                    group
+                    .append('path')
+                    .classed('stLine_' + clump, true)
+                    .attr('clip-path','url(#clip)')
+                    .data([botdev2])
+                    .attr('d', lineFunc)
+                    .attr('transform', () => {
+                        return `translate(${node.margin.x},${node.margin.y})`;
+                    });
+        
+                    let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
+                    .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
+        
+                    zeroLine.append('line')//.attr('class', 'myLine')
+                            .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
+                            .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
+                    zeroLine.append('text').text(node.zeroEvent).attr('x', node.timeScale(0));
+    
+    }
+    
 
 export function create(parent: Element, diagram, index, domains) {
     return new promisDiagram(parent, diagram, index, domains);

@@ -70,11 +70,23 @@ export class EventLine {
         });
       
         events.on('test', (evt, item)=> {
-            this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
+            console.log(item);
+            let cohortTree = item[0];
+            let cohortIndex = item[1];
+
+            if(item[1].length > 1){
+                console.log(cohortTree[cohortIndex[0]].branches[cohortIndex[0]]);
+                this.drawBranches(cohortTree).then(d=> this.classingSelected(cohortTree[cohortIndex[0]].branches[cohortIndex[1]]));
+               
+            }else{
+              
+                this.drawBranches(cohortTree).then(d=> this.classingSelected(item[0][item[1]]));
+            }
+           
         });
 
         events.on('clear_cohorts', (evt, item)=> {
-            let branchSvg =this.$node.select('.branch-wrapper').select('svg');;
+            let branchSvg =this.$node.select('.branch-wrapper').select('svg');
             branchSvg.selectAll('*').remove();
 
             this.layerBool = false;
@@ -82,39 +94,175 @@ export class EventLine {
         });
 
         events.on('update_chart', (evt, item)=> {
-         
-            this.filter = item.filterArray;
+            console.log(item);
 
-            let startEvent = item.startEvent;
-            if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
-                this.startEventLabel = item.startEvent[1][0].key;
-            }
-            
-            if(this.filter){
+            if(item){
 
-                this.drawEventButtons(item);
+                this.filter = item.filterArray;
+
+                let startEvent = item.startEvent;
+                if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
+                    this.startEventLabel = item.startEvent[1][0].key;
+                }
+                
+                if(this.filter){
+    
+                    this.drawEventButtons(item);
+                }
             }
+   
         });
 
     }
 
-    private async classingSelected(index){
+    private async classingSelected(cohort){
             
             selectAll('.selected-group').classed('selected-group', false);
 
-        if(index.length > 1){ 
-            let selected = document.getElementsByClassName(String(index[0]) + ' cohort-lines');
-            selectAll(selected).selectAll('.branches').classed('selected-group', true);
-        }else{
-            let selected = document.getElementsByClassName(String(index) + ' cohort-lines');
+     //   if(index.length > 1){ 
+        //    let selected = document.getElementsByClassName(String(index[0]) + ' cohort-lines');
+        //    selectAll(selected).selectAll('.branches').classed('selected-group', true);
+     //   }else{
+            let selected = document.getElementsByClassName(cohort.label);
             selectAll(selected).selectAll('.event-rows').classed('selected-group', true);
-        }
+    //    }
     }
 
     private async drawBranches(cohort){
+        let flat = [];
+
+        cohort.forEach(group => {
+            flat.push(group);
+            if(group.branches.length > 0){
+                group.branches.forEach(branch => {
+                    flat.push(branch);
+                });
+            }
+        });
+
+        console.log(flat);
     
-        this.branchHeight = cohort.length * 50;
-        let moveDistance = this.branchHeight / cohort.length;
+        this.branchHeight = flat.length * 40;
+        let moveDistance = (this.branchHeight / flat.length) - 5;
+        let branchMove = moveDistance / 2;
+
+        console.log(moveDistance);
+
+        let branchWrapper = this.$node.select('.branch-wrapper');
+        let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
+        branchSvg.selectAll('*').remove();
+
+        let rows = [];
+        cohort.forEach(c => {
+       
+            let e = c.filterArray.map((event, i) => {
+               let coord = {x: (i * 40) + 65, y: 6 };
+               return coord;
+            });
+            rows.push(e);
+            c.rowData = e;
+        });
+
+        cohort.forEach(c => {
+      
+          if(c.branches.length != 0){
+              c.branches.forEach((b, i) => {
+                  b.rowData = [{x: 27, y: -27 }, {x: 60, y: 0 }];
+                  b.filterArray.forEach((event, i) => {
+                      let coord = {x: (i * 40) + 65, y: 6 };
+                      b.rowData.push(coord);
+                   });
+              });
+          }
+      });
+
+    
+
+      let linko = line().curve(curveMonotoneX)
+      .x(function(d) { return d['x'] })
+      .y(function(d) { return d['y'] });
+
+        let cohorts = branchSvg.selectAll('.cohort-lines').data(flat);
+        cohorts.exit().remove();
+
+        let coEnter = cohorts.enter().append('g').attr('class', (d, i) => d.label).classed('cohort-lines', true);
+        cohorts = coEnter.merge(cohorts);
+
+        cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
+
+        let label = cohorts.append('g').classed('labels', true);
+        label.append('rect').attr('width', 55).attr('height', 18).attr('fill', 'white').attr('transform', 'translate(-3, -13)');;
+        label.append('text').text((d, i)=> {return d.label} );
+        label.attr('transform', 'translate(3, 10)');
+        label.on('click', (d, i)=> {
+           
+            this.$node.selectAll('.selected').classed('selected', false);
+            let thislabel = label.nodes();
+            thislabel[i].classList.add('selected');
+            console.log(d);
+            if(d.parentIndex == null){
+                events.fire('cohort_selected', d);
+            }else{
+                events.fire('branch_selected', d.cohortIndex);
+            }
+           // events.fire('cohort_selected', [d, i]);
+        });
+ 
+        let linegroups = cohorts.append('g').classed('rows', true).attr('transform', (d) => 'translate('+ (d.eventIndex * 4) +'0)');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+        linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
+
+       // let wrapperRow = cohorts.append('g').attr('transform', (d, i) => 'translate('+ (d.eventIndex * 6) +'0)');
+        
+        let cohortevents = linegroups.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
+        cohortevents.exit().remove();
+
+        let eventEnter = cohortevents.enter().append('g').classed('events', true);
+
+        cohortevents = eventEnter.merge(cohortevents);
+        cohortevents.attr('transform', (d, i)=> 'translate(' + i * 40 + ', 0)');
+
+        let circle = cohortevents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
+        circle.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+              .html(() => {
+                return this.renderOrdersTooltip(d);
+              })
+              .transition(t)
+              .style("opacity", 1)
+              .style("left", `${event.pageX + 10}px`)
+              .style("top", `${event.pageY + 10}px`);
+          })
+          .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+          });
+
+          let nodes = cohortevents.nodes();
+
+    }
+
+    private async drawBranches_test(cohort){
+        let flat = [];
+
+        cohort.forEach(group => {
+            flat.push(group);
+            if(group.branches.length > 0){
+                group.branches.forEach(branch => {
+                    flat.push(branch);
+                });
+            }
+        });
+
+        console.log(flat);
+    
+        this.branchHeight = flat.length * 30;
+        let moveDistance = (this.branchHeight / cohort.length) - 5;
+        let branchMove = moveDistance / 2;
+
+        console.log(moveDistance);
+
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
         branchSvg.selectAll('*').remove();
@@ -214,7 +362,7 @@ export class EventLine {
 
           blabel.attr('transform', (d, i) => 'translate(-60,'+ ((i * 10) + 8) + ')');
 
-          branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * 10) + 22) + ')');
+          branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * branchMove) + 22) + ')');
 
           let branchlines = branchGroups.append('g').classed('rows', true);
       

@@ -160,17 +160,15 @@ export class CohortManager {
             treeBranch.filterArray = bfilter;
             treeBranch.promis = b;
             treeBranch.cpt = bcpt;
-            treeBranch.cohortIndex = this.counter;
-            this.counter++;
+            treeBranch.cohortIndex = [this.cohortIndex, newSpot];
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
            
-            events.fire('branch_selected', [this.cohortIndex, newSpot]);
+            events.fire('branch_selected', treeBranch.cohortIndex);
 
-         
             });
 
         events.on('branch_selected', (evt, item)=> {
-    
+            console.log(item);
             this.branchSelected = item;
             this.cohortIndex = item[0];
             let branchIndex = item[1];
@@ -240,12 +238,12 @@ export class CohortManager {
         
             //this comes directly from cohrot tree in eventline;
         events.on('cohort_selected', (evt, item)=>{
+            console.log(item);
       
-            let cohort = item[0];
-            let index = item[1];
+            let index = item.cohortIndex;
    
             this.cohortIndex = index;
-            this.cohortTree[this.cohortIndex].promis = item[0].promis;
+            this.cohortTree[this.cohortIndex].promis = item.promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
            
            // let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
@@ -340,20 +338,20 @@ export class CohortManager {
             newParent.cpt = item[1];
             newParent.promis = promis;
             newParent.cohortIndex = this.cohortTree.length;
+            this.cohortIndex = this.cohortTree.length;
 
             newParent.filterArray.push(filterReq);
             this.cohortTree.push(newParent);
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-          
+     
             this.branchSelected = null;
-            this.cohortIndex = this.counter;
+            
             this.counter++;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-
+         
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
-            
-          
+
         });
 
         events.on('promis_from_demo_refiltered', (evt, item)=> {
