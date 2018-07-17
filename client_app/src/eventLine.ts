@@ -70,7 +70,19 @@ export class EventLine {
         });
       
         events.on('test', (evt, item)=> {
-            this.drawBranches(item[0]).then(d=> this.classingSelected(item[1]));
+            console.log(item);
+            let cohortTree = item[0];
+            let cohortIndex = item[1];
+
+            if(item[1].length > 1){
+                console.log(cohortTree[cohortIndex[0]].branches[cohortIndex[0]]);
+                this.drawBranches(cohortTree).then(d=> this.classingSelected(cohortTree[cohortIndex[0]].branches[cohortIndex[0]]));
+               
+            }else{
+              
+                this.drawBranches(cohortTree).then(d=> this.classingSelected(item[0][item[1]]));
+            }
+           
         });
 
         events.on('clear_cohorts', (evt, item)=> {
@@ -103,7 +115,7 @@ export class EventLine {
 
     }
 
-    private async classingSelected(index){
+    private async classingSelected(cohort){
             
             selectAll('.selected-group').classed('selected-group', false);
 
@@ -111,7 +123,7 @@ export class EventLine {
         //    let selected = document.getElementsByClassName(String(index[0]) + ' cohort-lines');
         //    selectAll(selected).selectAll('.branches').classed('selected-group', true);
      //   }else{
-            let selected = document.getElementsByClassName(String(index) + ' cohort-lines');
+            let selected = document.getElementsByClassName(cohort.label);
             selectAll(selected).selectAll('.event-rows').classed('selected-group', true);
     //    }
     }
@@ -155,7 +167,7 @@ export class EventLine {
       
           if(c.branches.length != 0){
               c.branches.forEach((b, i) => {
-                  b.rowData = [{x: 25, y: -27 }, {x: 60, y: 0 }];
+                  b.rowData = [{x: 27, y: -27 }, {x: 60, y: 0 }];
                   b.filterArray.forEach((event, i) => {
                       let coord = {x: (i * 40) + 65, y: 6 };
                       b.rowData.push(coord);
@@ -173,7 +185,7 @@ export class EventLine {
         let cohorts = branchSvg.selectAll('.cohort-lines').data(flat);
         cohorts.exit().remove();
 
-        let coEnter = cohorts.enter().append('g').attr('class', (d, i) => i).classed('cohort-lines', true);
+        let coEnter = cohorts.enter().append('g').attr('class', (d, i) => d.label).classed('cohort-lines', true);
         cohorts = coEnter.merge(cohorts);
 
         cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
@@ -187,7 +199,13 @@ export class EventLine {
             this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
             thislabel[i].classList.add('selected');
-            events.fire('cohort_selected', [d, i]);
+            console.log(d);
+            if(d.parentIndex == null){
+                events.fire('cohort_selected', d);
+            }else{
+                events.fire('branch_selected', d.cohortIndex);
+            }
+           // events.fire('cohort_selected', [d, i]);
         });
  
         let linegroups = cohorts.append('g').classed('rows', true).attr('transform', (d) => 'translate('+ (d.eventIndex * 4) +'0)');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
