@@ -104,11 +104,12 @@ export class PlotKeeper {
             this.comparisonArray = item;
      
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-            this.comparisonArray.forEach((cohort, i) => {
+            this.comparisonArray.layers.forEach((cohort, i) => {
+                console.log(cohort);
               
                 if(cohort.data.clumped){
                     //if it is aggregated
-                    this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item, i);//.then(co=> this.drawAgg(co, 'all'));
+                    this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);//.then(co=> this.drawAgg(co, 'all'));
                     
                 }else{
                     this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
@@ -146,6 +147,25 @@ export class PlotKeeper {
             console.log('test firing?');
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
+            let array = [];
+            if(this.layerBool){
+                console.log(item);
+
+              let layer = select('#layerDiv');
+      
+              let selected = layer.selectAll('.fill').nodes();
+          
+               selected.forEach((sel, i) => {
+                   console.log(select(sel).data());
+                   let cohort = select(sel).data()[0];
+                   let entry = {class: 'layer-' + i, data: cohort }
+                   array.push(entry);
+              });
+
+              events.fire('update_layers', array);
+              console.log(array);
+        
+            }
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
@@ -153,7 +173,9 @@ export class PlotKeeper {
                 this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
 
                 if(this.layerBool){
-                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, this.selectedCohort.cohortIndex);
+
+                    console.log(this.cohortData);
+                  //  this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, this.selectedCohort.cohortIndex);
                 }else{
                     this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
                 }
@@ -189,7 +211,10 @@ export class PlotKeeper {
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
         
                if(this.layerBool == true){
-           
+                console.log('update chart??');
+                
+                   /*
+                console.log(this.comparisonArray);
                 this.comparisonArray.forEach((cohort, i) => {
            
                     if(cohort.data.clumped){
@@ -206,7 +231,7 @@ export class PlotKeeper {
                         this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
                     }
 
-                });
+                });*/
 
                }else{
                

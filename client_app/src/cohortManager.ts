@@ -58,6 +58,7 @@ export class CohortManager {
         this.codes = codeDict.create();
         this.branchSelected = null;
         this.counter = 0;
+        this.layerKeeper = {layers : [], clumped: false, scaleR: false}
         
         this.attachListener();
     }
@@ -83,7 +84,30 @@ export class CohortManager {
         });
 
         events.on('update_layers', (evt, item)=> {
-            this.layerKeeper = item;
+            console.log('when does htsi happen');
+            console.log(this.layerKeeper);
+            if(this.layerKeeper.scaleR == true){
+                item.forEach(cohort => {
+                    cohort.data.scaleR = true;
+                });
+            }else{
+                item.forEach(cohort => {
+                    cohort.data.scaleR = false;
+                });
+            }
+            if(this.layerKeeper.clumped == true){
+                item.forEach(cohort => {
+                    cohort.data.clumped = true;
+                });
+            }else{
+                item.forEach(cohort => {
+                    cohort.data.clumped = false;
+                });
+            }
+            
+            this.layerKeeper.layers = item;
+            console.log(this.layerKeeper);
+       
             events.fire('draw_layers', this.layerKeeper);
         });
     
@@ -93,13 +117,15 @@ export class CohortManager {
             if(this.layerBool == true){
                 console.log('layer bool on!');
                 if(!this.layerKeeper.clumped){
-                    this.layerKeeper.forEach(layer => {
+                    console.log(this.layerKeeper);
+                    console.log(this.layerKeeper.layers)
+                    this.layerKeeper.layers.forEach(layer => {
                         layer.data.clumped = true;
                     });
                     this.layerKeeper.clumped = true;
                 }else{
                  
-                        this.layerKeeper.forEach(layer => {
+                        this.layerKeeper.layers.forEach(layer => {
                             layer.data.clumped = false;
                         });
                         this.layerKeeper.clumped = false;
@@ -184,12 +210,12 @@ export class CohortManager {
             if(this.layerBool == true){
                 console.log('layer bool on!');
                 if(!this.layerKeeper.scaleR){
-                    this.layerKeeper.forEach(layer => {
+                    this.layerKeeper.layers.forEach(layer => {
                         layer.data.scaleR = true;
                     });
                     this.layerKeeper.scaleR = true;
                 }else{
-                        this.layerKeeper.forEach(layer => {
+                        this.layerKeeper.layers.forEach(layer => {
                             layer.data.scaleR = false;
                         });
                         this.layerKeeper.scaleR = false;
@@ -287,6 +313,7 @@ export class CohortManager {
             if(!this.layerBool){
                 this.layerBool = true;
                 events.fire('enter_layer_view');
+               
             }else{
                 this.layerBool = false;
                 events.fire('exit_layer_view');
@@ -352,6 +379,8 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
 
+            console.log(this.layerKeeper);
+
         });
 
         events.on('promis_from_demo_refiltered', (evt, item)=> {
@@ -400,7 +429,7 @@ export class CohortManager {
                     this.cohortTree[this.cohortIndex].clumped = false;
                     this.selectedCohort = this.cohortTree[this.cohortIndex];
 
-                    index = this.cohortIndex;
+                   // index = this.cohortIndex;
               }else{
                     let index = this.branchSelected[0];
                     let branchIndex = this.branchSelected[1];
@@ -409,8 +438,10 @@ export class CohortManager {
                     this.cohortTree[index].branches[branchIndex].promis = item[1];
                     this.selectedCohort = this.cohortTree[index].branches[branchIndex];
 
-                    index = this.branchSelected;
+                   // index = this.branchSelected;
                 }
+                console.log(this.selectedCohort);
+                index = this.selectedCohort.cohortIndex;
 
                 events.fire('update_chart', this.selectedCohort);
                 events.fire('test', [this.cohortTree, index]);
@@ -498,19 +529,24 @@ export class CohortManager {
             let promis = item[0];
             let cpt = item[1];
             let codes = item[2];
+            let index;
 
             if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].promis = promis;
                 this.cohortTree[this.cohortIndex].cpt = cpt;
                 this.cohortTree[this.cohortIndex].startEvent = codes;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
+                index= this.cohortIndex;
             }else{
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].promis = promis;
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].cpt = cpt;
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].startEvent = codes;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
+                index = this.branchSelected;
             }
             events.fire('update_chart', this.selectedCohort);
+            events.fire('test', [this.cohortTree, index]);
+
         });
         events.on('selected_line_array', (evt, item)=> {
             events.fire('selected_line_with_cpt', [item, this.selectedCohort.cpt]);
