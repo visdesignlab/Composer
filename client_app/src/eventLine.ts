@@ -34,6 +34,7 @@ export class EventLine {
     private eventToggleLabels;
     private branchHeight;
     private layerBool;
+    private scoreChangeBool;
 
     constructor(parent: Element, cohort) {
 
@@ -50,6 +51,7 @@ export class EventLine {
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
     branchWrapper.append('svg').attr('height', this.branchHeight);
+    this.scoreChangeBool;
    
     this.attachListener();
 
@@ -605,8 +607,9 @@ export class EventLine {
             let quartDiv = div.append('div').classed('quartDiv', true);
                 quartDiv.append('input').attr('type', 'button').attr('id', 'quartile-btn')
                     .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
-                    .attr('value', 'Separate by Quartiles').on('click', () =>{
+                    .attr('value', 'Separate Quantiles').on('click', () =>{
                         select('.checkDiv').remove();
+                       
                         events.fire('separate_aggregate');
                           ///radio aggregation
                     });
@@ -648,6 +651,28 @@ export class EventLine {
                         }
                     });
                     bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
+                    let radio = quartDiv.append('form');
+                    radio.append('input').attr('type', 'radio').attr('value', true).attr('name', 'quart').attr('id', 'quartile-radio-1');
+                    radio.append('label').attr('for', 'quartile-radio-1').text('Average Score Change');
+                    radio.append('input').attr('type', 'radio').attr('value', false).attr('name', 'quart').attr('id', 'quartile-radio-2');
+                    radio.append('label').attr('for', 'quartile-radio-2').text('Score at Zero Day');
+
+                 //   select(document.getElementById(this.scoreChangeBool[1])).attr('checked', true);
+
+                    this.$node.selectAll("input[name='quart']").on('change', function() {
+                        console.log(this.value);
+                       
+                        let newBool; 
+                        if(this.id = 'quartile-radio-1'){
+                            newBool = [true, this.id];
+                        }else{
+                            newBool = [false, this.id];
+                        }
+                       
+                        this.scoreChangeBool = newBool;
+                        events.fire('change_sep_bool', newBool);
+                        
+                    });
 
                     if(!separated){  checkDiv.classed('hidden', true); }
                     else{ checkDiv.classed('hidden', false); }

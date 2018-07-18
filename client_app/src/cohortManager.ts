@@ -250,6 +250,7 @@ export class CohortManager {
             this.counter = 0;
             events.fire('clear_charts', null);
             this.layerBool = false;
+            events.fire('create_button_down');
             });
 
          events.on('cpt_filter_button', (evt, item)=> {
@@ -333,6 +334,7 @@ export class CohortManager {
             }
          
            events.fire('update_chart', this.selectedCohort);
+           console.log(this.selectedCohort);
           });
 
         events.on('selected_promis_filtered', (evt, item)=>{//fired in data manager
@@ -464,7 +466,7 @@ export class CohortManager {
                 this.selectedCohort.separated = true;
                 document.getElementById('quartile-btn').classList.add('btn-warning');
                 document.getElementById('checkDiv').classList.remove('hidden');
-                events.fire('separate_cohort_agg', this.selectedCohort);
+                events.fire('separate_cohort_agg', [this.selectedCohort, item]);
             }
             });
 
