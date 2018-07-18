@@ -88,7 +88,7 @@ export class EventLine {
             let cohortIndex = item[1];
 
             if(item[1].length > 1){
-                console.log(cohortTree[cohortIndex[0]].branches[cohortIndex[0]]);
+             
                 this.drawBranches(cohortTree).then(d=> this.classingSelected(cohortTree[cohortIndex[0]].branches[cohortIndex[1]]));
                
             }else{
@@ -104,11 +104,7 @@ export class EventLine {
     
             console.log(this.layerBool);
     
-            this.buildLayerFilter(layer, item[0]).then((array)=> {
-              if(this.layerBool == true){
-                events.fire('update_layers', array);
-              }
-            });
+            this.buildLayerFilter(layer, item[0]);
     
           });
 
@@ -133,7 +129,6 @@ export class EventLine {
                 }
                 
                 if(this.filter){
-    
                     this.drawEventButtons(item);
                 }
             }
