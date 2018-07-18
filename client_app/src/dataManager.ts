@@ -27,6 +27,8 @@ export class DataManager {
     private findMaxDateCPT = dataCalc.findMaxDateCPT;
     private parseTime = dataCalc.parseTime;
     private targetOrder;
+    private seperateValue;
+    private scoreChangeBool;
 
     //tables for all patient data
     demoTable : ITable;
@@ -138,7 +140,8 @@ export class DataManager {
 
 
         events.on('filter_cohort_agg', (evt, item)=> {
-            this.getQuant_Agg(item[0], item[1]);
+            console.log('filter cohrot agg happens');
+          //  this.getQuant_Agg(item[0], item[1]);
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -184,16 +187,22 @@ export class DataManager {
         events.on('selected_line_with_cpt', (evt, item)=> {
             this.filterObjectByArray(item[0], item[1], 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
+
+         events.on('change_sep_bool', (evt, item)=> {
+             this.scoreChangeBool = item[0];
+         })
  
         events.on('separate_cohort_agg', (evt, item)=> {
             let sepBool;
-            if(item.separated == true){
+            if(item[1] == true){
                 sepBool = true;
             }else{
                 sepBool = false;
             }
+
+            console.log(this.scoreChangeBool);
         
-            this.getQuant_Separate(item.promis, 3, sepBool).then(sep=> {
+            this.getQuant_Separate(item[0].promis, 3, this.scoreChangeBool).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
         });
@@ -369,102 +378,6 @@ export class DataManager {
 
     }
     
-    private async getQuant_Agg(cohort, quant) {
-    
-        let oneval = [];
-        let outofrange = [];
-        let topStart = [];
-        let middleStart = [];
-        let bottomStart = [];
-        let barray = [];
-        let selected;
-        let maxPromisCount = 1;
-
-        cohort.forEach(patient => {
-
-            if(patient.value.length == 1){
-                if(patient.value[0].diff > Math.abs(90)){
-                    outofrange.push(patient);
-                }
-                oneval.push(patient.key);
-            }else {
-
-                if(patient.value.length > maxPromisCount) {
-
-                    maxPromisCount = patient.value.length;
-                }
-
-            }
-
-            if(patient.b != undefined) {
-                barray.push(patient.b);
-                if(patient.b >= 43){topStart.push(patient)};
-                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
-                if(patient.b <= 29){bottomStart.push(patient)};
-                patient.scorespan = [patient.b];
-
-            }else{
-            }
-            
-            if(quant == 'bottom'){ selected = bottomStart };
-            if(quant == 'middle'){ selected = middleStart };
-            if(quant == 'top'){ selected = topStart };
-
-            
-        });
-
-        events.fire('filtered_by_quant', [selected, quant]);
-
-    }
-
-    private getQuant_Agg_Test(cohort, quant) {
-
-        let oneval = [];
-        let outofrange = [];
-        let topStart = [];
-        let middleStart = [];
-        let bottomStart = [];
-        let barray = [];
-        let selected;
-        let maxPromisCount = 1;
-
-        cohort.forEach(patient => {
-
-            if(patient.value.length == 1){
-                if(patient.value[0].diff > Math.abs(90)){
-                    outofrange.push(patient);
-                }
-                oneval.push(patient.key);
-            }else {
-
-                if(patient.value.length > maxPromisCount) {
-
-                    maxPromisCount = patient.value.length;
-                }
-
-            }
-
-            if(patient.b != undefined) {
-                barray.push(patient.b);
-                if(patient.b >= 43){topStart.push(patient)};
-                if(patient.b < 43 && patient.b > 29){ middleStart.push(patient)};
-                if(patient.b <= 29){bottomStart.push(patient)};
-                patient.scorespan = [patient.b];
-
-            }else{
-            }
-            
-            if(quant == 'bottom'){ selected = bottomStart };
-            if(quant == 'middle'){ selected = middleStart };
-            if(quant == 'top'){ selected = topStart };
-
-            
-        });
-
-        events.fire('filtered_by_quant', [selected, quant]);
-
-    }
-
     //breaks each pat value scores into Original and relative score
     private async getBaselines(cohort)  {
         
@@ -529,13 +442,17 @@ export class DataManager {
     private async getQuant_Separate(cohort, binNum, relativeChange) {
 
         let arrayofArrays = [];
+        console.log(relativeChange);
+        console.log(this.scoreChangeBool);
 
         if(relativeChange == true){
+
+            console.log('relative avsss');
 
             cohort.forEach(pat => {
                 let afterEvent = pat.value.filter(v=> v.diff > -1);
                 let scores = pat.value.map(s=> s.relScore);
-                // let scores = afterEvent.map(s=> s.relScore);
+           
                  let avs = scores.reduce((a, b) => parseFloat(a) + parseFloat(b)) / scores.length;
                  pat.avChange = avs;
              });
@@ -564,12 +481,15 @@ export class DataManager {
                  }
              }
         }else {
+
+            console.log('using b array');
      
             let barray = cohort.map(pat=> {
                 if(pat.b != undefined){return pat.b;
                 }else { return pat.value[0].SCORE; }
             });
 
+        
        
             barray = barray.sort((a,b)=> a-b);
          
