@@ -191,9 +191,7 @@ export class DataManager {
 
          events.on('change_sep_bool', (evt, item)=> {
             let bool;
-            console.log(item);
-            console.log(item.scaleR);
-
+        
             this.getQuant_Separate(this.selected.promis, 3, item.scaleR).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
@@ -207,8 +205,6 @@ export class DataManager {
             }else{
                 sepBool = false;
             }
-
-            console.log(this.scoreChangeBool);
             this.selected = item[0];
         
             this.getQuant_Separate(item[0].promis, 3, this.scoreChangeBool).then(sep=> {
@@ -451,8 +447,6 @@ export class DataManager {
     private async getQuant_Separate(cohort, binNum, relativeChange) {
 
         let arrayofArrays = [];
-        console.log(relativeChange);
-        console.log(this.scoreChangeBool);
 
         if(relativeChange == true){
 
@@ -460,10 +454,17 @@ export class DataManager {
 
             cohort.forEach(pat => {
                 let afterEvent = pat.value.filter(v=> v.diff > -1);
-                let scores = pat.value.map(s=> s.relScore);
-           
+                let scores2 = pat.value.map(s=> s.relScore);
+                let scores = pat.value.map(s=> {
+                    if(s.diff > -1){ return s.relScore}else{ return 0 }});
+                let scores3 = pat.value.map(s=> {
+                        if(s.diff > -1){ return s.relScore}});
                  let avs = scores.reduce((a, b) => parseFloat(a) + parseFloat(b)) / scores.length;
+                 let avs2 = scores2.reduce((a, b) => parseFloat(a) + parseFloat(b)) / scores2.length;
+                 pat.avChange2 = avs2;
                  pat.avChange = avs;
+                 pat.test = scores3;
+                 console.log(pat);
              });
      
              let avsArray = cohort.map(d=> d.avChange);
