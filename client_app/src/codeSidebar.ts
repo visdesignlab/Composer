@@ -59,15 +59,18 @@ export class CodeSidebar {
     private attachListener() {
 
        events.on('update_chart', (evt, item)=> {
-  
-        let selectedFilters = item.filterArray;
-        let cohortPromis = item.promis;
+    
+       
+            if(item){
+                let selectedFilters = item.filterArray;
+                let cohortPromis = item.promis;
 
-        select('.orderDiv').select('.codes').remove();
-        select('.checkDiv').remove();
-        this.$node.select('.distributionWrapper').selectAll('*').remove();
-        this.histogrammer(cohortPromis).then(d=> this.drawHistogram(d));
-        this.DrawfilterDescriptionBox(item);
+                select('.orderDiv').select('.codes').remove();
+                select('.checkDiv').remove();
+                this.$node.select('.distributionWrapper').selectAll('*').remove();
+                this.histogrammer(cohortPromis).then(d=> this.drawHistogram(d));
+                this.DrawfilterDescriptionBox(item);
+            }
        });
 
        events.on('clear_cohorts', (evt, item)=> {
