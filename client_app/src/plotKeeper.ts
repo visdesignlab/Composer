@@ -69,7 +69,7 @@ export class PlotKeeper {
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
-            this.layerBool = false;
+            document.getElementById('layerButton').classList.remove('btn-warning');
 
         });
 
