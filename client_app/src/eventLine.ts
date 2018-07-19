@@ -51,7 +51,7 @@ export class EventLine {
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
     branchWrapper.append('svg').attr('height', this.branchHeight);
-    this.scoreChangeBool;
+    this.scoreChangeBool = {id: 'quartile-radio-2', scaleR: false}
    
     this.attachListener();
 
@@ -609,7 +609,7 @@ export class EventLine {
                     .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                     .attr('value', 'Separate Quantiles').on('click', () =>{
                         select('.checkDiv').remove();
-                       
+                      
                         events.fire('separate_aggregate');
                           ///radio aggregation
                     });
@@ -657,25 +657,32 @@ export class EventLine {
                     radio.append('input').attr('type', 'radio').attr('value', false).attr('name', 'quart').attr('id', 'quartile-radio-2');
                     radio.append('label').attr('for', 'quartile-radio-2').text('Score at Zero Day');
 
-                 //   select(document.getElementById(this.scoreChangeBool[1])).attr('checked', true);
+                  //  select(document.getElementById(this.scoreChangeBool.id)).attr('checked', true);
 
                     this.$node.selectAll("input[name='quart']").on('change', function() {
                         console.log(this.value);
+
+                        let scoreChange = {id : this.id, scaleR: null};
                        
-                        let newBool; 
-                        if(this.id = 'quartile-radio-1'){
-                            newBool = [true, this.id];
-                        }else{
-                            newBool = [false, this.id];
+        
+                        if(this.id == 'quartile-radio-1'){
+                            scoreChange.scaleR = true;
                         }
-                       
-                        this.scoreChangeBool = newBool;
-                        events.fire('change_sep_bool', newBool);
+                        if(this.id == 'quartile-radio-2'){
+                            scoreChange.scaleR = false;
+                        }
+
+                        this.scoreChangeBool = scoreChange;
+
+                        events.fire('change_sep_bool', scoreChange);
                         
                     });
 
-                    if(!separated){  checkDiv.classed('hidden', true); }
-                    else{ checkDiv.classed('hidden', false); }
+                    if(!separated){  
+                        checkDiv.classed('hidden', true); 
+                        radio.classed('hidden', true); }
+                    else{ checkDiv.classed('hidden', false); 
+                          radio.classed('hidden', false);}
 
                     if(this.layerBool){
                         //document.getElementById('quartile-btn').classList.add('disabled');
