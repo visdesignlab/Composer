@@ -29,6 +29,7 @@ export class DataManager {
     private targetOrder;
     private seperateValue;
     private scoreChangeBool;
+    private selected;
 
     //tables for all patient data
     demoTable : ITable;
@@ -189,7 +190,14 @@ export class DataManager {
          });
 
          events.on('change_sep_bool', (evt, item)=> {
-             this.scoreChangeBool = item[0];
+            let bool;
+            console.log(item);
+            console.log(item.scaleR);
+
+            this.getQuant_Separate(this.selected.promis, 3, item.scaleR).then(sep=> {
+                events.fire('separated_by_quant', sep);
+            });
+
          })
  
         events.on('separate_cohort_agg', (evt, item)=> {
@@ -201,6 +209,7 @@ export class DataManager {
             }
 
             console.log(this.scoreChangeBool);
+            this.selected = item[0];
         
             this.getQuant_Separate(item[0].promis, 3, this.scoreChangeBool).then(sep=> {
                 events.fire('separated_by_quant', sep);
