@@ -51,7 +51,7 @@ export class EventLine {
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
     branchWrapper.append('svg').attr('height', this.branchHeight);
-    this.scoreChangeBool = {id: 'quartile-radio-2', scaleR: false}
+    this.scoreChangeBool;
    
     this.attachListener();
 
@@ -337,162 +337,6 @@ export class EventLine {
 
     }
 
-    private async drawBranches_test(cohort){
-        let flat = [];
-
-        cohort.forEach(group => {
-            flat.push(group);
-            if(group.branches.length > 0){
-                group.branches.forEach(branch => {
-                    flat.push(branch);
-                });
-            }
-        });
-
-        console.log(flat);
-    
-        this.branchHeight = flat.length * 30;
-        let moveDistance = (this.branchHeight / cohort.length) - 5;
-        let branchMove = moveDistance / 2;
-
-        console.log(moveDistance);
-
-        let branchWrapper = this.$node.select('.branch-wrapper');
-        let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
-        branchSvg.selectAll('*').remove();
-
-        let rows = [];
-        cohort.forEach(c => {
-            let e = c.filterArray.map((event, i) => {
-               let coord = {x: (i * 30.5) + 65, y: 6 };
-               return coord;
-            });
-            rows.push(e);
-            c.rowData = e;
-        });
-
-        cohort.forEach(c => {
-      
-          if(c.branches.length != 0){
-              c.branches.forEach((b, i) => {
-                  b.rowData = [{x: -25, y: -18 }, {x: -15, y: -5 }];
-                  b.filterArray.forEach((event, i) => {
-                      let coord = {x: (i * 30.5) + 5, y: 6 };
-                      b.rowData.push(coord);
-                   });
-              });
-          }
-      });
-
-      let linko = line().curve(curveMonotoneY)
-      .x(function(d) { return d['x'] })
-      .y(function(d) { return d['y'] });
-
-        let cohorts = branchSvg.selectAll('.cohort-lines').data(cohort);
-        cohorts.exit().remove();
-
-        let coEnter = cohorts.enter().append('g').attr('class', (d, i) => i).classed('cohort-lines', true);
-        cohorts = coEnter.merge(cohorts);
-
-        cohorts.attr('transform', (d, i)=> 'translate(0,' + i * moveDistance + ')');
-
-        let label = cohorts.append('g').classed('labels', true);
-        label.append('rect').attr('width', 55).attr('height', 18).attr('fill', 'white').attr('transform', 'translate(-3, -13)');;
-        label.append('text').text((d, i)=> {return 'Cohort ' + (i + 1)});
-        label.attr('transform', 'translate(3, 10)');
-        label.on('click', (d, i)=> {
-           
-            this.$node.selectAll('.selected').classed('selected', false);
-            let thislabel = label.nodes();
-            thislabel[i].classList.add('selected');
-            events.fire('cohort_selected', [d, i]);
-        });
- 
-        let linegroups = cohorts.append('g').classed('rows', true);//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
-        linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
-        
-        let cohortevents = cohorts.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
-        cohortevents.exit().remove();
-
-        let eventEnter = cohortevents.enter().append('g').classed('events', true);
-
-        cohortevents = eventEnter.merge(cohortevents);
-        cohortevents.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
-
-        let circle = cohortevents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
-        circle.on("mouseover", (d) => {
-            let t = transition('t').duration(500);
-            select(".tooltip")
-              .html(() => {
-                return this.renderOrdersTooltip(d);
-              })
-              .transition(t)
-              .style("opacity", 1)
-              .style("left", `${event.pageX + 10}px`)
-              .style("top", `${event.pageY + 10}px`);
-          })
-          .on("mouseout", () => {
-            let t = transition('t').duration(500);
-            select(".tooltip").transition(t)
-            .style("opacity", 0);
-          });
-
-          let nodes = cohortevents.nodes();
-
-          let branchGroups = cohorts.selectAll('.branches').data(d=>d.branches);
-
-          branchGroups.exit().remove();
-
-          let benter = branchGroups.enter().append('g').classed('branches', true);
-
-          branchGroups = benter.merge(branchGroups);
-
-          let blabel = branchGroups.append('g').classed('b-labels', true);
-          blabel.append('text').text((d, i)=> {return 'B-' + (i + 1)});
-          blabel.attr('transform', 'translate(0, 10)');
-          blabel.on('click', (d, i)=> {
-            events.fire('branch_selected', [d.parentIndex, i]);
-          });
-
-          blabel.attr('transform', (d, i) => 'translate(-60,'+ ((i * 10) + 8) + ')');
-
-          branchGroups.attr('transform', (d, i) => 'translate(' + ((d.eventIndex * 30) + 60) + ','+ ((i * branchMove) + 22) + ')');
-
-          let branchlines = branchGroups.append('g').classed('rows', true);
-      
-          branchlines.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
-
-          let branchEvents = branchGroups.selectAll('.branch-events').data((d, i)=> d.filterArray);
-
-          branchEvents.exit().remove();
-
-          let branchEventsEnter = branchEvents.enter().append('g').classed('branch-events', true);
-          
-          branchEvents = branchEventsEnter.merge(branchEvents);
-
-          branchEvents.attr('transform', (d, i)=> 'translate(' + i * 30 + ', 0)');
-
-          let branchCircle = branchEvents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
-
-          branchCircle.on("mouseover", (d) => {
-            let t = transition('t').duration(500);
-            select(".tooltip")
-            .html(() => {
-                return this.renderOrdersTooltip(d);
-            })
-            .transition(t)
-            .style("opacity", 1)
-            .style("left", `${event.pageX + 10}px`)
-            .style("top", `${event.pageY + 10}px`);
-          })
-          .on("mouseout", () => {
-              let t = transition('t').duration(500);
-              select(".tooltip").transition(t)
-              .style("opacity", 0);
-          });
-
-    }
-
     private drawEventButtons(cohort){
             let filters = cohort.filterArray;
             let scaleRelative = cohort.scaleR;
@@ -628,7 +472,7 @@ export class EventLine {
                     })
                     tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
 
-                    let mCheck = checkDiv.append('div');
+                    let mCheck = checkDiv.append('div')//.classed('container', true);
                     mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
                     .attr('value', 'middle').on('click', () => {
                         let p = selectAll('.middle');
@@ -638,6 +482,8 @@ export class EventLine {
                             p.classed('hidden', true);
                         }
                     });
+                  //  mCheck.append('span').classed('checkmark', true)
+                  
                     mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
 
                     let bCheck = checkDiv.append('div');
@@ -656,26 +502,21 @@ export class EventLine {
                     radio.append('label').attr('for', 'quartile-radio-1').text('Average Score Change');
                     radio.append('input').attr('type', 'radio').attr('value', false).attr('name', 'quart').attr('id', 'quartile-radio-2');
                     radio.append('label').attr('for', 'quartile-radio-2').text('Score at Zero Day');
-
-                  //  select(document.getElementById(this.scoreChangeBool.id)).attr('checked', true);
+                    if(this.scoreChangeBool){
+                        select(document.getElementById(this.scoreChangeBool)).attr('checked', true);
+                    }
 
                     this.$node.selectAll("input[name='quart']").on('change', function() {
-                        console.log(this.value);
-
+           
                         let scoreChange = {id : this.id, scaleR: null};
-                       
-        
-                        if(this.id == 'quartile-radio-1'){
-                            scoreChange.scaleR = true;
-                        }
-                        if(this.id == 'quartile-radio-2'){
-                            scoreChange.scaleR = false;
-                        }
 
-                        this.scoreChangeBool = scoreChange;
-
+                        if(this.id == 'quartile-radio-1'){ scoreChange.scaleR = true;
+                        }else{ scoreChange.scaleR = false; }
+             
+                        that.scoreChangeBool = this.id;
+              
                         events.fire('change_sep_bool', scoreChange);
-                        
+
                     });
 
                     if(!separated){  
