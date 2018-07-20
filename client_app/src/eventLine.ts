@@ -472,7 +472,7 @@ export class EventLine {
                     })
                     tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
 
-                    let mCheck = checkDiv.append('div');
+                    let mCheck = checkDiv.append('div')//.classed('container', true);
                     mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
                     .attr('value', 'middle').on('click', () => {
                         let p = selectAll('.middle');
@@ -482,6 +482,8 @@ export class EventLine {
                             p.classed('hidden', true);
                         }
                     });
+                  //  mCheck.append('span').classed('checkmark', true)
+                  
                     mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
 
                     let bCheck = checkDiv.append('div');
@@ -503,23 +505,18 @@ export class EventLine {
                     if(this.scoreChangeBool){
                         select(document.getElementById(this.scoreChangeBool)).attr('checked', true);
                     }
-                  //  select(document.getElementById(this.scoreChangeBool)).attr('checked', true);
 
                     this.$node.selectAll("input[name='quart']").on('change', function() {
            
                         let scoreChange = {id : this.id, scaleR: null};
 
-                        if(this.id == 'quartile-radio-1'){
-                            scoreChange.scaleR = true;
-                        }else{
-                            scoreChange.scaleR = false;
-                        }
+                        if(this.id == 'quartile-radio-1'){ scoreChange.scaleR = true;
+                        }else{ scoreChange.scaleR = false; }
              
                         that.scoreChangeBool = this.id;
-                        console.log(that.scoreChangeBool);
-
+              
                         events.fire('change_sep_bool', scoreChange);
-                        
+
                     });
 
                     if(!separated){  
