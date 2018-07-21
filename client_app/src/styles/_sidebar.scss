@@ -19,6 +19,32 @@ ul {
     //  border-radius: 2px;
 }
 
+#cohortSideBar {
+    height: 100%;
+    width: 250px;
+    //position: fixed;
+    position: relative;
+    background-color: #EAECEE;
+    padding-top: 35px;
+    display: inline;
+    float: left;
+    border-color: #566573;
+    border-width: 1px;
+}
+
+#cohortSideBar .panel-head {
+    width: 100%;
+    height: 50px;
+    background-color: #566573;
+    text-align: center;
+    padding-top: 10px;
+    color: #EAECEE;
+}
+
+#cohort_control .panel-head input {
+    margin: auto;
+}
+
 #cohortKeeper {
     border: .5px solid rgb(121, 107, 107);
     border-radius: 2px;
@@ -30,15 +56,6 @@ ul {
     padding-left: 20px;
     position: relative;
     display: inline-block;
-}
-
-.selected {
-    // padding: 2px;
-    //  color: #E67E22;
-    // border: #E67E22;
-    //  background-color: #E67E22;
-    //  opacity: .8;
-    // border-radius: 2px;
 }
 
 .branch svg {

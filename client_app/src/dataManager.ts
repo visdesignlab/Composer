@@ -73,9 +73,9 @@ export class DataManager {
 
           });
 
-        events.on('demo_add', (evt, item) => { // called in sidebar
-            let filter = item;
-            this.demoFilter(item, this.totalDemoObjects).then(ids=> {
+        events.on('create_button_down', (evt, item) => { // called in sidebar
+            let filter = [];
+            this.demoFilter(filter, this.totalDemoObjects).then(ids=> {
                 let cohortIDs = ids;
                 //this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(promis=> {
                 this.loadPromisData(cohortIDs, filter).then(promis=> {
