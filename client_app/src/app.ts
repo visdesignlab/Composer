@@ -55,6 +55,7 @@ export class App {
     const sideBarDiv = this.$node.append('div').attr('id', 'cohortSideBar');
     const side = cohortSideBar.create(sideBarDiv.node());
     await side.init();
+    const filterBarDiv = this.$node.append('div').attr('id', 'filterSideBar');
 
     const header = document.querySelector('#caleydoHeader');
     let cohortButtons = select(header).select('.navbar').select('.navbar-header')
