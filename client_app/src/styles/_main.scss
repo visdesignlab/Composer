@@ -1,5 +1,10 @@
 #app {
     /*width: 3200px;*/
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    margin: 0px;
+    padding: 0px;
 }
 
 #caleydoHeader {
@@ -45,6 +50,7 @@
     padding-right: 1%;
     width: 50%;
     margin-top: 50px;
+    display: inline-block;
 }
 
 .sideBar {

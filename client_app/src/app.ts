@@ -4,6 +4,7 @@
 
 import {select} from 'd3-selection';
 import * as sideBar from './sideBar';
+import * as cohortSideBar from './cohortSideBar';
 import * as events from 'phovea_core/src/event';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataManager from './dataManager';
@@ -51,23 +52,21 @@ export class App {
     const cohort = cohortManager.create();
     
     // create side bar
-    const sideBarDiv = this.$node.append('div').classed('sideBar', true);
-    const side = sideBar.create(sideBarDiv.node());
+    const sideBarDiv = this.$node.append('div').attr('id', 'cohortSideBar');
+    const side = cohortSideBar.create(sideBarDiv.node());
     await side.init();
 
     const header = document.querySelector('#caleydoHeader');
     let cohortButtons = select(header).select('.navbar').select('.navbar-header')
     .append('div').classed('cohort-buttons', true);
     let that = this;
-    let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).classed('btn-sm', true).attr('value', 'Add Cohort');
+  //  let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).classed('btn-sm', true).attr('value', 'Add Cohort');
     let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Branch Cohort');
-    let clear = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Clear Cohorts');
+  
    // let compare = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Comparison View');
     let layer = cohortButtons.insert('input').attr('type', 'button').attr('id', 'layerButton').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Layer View');
-    create.on('click', function(d){ events.fire('create_button_down'); });
+   
     branch.on('click', function(d){ events.fire('branch_cohort'); });
-    clear.on('click', function(d){ events.fire('clear_cohorts'); });
-   // compare.on('click', function(d){ events.fire('compare_button_down'); });
     layer.on('click', function(d){ events.fire('layer_button_down'); });
 
     // main div with child views
