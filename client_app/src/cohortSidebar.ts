@@ -127,7 +127,10 @@ export class CohortSideBar {
 
       button.attr('margin-left', 10);
 
-      button.on('click', function(d){ events.fire('show_layer_panel'); });
+      button.on('click', function(d){ 
+        events.fire('show_layer_panel'); 
+        select(document.getElementById('filterSideBar')).classed('hidden', false);
+      });
   
       let cohortBody = panelDiv.append('div').classed('panel-body', true);
 

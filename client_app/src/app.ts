@@ -16,6 +16,7 @@ import * as inStat from './individualStats';
 import { CohortManager } from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
 import * as codeside from './codeSidebar';
+import * as filterSidebar from './filterSidebar';
 import { selectAll } from 'd3';
 
 /**
@@ -56,6 +57,7 @@ export class App {
     const side = cohortSideBar.create(sideBarDiv.node());
     await side.init();
     const filterBarDiv = this.$node.append('div').attr('id', 'filterSideBar');
+    filterSidebar.create(filterBarDiv.node());
 
     const header = document.querySelector('#caleydoHeader');
     let cohortButtons = select(header).select('.navbar').select('.navbar-header')
@@ -77,7 +79,7 @@ export class App {
   
     PlotKeeper.create(plots.node());
   
-    codeside.create(statBar.node());
+   // codeside.create(statBar.node());
     inStat.create(main.node());
     const cpt = main.append('Div').classed('cptDiv', true);
 

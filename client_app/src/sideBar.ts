@@ -630,8 +630,6 @@ private async drawCohortLabel(cohortTree) {
         return d['frequency'] + .1;
     })]);
 
-  
-
     //////////////bar groups for all data////////////////////////////////
     let barGroupsALL = this.$node.select('.distributionWrapper').select('.' +type).selectAll('.barALL')
     .data(histobins);
