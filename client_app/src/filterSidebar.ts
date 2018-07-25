@@ -7,7 +7,7 @@ import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
 import * as events from 'phovea_core/src/event';
-import {scaleLinear,scaleTime,scaleOrdinal, scaleBand, scaleLog} from 'd3-scale';
+import {scaleLinear, scaleTime, scaleOrdinal, scaleBand, scaleLog, scalePoint} from 'd3-scale';
 import {area, line, curveMonotoneX, curveMonotoneY, curveLinear, curveBasis} from 'd3-shape';
 //importing other modules from app
 import * as demoGraph from './demoGraphs';
@@ -47,6 +47,7 @@ export class FilterSideBar {
   private freqBrush;
   private scoreFreqRange;
   private dictionary;
+  private demoPanel;
 
   private header = [
     {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -72,8 +73,8 @@ export class FilterSideBar {
     this.branchSelected = null;
     this.comparisonNum = 2;
     this.comparisonArray = [];
+    this.demoPanel;
 
-    
     this.dictionary = new dict.CPTDictionary().codeDict;
 
     this.init();
@@ -88,11 +89,24 @@ export class FilterSideBar {
   
     });
 
-    events.on('update_chart', (evt, item)=> {
+    events.on('population demo loaded', (evt, item)=> {
+        this.populationDemo = item;
+        console.log(item);
+        this.distribute(item).then(header => {
+      //  this.drawDistributionBands(header, 'demoPanel');
 
-      console.log(item);
-    
-     if(item){ this.histogrammer(item.promis).then(d=> this.drawHistogram(d));}
+        header.forEach(data => {
+            this.drawBandTest(data, 'demoPanel');
+        });
+        });
+       });
+
+    events.on('update_chart', (evt, item)=> {
+       
+     //select(document.getElementById('scorePanel')).select('form').selectAll('*').remove();
+     if(item){ 
+        let value = item.promis.map(v=> v.value);
+        this.histogrammer(value, null, 10).then(d=> this.drawHistogram(d));}
        
     });
 
@@ -104,28 +118,23 @@ export class FilterSideBar {
     this.BuildFilterPanel(demoPanel, 'Demographic Filters')//.then(panel=> this.buildDemoFilter(panel));//.then(div => this.cohortKeeper = div.append('svg').classed('cohortSvg', true));
     
     let scorePanel = this.$node.append('div').attr('id', 'scorePanel');
-    this.BuildFilterPanel(demoPanel, 'Score Filters').then(panel=> this.drawScoreFilterBox(panel));;
+    this.BuildFilterPanel(scorePanel, 'Score Filters').then(panel=> this.drawScoreFilterBox(panel));
 
     let codePanel = this.$node.append('div').attr('id', 'codePanel');
-    this.BuildFilterPanel(demoPanel, 'CPT Filters').then(panel => {
-
-       // panel.append('div').classed('orderDiv', true);
-        
-        this.drawOrderFilterBox(panel)});
-
+    this.BuildFilterPanel(codePanel, 'CPT Filters').then(panel => this.drawOrderFilterBox(panel));
     }
 
     private async BuildFilterPanel(panelDiv, title){
 
       let cohorthead = panelDiv.append('div').classed('panel-head', true);
-      cohorthead.append('text').text(title);
+      cohorthead.append('text').text(title).style('padding-right', '20px');
       let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
       .append('text').text('+');
 
       button.attr('margin-left', 10);
 
       button.on('click', function(d){ 
-        events.fire('show_layer_panel'); 
+        events.fire('show_layer_panel');
         select(document.getElementById('filterSideBar')).classed('hidden', false);
       });
   
@@ -284,28 +293,96 @@ export class FilterSideBar {
 
     }
 
-    private async histogrammer(cohort) {
+    private async frequencyMapper(data, key){
+
+        let categories = Array.from(new Set(data));
+
+        let mapped = [];
+
+        categories.forEach(cat => {
+            let counter = data.filter(d=> d == cat);
+            let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
+            mapped.push(map);
+        });
+
+        return mapped;
   
-      let totalPatients = cohort.length;
-      let mapped = cohort.map(pat  => {return +pat.value.length});
+    }
 
-      let maxValue = max(mapped);
+    private async histogrammer(data, type, ticks) {
 
-      let x = scaleLinear().domain([0, +maxValue]).nice();
+        let totalPatients = data.length;
 
-      let bins = histogram()
-      .domain([0, +maxValue])
-      .thresholds(x.ticks(40))
-      (mapped);
-      let histogramData = bins.map(function (d) {
-        totalPatients -= d.length;
-        return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
-      });
+        let x;
+        let bins;
 
-      return histogramData;
-  }
+        let maxValue = max(data);
+        x = scaleLinear().domain([0, +maxValue]).nice();
+
+        bins = histogram()
+                .domain([0, +maxValue])
+                .thresholds(x.ticks(ticks))
+                (data);
+        
+        let histogramData = bins.map(function (d) {
+            totalPatients -= d.length;
+        // return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
+            return {x0: d.x0, x1: d.x1, length: d.length, binCount: bins.length, frequency: d.length/bins.length, type: type};
+        });
+
+        return histogramData;
+    }
+
+    private async distribute(data){
+
+        let totalPatients = data.length;
+
+        let mappedBMI = data.map((d: number) => +d['BMI']);
+    
+        let mappedAGE = data.map((d: number) => +d['AGE']);
+    
+        let mappedCCI = data.map((d: number) => +d['CCI']);
+
+        let mappedAlco = data.map((d: string) => d['ALCOHOL']);
+
+        let mappedDrug = data.map((d: string) => d['DRUG_USER']);
+
+        let mappedDM = data.map((d: string) => d['DM_CODE']);
+
+        let mappedTOB = data.map((d: string) => d['TOBACCO']);
+
+        let alcDomain = Array.from(new Set(mappedAlco));
+        let drugDomain = Array.from(new Set(mappedDrug));
+        let dmDomain = Array.from(new Set(mappedDM));
+        let tobDomain = Array.from(new Set(mappedTOB));
+
+        let binBMI = await this.histogrammer(mappedBMI, 'quant', 8);
+        let binCCI = await this.histogrammer(mappedCCI, 'quant', 22);
+        let binAGE = await this.histogrammer(mappedAGE, 'quant', 9);
+        let binALCOHOL = await this.frequencyMapper(mappedAlco, 'ALCOHOL');
+        let binDRUG = await this.frequencyMapper(mappedDrug, 'DRUG_USER');
+        let binTOB = await this.frequencyMapper(mappedTOB, 'TOBACCO');
+
+        console.log(tobDomain);
+    
+       // 'scale': this.xScale.domain([0, binBMI[0].binCount])
+    
+       let distData = [
+        {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, +binBMI[0].binCount]).range([0, 180]), domain: [0, +binBMI[0].binCount]},
+        {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount]},
+        {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, +binAGE[0].binCount]).range([0, 180]), domain: [0, +binAGE[0].binCount]},
+        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: alcDomain },
+        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: drugDomain },
+        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scalePoint().domain(["Quit", "Yes", "", "Never", "Not Asked", "Passive"]).range([0, 180]), domain: tobDomain }
+        ];
+    
+        return distData;
+
+      }
 
     private drawScoreFilterBox (scorebody) {
+
+      scorebody.select('.frequency-histogram').remove();
 
       const form = scorebody.append('form');
 
@@ -329,12 +406,238 @@ export class FilterSideBar {
                           let count = +val;
                           events.fire('filter_by_Promis_count', count);
                   });
-}
+    }
+
+    private async drawBandTest(data, id){
+        console.log(data);
+        let bandWidth = 180;
+        let distScale = scaleLinear().domain([0, 1000]);
+        let domain = data.domain;
+        let label = data.label;
+        let key = data.key;
+        let scale = data.scale;
+        let value = data.value;
+        let brush;
+
+        let xAxis = axisBottom(scale);
+    
+        let panelBody = select(document.getElementById(id)).select('.panel-body');
+        let demoBand = panelBody.append('div').classed('demoBand', true);
+        let demoLabel = demoBand.append('div').append('text').text(label);
+        let bandSvg = demoBand.append('svg').attr('class', key);
+        let rects = bandSvg.append('g').attr('transform', 'translate(5, 0)').selectAll('rect').data(value).enter().append('rect').attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', 25)
+        .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+        .attr('fill', '#212F3D')
+        .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5);
+     //  .attr('x', (d, i)=> (scale(i) + 5) );
+
+       let axis = bandSvg.append('g').classed('x-axis', true).attr('transform', 'translate(5, 25)');
+
+       axis.call(xAxis);
+
+       let quantBrush = brushX()
+       .extent([[0, 0], [bandWidth, 30]])
+       .handleSize(1);
+
+       if(data.type == 'quant'){
+
+           brush = bandSvg.append('g').attr('class', data.key + '-BRUSH');
+           brush.call(quantBrush);
+       }else{
+
+        rects.on('click', (d, i)=> {
+            console.log(data);
+            console.log(d);
+            
+        })
+       }
+
+    }
+
+    private drawDistributionBands(data, id) {
+
+        let xScale = scaleLinear().range([0, 180]);
+
+        let bandWidth = 180;
+
+        let barBrush = brushX()
+        .extent([[0, 0], [bandWidth, 30]])
+        .handleSize(1);
+    
+        let distScale = scaleLinear().domain([0, 1000]);
+    
+        let bmiScale = scaleLinear().domain([0, 100]).range([0, bandWidth]);
+        let CCIScale = scaleLinear().domain([0, 23]).range([0, bandWidth]);
+        let AGEScale = scaleLinear().domain([0, 100]).range([0, bandWidth]);
+
+        let panelBody = select(document.getElementById(id)).select('.panel-body');
+
+        let distDiagrams = panelBody.selectAll('.demoBand').data(data);
+
+        distDiagrams.exit().remove();
+
+        let distEnter = distDiagrams.enter().append('div').classed('demoBand', true);
+       
+        distDiagrams = distEnter.merge(distDiagrams);
+
+        let bandSvg = distDiagrams.append('svg').attr('class', d=> d['key']);
+
+        let label = bandSvg.append('g').append('text').text(d=> d['label']).attr('transform', 'translate(0, 10)');
+        
+        let rects = bandSvg.append('g').attr('transform', 'translate(20, 0)').selectAll('rect').data(d => d['value']).enter().append('rect').attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', 15)
+        .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+        .attr('fill', '#212F3D')
+        .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5);
+       // .attr('x', (d, i)=> (d['scale'](i) + 5));
+
+
+        let axis = bandSvg.selectAll('.axis-x').data((d, i)=>  d['scale']).enter().append('g').classed('axis-x', true);
+       // let axis = bandSvg.append('g').classed('axis-x', true);
+
+      //  axis.call((d, i)=> axisBottom(d));
+
+        this.bmiBrush = brushX()
+        .extent([[0, 0], [this.svgWidth, 30]])
+        .handleSize(0)
+        .on("end", () => {
+          if (event.selection === null) {
+            //this.setOrderScale();
+        }else {
+          let start = bmiScale.invert(event.selection[0]);
+          let end = bmiScale.invert(event.selection[1]);
+          let Dom1 = Math.floor((start+1)/10)*10;
+          let Dom2 = Math.ceil((end+1)/10)*10;
+    
+          this.bmiRange = [Dom1, Dom2];
+        }
+        });
+    
+        this.cciBrush =  brushX()
+        .extent([[0, 0], [this.svgWidth, 30]])
+        .handleSize(0)
+        .on("end", () => {
+          if (event.selection === null) {
+    
+          } else {
+            let start = CCIScale.invert(event.selection[0]);
+            let end = CCIScale.invert(event.selection[1]);
+            let Dom1 = Math.floor(start);
+            let Dom2 = Math.ceil(end);
+            this.cciRange = [Dom1, Dom2];
+          }
+        });
+    
+        this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
+                        .on("end", () => {
+                          if (event.selection === null) {
+    
+                          } else {
+                            let start = AGEScale.invert(event.selection[0]);
+                            let end = AGEScale.invert(event.selection[1]);
+    
+                            let Dom1 = Math.floor((start+1)/10)*10;
+                            let Dom2 = Math.ceil((end+1)/10)*10;
+                            this.ageRange = [Dom1, Dom2];
+                          }
+                        });
+                        
+        this.$node.select('#BMI-Brush').call(this.bmiBrush);
+    
+        this.$node.select('#CCI-Brush').call(this.cciBrush);
+                    
+        this.$node.select('#AGE-Brush').call(this.ageBrush);
+    
+
+        /*
+    
+        let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true);//.classed('hidden', true);
+        let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', '95%');//.classed('hidden', true)
+        let svg_rect_group = distFilter_svg.append('g').attr('width', '95%');
+        let rect_label_group = distFilter_svg.append('g');
+    
+        rect_label_group.append('text').text(d=> d.value[0].x0).attr('transform', 'translate(0, 20)');
+        rect_label_group.append('text').text(d=> d.value[d.value.length-1].x1).attr('transform', 'translate('+ (this.svgWidth - 15) +', 20)');
+    
+        let rects = svg_rect_group.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 15)
+        .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+        .attr('fill', '#212F3D')
+        .attr('x', (d, i)=> (i * this.svgWidth/d.binCount) + 5);
+    
+        //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);
+    
+        let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
+        let that = this;
+    
+        this.bmiBrush = brushX()
+        .extent([[0, 0], [this.svgWidth, 30]])
+        .handleSize(0)
+        .on("end", () => {
+          if (event.selection === null) {
+            //this.setOrderScale();
+        }else {
+          let start = bmiScale.invert(event.selection[0]);
+          let end = bmiScale.invert(event.selection[1]);
+          let Dom1 = Math.floor((start+1)/10)*10;
+          let Dom2 = Math.ceil((end+1)/10)*10;
+    
+          this.bmiRange = [Dom1, Dom2];
+        }
+        });
+    
+        this.cciBrush =  brushX()
+        .extent([[0, 0], [this.svgWidth, 30]])
+        .handleSize(0)
+        .on("end", () => {
+          if (event.selection === null) {
+    
+          } else {
+            let start = CCIScale.invert(event.selection[0]);
+            let end = CCIScale.invert(event.selection[1]);
+            let Dom1 = Math.floor(start);
+            let Dom2 = Math.ceil(end);
+            this.cciRange = [Dom1, Dom2];
+          }
+        });
+    
+        this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
+                        .on("end", () => {
+                          if (event.selection === null) {
+    
+                          } else {
+                            let start = AGEScale.invert(event.selection[0]);
+                            let end = AGEScale.invert(event.selection[1]);
+    
+                            let Dom1 = Math.floor((start+1)/10)*10;
+                            let Dom2 = Math.ceil((end+1)/10)*10;
+                            this.ageRange = [Dom1, Dom2];
+                          }
+                        });
+                        
+        this.$node.select('#BMI-Brush').call(this.bmiBrush);
+    
+        this.$node.select('#CCI-Brush').call(this.cciBrush);
+                    
+        this.$node.select('#AGE-Brush').call(this.ageBrush);
+    
+        label.on('click', function(d){
+    
+          let svgLabel = (this.parentNode.parentNode).querySelector('.distDetail_svg');
+          if(svgLabel.classList.contains('hidden')) {
+            svgLabel.classList.remove('hidden');
+          }else{
+            svgLabel.classList.add('hidden');
+          }
+    
+        });
+    */
+    
+      }
 
     private drawHistogram(histobins) {
 
+     this.$node.select('.distributionWrapper').selectAll('*').remove();
 
-     let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, 'scale': this.xScale.domain([0, histobins[0].binCount])};
+     let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, scale: this.xScale.domain([0, histobins[0].binCount])};
 
       this.yScale.domain([0, max(histobins, function (d) {
           return d['frequency'] + .1;
@@ -434,151 +737,151 @@ export class FilterSideBar {
 
       this.$node.select('#Score-Count-Brush').call(this.freqBrush);
 
+    }
+
+    private drawOrderSearchBar(order){
+
+        select('.orderDiv').select('.codes').remove();
+
+        const box = select('.orderDiv').append('div').classed('codes', true);
+        let props = [];
+
+        let orderFilters = box.selectAll('.orderFilters').data(order);
+
+        let orderEnter = orderFilters.enter().append('div').classed('orderFilters', true);
+
+        orderFilters.exit().remove();
+
+        orderFilters = orderEnter.merge(orderFilters);
+
+        let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', d => d['value']).attr('checked', true);
+        let ordertext = orderFilters.append('text').text(d => d['key']);
+
+        ordertext.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+            .html(() => {
+                return this.renderOrdersTooltip(d);
+            })
+            .transition(t)
+            .style("opacity", 1)
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY + 10}px`);
+        })
+        .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+        });
+
+        ordercheck.on('click', (d)=>{ console.log(d);})
+
+        box.append('input')
+        .attr('type', 'button').classed('btn', true).classed('btn-default', true)
+        .attr('value', 'Filter by Code')
+        .on('click', () => {
+
+        let checkNodes = ordercheck.nodes();
+        let checkedarray = [];
+        let cptFilterArray = [];
+
+        checkNodes.forEach((n, i) => {
+            if(n['checked']){
+                checkedarray.push(n['value']);
+            // Maybe make the 2 arrays use this array?
+            cptFilterArray.push(order[i]);
+            }
+        });
+
+        let fixed = [];
+        checkedarray.forEach(ch=> {
+            if (ch.indexOf(',') > -1) { 
+                let fix = ch.split(',');
+                fix.forEach(f => {
+                    fixed.push(f);
+                });
+            }else{fixed.push(ch); };
+        });
+        events.fire('cpt_filter_button',  [fixed, cptFilterArray]);
+        // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
+
+        select('.orderDiv').select('.codes').remove();
+        });
 }
 
-private drawOrderSearchBar(order){
+    private DrawfilterDescriptionBox(cohort){
 
-  select('.orderDiv').select('.codes').remove();
+        let filter = cohort.filterArray.filter(d=> {return d[0] != 'Branch'});
+        
+        let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
-  const box = select('.orderDiv').append('div').classed('codes', true);
-  let props = [];
+        select('.descriptionDiv').selectAll('div').remove();
 
-  let orderFilters = box.selectAll('.orderFilters').data(order);
+        const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
+        box.append('div').classed('panel-heading', true).append('text').text(cohort.label + ' Filter Layers');
 
-  let orderEnter = orderFilters.enter().append('div').classed('orderFilters', true);
+        let body = box.append('div').classed('panel-body', true);
 
-  orderFilters.exit().remove();
+        let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
 
-  orderFilters = orderEnter.merge(orderFilters);
+        let barGroup = body.selectAll('.filter_stage').data(filter);
+        barGroup.exit().remove();
+        let barGroupEnter = barGroup.enter().append('div').classed('filter_stage', true);
+        barGroup = barGroupEnter.merge(barGroup);
 
-  let ordercheck = orderFilters.append('input').attr('type', 'checkbox').attr('value', d => d['value']).attr('checked', true);
-  let ordertext = orderFilters.append('text').text(d => d['key']);
+        let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
 
-  ordertext.on("mouseover", (d) => {
-      let t = transition('t').duration(500);
-      select(".tooltip")
-      .html(() => {
-          return this.renderOrdersTooltip(d);
-      })
-      .transition(t)
-      .style("opacity", 1)
-      .style("left", `${event.pageX + 10}px`)
-      .style("top", `${event.pageY + 10}px`);
-  })
-  .on("mouseout", () => {
-      let t = transition('t').duration(500);
-      select(".tooltip").transition(t)
-      .style("opacity", 0);
-  });
+        let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d[2])).attr('transform', 'translate(12, 0)');
+        rect.attr('class', d=> classRect(d));
 
-  ordercheck.on('click', (d)=>{ console.log(d);})
+        let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
+        text.append('text').text((d, i)=> { return (i + 1) + ': '});
 
-  box.append('input')
-  .attr('type', 'button').classed('btn', true).classed('btn-default', true)
-  .attr('value', 'Filter by Code')
-  .on('click', () => {
+        let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
 
-  let checkNodes = ordercheck.nodes();
-  let checkedarray = [];
-  let cptFilterArray = [];
+        function classRect(d){
+            let name;
+            if(d[0] == 'demographic'){ name = 'demographic';
+            }else if(d[0] == 'CPT'){ name = d[1][1][0].parent;
+            }else if(d[0] ==  'Score Count'){ name = 'score'; }
+            return name;
+        }
 
-  checkNodes.forEach((n, i) => {
-      if(n['checked']){
-          checkedarray.push(n['value']);
-      // Maybe make the 2 arrays use this array?
-      cptFilterArray.push(order[i]);
-      }
-  });
+        function fillText(d){
+            let des;
+            if(d[0] == 'demographic'){
+                if(d[1].length != 0){
+                    des = 'Demographic Filter';
+                }else{
+                    des = 'All Patients';
+                }
+            }else if(d[0] == 'CPT'){
+                    des = d[1][1][0].parent;
+                }
+            else{ des = d[0] + ' > ' + d[1]; }
 
-  let fixed = [];
-  checkedarray.forEach(ch=> {
-      if (ch.indexOf(',') > -1) { 
-          let fix = ch.split(',');
-          fix.forEach(f => {
-              fixed.push(f);
-          });
-      }else{fixed.push(ch); };
-  });
-  events.fire('cpt_filter_button',  [fixed, cptFilterArray]);
- // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
+            return des;
+        }
 
-  select('.orderDiv').select('.codes').remove();
-});
-}
+        text.append('text').text(d => d[2]).attr('transform', 'translate(170, 0)');
+        text.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+            .html(() => {
+                return this.renderFilterTooltip(d);
+            })
+            .transition(t)
+            .style("opacity", 1)
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY + 10}px`);
+        })
+        .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+        });
 
-private DrawfilterDescriptionBox(cohort){
-
-  let filter = cohort.filterArray.filter(d=> {return d[0] != 'Branch'});
-  
-  let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
-
-  select('.descriptionDiv').selectAll('div').remove();
-
-  const box = select('.descriptionDiv').append('div').classed('panel', true).classed('panel-default', true);
-  box.append('div').classed('panel-heading', true).append('text').text(cohort.label + ' Filter Layers');
-
-  let body = box.append('div').classed('panel-body', true);
-
-  let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
-
-  let barGroup = body.selectAll('.filter_stage').data(filter);
-  barGroup.exit().remove();
-  let barGroupEnter = barGroup.enter().append('div').classed('filter_stage', true);
-  barGroup = barGroupEnter.merge(barGroup);
-
-  let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
-
-  let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d[2])).attr('transform', 'translate(12, 0)');
-  rect.attr('class', d=> classRect(d));
-
-  let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
-  text.append('text').text((d, i)=> { return (i + 1) + ': '});
-
-  let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
-
-  function classRect(d){
-      let name;
-      if(d[0] == 'demographic'){ name = 'demographic';
-      }else if(d[0] == 'CPT'){ name = d[1][1][0].parent;
-      }else if(d[0] ==  'Score Count'){ name = 'score'; }
-      return name;
-  }
-
-  function fillText(d){
-      let des;
-      if(d[0] == 'demographic'){
-          if(d[1].length != 0){
-              des = 'Demographic Filter';
-          }else{
-              des = 'All Patients';
-          }
-      }else if(d[0] == 'CPT'){
-              des = d[1][1][0].parent;
-          }
-      else{ des = d[0] + ' > ' + d[1]; }
-
-      return des;
-  }
-
-  text.append('text').text(d => d[2]).attr('transform', 'translate(170, 0)');
-  text.on("mouseover", (d) => {
-      let t = transition('t').duration(500);
-      select(".tooltip")
-      .html(() => {
-          return this.renderFilterTooltip(d);
-      })
-      .transition(t)
-      .style("opacity", 1)
-      .style("left", `${event.pageX + 10}px`)
-      .style("top", `${event.pageY + 10}px`);
-  })
-  .on("mouseout", () => {
-      let t = transition('t').duration(500);
-      select(".tooltip").transition(t)
-      .style("opacity", 0);
-  });
-
-}
+    }
 
     private searchDictionary(value, type){
 

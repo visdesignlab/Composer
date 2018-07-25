@@ -64,12 +64,12 @@ export class App {
     .append('div').classed('cohort-buttons', true);
     let that = this;
   //  let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).classed('btn-sm', true).attr('value', 'Add Cohort');
-    let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Branch Cohort');
+   // let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Branch Cohort');
   
    // let compare = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Comparison View');
     let layer = cohortButtons.insert('input').attr('type', 'button').attr('id', 'layerButton').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Layer View');
    
-    branch.on('click', function(d){ events.fire('branch_cohort'); });
+   // branch.on('click', function(d){ events.fire('branch_cohort'); });
     layer.on('click', function(d){ events.fire('layer_button_down'); });
 
     // main div with child views

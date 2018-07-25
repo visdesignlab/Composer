@@ -41,12 +41,19 @@ ul {
     color: #EAECEE;
 }
 
+#cohortSideBar .panel-head div,
+#filterSideBar .panel-head div {
+    display: inline-block;
+    float: left;
+    padding-left: 20px;
+}
+
 #cohortSideBar .panel-body {
     padding: 0px;
 }
 
 #cohort_control .panel-head input {
-    margin: auto;
+    //  margin: auto;
 }
 
 #cohort_control .cohorts {
@@ -147,6 +154,11 @@ svg.cohortKeeper {
     width: 100%;
 }
 
+.demoBand svg {
+    width: 200px;
+    height: 50px;
+}
+
 .sideBar ul {
     list-style-type: none;
     margin: 0;
@@ -169,6 +181,18 @@ svg.cohortKeeper {
 
 .labelWrapper {
     //  margin-top: 15px;
+}
+
+.lastChild circle {
+    r: 10px;
+    // fill: #E67E22;
+    cursor: pointer;
+}
+
+.lastChild text {
+    margin-top: 5px;
+    // fill: #E67E22;
+    cursor: pointer;
 }
 
 .layers {
@@ -252,6 +276,15 @@ svg.cohortKeeper {
 .eye {
     width: 20px;
     height: 15px;
+}
+
+g.selected rect {
+    opacity: 1;
+}
+
+g.selected text {
+    color: white;
+    fill: white;
 }
 
 .cohort-label.selected div {

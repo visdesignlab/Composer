@@ -85,18 +85,12 @@ export class EventLine {
         });
       
         events.on('test', (evt, item)=> {
-            console.log(item);
+       
             let cohortTree = item[0];
             let cohortIndex = item[1];
 
-            if(item[1].length > 1){
-             
-                this.drawBranches(cohortTree).then(d=> this.classingSelected(cohortTree[cohortIndex[0]].branches[cohortIndex[1]]));
-               
-            }else{
-                this.drawBranches(cohortTree).then(d=> this.classingSelected(item[0][item[1]]));
-            }
-
+        
+            
             selectAll('.selected').classed('selected', false);
 
             //need to update comparison array
@@ -104,7 +98,7 @@ export class EventLine {
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
     
-            console.log(this.layerBool);
+
     
             this.buildLayerFilter(layer, item[0]);
     
@@ -119,7 +113,6 @@ export class EventLine {
         });
 
         events.on('update_chart', (evt, item)=> {
-            console.log(item);
 
             if(item){
 
@@ -220,7 +213,7 @@ export class EventLine {
             selectAll(selected).selectAll('.event-rows').classed('selected-group', true);
 
     }
-
+/*
     private async drawBranches(cohort){
         
         let flat = [];
@@ -234,13 +227,9 @@ export class EventLine {
             }
         });
 
-        console.log(flat);
-    
         this.branchHeight = flat.length * 40;
         let moveDistance = (this.branchHeight / flat.length) - 5;
         let branchMove = moveDistance / 2;
-
-        console.log(moveDistance);
 
         let branchWrapper = this.$node.select('.branch-wrapper');
         let branchSvg = branchWrapper.select('svg').attr('height', this.branchHeight);
@@ -293,7 +282,7 @@ export class EventLine {
             this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
             thislabel[i].classList.add('selected');
-            console.log(d);
+        
             if(d.parentIndex == null){
                 events.fire('cohort_selected', d);
             }else{
@@ -335,7 +324,7 @@ export class EventLine {
 
           let nodes = cohortevents.nodes();
 
-    }
+    }*/
 
     private drawEventButtons(cohort){
             let filters = cohort.filterArray;
@@ -464,7 +453,7 @@ export class EventLine {
 
                         let p = selectAll('.top');
                   
-                        if(select("#sampleT").property("checked")){
+                        if(select("#sampleT").property('checked')){
                             p.classed('hidden', false);
                         }else{
                             p.classed('hidden', true);
@@ -546,7 +535,7 @@ export class EventLine {
             }
         });
 
-        console.log(flat);
+       
         return flat;
     }
     
