@@ -48,6 +48,7 @@ export class FilterSideBar {
   private scoreFreqRange;
   private dictionary;
   private demoPanel;
+  private demoFilterKeeper;
 
   private header = [
     {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -74,6 +75,7 @@ export class FilterSideBar {
     this.comparisonNum = 2;
     this.comparisonArray = [];
     this.demoPanel;
+    this.demoFilterKeeper;
 
     this.dictionary = new dict.CPTDictionary().codeDict;
 
@@ -91,23 +93,17 @@ export class FilterSideBar {
 
     events.on('population demo loaded', (evt, item)=> {
         this.populationDemo = item;
-        console.log(item);
         this.distribute(item).then(header => {
-      //  this.drawDistributionBands(header, 'demoPanel');
-
-        header.forEach(data => {
-            this.drawBandTest(data, 'demoPanel');
+            header.forEach(data => {
+                this.drawBandTest(data, 'demoPanel');
+            });
         });
-        });
-       });
+    });
 
     events.on('update_chart', (evt, item)=> {
-       
-     //select(document.getElementById('scorePanel')).select('form').selectAll('*').remove();
      if(item){ 
         let value = item.promis.map(v=> v.value);
         this.histogrammer(value, null, 10).then(d=> this.drawHistogram(d));}
-       
     });
 
   }
@@ -323,11 +319,13 @@ export class FilterSideBar {
                 .domain([0, +maxValue])
                 .thresholds(x.ticks(ticks))
                 (data);
+
+       // console.log(maxValue)
         
         let histogramData = bins.map(function (d) {
             totalPatients -= d.length;
         // return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
-            return {x0: d.x0, x1: d.x1, length: d.length, binCount: bins.length, frequency: d.length/bins.length, type: type};
+            return {x0: d.x0, x1: d.x1, length: d.length, binCount: bins.length, frequency: d.length/bins.length, max: maxValue, type: type};
         });
 
         return histogramData;
@@ -363,17 +361,17 @@ export class FilterSideBar {
         let binDRUG = await this.frequencyMapper(mappedDrug, 'DRUG_USER');
         let binTOB = await this.frequencyMapper(mappedTOB, 'TOBACCO');
 
-        console.log(tobDomain);
+     
     
        // 'scale': this.xScale.domain([0, binBMI[0].binCount])
     
        let distData = [
-        {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, +binBMI[0].binCount]).range([0, 180]), domain: [0, +binBMI[0].binCount]},
-        {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount]},
-        {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, +binAGE[0].binCount]).range([0, 180]), domain: [0, +binAGE[0].binCount]},
-        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: alcDomain },
-        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: drugDomain },
-        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scalePoint().domain(["Quit", "Yes", "", "Never", "Not Asked", "Passive"]).range([0, 180]), domain: tobDomain }
+        {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, 90]).range([0, 180]), domain: [0, +binBMI[0].binCount], type: 'quant'},
+        {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount], type: 'quant'},
+        {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, 100]).range([0, 180]), domain: [0, +binAGE[0].binCount], type: 'quant'},
+        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: alcDomain, type: 'qual' },
+        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: drugDomain, type: 'qual' },
+        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scalePoint().domain(["Quit", "Yes", "", "Never", "Not Asked", "Passive"]).range([0, 180]), domain: tobDomain, type: 'qual' }
         ];
     
         return distData;
@@ -409,7 +407,7 @@ export class FilterSideBar {
     }
 
     private async drawBandTest(data, id){
-        console.log(data);
+  
         let bandWidth = 180;
         let distScale = scaleLinear().domain([0, 1000]);
         let domain = data.domain;
@@ -437,21 +435,46 @@ export class FilterSideBar {
 
        let quantBrush = brushX()
        .extent([[0, 0], [bandWidth, 30]])
-       .handleSize(1);
+       .handleSize(2);
 
        if(data.type == 'quant'){
 
            brush = bandSvg.append('g').attr('class', data.key + '-BRUSH');
+
+           quantBrush
+           .on("end", () => {
+               if(event.selection == null){
+            
+                events.fire('demo_filter_change', [data.key, null]);
+               }else{
+                let start = scale.invert(event.selection[0]);
+                let end = scale.invert(event.selection[1]);
+                let Dom1 = Math.floor(start);
+                let Dom2 = Math.ceil(end);
+    
+                events.fire('demo_filter_change', {parent: data.key, choice: [Dom1, Dom2]});
+               }
+          });
+
            brush.call(quantBrush);
+
+           
        }else{
+
+        rects.classed('choice', true);
 
         rects.on('click', (d, i)=> {
             console.log(data);
             console.log(d);
-            
+            console.log(this);
+
         })
        }
 
+    }
+
+    private async demoFilters(data){
+ 
     }
 
     private drawDistributionBands(data, id) {
@@ -546,90 +569,6 @@ export class FilterSideBar {
         this.$node.select('#CCI-Brush').call(this.cciBrush);
                     
         this.$node.select('#AGE-Brush').call(this.ageBrush);
-    
-
-        /*
-    
-        let distSvg = distFilter.append('svg').attr('class', d=> {return d.key}).classed('distDetail_svg', true);//.classed('hidden', true);
-        let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', '95%');//.classed('hidden', true)
-        let svg_rect_group = distFilter_svg.append('g').attr('width', '95%');
-        let rect_label_group = distFilter_svg.append('g');
-    
-        rect_label_group.append('text').text(d=> d.value[0].x0).attr('transform', 'translate(0, 20)');
-        rect_label_group.append('text').text(d=> d.value[d.value.length-1].x1).attr('transform', 'translate('+ (this.svgWidth - 15) +', 20)');
-    
-        let rects = svg_rect_group.selectAll('rect').data(d => d.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 15)
-        .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
-        .attr('fill', '#212F3D')
-        .attr('x', (d, i)=> (i * this.svgWidth/d.binCount) + 5);
-    
-        //let axis = distFilter.append("g").attr("class", "axis axis--x").attr("transform", "translate(0, 10)").call(xAxis);
-    
-        let brush = distFilter_svg.append('g').attr('id', d=> {return d['key'] + '-Brush'}).classed('brush', true);
-        let that = this;
-    
-        this.bmiBrush = brushX()
-        .extent([[0, 0], [this.svgWidth, 30]])
-        .handleSize(0)
-        .on("end", () => {
-          if (event.selection === null) {
-            //this.setOrderScale();
-        }else {
-          let start = bmiScale.invert(event.selection[0]);
-          let end = bmiScale.invert(event.selection[1]);
-          let Dom1 = Math.floor((start+1)/10)*10;
-          let Dom2 = Math.ceil((end+1)/10)*10;
-    
-          this.bmiRange = [Dom1, Dom2];
-        }
-        });
-    
-        this.cciBrush =  brushX()
-        .extent([[0, 0], [this.svgWidth, 30]])
-        .handleSize(0)
-        .on("end", () => {
-          if (event.selection === null) {
-    
-          } else {
-            let start = CCIScale.invert(event.selection[0]);
-            let end = CCIScale.invert(event.selection[1]);
-            let Dom1 = Math.floor(start);
-            let Dom2 = Math.ceil(end);
-            this.cciRange = [Dom1, Dom2];
-          }
-        });
-    
-        this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
-                        .on("end", () => {
-                          if (event.selection === null) {
-    
-                          } else {
-                            let start = AGEScale.invert(event.selection[0]);
-                            let end = AGEScale.invert(event.selection[1]);
-    
-                            let Dom1 = Math.floor((start+1)/10)*10;
-                            let Dom2 = Math.ceil((end+1)/10)*10;
-                            this.ageRange = [Dom1, Dom2];
-                          }
-                        });
-                        
-        this.$node.select('#BMI-Brush').call(this.bmiBrush);
-    
-        this.$node.select('#CCI-Brush').call(this.cciBrush);
-                    
-        this.$node.select('#AGE-Brush').call(this.ageBrush);
-    
-        label.on('click', function(d){
-    
-          let svgLabel = (this.parentNode.parentNode).querySelector('.distDetail_svg');
-          if(svgLabel.classList.contains('hidden')) {
-            svgLabel.classList.remove('hidden');
-          }else{
-            svgLabel.classList.add('hidden');
-          }
-    
-        });
-    */
     
       }
 

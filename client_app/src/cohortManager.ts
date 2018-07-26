@@ -16,6 +16,7 @@ class Cohort {
         cohortIndex: any;
         eventIndex: any;
         parentIndex: any;
+        ogPromis: any;
         promis: any;
         cpt: any;
         filterArray: any;
@@ -26,6 +27,7 @@ class Cohort {
         scaleR: boolean;
         startEvent: any;
         branches: any;
+        demoFilters: any;
 
         constructor() {
             this.promisSep = null;
@@ -290,6 +292,18 @@ export class CohortManager {
                 }
             });
 
+            events.on('demo_filter_change', (evt, item)=> {
+
+              
+                console.log(this.selectedCohort);
+                if( this.selectedCohort.filterArray)
+                this.selectedCohort.filterArray
+                
+                console.log(item);
+                events.fire('filter_demo_data', [this.selectedCohort, [item]]);
+
+            });
+
 //fired in sidebar. send the filter information to refine the sidebar
         events.on('demo_refine', (evt, item)=> {
      
@@ -302,7 +316,7 @@ export class CohortManager {
                 events.fire('get_selected_demo', [filters, this.cohortTree[index].branches[branchIndex]]);
             }
 
-          });
+        });
 
         events.on('event_selected', (evt, item)=> {
             let codes = item;

@@ -185,6 +185,20 @@ export class DataManager {
  
          });
 
+         events.on('filter_demo_data', (evt, item)=> {
+             console.log(item);
+             let promis = item[0].promis;
+             let cpt = item[0].cpt;
+             let filters = item[1];
+             this.demoFilter(filters, this.totalDemoObjects).then(ids=> {
+                this.filterObjectByArray(ids, promis, 'promis').then(pro => {
+                    this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
+                        events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered]);
+                    });
+                });
+             });
+        });
+
         events.on('selected_line_with_cpt', (evt, item)=> {
             this.filterObjectByArray(item[0], item[1], 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
@@ -281,7 +295,52 @@ export class DataManager {
 
 //pulled from parallel coord
 //this hapens when demo button it pushed
-    private async demoFilter(sidebarFilter, demoObjects) {
+    private async demoFilter(filters, demoObjects) {
+
+        let demo;
+        let cohortIds;
+
+        filters.forEach( (d)=> {
+        let parent = String(d.parent);
+        let choice = d.choice;
+        console.log(parent);
+
+        if(parent == 'BMI' || 'CCI' || 'AGE'){
+            console.log('bmi');
+            console.log('BMI?');
+            demo = demoObjects.filter(d => {
+                if(+d[parent] > +choice[0]){console.log(d)}
+              
+                return +d[parent] > +choice[0] && +d[parent] < +choice[1]});
+            cohortIds = demo.map(d=> d.ID);
+        }else{
+           
+            if (String(parent) == 'DM_CODE') {
+                     demo = demoObjects.filter(d => d[parent] == choice || d[parent] == choice + 3);
+            }else{ 
+                       
+                        if (choice.length === 1){
+                            demo = demoObjects.filter(d => d[parent] == choice);
+                        }else if(choice.length === 2){
+                            demo = demoObjects.filter(d => d[parent] == choice[0] || choice[1]);
+                       
+                        }else if(choice.length === 2){
+                            demo = demoObjects.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
+                           
+                        }else if(choice.length === 3){
+                            demo = demoObjects.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
+                        }
+                }
+                cohortIds = demo.map(d=> d.ID);
+            }
+         });
+  
+                console.log(cohortIds);
+                return cohortIds;
+           
+       }
+
+       private async demoFilterTest(sidebarFilter, demoObjects) {
        
         let cohortIdArray = [];
 
