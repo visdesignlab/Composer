@@ -82,8 +82,9 @@ export class CohortSideBar {
       if(item){
           let selectedFilters = item.filterArray;
           let cohortPromis = item.promis;
-        
+        if(selectedFilters.length > 0){
           this.DrawfilterDescriptionBox(item);
+        }
       }
     });
 
@@ -325,7 +326,7 @@ export class CohortSideBar {
     private DrawfilterDescriptionBox(cohort){
 
 
-      let filter = cohort.filterArray.filter(d=> {return d[0] != 'Branch'});
+      let filter = cohort.filterArray.filter(d=> {return d.type != 'Branch'});
       
       let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
@@ -336,7 +337,7 @@ export class CohortSideBar {
 
       let body = box.append('div').classed('panel-body', true);
 
-      let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1][2]);
+      let cohortCount = body.append('div').append('text').text('Cohort Size: ' + filter[filter.length - 1]['count']);
   
       let barGroup = body.selectAll('.filter_stage').data(filter);
       barGroup.exit().remove();
@@ -345,7 +346,7 @@ export class CohortSideBar {
 
       let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
 
-      let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d[2])).attr('transform', 'translate(12, 0)');
+      let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d['count'])).attr('transform', 'translate(12, 0)');
       rect.attr('class', d=> classRect(d));
 
       let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
@@ -355,29 +356,33 @@ export class CohortSideBar {
 
       function classRect(d){
           let name;
-          if(d[0] == 'demographic'){ name = 'demographic';
-          }else if(d[0] == 'CPT'){ name = d[1][1][0].parent;
-          }else if(d[0] ==  'Score Count'){ name = 'score'; }
+          if(d.type == 'Demographic'){ name = 'demographic';
+          }else if(d.type == 'CPT'){ name = d.type;
+          }else if(d.type ==  'Score Count'){ name = 'score'; }
           return name;
       }
 
       function fillText(d){
           let des;
-          if(d[0] == 'demographic'){
-              if(d[1].length != 0){
-                  des = 'Demographic Filter';
+          if(d.type == 'Demographic'){
+              if(d.value.length != 0){
+                  des = d.filter;
+                 
+                  d.value.forEach(c => {
+                    des = des + ' ' + c + ',';
+                  });
               }else{
                   des = 'All Patients';
               }
-          }else if(d[0] == 'CPT'){
-                  des = d[1][1][0].parent;
+          }else if(d.type == 'CPT'){
+                  des = d.filter;
               }
-          else{ des = d[0] + ' > ' + d[1]; }
+          else{ des = d.filter + ' > ' + d.value; }
 
           return des;
       }
 
-      text.append('text').text(d => d[2]).attr('transform', 'translate(170, 0)');
+      text.append('text').text(d => d['count']).attr('transform', 'translate(170, 0)');
       text.on("mouseover", (d) => {
           let t = transition('t').duration(500);
           select(".tooltip")

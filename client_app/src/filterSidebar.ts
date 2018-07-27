@@ -319,8 +319,6 @@ export class FilterSideBar {
                 .domain([0, +maxValue])
                 .thresholds(x.ticks(ticks))
                 (data);
-
-       // console.log(maxValue)
         
         let histogramData = bins.map(function (d) {
             totalPatients -= d.length;
@@ -423,7 +421,16 @@ export class FilterSideBar {
         let demoBand = panelBody.append('div').classed('demoBand', true);
         let demoLabel = demoBand.append('div').append('text').text(label);
         let bandSvg = demoBand.append('svg').attr('class', key);
-        let rects = bandSvg.append('g').attr('transform', 'translate(5, 0)').selectAll('rect').data(value).enter().append('rect').attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', 25)
+        let rects = bandSvg.append('g').attr('transform', 'translate(5, 0)').selectAll('rect').data(value);
+
+        rects.exit().remove();
+        
+        let rectEnter = rects.enter().append('rect');
+        
+        rects = rectEnter.merge(rects);
+
+        rects
+        .attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', 25)
         .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
         .attr('fill', '#212F3D')
         .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5);
@@ -463,12 +470,26 @@ export class FilterSideBar {
 
         rects.classed('choice', true);
 
-        rects.on('click', (d, i)=> {
-            console.log(data);
-            console.log(d);
-            console.log(this);
+        let rectArray = rects.nodes();
 
-        })
+        rects.on('click', function(d, i) {
+       
+            if(select(this).classed('choice')){
+                console.log(true);
+                select(this).classed('choice', false);
+            }else{
+                console.log(false);
+                select(this).classed('choice', true);
+            }
+            let nodes = document.getElementsByClassName(key);
+
+            let testArray = [];
+           
+            let selected = selectAll(nodes).selectAll('.choice').data();
+        
+            events.fire('demo_filter_change', {parent: data.key, choice: selected.map(d=> d['value']) });
+
+        });
        }
 
     }
