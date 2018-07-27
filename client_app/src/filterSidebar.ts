@@ -421,11 +421,11 @@ export class FilterSideBar {
         let demoBand = panelBody.append('div').classed('demoBand', true);
         let demoLabel = demoBand.append('div').append('text').text(label);
         let bandSvg = demoBand.append('svg').attr('class', key);
-        let rects = bandSvg.append('g').attr('transform', 'translate(5, 0)').selectAll('rect').data(value);
+        let rects = bandSvg.append('g').attr('transform', 'translate(2, 0)').selectAll('rect').data(value);
 
         rects.exit().remove();
         
-        let rectEnter = rects.enter().append('rect');
+        let rectEnter = rects.enter().append('rect').classed('filter-bars', true);
         
         rects = rectEnter.merge(rects);
 
@@ -434,9 +434,8 @@ export class FilterSideBar {
         .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
         .attr('fill', '#212F3D')
         .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5);
-     //  .attr('x', (d, i)=> (scale(i) + 5) );
 
-       let axis = bandSvg.append('g').classed('x-axis', true).attr('transform', 'translate(5, 25)');
+       let axis = bandSvg.append('g').classed('x-axis', true).attr('transform', 'translate(6, 25)');
 
        axis.call(xAxis);
 
@@ -446,7 +445,7 @@ export class FilterSideBar {
 
        if(data.type == 'quant'){
 
-           brush = bandSvg.append('g').attr('class', data.key + '-BRUSH');
+           brush = bandSvg.append('g').attr('class', data.key + '-BRUSH').attr('transform', 'translate(5, 0)');
 
            quantBrush
            .on("end", () => {
@@ -458,6 +457,12 @@ export class FilterSideBar {
                 let end = scale.invert(event.selection[1]);
                 let Dom1 = Math.floor(start);
                 let Dom2 = Math.ceil(end);
+                console.log(bandSvg.selectAll('rect'))
+                let test = bandSvg.selectAll('rect');
+                test.classed('choice', false);
+                let test2 = test.filter(r=> r['x0'] >= start && r['x1'] <= end);
+                console.log(test2);
+                test2.classed('choice', true);
     
                 events.fire('demo_filter_change', {parent: data.key, choice: [Dom1, Dom2]});
                }

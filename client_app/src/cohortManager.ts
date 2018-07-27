@@ -107,7 +107,6 @@ export class CohortManager {
             }
             
             this.layerKeeper.layers = item;
-            console.log(this.layerKeeper);
        
             events.fire('draw_layers', this.layerKeeper);
         });
@@ -185,6 +184,7 @@ export class CohortManager {
             treeBranch.eventIndex = indexBranch;
             treeBranch.parentIndex = this.cohortIndex;
             treeBranch.filterArray = bfilter;
+           // treeBranch.filterArray.push({  filter: 'Cohort Branched', type: 'Start', value: null, count: promis.length  });
             treeBranch.promis = b;
             treeBranch.cpt = bcpt;
             treeBranch.cohortIndex = [this.cohortIndex, newSpot];
@@ -302,7 +302,7 @@ export class CohortManager {
                     let filterReq = { filter: item.parent, type: 'Demographic', value: item.choice, count: null };
                     this.selectedCohort.filterArray.push(filterReq);
                 }
-                events.fire('filter_demo_data', [this.selectedCohort,  this.selectedCohort.filterArray]);
+                events.fire('filter_demo_data', [this.selectedCohort,  this.selectedCohort.filterArray, item.parent]);
 
             });
 
@@ -375,7 +375,7 @@ export class CohortManager {
             let promis = item[0];
 
            // let filterReq = ['demographic', item[2], item[0].length];
-           // let filterReq = { filter: item[2].parent, type: 'Demographic', value: filters, count: item[1].length };
+            let filterReq = { filter: 'All Patients', type: 'Start', value: null, count: item[1].length };
 
             let newParent = new Cohort();
 
@@ -386,7 +386,7 @@ export class CohortManager {
             newParent.cohortIndex = this.cohortTree.length;
             this.cohortIndex = this.cohortTree.length;
 
-          //  newParent.filterArray.push(filterReq);
+            newParent.filterArray.push(filterReq);
             this.cohortTree.push(newParent);
             this.selectedCohort = this.cohortTree[this.cohortIndex];
      
@@ -406,18 +406,17 @@ export class CohortManager {
             let filters = item[0];
             let promis = item[1];
             let cpt = item[2];
-          
+            let tag = item[3];
 
-           // let filterReq = [filters[0].parent, filters, item[1].length];
+            console.log(item);
+
            let test = this.selectedCohort.filterArray.map(d=> d.filter);
-           let testIndex = test.indexOf(filters[0].filter);
-          
+           console.log(test);
+           let testIndex = test.indexOf(tag);
+           console.log(testIndex);
            if(testIndex > -1){
             this.selectedCohort.filterArray[testIndex].count = item[1].length;
-         
            }else{
-          //  let filterReq = { filter: filters[0].parent, type: 'Demographic', value: filters, count: item[1].length };
-           // this.selectedCohort.filterArray.push(filterReq);
            console.log('not found!')
            }
 

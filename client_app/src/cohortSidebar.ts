@@ -191,142 +191,142 @@ export class CohortSideBar {
         });
         rows.push(e);
         c.rowData = e;
-    });
-
-    data.forEach(c => {
-  
-      if(c.branches.length != 0){
-          c.branches.forEach((b, i) => {
-              b.rowData = [{x: 27, y: -27 }, {x: 60, y: 0 }];
-              b.filterArray.forEach((event, i) => {
-                  let coord = {x: (i * 40) + 65, y: 6 };
-                  b.rowData.push(coord);
-               });
-          });
-      }
-  });
-
-
-  let linko = line().curve(curveMonotoneX)
-  .x(function(d) { return d['x'] })
-  .y(function(d) { return d['y'] });
-
-    let cohorts = div.selectAll('.cohort-lines').data(data);
-    cohorts.exit().remove();
-
-    let cohEnter = cohorts.enter().append('g').attr('class', (d, i) => d.label).classed('cohort-lines', true);
-    cohorts = cohEnter.merge(cohorts);
-
-    cohorts.attr('transform', (d, i)=> 'translate(0,' + ((i * 30) + 10) + ')');
-
-    let label = cohorts.append('g').classed('labels', true);
-    label.append('rect').attr('width', 55).attr('height', 18).attr('opacity', 0).attr('transform', 'translate(-3, -13)');;
-    label.append('text').text((d, i)=> {return d.label} );
-    label.attr('transform', 'translate(3, 10)');
-    label.on('click', (d, i)=> {
-       
-        this.$node.selectAll('.selected').classed('selected', false);
-        let thislabel = label.nodes();
-        thislabel[i].classList.add('selected');
- 
-        if(d.parentIndex == null){
-            events.fire('cohort_selected', d);
-        }else{
-            events.fire('branch_selected', d.cohortIndex);
-        }
-    });
-
-    let linegroups = cohorts.append('g').classed('rows', true).attr('transform', (d) => 'translate('+ (d.eventIndex * 4) +'0)');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
-    linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
-    
-    let cohortevents = linegroups.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
-    cohortevents.exit().remove();
-
-    let eventEnter = cohortevents.enter().append('g').classed('events', true);
-
-    cohortevents = eventEnter.merge(cohortevents);
-    cohortevents.attr('transform', (d, i)=> 'translate(' + i * 40 + ', 0)');
-
-    let circle = cohortevents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
-    circle.on("mouseover", (d) => {
-        let t = transition('t').duration(500);
-        select(".tooltip")
-          .html(() => {
-            return this.renderOrdersTooltip(d);
-          })
-          .transition(t)
-          .style("opacity", 1)
-          .style("left", `${event.pageX + 10}px`)
-          .style("top", `${event.pageY + 10}px`);
-      })
-      .on("mouseout", () => {
-        let t = transition('t').duration(500);
-        select(".tooltip").transition(t)
-        .style("opacity", 0);
       });
 
-      let last = selectAll('.event-rows').nodes();
-
-      selectAll('.lastChild').classed('lastChild', false);
-
-      last.forEach((c, i) => {
-
-        let eventNodes = select(c).selectAll('.events').nodes();
+      data.forEach(c => {
     
-        let index = eventNodes.length;
-        let lastChild = eventNodes[index - 1];
+        if(c.branches.length != 0){
+            c.branches.forEach((b, i) => {
+                b.rowData = [{x: 27, y: -27 }, {x: 60, y: 0 }];
+                b.filterArray.forEach((event, i) => {
+                    let coord = {x: (i * 40) + 65, y: 6 };
+                    b.rowData.push(coord);
+                });
+            });
+        }
+      });
 
-        select(lastChild).classed('lastChild', true)
-            .on("mouseover", (d) => {
-              let t = transition('t').duration(500);
-              select(".tooltip")
+      let linko = line().curve(curveMonotoneX)
+      .x(function(d) { return d['x'] })
+      .y(function(d) { return d['y'] });
+
+        let cohorts = div.selectAll('.cohort-lines').data(data);
+        cohorts.exit().remove();
+
+        let cohEnter = cohorts.enter().append('g').attr('class', (d, i) => d.label).classed('cohort-lines', true);
+        cohorts = cohEnter.merge(cohorts);
+
+        cohorts.attr('transform', (d, i)=> 'translate(0,' + ((i * 30) + 10) + ')');
+
+        let label = cohorts.append('g').classed('labels', true);
+        label.append('rect').attr('width', 55).attr('height', 18).attr('opacity', 0).attr('transform', 'translate(-3, -13)');;
+        label.append('text').text((d, i)=> {return d.label} );
+        label.attr('transform', 'translate(3, 10)');
+        label.on('click', (d, i)=> {
+          
+            this.$node.selectAll('.selected').classed('selected', false);
+            let thislabel = label.nodes();
+            thislabel[i].classList.add('selected');
+    
+            if(d.parentIndex == null){
+                events.fire('cohort_selected', d);
+            }else{
+                events.fire('branch_selected', d.cohortIndex);
+            }
+        });
+
+        let linegroups = cohorts.append('g').classed('rows', true).attr('transform', (d) => 'translate('+ (d.eventIndex * 4) +'0)');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+        linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
+        
+        let cohortevents = linegroups.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
+        cohortevents.exit().remove();
+
+        let eventEnter = cohortevents.enter().append('g').classed('events', true);
+
+        cohortevents = eventEnter.merge(cohortevents);
+        cohortevents.attr('transform', (d, i)=> 'translate(' + i * 40 + ', 0)');
+
+        let circle = cohortevents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
+        circle.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
               .html(() => {
-                  return this.renderBranchTooltip(d);
+                return this.renderOrdersTooltip(d);
               })
               .transition(t)
               .style("opacity", 1)
               .style("left", `${event.pageX + 10}px`)
               .style("top", `${event.pageY + 10}px`);
-            })
-            .on("mouseout", () => {
-                let t = transition('t').duration(500);
-                select(".tooltip").transition(t)
-                .style("opacity", 0);
-            });
+          })
+          .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+          });
+
+          let last = selectAll('.event-rows').nodes();
+
+          selectAll('.lastChild').classed('lastChild', false);
+
+          last.forEach((c, i) => {
+
+            let eventNodes = select(c).selectAll('.events').nodes();
         
-        let text = select(lastChild).append('g').append('text').text('+');//.attr('transform ', 'translate(0, 10)');
-   
-       text.attr('transform', 'translate(1, 10)');
+            let index = eventNodes.length;
+            let lastChild = eventNodes[index - 1];
 
-       text.on("mouseover", (d) => {
-        let t = transition('t').duration(500);
-        select(".tooltip")
-        .html(() => {
-            return this.renderBranchTooltip(d);
+            select(lastChild).classed('lastChild', true)
+                .on("mouseover", (d) => {
+                  let t = transition('t').duration(500);
+                  select(".tooltip")
+                  .html(() => {
+                      return this.renderBranchTooltip(d);
+                  })
+                  .transition(t)
+                  .style("opacity", 1)
+                  .style("left", `${event.pageX + 10}px`)
+                  .style("top", `${event.pageY + 10}px`);
+                })
+                .on("mouseout", () => {
+                    let t = transition('t').duration(500);
+                    select(".tooltip").transition(t)
+                    .style("opacity", 0);
+                });
+            
+            let text = select(lastChild).append('g').append('text').text('+');//.attr('transform ', 'translate(0, 10)');
+      
+          text.attr('transform', 'translate(1, 10)');
+
+          text.on("mouseover", (d) => {
+            let t = transition('t').duration(500);
+            select(".tooltip")
+            .html(() => {
+                return this.renderBranchTooltip(d);
+            })
+            .transition(t)
+            .style("opacity", 1)
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY + 10}px`);
         })
-        .transition(t)
-        .style("opacity", 1)
-        .style("left", `${event.pageX + 10}px`)
-        .style("top", `${event.pageY + 10}px`);
-    })
-    .on("mouseout", () => {
-        let t = transition('t').duration(500);
-        select(".tooltip").transition(t)
-        .style("opacity", 0);
-    });
+        .on("mouseout", () => {
+            let t = transition('t').duration(500);
+            select(".tooltip").transition(t)
+            .style("opacity", 0);
+        });
 
-       select(lastChild).on('click', (d, i)=> {
-         events.fire('branch_cohort');
-       });
-      });
+          select(lastChild).on('click', (d, i)=> {
+            events.fire('branch_cohort');
+          });
+          });
 
-      return cohortKeeper;
-    }
+          return cohortKeeper;
+      }
 
     private DrawfilterDescriptionBox(cohort){
 
-
       let filter = cohort.filterArray.filter(d=> {return d.type != 'Branch'});
+
+      console.log(filter);
       
       let rectScale = scaleLinear().domain([0, 6000]).range([0, 150]).clamp(true);
 
@@ -348,7 +348,6 @@ export class CohortSideBar {
 
       let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d['count'])).attr('transform', 'translate(12, 0)');
       rect.attr('class', d=> classRect(d));
-
       let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
       text.append('text').text((d, i)=> { return (i + 1) + ': '});
 
@@ -359,6 +358,7 @@ export class CohortSideBar {
           if(d.type == 'Demographic'){ name = 'demographic';
           }else if(d.type == 'CPT'){ name = d.type;
           }else if(d.type ==  'Score Count'){ name = 'score'; }
+          else{ name = 'start'; }
           return name;
       }
 
@@ -367,16 +367,12 @@ export class CohortSideBar {
           if(d.type == 'Demographic'){
               if(d.value.length != 0){
                   des = d.filter;
-                 
-                  d.value.forEach(c => {
-                    des = des + ' ' + c + ',';
-                  });
-              }else{
-                  des = 'All Patients';
-              }
-          }else if(d.type == 'CPT'){
-                  des = d.filter;
-              }
+               //   d.value.forEach(c => {
+               //     des = des + ' ' + c + ',';
+               //   });
+              }else{ des = 'All Patients'; }
+          }else if(d.type == 'CPT'){ des = d.filter;
+          }else if(d.type == 'Start'){ des = 'All Patients'; }
           else{ des = d.filter + ' > ' + d.value; }
 
           return des;
@@ -384,6 +380,7 @@ export class CohortSideBar {
 
       text.append('text').text(d => d['count']).attr('transform', 'translate(170, 0)');
       text.on("mouseover", (d) => {
+        console.log(d);
           let t = transition('t').duration(500);
           select(".tooltip")
           .html(() => {
@@ -399,39 +396,30 @@ export class CohortSideBar {
           select(".tooltip").transition(t)
           .style("opacity", 0);
       });
-
 }
 
 private renderOrdersTooltip(tooltip_data) {
-
   let text = "<strong style='color:darkslateblue'>" + tooltip_data['value'] + "</strong></br>";
-
   return text;
 }
 
 private renderHistogramTooltip(tooltip_data) {
-
   let text = "<strong style='color:darkslateblue'>" + tooltip_data.x0 + ' - ' + tooltip_data.x1 + ': ' +  tooltip_data.length + "</strong></br>";
   return text;
 }
 
 private renderFilterTooltip(data) {
- 
-  let text;
-  if(data[0]== 'demographic'){
-      if(data[1].length == 0){ text = 'All Patients'; 
-      }else{
-              text = ' ';
-              data[1].forEach(f=> {
-                 
-                  text = text + f.attributeName + ": " + f.checkedOptions[0] + "</br>";
-              });
-      }
+  let text = data.filter + '</br>';
 
-  }else{
-    //  text = data[1][0].parent;
+  if(data.value != null){ 
+    console.log(data);
+    if(data.filter == 'BMI' || data.filter == 'AGE' || data.filter == 'CCI'){ text = text + data.value[0] + ' - ' + data.value[1]; 
+    }else if(data.filter == 'ALCOHOL'){ 
+      console.log(data.value);
+      text = data.value.forEach(v => { 
+        console.log(v)
+        text + String(v) + ', '} );}
   }
-
   return text;
 }
 

@@ -194,7 +194,7 @@ export class DataManager {
      
                 this.filterObjectByArray(ids, promis, 'promis').then(pro => {
                     this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
-                        events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered]);
+                        events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered, item[2]]);
                     });
                 });
              });
@@ -303,6 +303,8 @@ export class DataManager {
         console.log(demo);
         let cohortIds;
 
+        filters = filters.filter(fil=> fil.type != 'Start');
+
         filters.forEach( (d)=> {
 
         let filter = String(d.filter);
@@ -311,8 +313,7 @@ export class DataManager {
                 console.log('brush filters happening');
                 demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
                 cohortIds = demo.map(d=> d.ID);
-               // console.log(demo);
-    
+
             }else{
                 if (String(filter) === 'DM_CODE') { demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3); 
                 }else{
