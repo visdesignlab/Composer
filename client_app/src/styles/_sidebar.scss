@@ -75,6 +75,14 @@ ul {
     display: inline-block;
 }
 
+rect.score,
+rect.demographic,
+rect.start,
+rect.CPT {
+    fill: gray;
+    opacity: .5;
+}
+
 .branch svg {
     height: 20px;
     width: 50px;
@@ -85,6 +93,11 @@ ul {
     display: inline;
     height: 20px;
     width: 50px;
+}
+
+.brush .extent {
+    fill-opacity: .02;
+    shape-rendering: crispEdges;
 }
 
 svg.cohortKeeper {
@@ -159,12 +172,12 @@ svg.cohortKeeper {
     height: 50px;
 }
 
-.demoBand rect {
-    //  fill: grey;
+.demoBand .filter-bars {
+    fill: rgb(190, 190, 190);
 }
 
 .demoBand rect.choice {
-    fill: orange;
+    fill: #F39C12;
 }
 
 .sideBar ul {
