@@ -191,6 +191,7 @@ export class DataManager {
              let cpt = item[0].cpt;
              let filters = item[1];
              this.demoFilter(filters, this.totalDemoObjects).then(ids=> {
+     
                 this.filterObjectByArray(ids, promis, 'promis').then(pro => {
                     this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
                         events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered]);
@@ -293,51 +294,100 @@ export class DataManager {
 
     }   
 
+
 //pulled from parallel coord
 //this hapens when demo button it pushed
     private async demoFilter(filters, demoObjects) {
 
-        let demo;
+        let demo = JSON.parse(JSON.stringify(demoObjects));
+        console.log(demo);
         let cohortIds;
 
         filters.forEach( (d)=> {
-        let parent = String(d.parent);
-        let choice = d.choice;
-        console.log(parent);
 
-        if(parent == 'BMI' || 'CCI' || 'AGE'){
-            console.log('bmi');
-            console.log('BMI?');
-            demo = demoObjects.filter(d => {
-                if(+d[parent] > +choice[0]){console.log(d)}
+        let filter = String(d.filter);
+        let choice = d.value;
+            if(filter === 'BMI' || filter === 'CCI' || filter === 'AGE'){
+                console.log('brush filters happening');
+                demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
+                cohortIds = demo.map(d=> d.ID);
+               // console.log(demo);
+    
+            }else{
+                if (String(filter) === 'DM_CODE') { demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3); 
+                }else{
+                    console.log('click filters happening');
               
-                return +d[parent] > +choice[0] && +d[parent] < +choice[1]});
+                    demo = demo.filter(de=> {
+                        if(choice.indexOf(de[filter]) > -1){ return de; }
+                    });
+                   // console.log(demo);
+                    cohortIds = demo.map(d=> d.ID);
+                }
+            }
+        });
+
+        return cohortIds;
+    }
+
+       //pulled from parallel coord
+//this hapens when demo button it pushed
+    private async brushDemoFilter(filters, demoObjects) {
+
+        let demo = JSON.parse(JSON.stringify(demoObjects));
+        console.log(demo);
+        let cohortIds;
+
+        filters.forEach( (d)=> {
+
+        let filter = String(d.filter);
+ 
+        let choice = d.value;
+    
+        if(filter === 'BMI' || 'CCI' || 'AGE'){
+            console.log('is this happening');
+            demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
             cohortIds = demo.map(d=> d.ID);
+
         }else{
            
-            if (String(parent) == 'DM_CODE') {
-                     demo = demoObjects.filter(d => d[parent] == choice || d[parent] == choice + 3);
+            if (String(filter) == 'DM_CODE') {
+                     demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3);
             }else{ 
-                       
+                      /*
                         if (choice.length === 1){
-                            demo = demoObjects.filter(d => d[parent] == choice);
+                            demo = demo.filter(d => d[filter] == choice);
                         }else if(choice.length === 2){
-                            demo = demoObjects.filter(d => d[parent] == choice[0] || choice[1]);
-                       
+                            demo = demo.filter(d => d[filter] == choice[0] || choice[1]);
                         }else if(choice.length === 2){
-                            demo = demoObjects.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
-                           
+                            demo = demo.filter(d => d[filter] == choice[0] || choice[1] || choice[2]);
                         }else if(choice.length === 3){
-                            demo = demoObjects.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
+                            demo = demo.filter(d => d[filter] == choice[0] || choice[1] || choice[2] || choice[3]);
                         }
                 }
                 cohortIds = demo.map(d=> d.ID);
+                */
             }
+        }
+            
+        if(filter == 'ALCOHOL') {
+            console.log(demo);
+            console.log(choice);
+            demo = demo.filter(de=> {
+                console.log(de);
+                de[filter].some(choice);
+                
+            });
+            console.log(demo);
+
+        }else{
+            console.log('not clickable');
+        }
+        
+        
          });
-  
-                console.log(cohortIds);
+
                 return cohortIds;
-           
        }
 
        private async demoFilterTest(sidebarFilter, demoObjects) {
@@ -509,7 +559,7 @@ export class DataManager {
 
         if(relativeChange == true){
 
-            console.log('relative avsss');
+       
 
             cohort.forEach(pat => {
                 let afterEvent = pat.value.filter(v=> v.diff > -1);
@@ -523,7 +573,7 @@ export class DataManager {
                  pat.avChange2 = avs2;
                  pat.avChange = avs;
                  pat.test = scores3;
-                 console.log(pat);
+         
              });
      
              let avsArray = cohort.map(d=> d.avChange);
@@ -749,7 +799,7 @@ export class DataManager {
 
       //uses Phovea to access PRO data and draw table
     private async getDemo(cohortIdArray, demObject) {
-      
+        
         let filteredPatOrders = {};
         // const patOrders = await this.orderTable.objects();
         if (cohortIdArray != null) {

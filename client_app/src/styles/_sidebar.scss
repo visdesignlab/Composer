@@ -159,6 +159,14 @@ svg.cohortKeeper {
     height: 50px;
 }
 
+.demoBand rect {
+    //  fill: grey;
+}
+
+.demoBand rect.choice {
+    fill: orange;
+}
+
 .sideBar ul {
     list-style-type: none;
     margin: 0;
