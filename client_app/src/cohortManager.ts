@@ -432,9 +432,8 @@ export class CohortManager {
              //   this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].filterArray.push(filterReq);
                 this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
             }
-           
             events.fire('update_chart', this.selectedCohort);
-
+            events.fire('test', [this.cohortTree, [this.cohortIndex]]);
           });
 
 
@@ -460,7 +459,6 @@ export class CohortManager {
                     this.cohortTree[this.cohortIndex].clumped = false;
                     this.selectedCohort = this.cohortTree[this.cohortIndex];
 
-                   // index = this.cohortIndex;
               }else{
                     let index = this.branchSelected[0];
                     let branchIndex = this.branchSelected[1];
@@ -468,8 +466,6 @@ export class CohortManager {
                     this.cohortTree[index].branches[branchIndex].cpt = item[0];
                     this.cohortTree[index].branches[branchIndex].promis = item[1];
                     this.selectedCohort = this.cohortTree[index].branches[branchIndex];
-
-                   // index = this.branchSelected;
                 }
      
                 index = this.selectedCohort.cohortIndex;
@@ -478,6 +474,24 @@ export class CohortManager {
                 events.fire('test', [this.cohortTree, index]);
              
           });
+
+        events.on('remove_cohort', (evt, item)=> {
+            console.log(item);
+            let test = this.cohortTree.filter(d=> d.label != item.label);
+            console.log(test);
+
+            test.forEach((cohort, i) => {
+                cohort.label = 'Cohort-'+ (i+1);
+                cohort.cohortIndex = i;
+            });
+
+            this.cohortTree = test;
+            this.selectedCohort = this.cohortTree[0];
+            this.cohortIndex = 0;
+            
+            events.fire('update_chart', this.selectedCohort);
+            events.fire('test', [this.cohortTree, 0]);
+        });
 
         events.on('filter_aggregate', (evt, item)=> {
             events.fire('filter_cohort_agg', [this.selectedCohort, item]);

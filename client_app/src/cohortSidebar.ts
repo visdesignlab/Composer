@@ -56,9 +56,6 @@ export class CohortSideBar {
     this.branchSelected = null;
     this.comparisonNum = 2;
     this.comparisonArray = [];
-
-
-    //this.buildComparisonFilter(compare);
     
     this.attachListener();
   }
@@ -95,7 +92,6 @@ export class CohortSideBar {
     let cohortPanel = this.$node.append('div').attr('id', 'cohort_control');
     this.BuildCohortPanel(cohortPanel).then(div => this.cohortKeeper = div.append('svg').classed('cohortSvg', true));
     
-
     let cohortDetail = this.$node.append('div').attr('id', 'cohort_detail');
     this.BuildFilterPanel(cohortDetail).then(panel => {
       panel.append('div').classed('descriptionDiv', true);
@@ -105,17 +101,19 @@ export class CohortSideBar {
 
     private async BuildCohortPanel(panelDiv){
 
-      let cohorthead = panelDiv.append('div').classed('panel-head', true);
-      cohorthead.append('text').text('Cohort Control');
+      let cohorthead = panelDiv.append('div').classed('panel-head', true).style('height', '70px');
+      let headertext = cohorthead.append('div').style('display', 'block').style('padding-left', '0').style('float', 'none').attr('width', 200).append('text').text('Cohort Control');
   
       let cohortBody = panelDiv.append('div').classed('panel-body', true);
+
+      let buttondiv = cohorthead.append('div').attr('width', 200).style('padding-left', '0').style('display', 'block').style('float', 'none');
   
-      let create = cohortBody.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+      let create = buttondiv.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
       .append('text').text('+ 1');
 
       create.on('click', function(d){ events.fire('create_button_down'); });
   
-      let clear = cohortBody.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+      let clear = buttondiv.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
       .append('text').text('clear all');
 
       clear.on('click', function(d){ events.fire('clear_cohorts'); });
@@ -181,12 +179,16 @@ export class CohortSideBar {
 
       let rect = cohortKeeper.append('rect').attr('height', 30).attr('transform', (d, i) => 'translate(0,'+ i * 30 +')');
 
-      let x = cohortKeeper.append('text').text('x');
+      let xGroup = cohortKeeper.append('g').classed('x', true);
+      
+      xGroup.append('rect').style('fill', 'white').style('width', '20px').attr('height', 20).style('opacity', '.7');
+      
+      let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
+      xGroup.attr('transform', (d, i)=> 'translate(225, '+ ((i * 30) + 4) + ')');
 
-      x.attr('transform', (d, i)=> 'translate(235, '+ ((i * 30) + 15) + ')');
-
-      x.on('click', function(d, i){
-        console.log('remove_cohort', d);
+      xGroup.on('click', function(d, i){
+       
+        events.fire('remove_cohort', d);
       });
 
       data.forEach(c => {
