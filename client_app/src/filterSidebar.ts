@@ -48,6 +48,8 @@ export class FilterSideBar {
   private scoreFreqRange;
   private dictionary;
   private demoPanel;
+  scorePanel;
+  codePanel;
   private demoFilterKeeper;
 
   private header = [
@@ -110,14 +112,20 @@ export class FilterSideBar {
 
   async init() {
 
-    let demoPanel = this.$node.append('div').attr('id', 'demoPanel');
-    this.BuildFilterPanel(demoPanel, 'Demographic Filters')//.then(panel=> this.buildDemoFilter(panel));//.then(div => this.cohortKeeper = div.append('svg').classed('cohortSvg', true));
+    this.demoPanel = this.$node.append('div').attr('id', 'demoPanel');
+    this.BuildFilterPanel(this.demoPanel, 'Demographic Filters')//.then(panel=> this.buildDemoFilter(panel));//.then(div => this.cohortKeeper = div.append('svg').classed('cohortSvg', true));
     
-    let scorePanel = this.$node.append('div').attr('id', 'scorePanel');
-    this.BuildFilterPanel(scorePanel, 'Score Filters').then(panel=> this.drawScoreFilterBox(panel));
+    this.scorePanel = this.$node.append('div').attr('id', 'scorePanel');
+    this.BuildFilterPanel(this.scorePanel, 'Score Filters').then(panel=> {
 
-    let codePanel = this.$node.append('div').attr('id', 'codePanel');
-    this.BuildFilterPanel(codePanel, 'CPT Filters').then(panel => this.drawOrderFilterBox(panel));
+        this.drawScoreFilterBox(panel)});
+
+    this.codePanel = this.$node.append('div').attr('id', 'codePanel');
+    this.BuildFilterPanel(this.codePanel, 'CPT Filters').then(panel => {
+
+        this.drawOrderFilterBox(panel)});
+
+    this.$node.selectAll('.panel-body').classed('hidden', true);
     }
 
     private async BuildFilterPanel(panelDiv, title){
@@ -127,6 +135,8 @@ export class FilterSideBar {
       let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
       .append('text').text('+');
 
+    
+
       button.attr('margin-left', 10);
 
       button.on('click', function(d){ 
@@ -135,6 +145,11 @@ export class FilterSideBar {
       });
   
       let cohortBody = panelDiv.append('div').classed('panel-body', true);
+
+      button.on('click', ()=> {
+          if(cohortBody.classed('hidden')){ cohortBody.classed('hidden', false)}
+          else{cohortBody.classed('hidden', true); }
+      });
 
       return cohortBody;
 
@@ -307,6 +322,11 @@ export class FilterSideBar {
 
     private async histogrammer(data, type, ticks) {
 
+        console.log(data);
+        if(type == null){
+            console.log(data.length)
+        }
+
         let totalPatients = data.length;
 
         let x;
@@ -457,11 +477,9 @@ export class FilterSideBar {
                 let end = scale.invert(event.selection[1]);
                 let Dom1 = Math.floor(start);
                 let Dom2 = Math.ceil(end);
-                console.log(bandSvg.selectAll('rect'))
                 let test = bandSvg.selectAll('rect');
                 test.classed('choice', false);
                 let test2 = test.filter(r=> r['x0'] >= start && r['x1'] <= end);
-                console.log(test2);
                 test2.classed('choice', true);
     
                 events.fire('demo_filter_change', {parent: data.key, choice: [Dom1, Dom2]});
@@ -472,6 +490,13 @@ export class FilterSideBar {
 
            
        }else{
+        bandSvg.attr('height', 150);
+        
+        axis.selectAll("text")
+        .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-50)" );
 
         rects.classed('choice', true);
 
@@ -480,10 +505,8 @@ export class FilterSideBar {
         rects.on('click', function(d, i) {
        
             if(select(this).classed('choice')){
-                console.log(true);
                 select(this).classed('choice', false);
             }else{
-                console.log(false);
                 select(this).classed('choice', true);
             }
             let nodes = document.getElementsByClassName(key);
@@ -497,10 +520,6 @@ export class FilterSideBar {
         });
        }
 
-    }
-
-    private async demoFilters(data){
- 
     }
 
     private drawDistributionBands(data, id) {
@@ -539,11 +558,7 @@ export class FilterSideBar {
         .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5);
        // .attr('x', (d, i)=> (d['scale'](i) + 5));
 
-
         let axis = bandSvg.selectAll('.axis-x').data((d, i)=>  d['scale']).enter().append('g').classed('axis-x', true);
-       // let axis = bandSvg.append('g').classed('axis-x', true);
-
-      //  axis.call((d, i)=> axisBottom(d));
 
         this.bmiBrush = brushX()
         .extent([[0, 0], [this.svgWidth, 30]])
@@ -599,6 +614,8 @@ export class FilterSideBar {
       }
 
     private drawHistogram(histobins) {
+
+        console.log(histobins);
 
      this.$node.select('.distributionWrapper').selectAll('*').remove();
 

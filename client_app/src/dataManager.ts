@@ -322,7 +322,6 @@ export class DataManager {
                     demo = demo.filter(de=> {
                         if(choice.indexOf(de[filter]) > -1){ return de; }
                     });
-                   // console.log(demo);
                     cohortIds = demo.map(d=> d.ID);
                 }
             }
@@ -330,106 +329,6 @@ export class DataManager {
 
         return cohortIds;
     }
-
-       //pulled from parallel coord
-//this hapens when demo button it pushed
-    private async brushDemoFilter(filters, demoObjects) {
-
-        let demo = JSON.parse(JSON.stringify(demoObjects));
-        console.log(demo);
-        let cohortIds;
-
-        filters.forEach( (d)=> {
-
-        let filter = String(d.filter);
- 
-        let choice = d.value;
-    
-        if(filter === 'BMI' || 'CCI' || 'AGE'){
-            console.log('is this happening');
-            demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
-            cohortIds = demo.map(d=> d.ID);
-
-        }else{
-           
-            if (String(filter) == 'DM_CODE') {
-                     demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3);
-            }else{ 
-                      /*
-                        if (choice.length === 1){
-                            demo = demo.filter(d => d[filter] == choice);
-                        }else if(choice.length === 2){
-                            demo = demo.filter(d => d[filter] == choice[0] || choice[1]);
-                        }else if(choice.length === 2){
-                            demo = demo.filter(d => d[filter] == choice[0] || choice[1] || choice[2]);
-                        }else if(choice.length === 3){
-                            demo = demo.filter(d => d[filter] == choice[0] || choice[1] || choice[2] || choice[3]);
-                        }
-                }
-                cohortIds = demo.map(d=> d.ID);
-                */
-            }
-        }
-            
-        if(filter == 'ALCOHOL') {
-            console.log(demo);
-            console.log(choice);
-            demo = demo.filter(de=> {
-                console.log(de);
-                de[filter].some(choice);
-                
-            });
-            console.log(demo);
-
-        }else{
-            console.log('not clickable');
-        }
-        
-        
-         });
-
-                return cohortIds;
-       }
-
-       private async demoFilterTest(sidebarFilter, demoObjects) {
-       
-        let cohortIdArray = [];
-
-        let filter = demoObjects;
-        sidebarFilter.forEach( (d)=> {
-        let parent = d.attributeName;
-        let choice = d.checkedOptions;
-        if(parent != 'BMI' || 'CCI' || 'AGE') {
-
-            if (parent == 'DM_CODE') {
-                    filter = filter.filter(d => d[parent] == choice || d[parent] == choice + 3);
-            }else{ 
-                       
-                        if (choice.length === 1){
-                            filter = filter.filter(d => d[parent] == choice);
-                        }else if(choice.length === 2){
-                            filter = filter.filter(d => d[parent] == choice[0] || choice[1]);
-                       
-                        }else if(choice.length === 2){
-                            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2]);
-                           
-                        }else if(choice.length === 3){
-                            filter = filter.filter(d => d[parent] == choice[0] || choice[1] || choice[2] || choice[3]);
-                        }
-                }
-           }
-           if(parent == 'BMI' || parent == 'CCI' || parent == 'AGE') {
-                filter = filter.filter(d => +d[parent] > choice[0] && +d[parent] < choice[1]);
-           }
-
-         });
-            filter.forEach((element) => {
-                cohortIdArray.push(element.ID);
-            });
-
-                return cohortIdArray;
-           
-       }
 
     private async filterByPromisCount(cohort, count) {
     

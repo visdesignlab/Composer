@@ -169,7 +169,7 @@ svg.cohortKeeper {
 
 .demoBand svg {
     width: 200px;
-    height: 50px;
+    height: 70px;
 }
 
 .demoBand .filter-bars {
@@ -230,39 +230,39 @@ svg.cohortKeeper {
 }
 
 .layer-0 rect {
-    fill: #2874A6;
+    fill: #ff4e50;
 }
 
 .layer-0 rect.clear {
     fill: white;
-    stroke: #2874A6;
+    stroke: #ff4e50;
 }
 
 .layer-1 rect {
-    fill: rgb(193, 109, 218);
+    fill: #f9d62e;
 }
 
 .layer-1 rect.clear {
     fill: white;
-    stroke: rgb(193, 109, 218);
+    stroke: #f9d62e;
 }
 
 .layer-2 rect {
-    fill: rgb(156, 223, 130);
+    fill: #8ec127;
 }
 
 .layer-2 rect.clear {
     fill: white;
-    stroke: rgb(156, 223, 130);
+    stroke: #8ec127;
 }
 
 .layer-3 rect {
-    fill: rgb(109, 174, 218);
+    fill: #83d0c9;
 }
 
 .layer-3 svg rect.clear {
     fill: white;
-    stroke: rgb(109, 174, 218);
+    stroke: #83d0c9;
 }
 
 .distDetail_svg {
