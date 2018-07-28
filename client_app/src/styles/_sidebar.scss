@@ -104,10 +104,23 @@ svg.cohortKeeper {
     width: 250px;
 }
 
+.x rect {
+    rx: 5;
+    ry: 5;
+}
+
+.x :hover {
+    cursor: pointer;
+}
+
 .c-0 rect {
     fill: #ff4e50;
     width: 250px;
     opacity: .5;
+}
+
+.c-0 text.x {
+    fill: #ff4e50;
 }
 
 .c-1 rect {
@@ -116,16 +129,28 @@ svg.cohortKeeper {
     opacity: .5;
 }
 
+.c-1 text.x {
+    fill: #f9d62e;
+}
+
 .c-2 rect {
     fill: #8ec127;
     width: 250px;
     opacity: .5;
 }
 
+.c-2 text.x {
+    fill: #8ec127;
+}
+
 .c-3 rect {
     fill: #83d0c9;
     width: 250px;
     opacity: .5;
+}
+
+.c-3 text.x {
+    fill: #83d0c9;
 }
 
 .center {
