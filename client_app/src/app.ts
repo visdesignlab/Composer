@@ -56,21 +56,16 @@ export class App {
     const sideBarDiv = this.$node.append('div').attr('id', 'cohortSideBar');
     const side = cohortSideBar.create(sideBarDiv.node());
     await side.init();
-    const filterBarDiv = this.$node.append('div').attr('id', 'filterSideBar');
+    const filterBarDiv = this.$node.append('div').attr('id', 'filterSideBar').classed('hidden', true);
     filterSidebar.create(filterBarDiv.node());
 
     const header = document.querySelector('#caleydoHeader');
     let cohortButtons = select(header).select('.navbar').select('.navbar-header')
     .append('div').classed('cohort-buttons', true);
     let that = this;
-  //  let create = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-primary', true).classed('btn-sm', true).attr('value', 'Add Cohort');
-   // let branch = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Branch Cohort');
   
-   // let compare = cohortButtons.insert('input').attr('type', 'button').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Comparison View');
-    let layer = cohortButtons.insert('input').attr('type', 'button').attr('id', 'layerButton').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Layer View');
-   
-   // branch.on('click', function(d){ events.fire('branch_cohort'); });
-    layer.on('click', function(d){ events.fire('layer_button_down'); });
+   // let layer = cohortButtons.insert('input').attr('type', 'button').attr('id', 'layerButton').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Layer View');
+   // layer.on('click', function(d){ events.fire('layer_button_down'); });
 
     // main div with child views
     const main = this.$node.append('div').classed('main', true);

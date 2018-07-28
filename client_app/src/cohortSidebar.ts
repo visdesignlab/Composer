@@ -131,6 +131,12 @@ export class CohortSideBar {
       let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
       .append('text').text('+');
 
+      button.on('click', ()=> {
+        let filterBox = select(document.getElementById('filterSideBar'));
+        if(filterBox.classed('hidden')){filterBox.classed('hidden', false);
+        }else{ filterBox.classed('hidden', true); }
+      });
+
       button.attr('transform', 'translate(10, 0)');
 
       button.on('click', function(d){ 
