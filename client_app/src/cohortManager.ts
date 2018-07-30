@@ -476,21 +476,36 @@ export class CohortManager {
           });
 
         events.on('remove_cohort', (evt, item)=> {
-            console.log(item);
-            let test = this.cohortTree.filter(d=> d.label != item.label);
-            console.log(test);
-
-            test.forEach((cohort, i) => {
-                cohort.label = 'Cohort-'+ (i+1);
-                cohort.cohortIndex = i;
-            });
-
-            this.cohortTree = test;
-            this.selectedCohort = this.cohortTree[0];
-            this.cohortIndex = 0;
+            console.log(item.cohortIndex);
+            if(item.cohortIndex.length > 1){
+                let pIndex = item.cohortIndex[0];
+                let bIndex = item.cohortIndex[1];
+                let test = this.cohortTree[pIndex].branches.filter(d=> d.label != item.label);
+     
+                this.cohortTree[pIndex].branches = test;
+                events.fire('update_chart', this.selectedCohort);
+                events.fire('test', [this.cohortTree, 0]);
+            }else{
             
-            events.fire('update_chart', this.selectedCohort);
-            events.fire('test', [this.cohortTree, 0]);
+                let test = this.cohortTree.filter(d=> d.label != item.label);
+                test.forEach((cohort, i) => {
+                    cohort.label = 'Cohort-'+ (i+1);
+                    cohort.cohortIndex = i;
+                    if(cohort.branches.length > 0){
+                        cohort.branches.forEach((branch, b) => {
+                            branch.cohortIndex = [i, b];
+                            branch.label = 'C-' + (i + 1) + ' Branch-' + (b + 1);
+                        });
+                    }
+                });
+    
+                this.cohortTree = test;
+                this.selectedCohort = this.cohortTree[0];
+                this.cohortIndex = 0;
+                
+                events.fire('update_chart', this.selectedCohort);
+                events.fire('test', [this.cohortTree, 0]);
+            }
         });
 
         events.on('filter_aggregate', (evt, item)=> {

@@ -126,8 +126,8 @@ export class CohortSideBar {
 
       let cohorthead = panelDiv.append('div').classed('panel-head', true);
       cohorthead.append('text').text('Applied Filters').style('padding-right', '20px');
-      let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
-      .append('text').text('+');
+      let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true);
+      button.append('text').text('+');
 
       button.on('click', ()=> {
         let filterBox = select(document.getElementById('filterSideBar'));

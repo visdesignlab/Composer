@@ -220,19 +220,21 @@ export class EventLine {
             let separated = cohort.separated;
             let clumped = cohort.clumped;
 
+            console.log(filters);
+        //    filters = filters.filter(f=> f.type != 'Demographic');
+
             if(!scaleRelative){  this.scoreLabel = 'Absolute Scale';
             }else{ this.scoreLabel = 'Relative Scale'; }
 
             let that = this;
 
             function filText(d){
-                if(d[0] !=  'Branch'){
-                    if(d[0] == 'CPT'){
-                        let label = d[1][1];
-                        return label[0].parent;
+                if(d.type !=  'Branch'){
+                    if(d.type == 'Start'){
+                        let label = 'First Promis Score';
+                        return label;
                     }else{ 
-                       
-                        let label = d;
+                        let label = d.filter;
                         return label;
                     }
                 }else{ console.log('Branch filter passed')};
@@ -246,17 +248,18 @@ export class EventLine {
                         that.drawEventButtons(that.filter);
                         events.fire('event_selected', that.startCodes);
                         }else{
-                        that.startCodes = d[1];
-                        let label = d[1][1];
-                        that.startEventLabel = label[0].parent;
+                        that.startCodes = d.value;
+                        console.log(that.startCodes)
+                        let label = d.filter;
+                        that.startEventLabel = label;
                         that.drawEventButtons(cohort);
                         events.fire('event_selected', that.startCodes);
                     }
             }
 
-            filters = filters.filter(d=> {return d[0] != 'Branch' && d[0] != 'demographic' && d[0] != 'Score Count'});
+            filters = filters.filter(d=> {return d.type != 'Branch' && d.type != 'Demographic' && d.type != 'Score'});
 
-            filters.push(['First Promis Score']);
+          //  filters.push(['First Promis Score']);
         
             this.$node.select('.event-buttons').remove();
 
