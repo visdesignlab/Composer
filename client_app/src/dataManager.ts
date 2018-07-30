@@ -121,7 +121,7 @@ export class DataManager {
             });
 
             }else{
-             
+                console.log(codes);
                 this.searchByEvent(cpt, codes[0]).then((cptFiltered)=> {
                
                     let eventStartArray = cptFiltered[1];
@@ -142,7 +142,7 @@ export class DataManager {
 
         events.on('filter_cohort_agg', (evt, item)=> {
             console.log('filter cohrot agg happens');
-          //  this.getQuant_Agg(item[0], item[1]);
+       
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -186,7 +186,7 @@ export class DataManager {
          });
 
          events.on('filter_demo_data', (evt, item)=> {
-             console.log(item);
+    
              let promis = item[0].promis;
              let cpt = item[0].cpt;
              let filters = item[1];
@@ -300,7 +300,7 @@ export class DataManager {
     private async demoFilter(filters, demoObjects) {
 
         let demo = JSON.parse(JSON.stringify(demoObjects));
-        console.log(demo);
+
         let cohortIds;
 
         filters = filters.filter(fil=> fil.type != 'Start');
@@ -310,14 +310,14 @@ export class DataManager {
         let filter = String(d.filter);
         let choice = d.value;
             if(filter === 'BMI' || filter === 'CCI' || filter === 'AGE'){
-                console.log('brush filters happening');
+        
                 demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
                 cohortIds = demo.map(d=> d.ID);
 
             }else{
                 if (String(filter) === 'DM_CODE') { demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3); 
                 }else{
-                    console.log('click filters happening');
+        
               
                     demo = demo.filter(de=> {
                         if(choice.indexOf(de[filter]) > -1){ return de; }
@@ -500,8 +500,6 @@ export class DataManager {
                  }
              }
         }else {
-
-            console.log('using b array');
      
             let barray = cohort.map(pat=> {
                 if(pat.b != undefined){return pat.b;

@@ -132,8 +132,8 @@ export class FilterSideBar {
 
       let cohorthead = panelDiv.append('div').classed('panel-head', true);
       cohorthead.append('text').text(title).style('padding-right', '20px');
-      let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
-      .append('text').text('+');
+      let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true);
+      button.append('text').text('+');
 
     
 
