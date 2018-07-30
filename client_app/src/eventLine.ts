@@ -220,9 +220,6 @@ export class EventLine {
             let separated = cohort.separated;
             let clumped = cohort.clumped;
 
-            console.log(filters);
-        //    filters = filters.filter(f=> f.type != 'Demographic');
-
             if(!scaleRelative){  this.scoreLabel = 'Absolute Scale';
             }else{ this.scoreLabel = 'Relative Scale'; }
 
@@ -249,7 +246,7 @@ export class EventLine {
                         events.fire('event_selected', that.startCodes);
                         }else{
                         that.startCodes = d.value;
-                        console.log(that.startCodes)
+                      
                         let label = d.filter;
                         that.startEventLabel = label;
                         that.drawEventButtons(cohort);
@@ -258,8 +255,6 @@ export class EventLine {
             }
 
             filters = filters.filter(d=> {return d.type != 'Branch' && d.type != 'Demographic' && d.type != 'Score'});
-
-          //  filters.push(['First Promis Score']);
         
             this.$node.select('.event-buttons').remove();
 
