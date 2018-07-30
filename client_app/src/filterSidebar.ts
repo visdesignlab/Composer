@@ -322,9 +322,8 @@ export class FilterSideBar {
 
     private async histogrammer(data, type, ticks) {
 
-        console.log(data);
         if(type == null){
-            console.log(data.length)
+          
         }
 
         let totalPatients = data.length;
@@ -614,8 +613,6 @@ export class FilterSideBar {
       }
 
     private drawHistogram(histobins) {
-
-        console.log(histobins);
 
      this.$node.select('.distributionWrapper').selectAll('*').remove();
 
