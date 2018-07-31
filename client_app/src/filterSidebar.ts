@@ -113,13 +113,7 @@ export class FilterSideBar {
 
         let cohortClass = 'c-' + (item.flatIndex);
         classGroup.classed(cohortClass, true);
-       
-        console.log(cohortClass);
-
-         this.oldClass = cohortClass;
-
-         console.log(this.oldClass);
-
+        this.oldClass = cohortClass;
         let value = item.promis.map(v=> v.value);
      
         this.histogrammer(value, null, 10).then(d=> this.drawHistogram(d));}
