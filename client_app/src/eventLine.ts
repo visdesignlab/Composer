@@ -94,12 +94,8 @@ export class EventLine {
             selectAll('.selected').classed('selected', false);
 
             //need to update comparison array
-    
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
-    
-
-    
             this.buildLayerFilter(layer, item[0]);
     
           });

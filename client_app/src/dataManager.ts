@@ -37,13 +37,10 @@ export class DataManager {
     //defined cohort info
   //  cohortIdArray;
     cohortOrderInfo; //defined cohort 
-
     totalProObjects;//Promis scores as objects for cohort
     totalDemoObjects;//demo for whole population
-    //filteredCohortDemo;//demographic info as objects for defined cohort
     totalCptObjects;//CPT as objects for defined cohort
     cohortIcdObjects;//ICD objects for cohort
-
     startDate;
 
     constructor() {
@@ -62,27 +59,21 @@ export class DataManager {
     private attachListener(){
 
        // let startDateSelection = d3.select('#start_date').select('text');
-
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
             let parent = item[0];
             let choice = item[1];
             let subFilter = this.totalDemoObjects.filter(d => d[parent] == choice);
-
            //gos right back to sidebar for the hover count
             events.fire('filter_counted', [this.totalDemoObjects.length, subFilter.length, parent]);
-
           });
 
         events.on('create_button_down', (evt, item) => { // called in sidebar
             let filter = [];
             this.demoFilter(filter, this.totalDemoObjects).then(ids=> {
                 let cohortIDs = ids;
-                //this.mapPromisScores(cohortIDs, this.totalProObjects, filter).then(promis=> {
                 this.loadPromisData(cohortIDs, filter).then(promis=> {
-                   
                     this.getCPT(cohortIDs, this.totalCptObjects).then(d=> {
                         this.mapCPT(promis, d).then(orders=> {
-                         
                             this.getDays(promis, null).then(promisShifted=> {
                                 this.getBaselines(promisShifted).then(based=> {
                                     events.fire('new_cohort', [based, orders, filter]);
@@ -110,9 +101,7 @@ export class DataManager {
             let cpt = item[1].cpt;
             
             if(item[0] == null){
-              
                this.getDays(promis, null).then(promisShifted=> {
-              
                 this.getBaselines(promisShifted).then(based=> {
                     this.updateDiff(codes, cpt, promisShifted).then(cptShifted=> {  
                         events.fire('min_day_calculated', [based, cptShifted, codes]);
@@ -125,7 +114,6 @@ export class DataManager {
                 this.searchByEvent(cpt, codes[0]).then((cptFiltered)=> {
                
                     let eventStartArray = cptFiltered[1];
-             
                     this.addMinDay(promis, eventStartArray).then(co=> {
                         this.getDays(co, 'days').then(promisShifted=> {
                             this.getBaselines(promisShifted).then(based=> {
@@ -142,7 +130,6 @@ export class DataManager {
 
         events.on('filter_cohort_agg', (evt, item)=> {
             console.log('filter cohrot agg happens');
-       
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -157,7 +144,6 @@ export class DataManager {
             let promis = item[2].promis;
 
             this.searchByEvent(cpt, item[0]).then((d)=> {
-
                 let order = item;
                 this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, promis, 'promis').then(ob=> {
                         events.fire('filter_cohort_by_event', [cpt, ob, order]);
@@ -166,6 +152,7 @@ export class DataManager {
                
             });
         });
+        /*
         events.on('get_selected_demo', (evt, item)=> {
 
             let promis = item[1].promis;
@@ -180,18 +167,27 @@ export class DataManager {
                         events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered]);
                     });
                 });
-                
             })));
  
-         });
+         });*/
 
-         events.on('filter_demo_data', (evt, item)=> {
+         events.on('filter_data', (evt, item)=> {
     
-             let promis = item[0].promis;
+             let promis = item[0].ogPromis;
              let cpt = item[0].cpt;
              let filters = item[1];
-             this.demoFilter(filters, this.totalDemoObjects).then(ids=> {
-     
+             console.log(filters);
+             if(filters[0].length > 1){
+                let temp = [];
+                filters.forEach(fil => {
+                    if(fil.length > 1){
+                        fil.forEach(f => { temp.push(f); });
+                    }else{ temp.push(fil); }
+                });
+                filters = temp;
+             }
+             this.dataFilter(filters, this.totalDemoObjects, cpt).then(ids=> {
+                 console.log(ids);
                 this.filterObjectByArray(ids, promis, 'promis').then(pro => {
                     this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
                         events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered, item[2]]);
@@ -199,6 +195,30 @@ export class DataManager {
                 });
              });
         });
+
+        events.on('filter_demo_data', (evt, item)=> {
+    
+            let promis = item[0].ogPromis;
+            let cpt = item[0].cpt;
+            let filters = item[1];
+            console.log(filters);
+            if(filters[0].length > 1){
+               let temp = [];
+               filters.forEach(fil => {
+                   if(fil.length > 1){
+                       fil.forEach(f => { temp.push(f); });
+                   }else{ temp.push(fil); }
+               });
+               filters = temp;
+            }
+            this.demoFilter(filters, this.totalDemoObjects).then(ids=> {
+               this.filterObjectByArray(ids, promis, 'promis').then(pro => {
+                   this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
+                       events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered, item[2]]);
+                   });
+               });
+            });
+       });
 
         events.on('selected_line_with_cpt', (evt, item)=> {
             this.filterObjectByArray(item[0], item[1], 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
@@ -294,6 +314,47 @@ export class DataManager {
 
     }   
 
+    
+//pulled from parallel coord
+//this hapens when demo button it pushed
+private async dataFilter(filters, demoObjects, CPT) {
+
+    let demo = JSON.parse(JSON.stringify(demoObjects));
+
+    let cohortIds;
+    console.log(filters);
+    filters = filters.filter(fil=> fil.type != 'Start' && fil.filter != undefined);
+    console.log(filters);
+    filters.forEach( (d)=> {
+    let filter = String(d.filter);
+    let type = String(d.type);
+    let choice = d.value;
+    console.log(type);
+    if(type == 'CPT'){
+        console.log('CPT FILTER');
+    }else if(type == 'Demographic'){
+
+        if(filter === 'BMI' || filter === 'CCI' || filter === 'AGE'){
+            demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
+            cohortIds = demo.map(d=> d.ID);
+        }else{
+            if (String(filter) === 'DM_CODE') { demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3); 
+            }else{
+                demo = demo.filter(de=> {
+                    if(choice.indexOf(de[filter]) > -1){ return de; }
+                });
+                cohortIds = demo.map(d=> d.ID);
+            }
+        }
+    }else{
+        console.log('SCORE FILTERSSS');
+    }
+
+    });
+
+    return cohortIds;
+}
+
 
 //pulled from parallel coord
 //this hapens when demo button it pushed
@@ -306,19 +367,16 @@ export class DataManager {
         filters = filters.filter(fil=> fil.type != 'Start');
 
         filters.forEach( (d)=> {
+        console.log(d);
 
         let filter = String(d.filter);
         let choice = d.value;
             if(filter === 'BMI' || filter === 'CCI' || filter === 'AGE'){
-        
                 demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
                 cohortIds = demo.map(d=> d.ID);
-
             }else{
                 if (String(filter) === 'DM_CODE') { demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3); 
                 }else{
-        
-              
                     demo = demo.filter(de=> {
                         if(choice.indexOf(de[filter]) > -1){ return de; }
                     });
@@ -458,8 +516,6 @@ export class DataManager {
         let arrayofArrays = [];
 
         if(relativeChange == true){
-
-       
 
             cohort.forEach(pat => {
                 let afterEvent = pat.value.filter(v=> v.diff > -1);
