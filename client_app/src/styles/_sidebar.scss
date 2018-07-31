@@ -28,7 +28,8 @@ ul {
     display: inline;
     float: left;
     border-color: #566573;
-    border-width: 1px;
+    border-width: 2px;
+    overflow: auto;
 }
 
 #cohortSideBar .panel-head,
@@ -119,7 +120,8 @@ svg.cohortKeeper {
     opacity: .5;
 }
 
-.c-0 text.x {
+.c-0 text.x,
+rect.choice.c-0 {
     fill: #ff4e50;
 }
 
@@ -129,7 +131,8 @@ svg.cohortKeeper {
     opacity: .5;
 }
 
-.c-1 text.x {
+.c-1 text.x,
+rect.choice.c-1 {
     fill: #f9d62e;
 }
 
@@ -139,7 +142,8 @@ svg.cohortKeeper {
     opacity: .5;
 }
 
-.c-2 text.x {
+.c-2 text.x,
+rect.choice.c-2 {
     fill: #8ec127;
 }
 
@@ -149,7 +153,8 @@ svg.cohortKeeper {
     opacity: .5;
 }
 
-.c-3 text.x {
+.c-3 text.x,
+rect.choice.c-3 {
     fill: #83d0c9;
 }
 
@@ -194,7 +199,7 @@ svg.cohortKeeper {
 
 .demoBand svg {
     width: 200px;
-    height: 70px;
+    height: 80px;
 }
 
 .demoBand .filter-bars {
@@ -202,7 +207,7 @@ svg.cohortKeeper {
 }
 
 .demoBand rect.choice {
-    fill: #F39C12;
+    //  fill: #F39C12;
 }
 
 .sideBar ul {

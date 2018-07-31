@@ -16,6 +16,7 @@ class Cohort {
         cohortIndex: any;
         eventIndex: any;
         parentIndex: any;
+        flatIndex: any;
         ogPromis: any;
         promis: any;
         cpt: any;
@@ -183,12 +184,14 @@ export class CohortManager {
             treeBranch.label = "C-"+ String(this.cohortIndex + 1) + " Branch-" + String((this.cohortTree[this.cohortIndex].branches + 1));
             treeBranch.eventIndex = indexBranch;
             treeBranch.parentIndex = this.cohortIndex;
+            treeBranch.flatIndex = this.counter;
             treeBranch.filterArray = bfilter;
            // treeBranch.filterArray.push({  filter: 'Cohort Branched', type: 'Start', value: null, count: promis.length  });
             treeBranch.promis = b;
             treeBranch.cpt = bcpt;
             treeBranch.cohortIndex = [this.cohortIndex, newSpot];
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
+            this.counter++;
            
             events.fire('branch_selected', treeBranch.cohortIndex);
 
@@ -381,6 +384,7 @@ export class CohortManager {
 
             newParent.label = 'Cohort-' + String((this.cohortTree.length + 1));
             newParent.eventIndex = 0;
+            newParent.flatIndex = this.counter;
             newParent.cpt = item[1];
             newParent.promis = promis;
             newParent.cohortIndex = this.cohortTree.length;
@@ -483,6 +487,7 @@ export class CohortManager {
                 let test = this.cohortTree[pIndex].branches.filter(d=> d.label != item.label);
      
                 this.cohortTree[pIndex].branches = test;
+                this.counter = this.counter - 1;
                 events.fire('update_chart', this.selectedCohort);
                 events.fire('test', [this.cohortTree, 0]);
             }else{

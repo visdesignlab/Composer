@@ -7,7 +7,7 @@ import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
 import * as events from 'phovea_core/src/event';
-import {scaleLinear, scaleTime, scaleOrdinal, scaleBand, scaleLog, scalePoint} from 'd3-scale';
+import {scaleLinear, scaleTime, scaleOrdinal, scaleBand, scaleLog, scalePoint, scalePow} from 'd3-scale';
 import {area, line, curveMonotoneX, curveMonotoneY, curveLinear, curveBasis} from 'd3-shape';
 //importing other modules from app
 import * as demoGraph from './demoGraphs';
@@ -51,6 +51,7 @@ export class FilterSideBar {
   scorePanel;
   codePanel;
   private demoFilterKeeper;
+  private oldClass;
 
   private header = [
     {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -104,7 +105,23 @@ export class FilterSideBar {
 
     events.on('update_chart', (evt, item)=> {
      if(item){ 
+
+        let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('rect');
+         if(this.oldClass){
+            classGroup.classed(this.oldClass, false);
+         }
+
+        let cohortClass = 'c-' + (item.flatIndex);
+        classGroup.classed(cohortClass, true);
+       
+        console.log(cohortClass);
+
+         this.oldClass = cohortClass;
+
+         console.log(this.oldClass);
+
         let value = item.promis.map(v=> v.value);
+     
         this.histogrammer(value, null, 10).then(d=> this.drawHistogram(d));}
     });
 
@@ -147,7 +164,8 @@ export class FilterSideBar {
       let cohortBody = panelDiv.append('div').classed('panel-body', true);
 
       button.on('click', ()=> {
-          if(cohortBody.classed('hidden')){ cohortBody.classed('hidden', false)}
+          if(cohortBody.classed('hidden')){ 
+              cohortBody.classed('hidden', false); }
           else{cohortBody.classed('hidden', true); }
       });
 
@@ -426,14 +444,19 @@ export class FilterSideBar {
     private async drawBandTest(data, id){
   
         let bandWidth = 180;
-        let distScale = scaleLinear().domain([0, 1000]);
+       
         let domain = data.domain;
         let label = data.label;
         let key = data.key;
         let scale = data.scale;
         let value = data.value;
+        console.log(value);
         let brush;
-
+      
+        let maxVal = max(value.map(d=> +d.frequency));
+ 
+        let distScale = scaleLinear().domain([0, +maxVal]).range([0, 50]);
+    
         let xAxis = axisBottom(scale);
     
         let panelBody = select(document.getElementById(id)).select('.panel-body');
@@ -449,17 +472,18 @@ export class FilterSideBar {
         rects = rectEnter.merge(rects);
 
         rects
-        .attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', 25)
-        .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+        .attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', (d)=> distScale(d['frequency']))
+      //  .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
         .attr('fill', '#212F3D')
-        .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5);
+        .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5)
+        .attr('y', (d)=> 50 - distScale(d['frequency']));
 
-       let axis = bandSvg.append('g').classed('x-axis', true).attr('transform', 'translate(6, 25)');
+       let axis = bandSvg.append('g').classed('x-axis', true).attr('transform', 'translate(6, 50)');
 
        axis.call(xAxis);
 
        let quantBrush = brushX()
-       .extent([[0, 0], [bandWidth, 30]])
+       .extent([[0, 0], [bandWidth, 50]])
        .handleSize(2);
 
        if(data.type == 'quant'){
@@ -520,97 +544,6 @@ export class FilterSideBar {
        }
 
     }
-
-    private drawDistributionBands(data, id) {
-
-        let xScale = scaleLinear().range([0, 180]);
-
-        let bandWidth = 180;
-
-        let barBrush = brushX()
-        .extent([[0, 0], [bandWidth, 30]])
-        .handleSize(1);
-    
-        let distScale = scaleLinear().domain([0, 1000]);
-    
-        let bmiScale = scaleLinear().domain([0, 100]).range([0, bandWidth]);
-        let CCIScale = scaleLinear().domain([0, 23]).range([0, bandWidth]);
-        let AGEScale = scaleLinear().domain([0, 100]).range([0, bandWidth]);
-
-        let panelBody = select(document.getElementById(id)).select('.panel-body');
-
-        let distDiagrams = panelBody.selectAll('.demoBand').data(data);
-
-        distDiagrams.exit().remove();
-
-        let distEnter = distDiagrams.enter().append('div').classed('demoBand', true);
-       
-        distDiagrams = distEnter.merge(distDiagrams);
-
-        let bandSvg = distDiagrams.append('svg').attr('class', d=> d['key']);
-
-        let label = bandSvg.append('g').append('text').text(d=> d['label']).attr('transform', 'translate(0, 10)');
-        
-        let rects = bandSvg.append('g').attr('transform', 'translate(20, 0)').selectAll('rect').data(d => d['value']).enter().append('rect').attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', 15)
-        .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
-        .attr('fill', '#212F3D')
-        .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5);
-       // .attr('x', (d, i)=> (d['scale'](i) + 5));
-
-        let axis = bandSvg.selectAll('.axis-x').data((d, i)=>  d['scale']).enter().append('g').classed('axis-x', true);
-
-        this.bmiBrush = brushX()
-        .extent([[0, 0], [this.svgWidth, 30]])
-        .handleSize(0)
-        .on("end", () => {
-          if (event.selection === null) {
-            //this.setOrderScale();
-        }else {
-          let start = bmiScale.invert(event.selection[0]);
-          let end = bmiScale.invert(event.selection[1]);
-          let Dom1 = Math.floor((start+1)/10)*10;
-          let Dom2 = Math.ceil((end+1)/10)*10;
-    
-          this.bmiRange = [Dom1, Dom2];
-        }
-        });
-    
-        this.cciBrush =  brushX()
-        .extent([[0, 0], [this.svgWidth, 30]])
-        .handleSize(0)
-        .on("end", () => {
-          if (event.selection === null) {
-    
-          } else {
-            let start = CCIScale.invert(event.selection[0]);
-            let end = CCIScale.invert(event.selection[1]);
-            let Dom1 = Math.floor(start);
-            let Dom2 = Math.ceil(end);
-            this.cciRange = [Dom1, Dom2];
-          }
-        });
-    
-        this.ageBrush = brushX().extent([[0, 0], [this.svgWidth, 30]]).handleSize(0)
-                        .on("end", () => {
-                          if (event.selection === null) {
-    
-                          } else {
-                            let start = AGEScale.invert(event.selection[0]);
-                            let end = AGEScale.invert(event.selection[1]);
-    
-                            let Dom1 = Math.floor((start+1)/10)*10;
-                            let Dom2 = Math.ceil((end+1)/10)*10;
-                            this.ageRange = [Dom1, Dom2];
-                          }
-                        });
-                        
-        this.$node.select('#BMI-Brush').call(this.bmiBrush);
-    
-        this.$node.select('#CCI-Brush').call(this.cciBrush);
-                    
-        this.$node.select('#AGE-Brush').call(this.ageBrush);
-    
-      }
 
     private drawHistogram(histobins) {
 
