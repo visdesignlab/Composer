@@ -174,8 +174,6 @@ export class PlotKeeper {
 
                 if(this.layerBool){
 
-                    console.log(this.cohortData);
-                  //  this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, this.selectedCohort.cohortIndex);
                 }else{
                     this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
                 }
@@ -212,26 +210,6 @@ export class PlotKeeper {
         
                if(this.layerBool == true){
                 console.log('update chart??');
-                
-                   /*
-                console.log(this.comparisonArray);
-                this.comparisonArray.forEach((cohort, i) => {
-           
-                    if(cohort.data.clumped){
-                        //if it is aggregated
-                        if(cohort.separated){
-                            cohort.data.forEach(promis => {
-                                this.frequencyCalc(cohort.data.promisSep[0], cohort.class, this.selectedPlot, item, i);
-                            });
-                        }else{
-                       
-                            this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, item, i);//.then(co=> this.drawAgg(co, 'all'));
-                        }
-                    }else{
-                        this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
-                    }
-
-                });*/
 
                }else{
                
@@ -259,7 +237,7 @@ export class PlotKeeper {
                           this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null);
                           this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null);
                       }else{
-                        this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null);
+                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null);
                       }
                   }
                  }

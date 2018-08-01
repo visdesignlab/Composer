@@ -1,5 +1,10 @@
 #app {
     /*width: 3200px;*/
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    margin: 0px;
+    padding: 0px;
 }
 
 #caleydoHeader {
@@ -45,13 +50,7 @@
     padding-right: 1%;
     width: 50%;
     margin-top: 50px;
-}
-
-.sideBar {
-    float: left;
-    width: 210px;
-    padding: 10px;
-    margin-top: 50px;
+    display: inline-block;
 }
 
 .stat_sidebar_view {
@@ -93,36 +92,6 @@
 .reject {
     stroke: gainsboro;
     stroke-opacity: .2;
-}
-
-.GENDER {
-    stroke: #873600;
-    // stroke-opacity: .2;
-}
-
-.TOBACCO {
-    stroke: #1B4F72;
-    //  stroke-opacity: .5;
-}
-
-.ALCOHOL {
-    stroke: #633974;
-    //  stroke-opacity: .5;
-}
-
-.DRUG_USER {
-    stroke: #1D8348;
-    // stroke-opacity: .3;
-}
-
-.MARITAL_STATUS {
-    stroke: #7D6608;
-    // stroke-opacity: .3;
-}
-
-.RACE {
-    stroke: #7D6608;
-    // stroke-opacity: .3;
 }
 
 .parent {
