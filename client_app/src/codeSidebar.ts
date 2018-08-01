@@ -105,7 +105,6 @@ export class CodeSidebar {
                     for(let p in this.dictionary[prop]){
                       // 
                         if(this.dictionary[prop][p].includes(+value)){
-                            
                             let order = {'key': p, 'value': value, 'parent': prop};
                             this.drawOrderSearchBar([order]);
                         }
@@ -118,11 +117,8 @@ export class CodeSidebar {
   
         let totalPatients = cohort.length;
         let mapped = cohort.map(pat  => {return +pat.value.length});
- 
         let maxValue = max(mapped);
-
         let x = scaleLinear().domain([0, +maxValue]).nice();
-
         let bins = histogram()
         .domain([0, +maxValue])
         .thresholds(x.ticks(40))
@@ -131,7 +127,6 @@ export class CodeSidebar {
           totalPatients -= d.length;
           return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
         });
-  
         return histogramData;
     }
 
@@ -279,12 +274,8 @@ export class CodeSidebar {
 
     private drawOrderFilterBox (div) {
     let orderpanel = div.classed('panel', true).classed('panel-default', true);
-    let scorehead = orderpanel.append('div').classed('panel-heading', true)
-    scorehead.append('text').text('Order Filters');
-
-    let panelbody = orderpanel.append('div').classed('panel-body', true);
-
-    const form = panelbody.append('form');
+  
+    const form = div.append('form');
 
     let ordersearch = form.append('div').classed('input-group', true);
 
@@ -311,6 +302,8 @@ export class CodeSidebar {
                     this.searchDictionary(value, 'code');
                 }
     });
+
+    div.append('div').classed('orderDiv', true);
 
 }
     private drawOrderSearchBar(order){
@@ -384,7 +377,6 @@ export class CodeSidebar {
 }
 
     private DrawfilterDescriptionBox(cohort){
-
 
 
         let filter = cohort.filterArray.filter(d=> {return d[0] != 'Branch'});

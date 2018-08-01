@@ -15,8 +15,66 @@ ul {
 #cohortDiv {
     width: 250;
     min-height: 200;
-    //  border: .5px solid rgb(121, 107, 107);
-    //  border-radius: 2px;
+}
+
+#cohortSideBar,
+#filterSideBar {
+    height: 100%;
+    width: 250px;
+    //position: fixed;
+    position: relative;
+    background-color: #EAECEE;
+    padding-top: 35px;
+    display: inline;
+    float: left;
+    border-color: #566573;
+    border-width: 2px;
+}
+
+#filterSideBar {
+    overflow: auto;
+}
+
+#cohortSideBar .panel-head,
+#filterSideBar .panel-head {
+    width: 100%;
+    height: 50px;
+    background-color: #566573;
+    text-align: center;
+    padding-top: 10px;
+    color: #EAECEE;
+}
+
+#cohortSideBar .panel-head div,
+#filterSideBar .panel-head div {
+    display: inline-block;
+    float: left;
+    padding-left: 20px;
+}
+
+#cohortSideBar .panel-body {
+    padding: 0px;
+}
+
+#cohortSideBar .panel-default {
+    padding: 0px;
+    width: 240px;
+    margin: 0px;
+}
+
+#cohort_control .panel-head input {
+    //  margin: auto;
+}
+
+#cohort_control .cohorts {
+    height: 30px;
+    background-color: aliceblue;
+    width: 100%;
+}
+
+.filter_stage_svg {
+    height: 20px;
+    width: 235px;
 }
 
 #cohortKeeper {
@@ -32,13 +90,12 @@ ul {
     display: inline-block;
 }
 
-.selected {
-    // padding: 2px;
-    //  color: #E67E22;
-    // border: #E67E22;
-    //  background-color: #E67E22;
-    //  opacity: .8;
-    // border-radius: 2px;
+rect.score,
+rect.demographic,
+rect.start,
+rect.CPT {
+    fill: gray;
+    opacity: .5;
 }
 
 .branch svg {
@@ -51,6 +108,68 @@ ul {
     display: inline;
     height: 20px;
     width: 50px;
+}
+
+.brush .extent {
+    fill-opacity: .02;
+    shape-rendering: crispEdges;
+}
+
+svg.cohortKeeper {
+    width: 250px;
+}
+
+.x rect {
+    rx: 5;
+    ry: 5;
+}
+
+.x :hover {
+    cursor: pointer;
+}
+
+.c-0 rect {
+    fill: #ff4e50;
+    width: 250px;
+    opacity: .5;
+}
+
+.c-0 text.x,
+rect.choice.c-0 {
+    fill: #ff4e50;
+}
+
+.c-1 rect {
+    fill: #f9d62e;
+    width: 250px;
+    opacity: .5;
+}
+
+.c-1 text.x,
+rect.choice.c-1 {
+    fill: #f9d62e;
+}
+
+.c-2 rect {
+    fill: #8ec127;
+    width: 250px;
+    opacity: .5;
+}
+
+.c-2 text.x,
+rect.choice.c-2 {
+    fill: #8ec127;
+}
+
+.c-3 rect {
+    fill: #83d0c9;
+    width: 250px;
+    opacity: .5;
+}
+
+.c-3 text.x,
+rect.choice.c-3 {
+    fill: #83d0c9;
 }
 
 .center {
@@ -73,8 +192,37 @@ ul {
     padding-top: 2px;
 }
 
+.cohortSvg .events circle,
+.cohortSvg .branch-events circle {
+    fill: white;
+}
+
+.choice :hover {
+    cursor: pointer;
+}
+
+.cohortSvg .node-links {
+    fill: none;
+    stroke: white;
+    stroke-width: 1px;
+}
+
 .compare-toggle .btn-group {
     width: 100%;
+}
+
+.demoBand svg {
+    width: 200px;
+    height: 80px;
+}
+
+.demoBand .filter-bars {
+    fill: rgb(190, 190, 190);
+}
+
+.demoBand rect.choice {
+    //  fill: #F39C12;
+    opacity: .7;
 }
 
 .sideBar ul {
@@ -101,6 +249,18 @@ ul {
     //  margin-top: 15px;
 }
 
+.lastChild circle {
+    r: 10px;
+    // fill: #E67E22;
+    cursor: pointer;
+}
+
+.lastChild text {
+    margin-top: 5px;
+    // fill: #E67E22;
+    cursor: pointer;
+}
+
 .layers {
     height: 35px;
     width: 100%;
@@ -115,39 +275,39 @@ ul {
 }
 
 .layer-0 rect {
-    fill: #2874A6;
+    fill: #ff4e50;
 }
 
 .layer-0 rect.clear {
     fill: white;
-    stroke: #2874A6;
+    stroke: #ff4e50;
 }
 
 .layer-1 rect {
-    fill: rgb(193, 109, 218);
+    fill: #f9d62e;
 }
 
 .layer-1 rect.clear {
     fill: white;
-    stroke: rgb(193, 109, 218);
+    stroke: #f9d62e;
 }
 
 .layer-2 rect {
-    fill: rgb(156, 223, 130);
+    fill: #8ec127;
 }
 
 .layer-2 rect.clear {
     fill: white;
-    stroke: rgb(156, 223, 130);
+    stroke: #8ec127;
 }
 
 .layer-3 rect {
-    fill: rgb(109, 174, 218);
+    fill: #83d0c9;
 }
 
 .layer-3 svg rect.clear {
     fill: white;
-    stroke: rgb(109, 174, 218);
+    stroke: #83d0c9;
 }
 
 .distDetail_svg {
@@ -182,6 +342,15 @@ ul {
 .eye {
     width: 20px;
     height: 15px;
+}
+
+g.selected rect {
+    opacity: 1;
+}
+
+g.selected text {
+    color: white;
+    fill: white;
 }
 
 .cohort-label.selected div {
