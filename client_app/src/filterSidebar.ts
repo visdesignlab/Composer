@@ -52,6 +52,7 @@ export class FilterSideBar {
   codePanel;
   private demoFilterKeeper;
   private oldClass;
+  FilterData;
 
   private header = [
     {'key': 'PAT_ETHNICITY', 'label': 'Ethnicity', 'value': ['W', 'H' ]},
@@ -79,6 +80,9 @@ export class FilterSideBar {
     this.comparisonArray = [];
     this.demoPanel;
     this.demoFilterKeeper;
+    this.bmiBrush = brushX().extent([[0, 0], [180, 50]]).handleSize(2);
+    this.cciBrush = brushX().extent([[0, 0], [180, 50]]).handleSize(2);
+    this.ageBrush = brushX().extent([[0, 0], [180, 50]]).handleSize(2);
 
     this.dictionary = new dict.CPTDictionary().codeDict;
 
@@ -98,19 +102,31 @@ export class FilterSideBar {
         this.populationDemo = item;
         this.distribute(item).then(header => {
             header.forEach(data => {
-                this.drawBandTest(data, 'demoPanel');
+                this.drawBandTest(data, 'demoPanel', null);
             });
         });
     });
 
     events.on('update_chart', (evt, item)=> {
      if(item){ 
+         console.log(item.filterArray);
+         let cohortFilters = item.filterArray;
+
+       // select(document.getElementById('demoPanel')).select('.panel-body').selectAll('*').remove();
+        this.FilterData.forEach(data => {
+          //  this.drawBandTest(data, 'demoPanel', cohortFilters);
+        });
 
         let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('rect');
          if(this.oldClass){
             classGroup.classed(this.oldClass, false);
          }
 
+        let test = this.demoPanel.select('.BMI-BRUSH');
+        console.log(test);
+     //   test.call(this.bmiBrush.move, null)
+        console.log(this.bmiBrush);
+       
         let cohortClass = 'c-' + (item.flatIndex);
         classGroup.classed(cohortClass, true);
         this.oldClass = cohortClass;
@@ -395,13 +411,15 @@ export class FilterSideBar {
        // 'scale': this.xScale.domain([0, binBMI[0].binCount])
     
        let distData = [
-        {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, 90]).range([0, 180]), domain: [0, +binBMI[0].binCount], type: 'quant'},
-        {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount], type: 'quant'},
-        {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, 100]).range([0, 180]), domain: [0, +binAGE[0].binCount], type: 'quant'},
-        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: alcDomain, type: 'qual' },
-        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), domain: drugDomain, type: 'qual' },
-        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scalePoint().domain(["Quit", "Yes", "", "Never", "Not Asked", "Passive"]).range([0, 180]), domain: tobDomain, type: 'qual' }
+        {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, 90]).range([0, 180]), domain: [0, +binBMI[0].binCount], brush:this.bmiBrush, type: 'quant'},
+        {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount], brush:this.cciBrush, type: 'quant'},
+        {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, 100]).range([0, 180]), domain: [0, +binAGE[0].binCount], brush:this.ageBrush, type: 'quant'},
+        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), brush: null, domain: alcDomain, type: 'qual' },
+        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), brush: null, domain: drugDomain, type: 'qual' },
+        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scalePoint().domain(["Quit", "Yes", "", "Never", "Not Asked", "Passive"]).range([0, 180]), brush: null, domain: tobDomain, type: 'qual' }
         ];
+
+        this.FilterData = distData;
     
         return distData;
 
@@ -435,7 +453,7 @@ export class FilterSideBar {
                   });
     }
 
-    private async drawBandTest(data, id){
+    private async drawBandTest(data, id, cohortFilters){
   
         let bandWidth = 180;
        
@@ -444,9 +462,13 @@ export class FilterSideBar {
         let key = data.key;
         let scale = data.scale;
         let value = data.value;
-        console.log(value);
-        let brush;
-      
+        let quantBrush = data.brush;
+        let chosen = null;
+
+        if(cohortFilters != null){
+           chosen = cohortFilters.filter(d=> d.filter == data.key);
+        }
+     
         let maxVal = max(value.map(d=> +d.frequency));
  
         let distScale = scaleLinear().domain([0, +maxVal]).range([0, 50]);
@@ -476,13 +498,9 @@ export class FilterSideBar {
 
        axis.call(xAxis);
 
-       let quantBrush = brushX()
-       .extent([[0, 0], [bandWidth, 50]])
-       .handleSize(2);
-
        if(data.type == 'quant'){
 
-           brush = bandSvg.append('g').attr('class', data.key + '-BRUSH').attr('transform', 'translate(5, 0)');
+           let brush = bandSvg.append('g').attr('class', data.key + '-BRUSH').attr('transform', 'translate(5, 0)');
 
            quantBrush
            .on("end", () => {
@@ -504,6 +522,12 @@ export class FilterSideBar {
           });
 
            brush.call(quantBrush);
+
+           if(chosen != null){
+               console.log(chosen.value);
+               brush.call(quantBrush.move, chosen.value);
+           }
+          
 
            
        }else{

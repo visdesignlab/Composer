@@ -117,11 +117,8 @@ export class CodeSidebar {
   
         let totalPatients = cohort.length;
         let mapped = cohort.map(pat  => {return +pat.value.length});
- 
         let maxValue = max(mapped);
-
         let x = scaleLinear().domain([0, +maxValue]).nice();
-
         let bins = histogram()
         .domain([0, +maxValue])
         .thresholds(x.ticks(40))
@@ -130,7 +127,6 @@ export class CodeSidebar {
           totalPatients -= d.length;
           return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
         });
-  
         return histogramData;
     }
 

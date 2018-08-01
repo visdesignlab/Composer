@@ -177,6 +177,7 @@ export class DataManager {
              let cpt = item[0].cpt;
              let filters = item[1];
              console.log(filters);
+             console.log('is this filtering?');
              if(filters[0].length > 1){
                 let temp = [];
                 filters.forEach(fil => {
