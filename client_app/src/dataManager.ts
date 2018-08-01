@@ -93,7 +93,6 @@ export class DataManager {
           });
 //this is for loading the data in don't delete this
        
-
         events.on('update_cohort_start', (evt, item)=> {
             let codes = item[0];
             let promis = item[1].promis;
@@ -810,6 +809,9 @@ private async dataFilter(filters, demoObjects, CPT) {
           
             return res;
        }
+       console.log(selectedIdArray);
+       console.log(objects);
+       
        if(obType == 'promis') { 
             let res = objects.filter((f) => selectedIdArray.includes(+f.key));
             return res;
