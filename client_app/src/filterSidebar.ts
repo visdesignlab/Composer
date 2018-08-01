@@ -109,23 +109,24 @@ export class FilterSideBar {
 
     events.on('update_chart', (evt, item)=> {
      if(item){ 
-         console.log(item.filterArray);
-         let cohortFilters = item.filterArray;
-
-       // select(document.getElementById('demoPanel')).select('.panel-body').selectAll('*').remove();
-        this.FilterData.forEach(data => {
-          //  this.drawBandTest(data, 'demoPanel', cohortFilters);
-        });
+        console.log(item.filterArray);
+        let cohortFilters = item.filterArray;
 
         let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('rect');
          if(this.oldClass){
             classGroup.classed(this.oldClass, false);
          }
 
-        let test = this.demoPanel.select('.BMI-BRUSH');
-        console.log(test);
-     //   test.call(this.bmiBrush.move, null)
-        console.log(this.bmiBrush);
+        let bmi = this.demoPanel.select('.BMI-BRUSH');
+        let cci = this.demoPanel.select('.CCI-BRUSH');
+        let age = this.demoPanel.select('.AGE-BRUSH');
+
+        console.log(this.demoPanel.selectAll('rect'))
+        this.demoPanel.selectAll('.filterBars').classed('choice', true);
+   
+        bmi.call(this.bmiBrush.move, null);
+        cci.call(this.cciBrush.move, null);
+        age.call(this.ageBrush.move, null);
        
         let cohortClass = 'c-' + (item.flatIndex);
         classGroup.classed(cohortClass, true);
@@ -162,8 +163,6 @@ export class FilterSideBar {
       let button = cohorthead.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true);
       button.append('text').text('+');
 
-    
-
       button.attr('margin-left', 10);
 
       button.on('click', function(d){ 
@@ -182,119 +181,6 @@ export class FilterSideBar {
       return cohortBody;
 
     }
-
-    private buildDemoFilter(div) {
-
-      // this.filters = [];
-       this.bmiRange = null;
-       this.cciRange = null;
-       this.ageRange = null;
-       
-       let parents = [];
-       let that = this;
-   
-       let demopanel = div.classed('panel', true).classed('panel-default', true);
-       let scorehead = demopanel.append('div').classed('panel-heading', true);
-       scorehead.append('text').text('Demographic Filters');
-   
-       let demobody = demopanel.append('div').classed('panel-body', true);
-   
-       this.demoform = demobody.append('form');
-   
-       let labels = this.demoform.append('div').classed('labelWrapper', true).selectAll('.labelDiv')
-           .data(this.header);
-   
-       let distLabel = this.demoform.append('div').classed('distributionWrapper', true);
-    
-       let labelsEnter = labels
-           .enter()
-           .append('div').classed('labelDiv', true);
-   
-       labels.exit().remove();
-   
-       labels = labelsEnter.merge(labels);
-   
-       let ul = labels.append('ul')
-           .attr('value', (d=>d.key));
-   
-           let popRects = labels.append('svg').attr('width', 150).attr('height', 16).attr('id', d=>d.key);
-           popRects.append('rect').attr('width', 0).attr('height', 16).attr('fill', '#AEB6BF');
-           popRects.append('text').attr('fill', '#AEB6BF');
-   
-           popRects.classed('hidden', true);
-   
-           let headerLabel = ul.append('label')
-           .text(function(d) {return d.label;}).attr('value', (d=>d.key));
-   
-           let listlabel = ul.selectAll('li').data((d) => {
-             if(d.value != null) {return d.value};
-            });
-           
-           let listlabelEnter = listlabel.enter().append('li');
-   
-           listlabel.exit().remove();
-   
-           listlabel = listlabelEnter.merge(listlabel);
-           
-           listlabel.text((d) => d);
-           ul.selectAll('li').attr('value', ((d) => d));
-           ul.selectAll('li').classed('hidden', true);
-   
-           headerLabel.on('click', function(d){
-          
-            let svgLabel = (this.parentNode.parentNode).querySelector('svg');
-            let children = (this.parentNode).querySelectorAll('li');
-            children.forEach(element => {
-              if(element.classList.contains('hidden')) {
-               element.classList.remove('hidden');
-               svgLabel.classList.remove('hidden');
-              }else{
-               element.classList.add('hidden');
-               svgLabel.classList.add('hidden');
-              }
-              
-            });
-           });
-   
-           listlabel.insert('input').attr('type', 'checkbox').attr('value', (d=>d));
-   
-           let liHover = ul.selectAll('li');
-           
-           liHover.on('mouseover', function(d){
-             let parentValue = this.parentNode.attributes[0].value;
-       
-             events.fire('checkbox_hover', [parentValue, d]);
-           });
-           liHover.on('mouseout', function(d){
-        
-             select(this.parentNode.parentNode).select('rect').attr('width', 0);
-             select(this.parentNode.parentNode).select('text').text(' ');
-          
-           });
-       
-           listlabel.on('click', function(d){
-   
-             let choice = d;
-   
-             let parentValue = this.parentNode.attributes[0].value;
-             let parental = this.parentNode;
-             if(parental.classList.contains('parent')) {
-               parental.classList.remove('parent');
-              }else { parental.classList.add('parent'); }
-   
-             parents.push(parental);
-   
-             let lines = select('#plotGroup').selectAll('path');
-             let filterGroup = lines.filter(d => d[parentValue] == choice);
-   
-             filterGroup.classed(parentValue, true);
-           });
-           this.demoform.append('div').append('input').attr('type', 'button')
-           .classed('btn', true).classed('btn-primary', true)
-           .attr('value', 'Filter by Demographic').on('click', ()=> {
-           //  that.filterDemo('demo_refine');
-           });
-     }
 
     private drawOrderFilterBox (div) {
         let orderpanel = div.classed('panel', true).classed('panel-default', true);
@@ -406,10 +292,6 @@ export class FilterSideBar {
         let binDRUG = await this.frequencyMapper(mappedDrug, 'DRUG_USER');
         let binTOB = await this.frequencyMapper(mappedTOB, 'TOBACCO');
 
-     
-    
-       // 'scale': this.xScale.domain([0, binBMI[0].binCount])
-    
        let distData = [
         {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, 90]).range([0, 180]), domain: [0, +binBMI[0].binCount], brush:this.bmiBrush, type: 'quant'},
         {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount], brush:this.cciBrush, type: 'quant'},
@@ -467,6 +349,7 @@ export class FilterSideBar {
 
         if(cohortFilters != null){
            chosen = cohortFilters.filter(d=> d.filter == data.key);
+           console.log(chosen);
         }
      
         let maxVal = max(value.map(d=> +d.frequency));
@@ -498,6 +381,8 @@ export class FilterSideBar {
 
        axis.call(xAxis);
 
+       rects.classed('choice', true);
+
        if(data.type == 'quant'){
 
            let brush = bandSvg.append('g').attr('class', data.key + '-BRUSH').attr('transform', 'translate(5, 0)');
@@ -505,8 +390,8 @@ export class FilterSideBar {
            quantBrush
            .on("end", () => {
                if(event.selection == null){
-            
-                events.fire('demo_filter_change', [data.key, null]);
+                console.log('brush null!');
+                events.fire('demo_filter_change', {parent: data.key, choice: null});
                }else{
                 let start = scale.invert(event.selection[0]);
                 let end = scale.invert(event.selection[1]);
@@ -522,14 +407,7 @@ export class FilterSideBar {
           });
 
            brush.call(quantBrush);
-
-           if(chosen != null){
-               console.log(chosen.value);
-               brush.call(quantBrush.move, chosen.value);
-           }
-          
-
-           
+ 
        }else{
         bandSvg.attr('height', 150);
         
@@ -538,8 +416,6 @@ export class FilterSideBar {
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
             .attr("transform", "rotate(-50)" );
-
-        rects.classed('choice', true);
 
         let rectArray = rects.nodes();
 
