@@ -409,6 +409,18 @@ export class CohortSideBar {
       let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
       text.append('text').text((d, i)=> { return (i + 1) + ': '});
 
+      let xGroup = barSvg.append('g').classed('x', true);
+      
+      xGroup.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
+      
+      let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
+      xGroup.attr('transform', (d, i)=> 'translate(205, 0)');
+
+      xGroup.on('click', function(d, i){
+       console.log(d);
+        events.fire('remove_filter', d);
+      });
+
       let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
 
       function classRect(d){

@@ -29,6 +29,9 @@ ul {
     float: left;
     border-color: #566573;
     border-width: 2px;
+}
+
+#filterSideBar {
     overflow: auto;
 }
 
@@ -53,6 +56,12 @@ ul {
     padding: 0px;
 }
 
+#cohortSideBar .panel-default {
+    padding: 0px;
+    width: 240px;
+    margin: 0px;
+}
+
 #cohort_control .panel-head input {
     //  margin: auto;
 }
@@ -61,6 +70,11 @@ ul {
     height: 30px;
     background-color: aliceblue;
     width: 100%;
+}
+
+.filter_stage_svg {
+    height: 20px;
+    width: 235px;
 }
 
 #cohortKeeper {

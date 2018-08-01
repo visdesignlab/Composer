@@ -174,8 +174,6 @@ export class PlotKeeper {
 
                 if(this.layerBool){
 
-                    console.log(this.cohortData);
-                  //  this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, this.selectedCohort.cohortIndex);
                 }else{
                     this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
                 }
