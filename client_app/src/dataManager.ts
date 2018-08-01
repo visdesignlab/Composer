@@ -131,26 +131,11 @@ export class DataManager {
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
+
             this.filterByPromisCount(item[0].promis, item[1]).then(d=> {
                 events.fire('filtered_by_count', d);
             });
         });
-
-        events.on('filter_by_cpt', (evt, item)=> {
- 
-            let cpt = item[2].cpt;
-            let promis = item[2].promis;
-
-            this.searchByEvent(cpt, item[0]).then((d)=> {
-                let order = item;
-                this.getCohortIdArrayAfterMap(d[0], 'cpt').then(id=> this.filterObjectByArray(id, promis, 'promis').then(ob=> {
-                        events.fire('filter_cohort_by_event', [cpt, ob, order]);
-                   })
-                );
-               
-            });
-        });
-
 
          events.on('filter_data', (evt, item)=> {
     
@@ -158,8 +143,6 @@ export class DataManager {
              let cpt = item[0].cpt;
              let filters = item[1];
 
-             console.log(item);
-   
              if(filters[0].length > 1){
                 let temp = [];
                 filters.forEach(fil => {
@@ -169,11 +152,12 @@ export class DataManager {
                 });
                 filters = temp;
              }
-             this.dataFilter(filters, this.totalDemoObjects, cpt).then(ids=> {
-           
+             this.dataFilter(filters, this.totalDemoObjects, cpt, promis).then(ids=> {
+                console.log(ids);
                 this.filterObjectByArray(ids, promis, 'promis').then(pro => {
                     this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
                         events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered, item[2]]);
+                        events.fire('data_filtered', [filters, pro, cptFiltered, item[2]]);
                     });
                 });
              });
@@ -218,9 +202,7 @@ export class DataManager {
     private async loadPromisData(cohortIDs){
 
         let promis;
-
         await this.loadData('PROMIS_Scores').then((d)=>  this.getDataObjects('pro_object', d).then(ob=> (this.mapPromisScores(null, ob).then(prom=> promis = prom))));
-
         return promis;
     }
 
@@ -262,7 +244,7 @@ export class DataManager {
     
 //pulled from parallel coord
 //this hapens when demo button it pushed
-private async dataFilter(filters, demoObjects, CPT) {
+private async dataFilter(filters, demoObjects, CPT, promis) {
 
     let demo = JSON.parse(JSON.stringify(demoObjects));
     let cpt = JSON.parse(JSON.stringify(CPT));
@@ -272,8 +254,6 @@ private async dataFilter(filters, demoObjects, CPT) {
     filters = filters.filter(fil=> fil.type != 'Start' && fil.filter != undefined);
     //use map to loop through each filter, changing demo value;
     let test = await filters.map(d=> {
-        console.log(d);
-        console.log(demo);
         if(d.type == 'CPT'){
             that.searchByEvent(cpt, d.value).then((c)=> {
                 let ids = c[1].map(id=> id.key);
@@ -295,18 +275,20 @@ private async dataFilter(filters, demoObjects, CPT) {
                     return demo;
                 }
             }
-        }else{ console.log('SCORE FILTER'); }
+        }else{ 
+            let ids = demo.map(dem=> dem.ID);
+            promis = promis.filter(p=> ids.indexOf(p.key) > -1 && p.value.length > d.value );
+            let pIndex = promis.map(p=> p.key);
+            demo = demo.filter(f=> pIndex.indexOf(f.ID) > -1);
+            console.log(demo);
+         }
         return demo;
     });
-    console.log(test);
-      
-   // });
-
-   
+ 
 
     cohortIds = demo.map(id=> id.ID);
     return cohortIds;
-  //  return cohortIds;
+
 }
 
     private async filterByPromisCount(cohort, count) {
@@ -738,8 +720,6 @@ private async dataFilter(filters, demoObjects, CPT) {
             });
 
         const self = this;
-
-
               // ----- add diff days to the data
         let filteredOrders = [];
 
@@ -815,8 +795,6 @@ private async dataFilter(filters, demoObjects, CPT) {
           
             return res;
        }
-       console.log(selectedIdArray);
-       console.log(objects);
 
        if(obType == 'promis') { 
             let res = objects.filter((f) => selectedIdArray.includes(+f.key));

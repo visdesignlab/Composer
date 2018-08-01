@@ -447,8 +447,8 @@ export class CohortManager {
           
         });
 
-        events.on('promis_from_demo_refiltered', (evt, item)=> {
-
+        events.on('data_filtered', (evt, item)=> {
+            console.log(item);
             let filters = item[0];
             let promis = item[1];
             let cpt = item[2];
@@ -463,7 +463,6 @@ export class CohortManager {
                     this.selectedCohort.filterArray[testIndex].count = item[1].length;
                     testIndex++;
                 }
-            
             }else{
             console.log('not found!');
             }
@@ -609,8 +608,36 @@ export class CohortManager {
           });
 
         events.on('filter_by_Promis_count', (evt, item)=> {
-              events.fire('filtering_Promis_count', [this.selectedCohort, item]);
+             console.log(item);
+           //  let filterLabel = item[1][0].key;
+       
+             let filterArray = this.selectedCohort.filterArray;
+             if(filterArray[0].length > 1){
+                 let temp = [];
+                 filterArray.forEach(fil => {
+                     if(fil.length > 1){
+                         fil.forEach(f => { temp.push(f); });
+                     }else{ temp.push(fil); }
+                 });
+                 filterArray = temp;
+             }
+             if(item != null){
+                 let test = filterArray.map(d=> d.filter);
+                 let testIndex = test.indexOf(item.parent);
+         
+                 if(+testIndex > -1){
+                     this.selectedCohort.filterArray = filterArray;
+                     this.selectedCohort.filterArray[testIndex].value = item;
+               
+                 }else{
+                     let filterReq = {filter: 'Score Count', type: 'Score', value: item, count: null }
+                     this.selectedCohort.filterArray.push(filterReq);
+                 }
+                }
+                 events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, 'Score Count']);
+          
           });
+
         events.on('cohort_interpolated', (evt, item)=> {
     
             if(this.branchSelected == null){
