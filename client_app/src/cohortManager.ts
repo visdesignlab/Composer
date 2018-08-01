@@ -259,11 +259,36 @@ export class CohortManager {
             });
 
          events.on('cpt_filter_button', (evt, item)=> {
-
-            let fixed = item[0];
-            let cptFilterArray = item[1];
+   
+            let filterLabel = item[1][0].key;
+       
+            let filterArray = this.selectedCohort.filterArray;
+            if(filterArray[0].length > 1){
+                let temp = [];
+                filterArray.forEach(fil => {
+                    if(fil.length > 1){
+                        fil.forEach(f => { temp.push(f); });
+                    }else{ temp.push(fil); }
+                });
+                filterArray = temp;
+            }
+            if(item != null){
+                let test = filterArray.map(d=> d.filter);
+                let testIndex = test.indexOf(item.parent);
+        
+                if(+testIndex > -1){
+                    this.selectedCohort.filterArray = filterArray;
+                    this.selectedCohort.filterArray[testIndex].value = item[0];
+              
+                }else{
+                    let filterReq = { filter: filterLabel, type: 'CPT', value: item[0], count: null };
+                    this.selectedCohort.filterArray.push(filterReq);
+                }
+                events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, filterLabel]);
+            }
              
-            events.fire('filter_by_cpt', [fixed, cptFilterArray, this.selectedCohort]);
+           // events.fire('filter_by_cpt', [fixed, cptFilterArray, this.selectedCohort]);
+        
 
          });
             // events.fire('filter_by_cpt', [fixed, cptFilterArray]);

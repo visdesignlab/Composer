@@ -109,7 +109,7 @@ export class FilterSideBar {
 
     events.on('update_chart', (evt, item)=> {
      if(item){ 
-        console.log(item.filterArray);
+
         let cohortFilters = item.filterArray;
 
         let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('rect');
@@ -121,7 +121,7 @@ export class FilterSideBar {
         let cci = this.demoPanel.select('.CCI-BRUSH');
         let age = this.demoPanel.select('.AGE-BRUSH');
 
-        console.log(this.demoPanel.selectAll('rect'))
+ 
         this.demoPanel.selectAll('.filterBars').classed('choice', true);
    
         bmi.call(this.bmiBrush.move, null);
@@ -349,7 +349,7 @@ export class FilterSideBar {
 
         if(cohortFilters != null){
            chosen = cohortFilters.filter(d=> d.filter == data.key);
-           console.log(chosen);
+     
         }
      
         let maxVal = max(value.map(d=> +d.frequency));
@@ -390,7 +390,7 @@ export class FilterSideBar {
            quantBrush
            .on("end", () => {
                if(event.selection == null){
-                console.log('brush null!');
+           
                 events.fire('demo_filter_change', {parent: data.key, choice: null});
                }else{
                 let start = scale.invert(event.selection[0]);

@@ -157,6 +157,8 @@ export class DataManager {
              let promis = item[0].ogPromis;
              let cpt = item[0].cpt;
              let filters = item[1];
+
+             console.log(item);
    
              if(filters[0].length > 1){
                 let temp = [];
@@ -263,44 +265,48 @@ export class DataManager {
 private async dataFilter(filters, demoObjects, CPT) {
 
     let demo = JSON.parse(JSON.stringify(demoObjects));
-    console.log(demo);
-
+    let cpt = JSON.parse(JSON.stringify(CPT));
     let cohortIds;
+    let that = this;
 
     filters = filters.filter(fil=> fil.type != 'Start' && fil.filter != undefined);
-
-    await filters.forEach( (d)=> {
+    //use map to loop through each filter, changing demo value;
+    let test = await filters.map(d=> {
         console.log(d);
-        let filter = String(d.filter);
-        let type = String(d.type);
-        let choice = d.value;
-
-        if(type == 'CPT'){
-
-            console.log('CPT FILTER');
-
-        }else if(type == 'Demographic'){
-            
-            if(filter === 'BMI' || filter === 'CCI' || filter === 'AGE'){
-                console.log(filter);
-                demo = demo.filter(f => { return +f[filter] > +choice[0] && +f[filter] < +choice[1] });
-                cohortIds = demo.map(d=> d.ID);
+        console.log(demo);
+        if(d.type == 'CPT'){
+            that.searchByEvent(cpt, d.value).then((c)=> {
+                let ids = c[1].map(id=> id.key);
+                demo = demo.filter(dem=> ids.indexOf(dem.ID) > -1);
+                console.log(demo);
+                return demo;
+            });
+        }else if(d.type == 'Demographic'){
+            if(d.filter === 'BMI' || d.filter === 'CCI' || d.filter === 'AGE'){
+                demo = demo.filter(f => { return +f[d.filter] > +d.value[0] && +f[d.filter] < +d.value[1] });
+                return demo;
             }else{
-                if (String(filter) === 'DM_CODE') { demo = demo.filter(dm => dm[filter] == choice || dm[filter] == choice + 3); 
+                if (String(d.filter) === 'DM_CODE') { 
+                    demo = demo.filter(dm => dm[d.filter] == d.value || dm[d.filter] == d.value + 3);
                 }else{
                     demo = demo.filter(de=> {
-                        if(choice.indexOf(de[filter]) > -1){ return de; }
+                        if(d.value.indexOf(de[d.filter]) > -1){ return de; }
                     });
-                    cohortIds = demo.map(d=> d.ID);
+                    return demo;
                 }
             }
-        }else{
-            console.log('SCORE FILTERSSS');
-        }
-
+        }else{ console.log('SCORE FILTER'); }
+        return demo;
     });
+    console.log(test);
+      
+   // });
 
+   
+
+    cohortIds = demo.map(id=> id.ID);
     return cohortIds;
+  //  return cohortIds;
 }
 
     private async filterByPromisCount(cohort, count) {
@@ -811,7 +817,7 @@ private async dataFilter(filters, demoObjects, CPT) {
        }
        console.log(selectedIdArray);
        console.log(objects);
-       
+
        if(obType == 'promis') { 
             let res = objects.filter((f) => selectedIdArray.includes(+f.key));
             return res;
