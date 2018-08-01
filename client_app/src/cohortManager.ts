@@ -312,6 +312,7 @@ export class CohortManager {
                 if(+testIndex > -1){
                     this.selectedCohort.filterArray = filterArray;
                     this.selectedCohort.filterArray[testIndex].value = item.choice;
+              
                 }else{
                     let filterReq = { filter: item.parent, type: 'Demographic', value: item.choice, count: null };
                     this.selectedCohort.filterArray.push(filterReq);
@@ -429,7 +430,11 @@ export class CohortManager {
             let testIndex = test.indexOf(tag);
             console.log(testIndex);
             if(testIndex > -1){
-             this.selectedCohort.filterArray[testIndex].count = item[1].length;
+                while(testIndex < this.selectedCohort.filterArray.length){
+                    this.selectedCohort.filterArray[testIndex].count = item[1].length;
+                    testIndex++;
+                }
+            
             }else{
             console.log('not found!');
             }
