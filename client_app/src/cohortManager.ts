@@ -304,20 +304,23 @@ export class CohortManager {
                     });
                     filterArray = temp;
                 }
-                let test = filterArray.map(d=> d.filter);
-                console.log(test);
-                let testIndex = test.indexOf(item.parent);
-                console.log(testIndex);
-
-                if(+testIndex > -1){
-                    this.selectedCohort.filterArray = filterArray;
-                    this.selectedCohort.filterArray[testIndex].value = item.choice;
-              
-                }else{
-                    let filterReq = { filter: item.parent, type: 'Demographic', value: item.choice, count: null };
-                    this.selectedCohort.filterArray.push(filterReq);
+                if(item.choice != null){
+                    let test = filterArray.map(d=> d.filter);
+                    console.log(test);
+                    let testIndex = test.indexOf(item.parent);
+                    console.log(testIndex);
+    
+                    if(+testIndex > -1){
+                        this.selectedCohort.filterArray = filterArray;
+                        this.selectedCohort.filterArray[testIndex].value = item.choice;
+                  
+                    }else{
+                        let filterReq = { filter: item.parent, type: 'Demographic', value: item.choice, count: null };
+                        this.selectedCohort.filterArray.push(filterReq);
+                    }
+                    events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, item.parent]);
                 }
-                events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, item.parent]);
+              
 
             });
 
