@@ -188,6 +188,7 @@ export class CohortManager {
             treeBranch.filterArray = bfilter;
            // treeBranch.filterArray.push({  filter: 'Cohort Branched', type: 'Start', value: null, count: promis.length  });
             treeBranch.promis = b;
+            treeBranch.ogPromis = b;
             treeBranch.cpt = bcpt;
             treeBranch.cohortIndex = [this.cohortIndex, newSpot];
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
