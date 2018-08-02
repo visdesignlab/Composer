@@ -393,6 +393,7 @@ export class CohortManager {
 
         events.on('event_selected', (evt, item)=> {
             let codes = item;
+            console.log(codes);
             events.fire('update_cohort_start', [codes, this.selectedCohort]);
         });
 

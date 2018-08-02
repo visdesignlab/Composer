@@ -116,7 +116,7 @@ export class EventLine {
 
                 let startEvent = item.startEvent;
                 if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
-                    this.startEventLabel = item.startEvent[1][0].key;
+                    this.startEventLabel = item.startEvent[1];
                 }
                 
                 if(this.filter){
@@ -239,14 +239,14 @@ export class EventLine {
                         that.startCodes = null;
                         that.startEventLabel = 'First Promis Score';
                         that.drawEventButtons(that.filter);
-                        events.fire('event_selected', that.startCodes);
+                        events.fire('event_selected', [that.startCodes, that.startEventLabel]);
                         }else{
                         that.startCodes = d.value;
                       
                         let label = d.filter;
                         that.startEventLabel = label;
                         that.drawEventButtons(cohort);
-                        events.fire('event_selected', that.startCodes);
+                        events.fire('event_selected', [that.startCodes, that.startEventLabel]);
                     }
             }
 
