@@ -95,13 +95,14 @@ export class DataManager {
        
         events.on('update_cohort_start', (evt, item)=> {
             let codes = item[0];
+            console.log(item);
             let promis = item[1].promis;
             let cpt = item[1].cpt;
             
             if(item[0] == null){
                this.getDays(promis, null).then(promisShifted=> {
                 this.getBaselines(promisShifted).then(based=> {
-                    this.updateDiff(codes, cpt, promisShifted).then(cptShifted=> {  
+                    this.updateDiff(codes[0], cpt, promisShifted).then(cptShifted=> {  
                         events.fire('min_day_calculated', [based, cptShifted, codes]);
                     });
                 });
@@ -115,7 +116,7 @@ export class DataManager {
                     this.addMinDay(promis, eventStartArray).then(co=> {
                         this.getDays(co, 'days').then(promisShifted=> {
                             this.getBaselines(promisShifted).then(based=> {
-                                this.updateDiff(codes, cptFiltered[0], null).then(cptShifted=> {
+                                this.updateDiff(codes[0], cptFiltered[0], null).then(cptShifted=> {
                                     events.fire('min_day_calculated', [based, cptShifted, codes]);
                                 });
                             });
@@ -255,6 +256,7 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
     //use map to loop through each filter, changing demo value;
     let test = await filters.map(d=> {
         if(d.type == 'CPT'){
+            console.log(d);
             that.searchByEvent(cpt, d.value).then((c)=> {
                 let ids = c[1].map(id=> id.key);
                 demo = demo.filter(dem=> ids.indexOf(dem.ID) > -1);
@@ -827,6 +829,8 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
         let withQuery = [];
         let queryDate = [];
         let eventArray = [];
+        console.log(cohort);
+        console.log(value);
 
        cohort.forEach((element) => {
         let events = [];
@@ -853,7 +857,7 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
 
        if(code!= null){
 
-        code = code[0].map(c => +c);
+        code = code.map(c => +c);
         let filArray = []
         patCPT.forEach(pat => {
             let fil = pat.filter(visit=> {
