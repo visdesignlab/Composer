@@ -162,10 +162,11 @@ export class PlotKeeper {
             }
         });
 
-        events.on('change_plot_data', (evt, item)=> {
+        events.on('plot_data_changed', (evt, item)=> {
             console.log(item);
-            console.log(this.selectedCohort[item]);
-            this.drawPromisChart(this.selectedCohort[item], 'proLine', this.selectedPlot, this.selectedCohort, null);
+            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+      
+            this.drawPromisChart(item.chartData, 'proLine', this.selectedPlot, item, null);
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -198,7 +199,7 @@ export class PlotKeeper {
                 console.log('update chart??');
                }else{
                
-                  let promis = item.promis;
+                  let promis = item.chartData;
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
                   let separated = item.separated;
@@ -235,7 +236,7 @@ export class PlotKeeper {
 }
 
     private buildPlot(container, index, domain) {
-        //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
+
        return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain);
 
     }
