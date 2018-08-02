@@ -18,6 +18,7 @@ import {nest, values, keys, map, entries} from 'd3-collection';
 import * as d3 from 'd3';
 import * as dataCalc from './dataCalculations';
 import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
+import {timeParse, timeFormat} from 'd3-time-format';
 
 export class DataManager {
 
@@ -33,14 +34,16 @@ export class DataManager {
 
     //tables for all patient data
     demoTable : ITable;
-
+    promisTable : ITable;
     //defined cohort info
     cohortOrderInfo; //defined cohort 
     totalProObjects;//Promis scores as objects for cohort
     totalDemoObjects;//demo for whole population
     totalCptObjects;//CPT as objects for defined cohort
+    totalOsObjects;
     cohortIcdObjects;//ICD objects for cohort
     startDate;
+  
 
     constructor() {
         /* 
@@ -60,13 +63,26 @@ export class DataManager {
             events.fire('initial_cohort_load');
         }));
 
+        this.loadData('Total_Scores').then(d=>this.promisTable = d );
+            
+            /*
+            this.loadOswestry(d, 3).then(os=> {
+                this.totalOsObjects = os;
+                this.mapPromisScores(null, os, 3).then(mapp=> this.getDays(mapp, null).then(day=> {
+                    this.getBaselines(day).then(based=> {
+                       
+                    });
+                    console.log(day)}));
+            });*/
+     
+
         this.attachListener();
 
     }
 
+    
     private attachListener(){
 
-       // let startDateSelection = d3.select('#start_date').select('text');
         events.on('checkbox_hover', (evt, item)=> {//this is called when you click the checkboxes or hover
             let parent = item[0];
             let choice = item[1];
@@ -76,26 +92,15 @@ export class DataManager {
           });
 
         events.on('create_button_down', () => { // called in sidebar
-            let filter = [];
-                this.loadPromisData(null).then(promis=> {
-                    let ids = promis.map(p=> +p.key);
-                    this.getCPT(ids, this.totalCptObjects).then(d=> {
-                        this.mapCPT(promis, d).then(orders=> {
-                            this.getDays(promis, null).then(promisShifted=> {
-                                this.getBaselines(promisShifted).then(based=> {
-                                    events.fire('new_cohort', [based, orders, filter]);
-                                });
-                            });
-                        });
-                    });
-                });
-
+    
+                this.loadNewCohortData().then(data=> {
+                    console.log(data);
+                    events.fire('new_cohort', data)});
           });
 //this is for loading the data in don't delete this
        
         events.on('update_cohort_start', (evt, item)=> {
             let codes = item[0];
-            console.log(item);
             let promis = item[1].promis;
             let cpt = item[1].cpt;
             
@@ -132,7 +137,6 @@ export class DataManager {
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
-
             this.filterByPromisCount(item[0].promis, item[1]).then(d=> {
                 events.fire('filtered_by_count', d);
             });
@@ -154,7 +158,7 @@ export class DataManager {
                 filters = temp;
              }
              this.dataFilter(filters, this.totalDemoObjects, cpt, promis).then(ids=> {
-                console.log(ids);
+      
                 this.filterObjectByArray(ids, promis, 'promis').then(pro => {
                     this.filterObjectByArray(ids, cpt, 'cpt').then(cptFiltered => {
                         events.fire('promis_from_demo_refiltered', [filters, pro, cptFiltered, item[2]]);
@@ -185,14 +189,12 @@ export class DataManager {
                 sepBool = false;
             }
             this.selected = item[0];
-        
             this.getQuant_Separate(item[0].promis, 3, this.scoreChangeBool).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
         });
 
         events.on('update_cpt_days', (evt, item)=>{
-    
             this.updateDiff(this.targetOrder, item[0], null).then(cpt=> {
                 events.fire('cpt_updated', cpt);
             });
@@ -200,11 +202,33 @@ export class DataManager {
 
     }
 
-    private async loadPromisData(cohortIDs){
-
+    //loads, maps and calculates the day differences for cpt, promis and oswestry index.
+    private async loadNewCohortData(){
+        let promis =  await this.loadPromisData(this.promisTable, 1123);
+        let ids = promis.map(p=> +p.key);
+        let cpt = await this.getCPT(ids, this.totalCptObjects).then(d=> this.mapCPT(promis, d));
+        let basedPromis = await this.getDays(promis, null).then(promisShifted=>  this.getBaselines(promisShifted));
+        let oswestry = await this.loadPromisData(this.promisTable, 3).then(d=> this.getDays(d, null).then(shift=> this.getBaselines(shift)));
+        return [basedPromis, cpt, oswestry];
+    }
+    //takes table information and filters table. Loads objects and maps promis to key value pairs
+    private async loadPromisData(table, formID){
         let promis;
-        await this.loadData('PROMIS_Scores').then((d)=>  this.getDataObjects('pro_object', d).then(ob=> (this.mapPromisScores(null, ob).then(prom=> promis = prom))));
+        await this.loadPromisObjects(table, formID).then(ob=> (this.mapPromisScores(null, ob, formID).then(prom=> promis = prom)));
         return promis;
+    }
+    private async loadPromisObjects(dataTable: ITable, formID: any){
+        let formNum: INumericalVector;
+        dataTable.cols().forEach((vector: IAnyVector) => {
+          if (vector.desc.name === 'FORM_ID') {
+            formNum = <INumericalVector>vector;
+          }
+        });
+        const albumData = await formNum.data();
+        const indices = argFilter(albumData, (d) => d == formID);
+        const promis = list(indices).filter(await dataTable.objects());
+        const newPro = JSON.parse(JSON.stringify(promis));
+        return newPro;
     }
 
     private async addMinDay(patients, eventArray) {
@@ -256,11 +280,11 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
     //use map to loop through each filter, changing demo value;
     let test = await filters.map(d=> {
         if(d.type == 'CPT'){
-            console.log(d);
+ 
             that.searchByEvent(cpt, d.value).then((c)=> {
                 let ids = c[1].map(id=> id.key);
                 demo = demo.filter(dem=> ids.indexOf(dem.ID) > -1);
-                console.log(demo);
+
                 return demo;
             });
         }else if(d.type == 'Demographic'){
@@ -282,7 +306,7 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
             promis = promis.filter(p=> ids.indexOf(p.key) > -1 && p.value.length > d.value );
             let pIndex = promis.map(p=> p.key);
             demo = demo.filter(f=> pIndex.indexOf(f.ID) > -1);
-            console.log(demo);
+     
          }
         return demo;
     });
@@ -320,13 +344,13 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
                     let  minDate;
                     if(g.CPTtime != undefined && date != null ) {
                         minDate = this.parseTime(g.CPTtime, null);
-                      
                     }else minDate = g.min_date;
                 //these have already been parsed
                 let maxDate = g.max_date;
                             g.value.forEach((d) => {
                             try {
-                            d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                           // d.diff = Math.ceil((this.parseTime(d['ASSESSMENT_START_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                            d.diff = Math.ceil((new Date(d['ASSESSMENT_START_DTM']).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
                             maxDiff = d.diff > maxDiff ? d.diff : maxDiff;
                             }
                             catch (typeError) {
@@ -556,10 +580,10 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
        }
 
     //uses Phovea to access PROMIS data and draw table for cohort
-    private async mapPromisScores(cohortIdArray, proObjects) {
+    private async mapPromisScores(cohortIdArray, proObjects, formID) {
 
         let proObjectsFiltered = proObjects.filter((d) => {
-            return d['FORM_ID'] === 1123;
+            return d['FORM_ID'] === formID;
         });
 
         let filteredPatOrders = {};
@@ -587,8 +611,10 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
             });
 
         }
+
         let mapped =  await entries(filteredPatOrders);
         //return filteredPatOrders;
+
         let patPromis = mapped.map(d=> {
             return {
                 key: +d.key,
@@ -597,9 +623,7 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
                 max_date: this.findMaxDate(d.value)
             };
         });
-
         return patPromis;
-
      };
 
      private getAverage(selected) {

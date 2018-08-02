@@ -188,8 +188,9 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     let scoreScale = node.scoreScale;
     let svg = node.svg;
     let index = node.cohortIndex;
+    let diagram;
 
-    console.log(cohort.startEvent);
+    console.log(promis);
 
     if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
     }else{
@@ -542,11 +543,9 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
         negdiff = Math.round(negdiff / 10) * 10;
         posdiff = Math.round(posdiff / 10) * 10;
 
-        console.log(posdiff);
-        console.log(negdiff);
         //get diff of days between maxneg diff and maxpos diff
         let daydiff = posdiff - negdiff;
-        console.log(daydiff);
+
         let bincount = Math.floor(daydiff/10);
 
         cohortFiltered.forEach(pat=> {
@@ -684,7 +683,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
              let botdev2 = [];
              
             botdev.forEach(d=> {
-                console.log(d);
+    
                 let arr = [];
                 d.forEach(q=> {
                     //let val = [];
@@ -722,8 +721,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 }
                   
             });
-            console.log(data);
-            
+
             // -----  set domains and axis
             // time scale
             node.timeScale.domain([minDay, maxDay]);
@@ -809,7 +807,6 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 zeroText.attr('transform', 'translate(0,'+ i * 12 +')').classed(clump, true);
                 }
 
-                
 
 }
 
