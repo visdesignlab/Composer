@@ -984,7 +984,7 @@
         "name": "Total_Scores",
         "path": "PROMIS_SCORES_ALL.csv",
         "separator": ",",
-        "id": "Orders",
+        "id": "Total_Scores",
         "size": [51549, 7],
         "type": "table",
         "idtype": "INDEX",
@@ -997,39 +997,27 @@
             },
             {
                 "name": "VISIT_NO",
-                "value": {
-                    "type": "int"
-                }
+                "value": { "type": "int" }
             },
             {
                 "name": "ASSESSMENT_ID",
-                "value": {
-                    "type": "int"
-                }
+                "value": { "type": "int" }
             },
             {
                 "name": "ASSESSMENT_START_DTM",
-                "value": {
-                    "type": "string"
-                }
+                "value": { "type": "string" }
             },
             {
                 "name": "FORM_ID",
-                "value": {
-                    "type": "int"
-                }
+                "value": { "type": "int" }
             },
             {
                 "name": "FORM",
-                "value": {
-                    "type": "string"
-                }
+                "value": { "type": "string" }
             },
             {
                 "name": "SCORE",
-                "value": {
-                    "type": "float"
-                }
+                "value": { "type": "float" }
             }
         ]
     },

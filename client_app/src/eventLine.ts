@@ -30,6 +30,7 @@ export class EventLine {
     private filter;
     private startCodes;
     private scoreLabel;
+    private scoreType;
     private startEventLabel;
     private eventToggleLabels;
     private branchHeight;
@@ -57,11 +58,11 @@ export class EventLine {
 
     const that = this;
     this.startCodes = null;
+    this.scoreType = 'PROMIS Physical Function';
     }
 
     private attachListener() {
-          
-
+        
         events.on('enter_layer_view', ()=> {
             this.layerBool = true;
             document.getElementById('quartile-btn').classList.add('disabled');
@@ -89,8 +90,6 @@ export class EventLine {
             let cohortTree = item[0];
             let cohortIndex = item[1];
 
-        
-            
             selectAll('.selected').classed('selected', false);
 
             //need to update comparison array
@@ -111,14 +110,13 @@ export class EventLine {
         events.on('update_chart', (evt, item)=> {
 
             if(item){
-
                 this.filter = item.filterArray;
 
                 let startEvent = item.startEvent;
                 if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
                     this.startEventLabel = item.startEvent[1];
                 }
-                
+
                 if(this.filter){
                     this.drawEventButtons(item);
                 }
@@ -332,17 +330,14 @@ export class EventLine {
                     let tCheck = checkDiv.append('div');
                     tCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleT').attr('checked', true)
                     .attr('value', 'top').on('click', () => {
-
                         let p = selectAll('.top');
-                  
                         if(select("#sampleT").property('checked')){
                             p.classed('hidden', false);
                         }else{
                             p.classed('hidden', true);
                         }
-                    })
+                    });
                     tCheck.append('label').attr('for', 'sampleT').text('top').style('color', '#2874A6');
-
                     let mCheck = checkDiv.append('div')//.classed('container', true);
                     mCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleM').attr('checked', true)
                     .attr('value', 'middle').on('click', () => {
@@ -353,10 +348,8 @@ export class EventLine {
                             p.classed('hidden', true);
                         }
                     });
-                  //  mCheck.append('span').classed('checkmark', true)
-                  
+                
                     mCheck.append('label').attr('for', 'sampleM').text('middle').style('color', '#F7DC6F');
-
                     let bCheck = checkDiv.append('div');
                     bCheck.append('input').attr('type', 'checkbox').attr('name', 'sample').attr('id', 'sampleB').attr('checked', true)
                     .attr('value', 'bottom').on('click', () =>{
@@ -378,16 +371,11 @@ export class EventLine {
                     }
 
                     this.$node.selectAll("input[name='quart']").on('change', function() {
-           
                         let scoreChange = {id : this.id, scaleR: null};
-
                         if(this.id == 'quartile-radio-1'){ scoreChange.scaleR = true;
                         }else{ scoreChange.scaleR = false; }
-             
                         that.scoreChangeBool = this.id;
-              
                         events.fire('change_sep_bool', scoreChange);
-
                     });
 
                     if(!separated){  
@@ -403,8 +391,25 @@ export class EventLine {
 
                     let layer = div.append('input').attr('type', 'button').attr('id', 'layerButton').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Layer View');
                     layer.on('click', function(d){ events.fire('layer_button_down'); });
-                 
 
+                    let changePanel = div.append('div').classed('changePlot', true);
+                    
+                    let changeToggle = changePanel.append('div').classed('btn-group', true);
+                    changeToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                            .append('text').text(this.scoreType);
+        
+                    let changeTogglebutton = changeToggle.append('button')
+                                                .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                                .classed('dropdown-toggle', true)
+                                                .attr('data-toggle', 'dropdown');
+            
+                    changeTogglebutton.append('span').classed('caret', true);
+            
+                                let cul = changeToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+                                let c1 = cul.append('li').attr('class', 'choice').append('text').text('PROMIS Physical Function');
+                                c1.on('click', ()=> events.fire('change_plot_data', 'promis'));
+                                let c2 = cul.append('li').attr('class', 'choice').append('text').text('Oswestry').attr('value', 'oswestry');
+                                c2.on('click', ()=> events.fire('change_plot_data', 'oswestry'));
             }
 
     private async flattenCohort(cohort) {

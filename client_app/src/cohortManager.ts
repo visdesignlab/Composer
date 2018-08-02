@@ -18,8 +18,10 @@ class Cohort {
         parentIndex: any;
         flatIndex: any;
         ogPromis: any;
-        promis: any;
-        cpt: any;
+        promis: any[];
+        chartData: Object[];
+        cpt: any[];
+        oswestry: any[];
         filterArray: any;
         promisSep: any;
         promisAgg: any;
@@ -156,18 +158,18 @@ export class CohortManager {
 
             let branch;
             if(this.cohortTree[this.cohortIndex].branches.length == 0){
-              
                 branch = [];
             }else{ 
                 branch = this.cohortTree[this.cohortIndex].branches;
-            
             }
 
             let promis = this.selectedCohort.promis;
             let cpt = this.selectedCohort.cpt;
+            let oswestry = this.selectedCohort.oswestry;
             let filterArray = this.selectedCohort.filterArray;
          
             let bcpt = JSON.parse(JSON.stringify(cpt));
+            let bos = JSON.parse(JSON.stringify(oswestry));
             let bfilter = Object.assign([], this.cohortTree[this.cohortIndex].filterArray);
             let b = JSON.parse(JSON.stringify(promis));
       
@@ -190,6 +192,7 @@ export class CohortManager {
             treeBranch.promis = b;
             treeBranch.ogPromis = b;
             treeBranch.cpt = bcpt;
+            treeBranch.oswestry = bos;
             treeBranch.cohortIndex = [this.cohortIndex, newSpot];
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
             this.counter++;
@@ -358,42 +361,20 @@ export class CohortManager {
                 }
                 if(item.choice != null){
                     let test = filterArray.map(d=> d.filter);
-                    console.log(test);
                     let testIndex = test.indexOf(item.parent);
-                    console.log(testIndex);
-    
                     if(+testIndex > -1){
                         this.selectedCohort.filterArray = filterArray;
                         this.selectedCohort.filterArray[testIndex].value = item.choice;
-                  
                     }else{
                         let filterReq = { filter: item.parent, type: 'Demographic', value: item.choice, count: null };
                         this.selectedCohort.filterArray.push(filterReq);
                     }
                     events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, item.parent]);
                 }
-            
             });
-
-
-//fired in sidebar. send the filter information to refine the sidebar
-/*
-        events.on('demo_refine', (evt, item)=> {
-     
-            let filters = item;
-            if(this.branchSelected == null){
-                events.fire('get_selected_demo', [filters, this.cohortTree[this.cohortIndex]]);
-            }else{
-                let index = this.branchSelected[0];
-                let branchIndex = this.branchSelected[1];
-                events.fire('get_selected_demo', [filters, this.cohortTree[index].branches[branchIndex]]);
-            }
-
-        });*/
 
         events.on('event_selected', (evt, item)=> {
             let codes = item;
-            console.log(codes);
             events.fire('update_cohort_start', [codes, this.selectedCohort]);
         });
 
@@ -430,8 +411,9 @@ export class CohortManager {
         events.on('new_cohort', (evt, item)=> {
 
             let promis = item[0];
-
-           // let filterReq = ['demographic', item[2], item[0].length];
+            let cpt = item[1];
+            let oswestry = item[2];
+        
             let filterReq = { filter: 'All Patients', type: 'Start', value: null, count: item[1].length };
 
             let newParent = new Cohort();
@@ -442,6 +424,7 @@ export class CohortManager {
             newParent.cpt = item[1];
             newParent.promis = promis;
             newParent.ogPromis = promis;
+            newParent.oswestry = oswestry;
             newParent.cohortIndex = this.cohortTree.length;
             this.cohortIndex = this.cohortTree.length;
 
@@ -453,6 +436,7 @@ export class CohortManager {
             
             this.counter++;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
+            console.log(this.selectedCohort);
          
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
@@ -461,21 +445,21 @@ export class CohortManager {
         });
 
         events.on('data_filtered', (evt, item)=> {
-            console.log(item);
+      
             let filters = item[0];
             let promis = item[1];
             let cpt = item[2];
             let tag = item[3];
 
             let test = this.selectedCohort.filterArray.map(d=> d.filter);
-            console.log(test);
+       
             let testIndex;
             if(tag == null){
                 testIndex = filters.length - 1;
             }else{
                 testIndex = test.indexOf(tag);
             } 
-            console.log(testIndex);
+     
             if(testIndex > -1){
                 while(testIndex < this.selectedCohort.filterArray.length){
                     this.selectedCohort.filterArray[testIndex].count = item[1].length;
