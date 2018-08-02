@@ -403,9 +403,10 @@ export class CohortSideBar {
       barGroup = barGroupEnter.merge(barGroup);
 
       let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
-
+     
       let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d['count'])).attr('transform', 'translate(12, 0)');
       rect.attr('class', d=> classRect(d));
+      rect.classed('c-' + cohort.flatIndex, true);
       let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
       text.append('text').text((d, i)=> { return (i + 1) + ': '});
 

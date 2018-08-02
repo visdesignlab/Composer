@@ -118,10 +118,8 @@ export class TimelineKeeper {
 
 
         slider.call(this.brush)
-         .call(this.brush.move, [this.timeScale(-30), this.timeScale(50)]);
+         .call(this.brush.move, [this.timeScale(-10), this.timeScale(50)]);
 
-
-     // -----
     }
 
     private updateDays(start, end) {
