@@ -287,6 +287,36 @@ export class CohortManager {
                 events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, filterLabel]);
             }
          });
+
+         events.on('filter_by_count', (evt, item)=> {
+   
+            let filterLabel = 'Score Count';
+       
+            let filterArray = this.selectedCohort.filterArray;
+            if(filterArray[0].length > 1){
+                let temp = [];
+                filterArray.forEach(fil => {
+                    if(fil.length > 1){
+                        fil.forEach(f => { temp.push(f); });
+                    }else{ temp.push(fil); }
+                });
+                filterArray = temp;
+            }
+            if(item != null){
+                let test = filterArray.map(d=> d.filter);
+                let testIndex = test.indexOf(item.parent);
+        
+                if(+testIndex > -1){
+                    this.selectedCohort.filterArray = filterArray;
+                    this.selectedCohort.filterArray[testIndex].value = item[0];
+              
+                }else{
+                    let filterReq = { filter: filterLabel, type: 'Score', value: item, count: null };
+                    this.selectedCohort.filterArray.push(filterReq);
+                }
+                events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, filterLabel]);
+            }
+         });
             // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
         
             //this comes directly from cohrot tree in eventline;
@@ -342,9 +372,9 @@ export class CohortManager {
                     }
                     events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, item.parent]);
                 }
-              
-
+            
             });
+
 
 //fired in sidebar. send the filter information to refine the sidebar
 /*
@@ -468,11 +498,9 @@ export class CohortManager {
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
           });
 
-
         events.on('show_distributions', ()=> {
               events.fire('cohort_stat_array', this.cohortTree);
           });
-
 
         events.on('remove_cohort', (evt, item)=> {
             console.log(item.cohortIndex);

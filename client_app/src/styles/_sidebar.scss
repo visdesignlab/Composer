@@ -134,6 +134,11 @@ svg.cohortKeeper {
     opacity: .5;
 }
 
+.filter_stage_svg rect.c-0 {
+    fill: #ff4e50;
+    opacity: .5;
+}
+
 .c-0 text.x,
 rect.choice.c-0 {
     fill: #ff4e50;
@@ -142,6 +147,11 @@ rect.choice.c-0 {
 .c-1 rect {
     fill: #f9d62e;
     width: 250px;
+    opacity: .5;
+}
+
+rect.c-1 {
+    fill: #f9d62e;
     opacity: .5;
 }
 
@@ -156,6 +166,11 @@ rect.choice.c-1 {
     opacity: .5;
 }
 
+rect.c-2 {
+    fill: #8ec127;
+    opacity: .5;
+}
+
 .c-2 text.x,
 rect.choice.c-2 {
     fill: #8ec127;
@@ -164,6 +179,11 @@ rect.choice.c-2 {
 .c-3 rect {
     fill: #83d0c9;
     width: 250px;
+    opacity: .5;
+}
+
+rect.c-3 {
+    fill: #83d0c9;
     opacity: .5;
 }
 

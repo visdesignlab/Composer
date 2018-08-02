@@ -16,8 +16,7 @@ import { format } from 'd3-format';
 import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
-//import * as promisDiagram from './promisDiagram';
-import * as promisDiagram from './testPromis';
+import * as promisDiagram from './promisDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
 
@@ -44,7 +43,7 @@ export class PlotKeeper {
 
         this.domain = {
             maxDay: 50,
-            minDay: -30,
+            minDay: -10,
         }
 
         this.drawPromisChart = promisDiagram.drawPromisChart;

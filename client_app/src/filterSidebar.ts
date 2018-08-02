@@ -317,7 +317,6 @@ export class FilterSideBar {
       
       freqPanel.append('div').classed('distributionWrapper', true);
       
-  
       let countPromis = form.append('div').classed('input-group', true).classed('countPromis', true);
                       //filter patients by a minimum score count threshold
 
@@ -331,7 +330,7 @@ export class FilterSideBar {
                       .attr('value', 'Filter').on('click', () =>{
                           let val = (<HTMLInputElement>document.getElementById('count_search')).value;
                           let count = +val;
-                          events.fire('filter_by_Promis_count', count);
+                          events.fire('filter_by_count', count);
                   });
     }
 
@@ -349,7 +348,6 @@ export class FilterSideBar {
 
         if(cohortFilters != null){
            chosen = cohortFilters.filter(d=> d.filter == data.key);
-     
         }
      
         let maxVal = max(value.map(d=> +d.frequency));
