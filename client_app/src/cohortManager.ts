@@ -529,11 +529,18 @@ export class CohortManager {
                 });
     
                 this.cohortTree = test;
-                this.selectedCohort = this.cohortTree[0];
-                this.cohortIndex = 0;
+                if(this.cohortTree.length > 0){
+                    this.selectedCohort = this.cohortTree[0];
+                    this.cohortIndex = 0;
+                    events.fire('update_chart', this.selectedCohort);
+                    events.fire('test', [this.cohortTree, 0]);
+                }else{
+                    this.cohortIndex = 0;
+                    events.fire('create_button_down');
+                }
+              
                 
-                events.fire('update_chart', this.selectedCohort);
-                events.fire('test', [this.cohortTree, 0]);
+             
             }
         });
 
