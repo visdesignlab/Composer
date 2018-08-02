@@ -54,6 +54,8 @@ export class promisDiagram {
     private yBrushSelection = false;
     private cohortLabel;
     private domains;
+    private scoreGroup;
+    private plotLabel;
 
     constructor(parent: Element, diagram, index, domains) {
 
@@ -72,10 +74,10 @@ export class promisDiagram {
             .attr('height', this.promisDimension.height)
             .attr('width', this.promisDimension.width);
 
-        let scoreGroup = this.svg.append('g').classed('scoreGroup-'+ this.cohortIndex, true);
-        let voronoiGroup = scoreGroup.append('g').classed('voronoi', true);
+        this.scoreGroup = this.svg.append('g').classed('scoreGroup-'+ this.cohortIndex, true);
+        let voronoiGroup = this.scoreGroup.append('g').classed('voronoi', true);
 
-        let lineGroup = scoreGroup.append('g').classed('lines', true);
+        let lineGroup = this.scoreGroup.append('g').classed('lines', true);
 
         // scales
         this.timeScale = scaleLinear()
@@ -95,17 +97,17 @@ export class promisDiagram {
             .range([.8, .2]);//.clamp(true);
 
         // axis
-        scoreGroup.append('g')
+        this.scoreGroup.append('g')
             .attr('class', 'xAxis')
             .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
 
-        scoreGroup.append('g')
+        this.scoreGroup.append('g')
             .attr('class', 'yAxis')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`);
 
         // ----- SLIDER
 
-        let slider = scoreGroup.append('g')
+        let slider = this.scoreGroup.append('g')
             .attr('class', 'slider')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth + 2)},${this.margin.y})`);
 
@@ -133,19 +135,21 @@ export class promisDiagram {
                 }
             });
         // -----
-
+/*
         scoreGroup.append('text')
             .text(`${this.diagram}`)
             .attr('text-anchor', 'middle')
             .attr('transform', `translate(${this.margin.x / 4},${this.promisDimension.height * 0.5}) rotate(-90)`);
-
-        scoreGroup.append('g')
+*/
+        this.scoreGroup.append('g')
             .attr('class', 'grid')
             .attr('transform', `translate(${this.margin.x},${this.margin.y})`)
             .call(axisLeft(this.scoreScale)
                 .tickSize(-(this.promisDimension.width - this.margin.x))
             )
             .selectAll('text').remove();
+
+        this.plotLabel = this.scoreGroup.append('text');
 
     }
 
@@ -188,9 +192,16 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     let scoreScale = node.scoreScale;
     let svg = node.svg;
     let index = node.cohortIndex;
-    let diagram;
-
+    let diagram = promis[0].value[0]['FORM'];
+    this.diagram = promis[0].value[0]['FORM'];
     console.log(promis);
+
+    node.plotLabel
+    .text(`${this.diagram}`)
+    .attr('text-anchor', 'middle')
+    .attr('transform', `translate(${node.margin.x / 4},${node.promisDimension.height * 0.5}) rotate(-90)`);
+
+    console.log(promis[0].value[0]['FORM']);
 
     if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
     }else{
@@ -200,7 +211,6 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     if(scaleRelative){
         scoreScale.domain([30, -30]);
      }else{ 
-
         scoreScale.domain([80, 0]);
      }
 
@@ -218,10 +228,8 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
    const promisScoreGroup = svg.select('.scoreGroup-'+ index);
 
    if(scaleRelative){
-
            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
            .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
-
            zeroLine.append('line')
                    .attr('x1', 0).attr('x2', 670)
                    .attr('y1', scoreScale(0)).attr('y2', scoreScale(0)).attr('stroke-width', .5)
@@ -234,9 +242,10 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
    let similarData = co.map((d) => {
            let data = {key: d.key, value: null, line: null, fakeArray: []};
-           let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
-           return g['FORM'] == node.diagram;
-           });
+           let res = d.value;
+         //  let res = d.value.filter((g) => {//this is redundant for now because promis physical function already filtered
+           //return g['FORM'] == node.diagram;
+         //  });
            res.sort((a, b) => ascending(a.diff, b.diff));
            res.forEach(r=> r.maxday = d.days);
            res = res.map((r, i)=> {return {
@@ -815,7 +824,6 @@ export function frequencyCalc_saved(promis, clump, node, cohort, i) {
       // creates bin array for each patient scores and calulates slope for each bin
         //TODO : get rid of test in name and global variables?
     
-        
             let minDay = node.domains.minDay;
             let maxDay = node.domains.maxDay;
     

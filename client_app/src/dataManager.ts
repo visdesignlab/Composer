@@ -64,17 +64,6 @@ export class DataManager {
         }));
 
         this.loadData('Total_Scores').then(d=>this.promisTable = d );
-            
-            /*
-            this.loadOswestry(d, 3).then(os=> {
-                this.totalOsObjects = os;
-                this.mapPromisScores(null, os, 3).then(mapp=> this.getDays(mapp, null).then(day=> {
-                    this.getBaselines(day).then(based=> {
-                       
-                    });
-                    console.log(day)}));
-            });*/
-     
 
         this.attachListener();
 
@@ -143,9 +132,11 @@ export class DataManager {
         });
 
          events.on('filter_data', (evt, item)=> {
-    
-             let promis = item[0].ogPromis;
-             let cpt = item[0].cpt;
+            let cohort = item[0];
+            let type = cohort.dataType;
+             let promis = cohort.og[type];
+             console.log(promis);
+             let cpt = cohort.cpt;
              let filters = item[1];
 
              if(filters[0].length > 1){
@@ -230,7 +221,6 @@ export class DataManager {
         const newPro = JSON.parse(JSON.stringify(promis));
         return newPro;
     }
-
     private async addMinDay(patients, eventArray) {
         let cohort = patients
       
