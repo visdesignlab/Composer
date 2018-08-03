@@ -22,6 +22,7 @@ import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter} from 'phovea_core/src/';
 import { stringify } from 'querystring';
+import {format} from 'd3-format';
 
 export class promisDiagram {
 
@@ -196,15 +197,16 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     let index = node.cohortIndex;
     let diagram = promis[0].value[0]['FORM'];
     this.diagram = promis[0].value[0]['FORM'];
-    console.log(promis);
-    if(cohort.dataType == 'oswestry'){ scoreScale.domain([100, 0])}
-
+ 
+    let formatPercent = d3.format(".0%");
     node.plotLabel
     .text(`${this.diagram}`)
     .attr('text-anchor', 'middle')
     .attr('transform', `translate(${node.margin.x / 4},${node.promisDimension.height * 0.5}) rotate(-90)`);
 
-    console.log(promis[0].value[0]['FORM']);
+    let test = promis.map(p=> p.value);
+
+    console.log(test);
 
     if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
     }else{
@@ -274,8 +276,15 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
         svg.select('.xAxis')
             .call(axisBottom(node.timeScale));
 
-        svg.select('.yAxis')
+
+        if(cohort.dataType == 'oswestry'){ 
+            svg.select('.yAxis')
+            .call(axisLeft(scoreScale).tickFormat(d => d + "%"));
+          
+        }else{
+            svg.select('.yAxis')
             .call(axisLeft(scoreScale));
+        }
         // -------  define line function
         const lineFunc = line()
             .curve(curveLinear)

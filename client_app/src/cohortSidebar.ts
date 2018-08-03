@@ -69,7 +69,6 @@ export class CohortSideBar {
         let selected = cohorts.filter(c=> c.cohortIndex == index);
     
         selected.classed('selected', true);
-
       });
 
    });
@@ -131,17 +130,15 @@ export class CohortSideBar {
 
       button.on('click', ()=> {
         let filterBox = select(document.getElementById('filterSideBar'));
-        if(filterBox.classed('hidden')){filterBox.classed('hidden', false);
-        }else{ filterBox.classed('hidden', true); }
+    
+        if(filterBox.classed('hidden')){
+          filterBox.classed('hidden', false);
+        }else{ 
+          filterBox.classed('hidden', true); }
       });
 
       button.attr('transform', 'translate(10, 0)');
 
-      button.on('click', function(d){ 
-        events.fire('show_layer_panel'); 
-        select(document.getElementById('filterSideBar')).classed('hidden', false);
-      });
-  
       let cohortBody = panelDiv.append('div').classed('panel-body', true);
 
       return cohortBody;
@@ -198,7 +195,7 @@ export class CohortSideBar {
           let tempFilterArray = [];
           let tempEvents = [];
           let stopIndex = c.filterArray.length - 1;
-          console.log(stopIndex);
+          
           let index;
           for(index = 0; index < stopIndex; index++){
             tempEvents.push(c.filterArray[index]);
@@ -208,7 +205,7 @@ export class CohortSideBar {
             tempFilterArray.push(c.filterArray[index]);
           }
           c.filterArray = tempFilterArray;
-          console.log(c.filterArray);
+   
         }
 
       })
@@ -418,7 +415,6 @@ export class CohortSideBar {
       xGroup.attr('transform', (d, i)=> 'translate(205, 0)');
 
       xGroup.on('click', function(d, i){
-       console.log(d);
         events.fire('remove_filter', d);
       });
 

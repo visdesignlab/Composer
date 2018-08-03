@@ -71,17 +71,12 @@ export class CohortManager {
     private attachListener(){
 
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
-              //  let filterReq = ['demographic', item[0], item[1]];
-              
+         
                 if(this.branchSelected == null){
-                  ///  this.cohortTree[this.cohortIndex].filterArray.push(filterReq);
                     this.selectedCohort =  this.cohortTree[this.cohortIndex];
-                   
                     events.fire('test', [this.cohortTree, [this.cohortIndex]]);
                 }else{
-                   // this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].filterArray.push(filterReq);
                     this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
-                  
                     events.fire('test', [this.cohortTree, [this.branchSelected]]);
                 }
 
@@ -344,6 +339,7 @@ export class CohortManager {
             this.selectedCohort.chartData = this.selectedCohort[item];
             this.selectedCohort.dataType = item;
             events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, null]);
+            //maybe add layerbool for os?
         });
 
           events.on('compare_button_down', ()=> {
