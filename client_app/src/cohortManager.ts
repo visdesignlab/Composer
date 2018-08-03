@@ -342,11 +342,11 @@ export class CohortManager {
           });
 
           events.on('change_plot_data', (evt, item)=> {
-              this.selectedCohort.chartData = this.selectedCohort[item];
-              this.selectedCohort.dataType = item;
-              events.fire('update_chart', this.selectedCohort);
-          });
-
+            this.selectedCohort.chartData = this.selectedCohort[item];
+            this.selectedCohort.dataType = item;
+            events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, null]);
+        });
+        
           events.on('compare_button_down', ()=> {
     
                 if(!this.comparisonBool){
