@@ -457,13 +457,52 @@ export class FilterSideBar {
 
     private drawHistogram(histobins) {
 
-     this.$node.select('.distributionWrapper').selectAll('*').remove();
+    select(document.getElementById('scorePanel')).select('.panel-body').select('.distributionWrapper').selectAll('*').remove();
 
-     let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, scale: this.xScale.domain([0, histobins[0].binCount])};
+     let data = {key: 'Score-Count', label: 'Score Count', value: histobins, scale: this.xScale.domain([0, histobins[0].binCount]).range([0, 180])};
 
       this.yScale.domain([0, max(histobins, function (d) {
           return d['frequency'] + .1;
       })]);
+
+      let bandWidth = 180;
+       
+      let maxVal = max(data.value.map(d=> +d.frequency));
+      let distScale = scaleLinear().domain([0, +maxVal]).range([0, 50]);
+      let xAxis = axisBottom(data.scale);
+  
+      let panelBody = select(document.getElementById('scorePanel')).select('.panel-body').select('.distributionWrapper');
+      let demoBand = panelBody.append('div').classed('demoBand', true);
+      let demoLabel = demoBand.append('div').append('text').text(data.label);
+      let bandSvg = demoBand.append('svg').attr('class', data.key);
+      let rects = bandSvg.append('g').attr('transform', 'translate(2, 0)').selectAll('.filter-bars').data(data.value);
+
+      rects.exit().remove();
+      
+      let rectEnter = rects.enter().append('rect').classed('filter-bars', true);
+      
+      rects = rectEnter.merge(rects);
+
+      rects
+      .attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', (d)=> distScale(d['frequency']))
+    //  .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+      .attr('fill', '#212F3D')
+      .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5)
+      .attr('y', (d)=> 50 - distScale(d['frequency']));
+
+     let axis = bandSvg.append('g').classed('x-axis', true).attr('transform', 'translate(6, 50)');
+
+     axis.call(xAxis);
+
+     rects.classed('choice', true);
+
+
+    let brush = bandSvg.append('g').attr('class', data.key + '-BRUSH').attr('transform', 'translate(5, 0)');
+
+
+
+
+      /*
 
       let barBrush = brushX()
       .extent([[0, 0], [this.svgWidth, 30]])
@@ -558,6 +597,8 @@ export class FilterSideBar {
       });
 
       this.$node.select('#Score-Count-Brush').call(this.freqBrush);
+      */
+
 
     }
 
