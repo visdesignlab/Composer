@@ -344,7 +344,7 @@ export class CohortManager {
           events.on('change_plot_data', (evt, item)=> {
               this.selectedCohort.chartData = this.selectedCohort[item];
               this.selectedCohort.dataType = item;
-              events.fire('plot_data_changed', this.selectedCohort);
+              events.fire('update_chart', this.selectedCohort);
           });
 
           events.on('compare_button_down', ()=> {

@@ -90,7 +90,7 @@ export class DataManager {
        
         events.on('update_cohort_start', (evt, item)=> {
             let codes = item[0];
-            let promis = item[1].promis;
+            let promis = item[1].chartData;
             let cpt = item[1].cpt;
             
             if(item[0] == null){
@@ -163,10 +163,12 @@ export class DataManager {
             this.filterObjectByArray(item[0], item[1], 'cpt').then((cpt)=> events.fire('chosen_pat_cpt', cpt));
          });
 
+         //there are two of these you need to get rid of one
+
          events.on('change_sep_bool', (evt, item)=> {
             let bool;
         
-            this.getQuant_Separate(this.selected.promis, 3, item.scaleR).then(sep=> {
+            this.getQuant_Separate(this.selected.chartData, 3, item.scaleR).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
 
@@ -180,7 +182,7 @@ export class DataManager {
                 sepBool = false;
             }
             this.selected = item[0];
-            this.getQuant_Separate(item[0].promis, 3, this.scoreChangeBool).then(sep=> {
+            this.getQuant_Separate(item[0].chartData, 3, this.scoreChangeBool).then(sep=> {
                 events.fire('separated_by_quant', sep);
             });
         });
@@ -843,8 +845,6 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
         let withQuery = [];
         let queryDate = [];
         let eventArray = [];
-        console.log(cohort);
-        console.log(value);
 
        cohort.forEach((element) => {
         let events = [];

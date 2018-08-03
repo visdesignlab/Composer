@@ -109,30 +109,23 @@ export class FilterSideBar {
 
     events.on('update_chart', (evt, item)=> {
      if(item){ 
-
         let cohortFilters = item.filterArray;
-
         let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('rect');
          if(this.oldClass){
             classGroup.classed(this.oldClass, false);
          }
-
         let bmi = this.demoPanel.select('.BMI-BRUSH');
         let cci = this.demoPanel.select('.CCI-BRUSH');
         let age = this.demoPanel.select('.AGE-BRUSH');
-
- 
         this.demoPanel.selectAll('.filterBars').classed('choice', true);
-   
         bmi.call(this.bmiBrush.move, null);
         cci.call(this.cciBrush.move, null);
         age.call(this.ageBrush.move, null);
-       
         let cohortClass = 'c-' + (item.flatIndex);
         classGroup.classed(cohortClass, true);
         this.oldClass = cohortClass;
-        let value = item.promis.map(v=> v.value);
-     
+        let value = item.chartData.map(v=> v.value);
+        console.log(value);
         this.histogrammer(value, null, 10).then(d=> this.drawHistogram(d));}
     });
 
@@ -235,30 +228,37 @@ export class FilterSideBar {
     }
 
     private async histogrammer(data, type, ticks) {
-
-        if(type == null){
-          
-        }
-
         let totalPatients = data.length;
-
         let x;
         let bins;
+        let maxValue;
 
-        let maxValue = max(data);
-        x = scaleLinear().domain([0, +maxValue]).nice();
+        if(type == null){
+           
+           // data = data.map(d=> d.length);
+            console.log(data);
+            maxValue = max(data.map(d=> d.length));
+            x = scaleLinear().domain([0, +maxValue]).nice();
+            bins = histogram()
+            .domain([0, +maxValue])
+            .thresholds(x.ticks(25))
+            (data.map(d=> d.length));
 
-        bins = histogram()
-                .domain([0, +maxValue])
-                .thresholds(x.ticks(ticks))
-                (data);
-        
+        }else{
+          
+            maxValue = max(data);
+            x = scaleLinear().domain([0, +maxValue]).nice();
+            bins = histogram()
+                    .domain([0, +maxValue])
+                    .thresholds(x.ticks(ticks))
+                    (data);
+        }
+    
         let histogramData = bins.map(function (d) {
             totalPatients -= d.length;
         // return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
             return {x0: d.x0, x1: d.x1, length: d.length, binCount: bins.length, frequency: d.length/bins.length, max: maxValue, type: type};
         });
-
         return histogramData;
     }
 
@@ -319,7 +319,6 @@ export class FilterSideBar {
       
       let countPromis = form.append('div').classed('input-group', true).classed('countPromis', true);
                       //filter patients by a minimum score count threshold
-
       countPromis.append('input').attr('type', 'text').classed('form-control', true)
                       .attr('placeholder', 'Min Score Count')
                       .attr('id', 'count_search')
@@ -456,7 +455,7 @@ export class FilterSideBar {
   
       let distLabel = this.$node.select('.distributionWrapper');
       distLabel.append('text').text('Score Count Distributions');
-      let distDiagrams = distLabel.append('div').classed('distLabel', true).attr('width', this.svgWidth).attr('height', this.svgHeight);
+      let distDiagrams = distLabel.append('div').classed('distLabel', true).attr('width', this.svgWidth).attr('height', 40);
   
       let distFilter = distDiagrams.append('div').classed('distFilter', true).attr('width', this.svgWidth);
 
