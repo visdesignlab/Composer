@@ -277,7 +277,6 @@ export class FilterSideBar {
     
         let histogramData = bins.map(function (d) {
             totalPatients -= d.length;
-        // return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
             return {x0: d.x0, x1: d.x1, length: d.length, binCount: bins.length, frequency: d.length/bins.length, max: maxValue, type: type};
         });
         return histogramData;
@@ -317,9 +316,9 @@ export class FilterSideBar {
         {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, 90]).range([0, 180]), domain: [0, +binBMI[0].binCount], brush:this.bmiBrush, type: 'quant'},
         {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount], brush:this.cciBrush, type: 'quant'},
         {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, 100]).range([0, 180]), domain: [0, +binAGE[0].binCount], brush:this.ageBrush, type: 'quant'},
-        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), brush: null, domain: alcDomain, type: 'qual' },
-        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), brush: null, domain: drugDomain, type: 'qual' },
-        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scalePoint().domain(["Quit", "Yes", "", "Never", "Not Asked", "Passive"]).range([0, 180]), brush: null, domain: tobDomain, type: 'qual' }
+        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scaleBand().domain(['Yes', 'No', 'NA', 'Not Asked']).range([0, 180]), brush: null, domain: alcDomain, type: 'qual' },
+        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scaleBand().domain(['Yes', 'No', 'NA', 'Not Asked']).range([0, 180]), brush: null, domain: drugDomain, type: 'qual' },
+        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scaleBand().domain(["Quit", "Yes", "NA", "Never", "Not Asked", "Passive"]).range([0, 180]), brush: null, domain: tobDomain, type: 'qual' }
         ];
 
         this.FilterData = distData;
@@ -371,9 +370,7 @@ export class FilterSideBar {
         }
      
         let maxVal = max(value.map(d=> +d.frequency));
- 
         let distScale = scaleLinear().domain([0, +maxVal]).range([0, 50]);
-    
         let xAxis = axisBottom(scale);
     
         let panelBody = select(document.getElementById(id)).select('.panel-body');
@@ -427,8 +424,9 @@ export class FilterSideBar {
            brush.call(quantBrush);
  
        }else{
-        bandSvg.attr('height', 150);
-        
+
+        bandSvg.style('height', '99px');
+    
         axis.selectAll("text")
         .style("text-anchor", "end")
             .attr("dx", "-.8em")

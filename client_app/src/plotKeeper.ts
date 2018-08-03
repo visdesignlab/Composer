@@ -73,8 +73,7 @@ export class PlotKeeper {
         });
 
         events.on('comparison_update', (evt, item)=> {
-          
-            //this comes from the sidebar
+
             this.comparisonArray = item;
             this.plotArray = [];
     

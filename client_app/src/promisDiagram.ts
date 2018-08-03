@@ -103,10 +103,11 @@ export class promisDiagram {
 
         this.scoreGroup.append('g')
             .attr('class', 'yAxis')
-            .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`);
+         //   .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`);
+            .attr('transform', `translate(${(this.margin.x - 5)},${this.margin.y})`);
 
         // ----- SLIDER
-
+/*
         let slider = this.scoreGroup.append('g')
             .attr('class', 'slider')
             .attr('transform', `translate(${(this.margin.x - this.sliderWidth + 2)},${this.margin.y})`);
@@ -135,6 +136,7 @@ export class promisDiagram {
                 }
             });
         // -----
+        */
 /*
         scoreGroup.append('text')
             .text(`${this.diagram}`)
@@ -212,7 +214,8 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     if(scaleRelative){
         scoreScale.domain([30, -30]);
      }else{ 
-        scoreScale.domain([80, 0]);
+        if(cohort.dataType == 'oswestry'){ scoreScale.domain([100, 0])
+        }else{  scoreScale.domain([80, 0]); }
      }
 
    svg.select('.cohort-plot-label').remove();

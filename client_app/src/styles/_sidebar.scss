@@ -233,7 +233,7 @@ rect.choice.c-3 {
 
 .demoBand svg {
     width: 200px;
-    height: 80px;
+    height: 70px;
 }
 
 .demoBand .filter-bars {
@@ -366,6 +366,8 @@ rect.choice.c-3 {
 
 g.selected rect {
     opacity: 1;
+    stroke: gray;
+    stroke-width: 1.5px;
 }
 
 g.selected text {
