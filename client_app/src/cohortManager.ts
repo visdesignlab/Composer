@@ -334,8 +334,7 @@ export class CohortManager {
             this.cohortIndex = index;
             this.cohortTree[this.cohortIndex].promis = item.promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-           
-           // let selectedLabel = document.getElementById('cohortKeeper').getElementsByClassName(index);
+
             this.branchSelected = null;
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [index]]);
@@ -346,7 +345,7 @@ export class CohortManager {
             this.selectedCohort.dataType = item;
             events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, null]);
         });
-        
+
           events.on('compare_button_down', ()=> {
     
                 if(!this.comparisonBool){
