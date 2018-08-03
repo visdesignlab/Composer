@@ -110,14 +110,35 @@ export class FilterSideBar {
     events.on('update_chart', (evt, item)=> {
      if(item){ 
         let cohortFilters = item.filterArray;
-        let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('rect');
+        let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('.filter-bars');
          if(this.oldClass){
             classGroup.classed(this.oldClass, false);
          }
         let bmi = this.demoPanel.select('.BMI-BRUSH');
         let cci = this.demoPanel.select('.CCI-BRUSH');
         let age = this.demoPanel.select('.AGE-BRUSH');
-        this.demoPanel.selectAll('.filterBars').classed('choice', true);
+        this.demoPanel.selectAll('.demoBand').selectAll('.filter-bars').classed('choice', true);
+        
+        let brushFilters = cohortFilters.filter(f=> f.value != null);
+
+        brushFilters.map(brush => {
+            let c = '.' + brush.filter;
+            let test = this.demoPanel.selectAll('.demoBand').select(c).selectAll('.filter-bars');
+        
+            test.classed('choice', false);
+            if(brush.filter == 'BMI' || brush.filter == 'CCI' || brush.filter == 'AGE'){
+                let test2 = test.filter(r=> r['x0'] >= brush.value[0] && r['x1'] <= brush.value[1]);
+                test2.classed('choice', true);
+            }else{
+                console.log(brush.value);
+                let test3 = test.filter(r=> {
+                    console.log(r.value);
+                    return brush.value.indexOf(r.value) > -1});
+                test3.classed('choice', true);
+            }
+        
+        
+        });
         bmi.call(this.bmiBrush.move, null);
         cci.call(this.cciBrush.move, null);
         age.call(this.ageBrush.move, null);
@@ -359,7 +380,7 @@ export class FilterSideBar {
         let demoBand = panelBody.append('div').classed('demoBand', true);
         let demoLabel = demoBand.append('div').append('text').text(label);
         let bandSvg = demoBand.append('svg').attr('class', key);
-        let rects = bandSvg.append('g').attr('transform', 'translate(2, 0)').selectAll('rect').data(value);
+        let rects = bandSvg.append('g').attr('transform', 'translate(2, 0)').selectAll('.filter-bars').data(value);
 
         rects.exit().remove();
         
