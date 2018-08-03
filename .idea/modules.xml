@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/dataexploration.iml" filepath="$PROJECT_DIR$/.idea/dataexploration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/composer.iml" filepath="$PROJECT_DIR$/.idea/composer.iml" />
     </modules>
   </component>
 </project>

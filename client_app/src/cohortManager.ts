@@ -465,12 +465,7 @@ export class CohortManager {
                 this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
             }
             events.fire('update_chart', this.selectedCohort);
-<<<<<<< HEAD
-            events.fire('test', [this.cohortTree, this.selectedCohort.cohortIndex]);
-
-=======
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
->>>>>>> combine
           });
 
 
