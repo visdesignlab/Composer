@@ -393,7 +393,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                select(group).classed('hover-selected', false);
             }
 
-           function voronoiClicked(d) {
+            function voronoiClicked(d) {
      
                let line = d.line;
                if(line.classList.contains('selected')) {
@@ -407,15 +407,14 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                    line.classList.add('selected');
                    addPromisDotsClick(d, scaleRelative);
                    events.fire('line_clicked', d);
-            };
+                };
 
-            let lines = svg.select('.lines').selectAll('.selected').nodes();
-            
-            let idarray = [];
-            lines.forEach(element => {
-                       idarray.push(+element.__data__.key);
-                   });
-                   events.fire('selected_line_array', idarray);
+                let lines = svg.select('.lines').selectAll('.selected').nodes();
+                
+                let idarray = [];
+                lines.forEach(element => { idarray.push(+element.__data__.key); });
+                events.fire('selected_line_array', idarray);
+
                }
 
             function addPromisDotsHover (d, scale) {
@@ -523,7 +522,6 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
      // creates bin array for each patient scores and calulates slope for each bin
     //TODO : get rid of test in name and global variables?
 
-    
         let minDay = node.domains.minDay;
         let maxDay = node.domains.maxDay;
 
@@ -679,11 +677,9 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
             });
     
             let quart = means.map((d, i)=> {
-                
                 let x = d[0];
                 let y1 = d[1] + devs[i];
                 let y2 = d[1] - devs[i];
-     
                 return [x, y1, y2];
              });
     
@@ -828,8 +824,6 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 if(i != null){
                 zeroText.attr('transform', 'translate(0,'+ i * 12 +')').classed(clump, true);
                 }
-
-
 }
 
 export function frequencyCalc_saved(promis, clump, node, cohort, i) {
@@ -874,15 +868,13 @@ export function frequencyCalc_saved(promis, clump, node, cohort, i) {
                 if(patpos > posdiff) {posdiff = patpos;  };
             });
            
-    
             negdiff = Math.round(negdiff / 10) * 10;
             posdiff = Math.round(posdiff / 10) * 10;
     
-            console.log(posdiff);
-            console.log(negdiff);
+  
             //get diff of days between maxneg diff and maxpos diff
             let daydiff = posdiff - negdiff;
-            console.log(daydiff);
+  
             let bincount = Math.floor(daydiff/10);
     
             cohortFiltered.forEach(pat=> {
@@ -947,16 +939,12 @@ export function frequencyCalc_saved(promis, clump, node, cohort, i) {
                     }
     
                 for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
-                  
                     let x = pat.bins[i].x;
-                  
                         pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
                             let top = pat.value.find((v)=> v.diff > x);
-                    
                             if(top != undefined){
-                      
                              pat.bins[i].y = (top.slope * x) + top.b;
-                             };
+                            };
                 }
             });
        
@@ -981,7 +969,6 @@ export function frequencyCalc_saved(promis, clump, node, cohort, i) {
                 let botdev = means.map((d, i)=> {
                     let y = d[1] - devs[i];
                     let x = d[0];
-        
                     return [x, y];
                 });
         
@@ -989,7 +976,6 @@ export function frequencyCalc_saved(promis, clump, node, cohort, i) {
                     
                    let y = d[1] + devs[i];
                    let x = d[0];
-        
                    return [x, y];
                 });
         
