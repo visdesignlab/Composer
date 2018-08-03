@@ -213,6 +213,10 @@ export class EventLine {
             let scaleRelative = cohort.scaleR;
             let separated = cohort.separated;
             let clumped = cohort.clumped;
+            let dataType = cohort.chartData[0].value[0]['FORM'];
+            let startEvent = cohort.startEvent;
+
+            console.log(startEvent);
 
             if(!scaleRelative){  this.scoreLabel = 'Absolute Scale';
             }else{ this.scoreLabel = 'Relative Scale'; }
@@ -396,7 +400,7 @@ export class EventLine {
                     
                     let changeToggle = changePanel.append('div').classed('btn-group', true);
                     changeToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
-                                            .append('text').text(this.scoreType);
+                                            .append('text').text(dataType);
         
                     let changeTogglebutton = changeToggle.append('button')
                                                 .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
@@ -407,9 +411,13 @@ export class EventLine {
             
                                 let cul = changeToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
                                 let c1 = cul.append('li').attr('class', 'choice').append('text').text('PROMIS Physical Function');
-                                c1.on('click', ()=> events.fire('change_plot_data', 'promis'));
+                                c1.on('click', ()=> {
+                                    this.scoreType = 'PROMIS Physical Function';
+                                    events.fire('change_plot_data', 'promis')});
                                 let c2 = cul.append('li').attr('class', 'choice').append('text').text('Oswestry').attr('value', 'oswestry');
-                                c2.on('click', ()=> events.fire('change_plot_data', 'oswestry'));
+                                c2.on('click', ()=> {
+                                    this.scoreType = 'Oswestry Index';
+                                    events.fire('change_plot_data', 'oswestry')});
             }
 
     private async flattenCohort(cohort) {

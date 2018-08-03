@@ -162,13 +162,6 @@ export class PlotKeeper {
             }
         });
 
-        events.on('plot_data_changed', (evt, item)=> {
-            console.log(item);
-            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-      
-            this.drawPromisChart(item.chartData, 'proLine', this.selectedPlot, item, null);
-        });
-
         events.on('domain updated', (evt, item)=> {
           
             this.domain.minDay = item[0];

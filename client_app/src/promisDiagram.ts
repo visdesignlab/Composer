@@ -195,6 +195,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     let diagram = promis[0].value[0]['FORM'];
     this.diagram = promis[0].value[0]['FORM'];
     console.log(promis);
+    if(cohort.dataType == 'oswestry'){ scoreScale.domain([100, 0])}
 
     node.plotLabel
     .text(`${this.diagram}`)
