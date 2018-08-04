@@ -153,18 +153,22 @@ export class CohortSideBar {
       let data = [];
       let rows = [];
 
-      let newData = cohortData.map(d=> d);
-    
-      newData.forEach(d => {
+      let newData = cohortData.map(d=> {
         data.push(d);
-        if(d.branches.length != 0){ 
-          d.branches.forEach(b => {
+        if(d.branches.length != 0){
+          d.branches.map(b=> {
             data.push(b);
+            if(b.branches.length != 0){
+              b.branches.map(p=> data.push(p));
+            }
           });
-         };
+        }
       });
 
+      console.log(data);
+
       let height = data.length;
+      let width = 260;
   
       div.attr('height', height * 30);
 
@@ -176,20 +180,26 @@ export class CohortSideBar {
 
       cohortKeeper = coEnter.merge(cohortKeeper);
 
-      let rect = cohortKeeper.append('rect').attr('height', 30).attr('transform', (d, i) => 'translate(0,'+ i * 30 +')');
+      let rect = cohortKeeper.append('rect').attr('height', 30).attr('width', width).attr('transform', (d, i) => 'translate(0,'+ i * 30 +')');
 
       let xGroup = cohortKeeper.append('g').classed('x', true);
       
       xGroup.append('rect').style('fill', 'white').style('width', '20px').attr('height', 20).style('opacity', '.7');
       
       let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
-      xGroup.attr('transform', (d, i)=> 'translate(225, '+ ((i * 30) + 4) + ')');
+      xGroup.attr('transform', (d, i)=> 'translate(230,'+ ((i * 30) + 4) + ')');
 
       xGroup.on('click', function(d, i){
        
         events.fire('remove_cohort', d);
       });
 
+      let test = data.map((co, i)=> {
+        if(co.filterArray.length > 3){
+          console.log(co);
+        }
+      });
+/*
       data.forEach((c, i) => {
         if(c.filterArray.length > 3){
           let tempFilterArray = [];
@@ -208,12 +218,16 @@ export class CohortSideBar {
    
         }
 
-      })
+      });
+      */
+    let moveLength =  max(data.map(d=> d.filterArray.length));
 
       data.forEach(c => {
-        
+
         let e = c.filterArray.map(function(event, i){
-          let xMove = (+i * 40) + 65;
+          let xMove = (+i * (180/moveLength)) + 65;
+          
+         // let xMove = (+i * 40) + 65;
           if(event.length > 1){ 
             let coord = [{x: xMove, y: 6 },{x: xMove + 6, y: 6}, {x: xMove + 9, y: 0}, {x: xMove + 12, y: 12}, {x: xMove + 15, y: 6}];
             return coord;
@@ -288,7 +302,7 @@ export class CohortSideBar {
         let eventEnter = cohortevents.enter().append('g').classed('events', true);
 
         cohortevents = eventEnter.merge(cohortevents);
-        cohortevents.attr('transform', (d, i)=> 'translate(' + i * 40 + ', 0)');
+        cohortevents.attr('transform', (d, i)=> 'translate(' + i * (180/moveLength) + ', 0)');
 
         let circle = cohortevents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
         circle.on("mouseover", (d) => {

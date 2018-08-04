@@ -851,7 +851,6 @@ private async dataFilter(filters, demoObjects, CPT, promis) {
         let elementBool;
         element.forEach(g => {
             value.forEach(v => {
-
                 if (g.value[0].includes(+v)){
                         events.push(g);
                     if(elementBool != g.key){
