@@ -163,7 +163,7 @@ export class CohortManager {
             let oswestry = this.selectedCohort.oswestry;
             let filterArray = this.selectedCohort.filterArray;
             let chartData = this.selectedCohort.chartData;
-         
+            let dataType = this.selectedCohort.dataType;
             let bcpt = JSON.parse(JSON.stringify(cpt));
             let bos = JSON.parse(JSON.stringify(oswestry));
             let bchart = JSON.parse(JSON.stringify(chartData));
@@ -193,6 +193,7 @@ export class CohortManager {
             treeBranch.oswestry = bos;
             treeBranch.chartData = bchart;
             treeBranch.cohortIndex = [this.cohortIndex, newSpot];
+            treeBranch.dataType = dataType;
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
             this.counter++;
            
@@ -354,6 +355,7 @@ export class CohortManager {
             });
 
             events.on('demo_filter_change', (evt, item)=> {
+                console.log(this.selectedCohort);
                 let filterArray = this.selectedCohort.filterArray;
                 if(filterArray[0].length > 1){
                     let temp = [];

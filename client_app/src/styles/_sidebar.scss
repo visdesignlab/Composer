@@ -20,7 +20,7 @@ ul {
 #cohortSideBar,
 #filterSideBar {
     height: 100%;
-    width: 250px;
+    width: 260px;
     //position: fixed;
     position: relative;
     background-color: #EAECEE;
@@ -58,7 +58,7 @@ ul {
 
 #cohortSideBar .panel-default {
     padding: 0px;
-    width: 240px;
+    width: 250px;
     margin: 0px;
 }
 
@@ -130,7 +130,7 @@ svg.cohortKeeper {
 
 .c-0 rect {
     fill: #ff4e50;
-    width: 250px;
+    //  width: 250px;
     opacity: .5;
 }
 
@@ -146,7 +146,7 @@ rect.choice.c-0 {
 
 .c-1 rect {
     fill: #f9d62e;
-    width: 250px;
+    // width: 250px;
     opacity: .5;
 }
 
@@ -162,7 +162,7 @@ rect.choice.c-1 {
 
 .c-2 rect {
     fill: #8ec127;
-    width: 250px;
+    // width: 250px;
     opacity: .5;
 }
 
@@ -178,7 +178,7 @@ rect.choice.c-2 {
 
 .c-3 rect {
     fill: #83d0c9;
-    width: 250px;
+    // width: 250px;
     opacity: .5;
 }
 
