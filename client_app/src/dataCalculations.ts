@@ -36,17 +36,10 @@ export class dataCalc {
      * @returns {Date}
      */
     export function findMinDate(pat) {
-
-        let minDate = new Date();
-        for (let index = 0; index < pat.length; index++) {
-            if (!pat[index]['ASSESSMENT_START_DTM']) continue;
-            if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) < minDate)
-           // if (pat[index]['ASSESSMENT_START_DTM'] < minDate)
-                minDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
-        }
-       
+       // console.log(pat);
+        let timeArray = pat.map(p=> new Date(p['ASSESSMENT_START_DTM']));
+        let minDate = min(timeArray);
         return minDate
-        
     }
 
         /**
@@ -55,17 +48,9 @@ export class dataCalc {
      * @returns {Date}
      */
     export function findMaxDate(pat) {
-
-        let maxDate = this.parseTime(pat[0]['ASSESSMENT_START_DTM'], null);
-
-        for (let index = 0; index < pat.length; index++) {
-            if (!pat[index]['ASSESSMENT_START_DTM']) continue;
-            if (this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null) > maxDate)
-                maxDate = this.parseTime(pat[index]['ASSESSMENT_START_DTM'], null)
-        }
-       
+        let timeArray = pat.map(p=> new Date(p['ASSESSMENT_START_DTM']));
+        let maxDate = max(timeArray);
         return maxDate
-        
     }
 
      /**
@@ -139,6 +124,7 @@ export class dataCalc {
      * @returns {null}
      */
     export function parseTime(date, nullDate) {
+
         let parseT1 = timeParse('%x %X');
         let parseT2 = timeParse('%x');
         let time = nullDate;

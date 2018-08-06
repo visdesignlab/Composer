@@ -16,8 +16,7 @@ import { format } from 'd3-format';
 import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
-//import * as promisDiagram from './promisDiagram';
-import * as promisDiagram from './testPromis';
+import * as promisDiagram from './promisDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
 
@@ -44,7 +43,7 @@ export class PlotKeeper {
 
         this.domain = {
             maxDay: 50,
-            minDay: -30,
+            minDay: -10,
         }
 
         this.drawPromisChart = promisDiagram.drawPromisChart;
@@ -74,8 +73,7 @@ export class PlotKeeper {
         });
 
         events.on('comparison_update', (evt, item)=> {
-          
-            //this comes from the sidebar
+
             this.comparisonArray = item;
             this.plotArray = [];
     
@@ -96,8 +94,6 @@ export class PlotKeeper {
         
         events.on('draw_layers', (evt, item)=> {
 
-            console.log(item);
-          
             //this comes from the sidebar
         if(this.selectedPlot != undefined){    
             
@@ -106,16 +102,12 @@ export class PlotKeeper {
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
             this.comparisonArray.layers.forEach((cohort, i) => {
                 console.log(cohort);
-              
                 if(cohort.data.clumped){
                     //if it is aggregated
                     this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);//.then(co=> this.drawAgg(co, 'all'));
-                    
                 }else{
                     this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
-                    console.log(cohort.class);
                 }
-               
             });}
         });
 
@@ -144,41 +136,28 @@ export class PlotKeeper {
         });
 
         events.on('test', (evt, item)=> {
-            console.log('test firing?');
+   
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
             let array = [];
             if(this.layerBool){
-                console.log(item);
-
               let layer = select('#layerDiv');
-      
               let selected = layer.selectAll('.fill').nodes();
-          
                selected.forEach((sel, i) => {
-                   console.log(select(sel).data());
                    let cohort = select(sel).data()[0];
                    let entry = {class: 'layer-' + i, data: cohort }
                    array.push(entry);
               });
-
               events.fire('update_layers', array);
-              console.log(array);
-        
             }
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-               
                 this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
-
                 if(this.layerBool){
-
                 }else{
                     this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
                 }
-               
-             
             }
         });
 
@@ -210,10 +189,9 @@ export class PlotKeeper {
         
                if(this.layerBool == true){
                 console.log('update chart??');
-
                }else{
                
-                  let promis = item.promis;
+                  let promis = item.chartData;
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
                   let separated = item.separated;
@@ -250,7 +228,7 @@ export class PlotKeeper {
 }
 
     private buildPlot(container, index, domain) {
-        //similarityScoreDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', cohort, index);
+
        return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain);
 
     }

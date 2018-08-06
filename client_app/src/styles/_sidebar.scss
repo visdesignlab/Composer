@@ -20,7 +20,7 @@ ul {
 #cohortSideBar,
 #filterSideBar {
     height: 100%;
-    width: 250px;
+    width: 260px;
     //position: fixed;
     position: relative;
     background-color: #EAECEE;
@@ -58,7 +58,7 @@ ul {
 
 #cohortSideBar .panel-default {
     padding: 0px;
-    width: 240px;
+    width: 250px;
     margin: 0px;
 }
 
@@ -130,7 +130,12 @@ svg.cohortKeeper {
 
 .c-0 rect {
     fill: #ff4e50;
-    width: 250px;
+    //  width: 250px;
+    opacity: .5;
+}
+
+.filter_stage_svg rect.c-0 {
+    fill: #ff4e50;
     opacity: .5;
 }
 
@@ -141,7 +146,12 @@ rect.choice.c-0 {
 
 .c-1 rect {
     fill: #f9d62e;
-    width: 250px;
+    // width: 250px;
+    opacity: .5;
+}
+
+.filter_stage_svg rect.c-1 {
+    fill: #f9d62e;
     opacity: .5;
 }
 
@@ -152,7 +162,12 @@ rect.choice.c-1 {
 
 .c-2 rect {
     fill: #8ec127;
-    width: 250px;
+    // width: 250px;
+    opacity: .5;
+}
+
+.filter_stage_svg rect.c-2 {
+    fill: #8ec127;
     opacity: .5;
 }
 
@@ -163,7 +178,12 @@ rect.choice.c-2 {
 
 .c-3 rect {
     fill: #83d0c9;
-    width: 250px;
+    // width: 250px;
+    opacity: .5;
+}
+
+.filter_stage_svg rect.c-3 {
+    fill: #83d0c9;
     opacity: .5;
 }
 
@@ -213,7 +233,7 @@ rect.choice.c-3 {
 
 .demoBand svg {
     width: 200px;
-    height: 80px;
+    height: 70px;
 }
 
 .demoBand .filter-bars {
@@ -346,6 +366,8 @@ rect.choice.c-3 {
 
 g.selected rect {
     opacity: 1;
+    stroke: gray;
+    stroke-width: 1.5px;
 }
 
 g.selected text {

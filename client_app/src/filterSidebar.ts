@@ -109,30 +109,41 @@ export class FilterSideBar {
 
     events.on('update_chart', (evt, item)=> {
      if(item){ 
-
         let cohortFilters = item.filterArray;
-
-        let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('rect');
+        let classGroup = select(document.getElementById('filterSideBar')).selectAll('.demoBand').selectAll('.filter-bars');
          if(this.oldClass){
             classGroup.classed(this.oldClass, false);
          }
-
         let bmi = this.demoPanel.select('.BMI-BRUSH');
         let cci = this.demoPanel.select('.CCI-BRUSH');
         let age = this.demoPanel.select('.AGE-BRUSH');
+        this.demoPanel.selectAll('.demoBand').selectAll('.filter-bars').classed('choice', true);
+        
+        let brushFilters = cohortFilters.filter(f=> f.value != null);
 
- 
-        this.demoPanel.selectAll('.filterBars').classed('choice', true);
-   
+        brushFilters.map(brush => {
+            let c = '.' + brush.filter;
+            let test = this.demoPanel.selectAll('.demoBand').select(c).selectAll('.filter-bars');
+        
+            test.classed('choice', false);
+            if(brush.filter == 'BMI' || brush.filter == 'CCI' || brush.filter == 'AGE'){
+                let test2 = test.filter(r=> r['x0'] >= brush.value[0] && r['x1'] <= brush.value[1]);
+                test2.classed('choice', true);
+            }else{
+                let test3 = test.filter(r=> {
+                    return brush.value.indexOf(r.value) > -1});
+                test3.classed('choice', true);
+            }
+        
+        
+        });
         bmi.call(this.bmiBrush.move, null);
         cci.call(this.cciBrush.move, null);
         age.call(this.ageBrush.move, null);
-       
         let cohortClass = 'c-' + (item.flatIndex);
         classGroup.classed(cohortClass, true);
         this.oldClass = cohortClass;
-        let value = item.promis.map(v=> v.value);
-     
+        let value = item.chartData.map(v=> v.value);
         this.histogrammer(value, null, 10).then(d=> this.drawHistogram(d));}
     });
 
@@ -219,71 +230,92 @@ export class FilterSideBar {
     }
 
     private async frequencyMapper(data, key){
+        
+        if(key == "DM_CODE"){
+            console.log('dm!');
+            data = data.map(d=> parseInt(d));
+            let categories = Array.from(new Set(data));
+            console.log(categories);
+            let mapped = categories.map(cat => {
+                let counter = data.filter(d=> d == cat);
+                let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
+                return map;
+            });
+            return mapped;
 
-        let categories = Array.from(new Set(data));
+        }else{
 
-        let mapped = [];
+            let categories = Array.from(new Set(data));
+            console.log(categories);
+            let mapped = [];
+    
+            categories.forEach(cat => {
+                let counter = data.filter(d=> d == cat);
+                let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
+                mapped.push(map);
+            });
+            return mapped;
 
-        categories.forEach(cat => {
-            let counter = data.filter(d=> d == cat);
-            let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
-            mapped.push(map);
-        });
+        }
 
-        return mapped;
+       
+
+   
   
     }
 
     private async histogrammer(data, type, ticks) {
-
-        if(type == null){
-          
-        }
-
         let totalPatients = data.length;
-
         let x;
         let bins;
+        let maxValue;
 
-        let maxValue = max(data);
-        x = scaleLinear().domain([0, +maxValue]).nice();
+        if(type == null){
 
-        bins = histogram()
-                .domain([0, +maxValue])
-                .thresholds(x.ticks(ticks))
-                (data);
-        
+            maxValue = max(data.map(d=> d.length));
+            x = scaleLinear().domain([0, +maxValue]).nice();
+            bins = histogram()
+            .domain([0, +maxValue])
+            .thresholds(x.ticks(25))
+            (data.map(d=> d.length));
+
+        }else{
+          
+            maxValue = max(data);
+            x = scaleLinear().domain([0, +maxValue]).nice();
+            bins = histogram()
+                    .domain([0, +maxValue])
+                    .thresholds(x.ticks(ticks))
+                    (data);
+        }
+    
         let histogramData = bins.map(function (d) {
             totalPatients -= d.length;
-        // return {x0: d.x0, x1: d.x1, length: d.length, totalPatients: totalPatients + d.length, binCount: bins.length, frequency: d.length/bins.length, };
             return {x0: d.x0, x1: d.x1, length: d.length, binCount: bins.length, frequency: d.length/bins.length, max: maxValue, type: type};
         });
-
         return histogramData;
     }
 
     private async distribute(data){
 
         let totalPatients = data.length;
+        console.log(data);
 
         let mappedBMI = data.map((d: number) => +d['BMI']);
-    
         let mappedAGE = data.map((d: number) => +d['AGE']);
-    
         let mappedCCI = data.map((d: number) => +d['CCI']);
-
         let mappedAlco = data.map((d: string) => d['ALCOHOL']);
-
         let mappedDrug = data.map((d: string) => d['DRUG_USER']);
-
-        let mappedDM = data.map((d: string) => d['DM_CODE']);
-
+        let mappedDM = data.map((d: number) => parseInt(d['DM_CODE']));
         let mappedTOB = data.map((d: string) => d['TOBACCO']);
+        let mappedGENDER = data.map((d: string) => d['GENDER']);
 
         let alcDomain = Array.from(new Set(mappedAlco));
         let drugDomain = Array.from(new Set(mappedDrug));
         let dmDomain = Array.from(new Set(mappedDM));
         let tobDomain = Array.from(new Set(mappedTOB));
+        let genDomain = Array.from(new Set(mappedGENDER));
+        console.log(dmDomain);
 
         let binBMI = await this.histogrammer(mappedBMI, 'quant', 8);
         let binCCI = await this.histogrammer(mappedCCI, 'quant', 22);
@@ -291,14 +323,18 @@ export class FilterSideBar {
         let binALCOHOL = await this.frequencyMapper(mappedAlco, 'ALCOHOL');
         let binDRUG = await this.frequencyMapper(mappedDrug, 'DRUG_USER');
         let binTOB = await this.frequencyMapper(mappedTOB, 'TOBACCO');
+        let binGEN = await this.frequencyMapper(mappedGENDER, 'GENDER');
+        let binDM = await this.frequencyMapper(mappedDM, 'DM');
 
        let distData = [
         {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, 90]).range([0, 180]), domain: [0, +binBMI[0].binCount], brush:this.bmiBrush, type: 'quant'},
         {key: 'CCI', 'label': 'CCI', value: binCCI, scale: scaleLinear().domain([0, +binCCI[0].binCount - 1]).range([0, 180]), domain: [0, +binCCI[0].binCount], brush:this.cciBrush, type: 'quant'},
         {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, 100]).range([0, 180]), domain: [0, +binAGE[0].binCount], brush:this.ageBrush, type: 'quant'},
-        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), brush: null, domain: alcDomain, type: 'qual' },
-        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scalePoint().domain(['Yes', 'No', '', 'Not Asked']).range([0, 180]), brush: null, domain: drugDomain, type: 'qual' },
-        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scalePoint().domain(["Quit", "Yes", "", "Never", "Not Asked", "Passive"]).range([0, 180]), brush: null, domain: tobDomain, type: 'qual' }
+        {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scaleBand().domain(['Yes', 'No', 'NA', 'Not Asked']).range([0, 180]), brush: null, domain: alcDomain, type: 'qual' },
+        {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scaleBand().domain(['Yes', 'No', 'NA', 'Not Asked']).range([0, 180]), brush: null, domain: drugDomain, type: 'qual' },
+        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scaleBand().domain(["Quit", "Yes", "NA", "Never", "Not Asked", "Passive"]).range([0, 180]), brush: null, domain: tobDomain, type: 'qual' },
+        {key: 'GENDER', 'label': 'Gender', value: binGEN, scale: scaleBand().domain(['Male', 'Female']).range([0, 180]), brush: null, domain: genDomain, type: 'qual' },
+        {key: 'DM_CODE', 'label': 'DM', value: binDM, scale: scaleBand().domain(['0','250']).range([0, 180]), brush: null, domain: dmDomain, type: 'qual' }
         ];
 
         this.FilterData = distData;
@@ -317,10 +353,8 @@ export class FilterSideBar {
       
       freqPanel.append('div').classed('distributionWrapper', true);
       
-  
       let countPromis = form.append('div').classed('input-group', true).classed('countPromis', true);
                       //filter patients by a minimum score count threshold
-
       countPromis.append('input').attr('type', 'text').classed('form-control', true)
                       .attr('placeholder', 'Min Score Count')
                       .attr('id', 'count_search')
@@ -331,7 +365,7 @@ export class FilterSideBar {
                       .attr('value', 'Filter').on('click', () =>{
                           let val = (<HTMLInputElement>document.getElementById('count_search')).value;
                           let count = +val;
-                          events.fire('filter_by_Promis_count', count);
+                          events.fire('filter_by_count', count);
                   });
     }
 
@@ -349,20 +383,17 @@ export class FilterSideBar {
 
         if(cohortFilters != null){
            chosen = cohortFilters.filter(d=> d.filter == data.key);
-     
         }
      
         let maxVal = max(value.map(d=> +d.frequency));
- 
         let distScale = scaleLinear().domain([0, +maxVal]).range([0, 50]);
-    
         let xAxis = axisBottom(scale);
     
         let panelBody = select(document.getElementById(id)).select('.panel-body');
         let demoBand = panelBody.append('div').classed('demoBand', true);
         let demoLabel = demoBand.append('div').append('text').text(label);
         let bandSvg = demoBand.append('svg').attr('class', key);
-        let rects = bandSvg.append('g').attr('transform', 'translate(2, 0)').selectAll('rect').data(value);
+        let rects = bandSvg.append('g').attr('transform', 'translate(2, 0)').selectAll('.filter-bars').data(value);
 
         rects.exit().remove();
         
@@ -409,8 +440,9 @@ export class FilterSideBar {
            brush.call(quantBrush);
  
        }else{
-        bandSvg.attr('height', 150);
-        
+
+        bandSvg.style('height', '99px');
+    
         axis.selectAll("text")
         .style("text-anchor", "end")
             .attr("dx", "-.8em")
@@ -441,107 +473,45 @@ export class FilterSideBar {
 
     private drawHistogram(histobins) {
 
-     this.$node.select('.distributionWrapper').selectAll('*').remove();
+    select(document.getElementById('scorePanel')).select('.panel-body').select('.distributionWrapper').selectAll('*').remove();
 
-     let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, scale: this.xScale.domain([0, histobins[0].binCount])};
+     let data = {key: 'Score-Count', label: 'Score Count', value: histobins, scale: this.xScale.domain([0, histobins[0].binCount]).range([0, 180])};
 
       this.yScale.domain([0, max(histobins, function (d) {
           return d['frequency'] + .1;
       })]);
 
-      let barBrush = brushX()
-      .extent([[0, 0], [this.svgWidth, 30]])
-      .handleSize(0);
-
-      let distScale = scaleLinear().domain([0, 1000]);
-      let freqScale = scaleLinear().domain([0, 100]).range([0, this.svgWidth]);
+      let bandWidth = 180;
+       
+      let maxVal = max(data.value.map(d=> +d.frequency));
+      let distScale = scaleLinear().domain([0, +maxVal]).range([0, 50]);
+      let xAxis = axisBottom(data.scale);
   
-      let distLabel = this.$node.select('.distributionWrapper');
-      distLabel.append('text').text('Score Count Distributions');
-      let distDiagrams = distLabel.append('div').classed('distLabel', true).attr('width', this.svgWidth).attr('height', this.svgHeight);
-  
-      let distFilter = distDiagrams.append('div').classed('distFilter', true).attr('width', this.svgWidth);
+      let panelBody = select(document.getElementById('scorePanel')).select('.panel-body').select('.distributionWrapper');
+      let demoBand = panelBody.append('div').classed('demoBand', true);
+      let demoLabel = demoBand.append('div').append('text').text(data.label);
+      let bandSvg = demoBand.append('svg').attr('class', data.key);
+      let rects = bandSvg.append('g').attr('transform', 'translate(2, 0)').selectAll('.filter-bars').data(data.value);
 
-      let distSvg = distFilter.append('svg').classed('distDetail_svg', true);//.classed('hidden', true);
-      let distFilter_svg = distFilter.append('svg').classed('distFilter_svg', true).attr('width', '95%');//.classed('hidden', true)
-      let svg_rect_group = distFilter_svg.append('g').attr('width', '95%');
-      let rect_label_group = distFilter_svg.append('g');
+      rects.exit().remove();
+      
+      let rectEnter = rects.enter().append('rect').classed('filter-bars', true);
+      
+      rects = rectEnter.merge(rects);
 
-      rect_label_group.append('text').text(data.value[0].x0).attr('transform', 'translate(0, 20)');
-      rect_label_group.append('text').text(data.value[data.value.length-1].x1).attr('transform', 'translate('+ (this.svgWidth - 15) +', 20)');
-
-      let rects = svg_rect_group.selectAll('rect').data(data.value).enter().append('rect').attr('width', d=> (this.svgWidth/d.binCount)-1).attr('height', 15)
-      .attr('opacity', (d)=> (distScale(d['length'] * 2.5)))
+      rects
+      .attr('width', d=> (bandWidth/d['binCount'])-1).attr('height', (d)=> distScale(d['frequency']))
       .attr('fill', '#212F3D')
-      .attr('x', (d, i)=> (i * this.svgWidth/d.binCount) + 5);
+      .attr('x', (d, i)=> (i * bandWidth/d['binCount']) + 5)
+      .attr('y', (d)=> 50 - distScale(d['frequency']));
 
-      //////////////bar groups for all data////////////////////////////////
-      let barGroupsALL = distSvg.selectAll('.barALL')
-      .data(histobins);
+    let axis = bandSvg.append('g').classed('x-axis', true).attr('transform', 'translate(6, 50)');
 
-      barGroupsALL.exit().remove();
+    axis.call(xAxis);
 
-      let barEnterALL = barGroupsALL.enter().append("g")
-      .attr("class", "barALL");
+    rects.classed('choice', true);
 
-      barGroupsALL = barEnterALL.merge(barGroupsALL);
-
-      barGroupsALL
-      .attr("transform", (d, i) => {
-          return "translate(" +  ((i * this.svgWidth/d.binCount) + 4) + ",0)";
-      });
-      barEnterALL.append("rect");
-
-      barGroupsALL.select('rect')
-      .transition(9000)
-      .attr("x", 1)
-      .attr("y", (d) => {
-          return 30 - this.yScale(d.frequency);
-      })
-
-      .attr('width', d=> (this.svgWidth/d.binCount)-1)
-      .attr("height", (d) => {
-          return this.yScale(d.frequency);
-      });
-
-      barGroupsALL.on("mouseover", (d) => {
-  
-          let t = transition('t').duration(500);
-          select(".tooltip")
-        //  .html(() => {
-            //  return this.renderHistogramTooltip(d);
-       //   })
-          .transition(t)
-          .style("opacity", 1)
-          .style("left", `${event.pageX + 10}px`)
-          .style("top", `${event.pageY + 10}px`);
-      })
-      .on("mouseout", () => {
-          let t = transition('t').duration(500);
-          select(".tooltip").transition(t)
-          .style("opacity", 0);
-      });
-
-      let brush = distFilter_svg.append('g').attr('id', data['key'] + '-Brush').classed('brush', true);
-      let that = this;
-
-      this.freqBrush = brushX()
-      .extent([[0, 0], [this.svgWidth, 30]])
-      .handleSize(0)
-      .on("end", () => {
-      if (event.selection === null) {
-          //this.setOrderScale();
-      }else {
-      let start = freqScale.invert(event.selection[0]);
-      let end = freqScale.invert(event.selection[1]);
-      let Dom1 = Math.floor((start+1)/10)*10;
-      let Dom2 = Math.ceil((end+1)/10)*10;
-
-      this.scoreFreqRange = [Dom1, Dom2];
-          }
-      });
-
-      this.$node.select('#Score-Count-Brush').call(this.freqBrush);
+    let brush = bandSvg.append('g').attr('class', data.key + '-BRUSH').attr('transform', 'translate(5, 0)');
 
     }
 

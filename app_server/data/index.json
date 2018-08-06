@@ -981,14 +981,52 @@
         ]
     },
     {
+        "name": "Total_Scores",
+        "path": "PROMIS_SCORES_ALL.csv",
+        "separator": ",",
+        "id": "Total_Scores",
+        "size": [51549, 7],
+        "type": "table",
+        "idtype": "INDEX",
+        "idcolumn": 0,
+        "columns": [{
+                "name": "PAT_ID",
+                "value": {
+                    "type": "int"
+                }
+            },
+            {
+                "name": "VISIT_NO",
+                "value": { "type": "int" }
+            },
+            {
+                "name": "ASSESSMENT_ID",
+                "value": { "type": "int" }
+            },
+            {
+                "name": "ASSESSMENT_START_DTM",
+                "value": { "type": "string" }
+            },
+            {
+                "name": "FORM_ID",
+                "value": { "type": "int" }
+            },
+            {
+                "name": "FORM",
+                "value": { "type": "string" }
+            },
+            {
+                "name": "SCORE",
+                "value": { "type": "float" }
+            }
+        ]
+    },
+    {
         "name": "Orders",
         "path": "Orders_index.csv",
         "separator": ",",
         "id": "Orders",
-        "size": [
-            792122,
-            7
-        ],
+        "size": [792122, 7],
         "type": "table",
         "idtype": "INDEX",
         "idcolumn": 0,
