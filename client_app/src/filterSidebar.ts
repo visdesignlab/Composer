@@ -230,18 +230,37 @@ export class FilterSideBar {
     }
 
     private async frequencyMapper(data, key){
+        
+        if(key == "DM_CODE"){
+            console.log('dm!');
+            data = data.map(d=> parseInt(d));
+            let categories = Array.from(new Set(data));
+            console.log(categories);
+            let mapped = categories.map(cat => {
+                let counter = data.filter(d=> d == cat);
+                let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
+                return map;
+            });
+            return mapped;
 
-        let categories = Array.from(new Set(data));
+        }else{
 
-        let mapped = [];
+            let categories = Array.from(new Set(data));
+            console.log(categories);
+            let mapped = [];
+    
+            categories.forEach(cat => {
+                let counter = data.filter(d=> d == cat);
+                let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
+                mapped.push(map);
+            });
+            return mapped;
 
-        categories.forEach(cat => {
-            let counter = data.filter(d=> d == cat);
-            let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
-            mapped.push(map);
-        });
+        }
 
-        return mapped;
+       
+
+   
   
     }
 
@@ -280,25 +299,23 @@ export class FilterSideBar {
     private async distribute(data){
 
         let totalPatients = data.length;
+        console.log(data);
 
         let mappedBMI = data.map((d: number) => +d['BMI']);
-    
         let mappedAGE = data.map((d: number) => +d['AGE']);
-    
         let mappedCCI = data.map((d: number) => +d['CCI']);
-
         let mappedAlco = data.map((d: string) => d['ALCOHOL']);
-
         let mappedDrug = data.map((d: string) => d['DRUG_USER']);
-
-        let mappedDM = data.map((d: string) => d['DM_CODE']);
-
+        let mappedDM = data.map((d: number) => parseInt(d['DM_CODE']));
         let mappedTOB = data.map((d: string) => d['TOBACCO']);
+        let mappedGENDER = data.map((d: string) => d['GENDER']);
 
         let alcDomain = Array.from(new Set(mappedAlco));
         let drugDomain = Array.from(new Set(mappedDrug));
         let dmDomain = Array.from(new Set(mappedDM));
         let tobDomain = Array.from(new Set(mappedTOB));
+        let genDomain = Array.from(new Set(mappedGENDER));
+        console.log(dmDomain);
 
         let binBMI = await this.histogrammer(mappedBMI, 'quant', 8);
         let binCCI = await this.histogrammer(mappedCCI, 'quant', 22);
@@ -306,6 +323,8 @@ export class FilterSideBar {
         let binALCOHOL = await this.frequencyMapper(mappedAlco, 'ALCOHOL');
         let binDRUG = await this.frequencyMapper(mappedDrug, 'DRUG_USER');
         let binTOB = await this.frequencyMapper(mappedTOB, 'TOBACCO');
+        let binGEN = await this.frequencyMapper(mappedGENDER, 'GENDER');
+        let binDM = await this.frequencyMapper(mappedDM, 'DM');
 
        let distData = [
         {key: 'BMI', 'label': 'BMI', value: binBMI, scale: scaleLinear().domain([0, 90]).range([0, 180]), domain: [0, +binBMI[0].binCount], brush:this.bmiBrush, type: 'quant'},
@@ -313,7 +332,9 @@ export class FilterSideBar {
         {key: 'AGE', 'label': 'Age', value: binAGE, scale: scaleLinear().domain([0, 100]).range([0, 180]), domain: [0, +binAGE[0].binCount], brush:this.ageBrush, type: 'quant'},
         {key: 'ALCOHOL', 'label': 'Alcohol User', value: binALCOHOL, scale: scaleBand().domain(['Yes', 'No', 'NA', 'Not Asked']).range([0, 180]), brush: null, domain: alcDomain, type: 'qual' },
         {key: 'DRUG_USER', 'label': 'Drug User', value: binDRUG, scale: scaleBand().domain(['Yes', 'No', 'NA', 'Not Asked']).range([0, 180]), brush: null, domain: drugDomain, type: 'qual' },
-        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scaleBand().domain(["Quit", "Yes", "NA", "Never", "Not Asked", "Passive"]).range([0, 180]), brush: null, domain: tobDomain, type: 'qual' }
+        {key: 'TOBACCO', 'label': 'Tobacco User', value: binTOB, scale: scaleBand().domain(["Quit", "Yes", "NA", "Never", "Not Asked", "Passive"]).range([0, 180]), brush: null, domain: tobDomain, type: 'qual' },
+        {key: 'GENDER', 'label': 'Gender', value: binGEN, scale: scaleBand().domain(['Male', 'Female']).range([0, 180]), brush: null, domain: genDomain, type: 'qual' },
+        {key: 'DM_CODE', 'label': 'DM', value: binDM, scale: scaleBand().domain(['0','250']).range([0, 180]), brush: null, domain: dmDomain, type: 'qual' }
         ];
 
         this.FilterData = distData;
