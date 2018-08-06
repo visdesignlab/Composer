@@ -63,19 +63,19 @@ export class CohortSideBar {
   private attachListener () {
 
     events.on('test', (evt, item)=> {
-      this.updateCohorts(item[0], this.cohortKeeper).then(cohorts=> {
-      
-        let index = item[1];
-        let selected = cohorts.filter(c=> c.cohortIndex == index);
-    
-        selected.classed('selected', true);
-
-      });
-
-   });
+      this.groupEvents(item[0], true).then(d=> {
+        console.log(d);
+        
+        this.updateCohorts(d, this.cohortKeeper).then(cohorts=> {
+              let index = item[1];
+              let selected = cohorts.filter(c=> c.cohortIndex == index);
+              selected.classed('selected', true);
+            });
+            
+          });
+    });
 
     events.on('update_chart', (evt, item)=> {
-    
       if(item){
           let selectedFilters = item.filterArray;
           let cohortPromis = item.promis;
@@ -84,7 +84,6 @@ export class CohortSideBar {
         }
       }
     });
-
   }
 
   async init() {
@@ -100,7 +99,6 @@ export class CohortSideBar {
     }
 
     private async BuildCohortPanel(panelDiv){
-
       let cohorthead = panelDiv.append('div').classed('panel-head', true).style('height', '70px');
       let headertext = cohorthead.append('div').style('display', 'block').style('padding-left', '0').style('float', 'none').attr('width', 200).append('text').text('Cohort Control');
   
@@ -119,7 +117,6 @@ export class CohortSideBar {
       clear.on('click', function(d){ events.fire('clear_cohorts'); });
 
       return cohortBody;
-
     }
 
     private async BuildFilterPanel(panelDiv){
@@ -131,94 +128,112 @@ export class CohortSideBar {
 
       button.on('click', ()=> {
         let filterBox = select(document.getElementById('filterSideBar'));
-        if(filterBox.classed('hidden')){filterBox.classed('hidden', false);
-        }else{ filterBox.classed('hidden', true); }
+        if(filterBox.classed('hidden')){
+          filterBox.classed('hidden', false);
+        }else{ 
+          filterBox.classed('hidden', true); }
       });
 
       button.attr('transform', 'translate(10, 0)');
 
-      button.on('click', function(d){ 
-        events.fire('show_layer_panel'); 
-        select(document.getElementById('filterSideBar')).classed('hidden', false);
-      });
-  
       let cohortBody = panelDiv.append('div').classed('panel-body', true);
 
       return cohortBody;
 
     }
 
-    private async updateCohorts(cohortData, div){
+    private async groupEvents(cohortData, groupBool){
+  
+      let data = [];
+    
+      let newData = cohortData.map(d=> {
+        data.push(d);
+        if(d.branches.length != 0){
+          d.branches.map(b=> {
+            data.push(b);
+            if(b.branches.length != 0){ b.branches.map(p=> data.push(p)); }
+          });
+        }
+      });
+      if(groupBool == true){
+        let test = data.map((co, i)=> {
+          if(co.filterArray.length > 3){
+            console.log(co);
+            let tempFilterArray = [];
+            let tempEvents = [];
+            let stopIndex = co.filterArray.length - 1;
+            
+            let index;
+            for(index = 0; index < stopIndex; index++){
+              tempEvents.push(co.filterArray[index]);
+            }
+            tempFilterArray.push(tempEvents);
+            for(index; index < co.filterArray.length; index++){
+              tempFilterArray.push(co.filterArray[index]);
+            }
+            co.filterArray = tempFilterArray;
+          }
+          return co;
+        });
+        return test;
+      }else{
+        console.log('ungroup');
+        let test = data.map((co, i)=> {
+          if(co.filterArray[0].length > 1){
+            let temp = [];
+            co.filterArray.forEach(fil => {
+                if(fil.length > 1){
+                    fil.forEach(f => { temp.push(f); });
+                }else{ temp.push(fil); }
+            });
+            co.filterArray = temp;
+         }
+         return co;
+        });
+        return test;
+      }
+    }
+
+    private async updateCohorts(data, div){
 
       div.selectAll('.cohort').remove();
       div.selectAll('.cohort-lines').remove();
 
-      let data = [];
-      let rows = [];
-
-      let newData = cohortData.map(d=> d);
-    
-      newData.forEach(d => {
-        data.push(d);
-        if(d.branches.length != 0){ 
-          d.branches.forEach(b => {
-            data.push(b);
-          });
-         };
-      });
-
       let height = data.length;
+      let width = 260;
   
       div.attr('height', height * 30);
 
       let cohortKeeper = div.selectAll('.cohort').data(data);
-
       cohortKeeper.exit().remove();
-
       let coEnter = cohortKeeper.enter().append('g').attr('class', (d, i)=> 'c-' + i).classed('cohort', true);
-
       cohortKeeper = coEnter.merge(cohortKeeper);
 
-      let rect = cohortKeeper.append('rect').attr('height', 30).attr('transform', (d, i) => 'translate(0,'+ i * 30 +')');
+      let rect = cohortKeeper.append('rect').attr('height', 30).attr('width', width).attr('transform', (d, i) => 'translate(0,'+ i * 30 +')');
 
       let xGroup = cohortKeeper.append('g').classed('x', true);
-      
       xGroup.append('rect').style('fill', 'white').style('width', '20px').attr('height', 20).style('opacity', '.7');
       
       let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
-      xGroup.attr('transform', (d, i)=> 'translate(225, '+ ((i * 30) + 4) + ')');
+      xGroup.attr('transform', (d, i)=> 'translate(230,'+ ((i * 30) + 4) + ')');
 
-      xGroup.on('click', function(d, i){
-       
-        events.fire('remove_cohort', d);
-      });
+      xGroup.on('click', function(d, i){ events.fire('remove_cohort', d); });
 
-      data.forEach((c, i) => {
-        if(c.filterArray.length > 3){
-          let tempFilterArray = [];
-          let tempEvents = [];
-          let stopIndex = c.filterArray.length - 1;
-          console.log(stopIndex);
-          let index;
-          for(index = 0; index < stopIndex; index++){
-            tempEvents.push(c.filterArray[index]);
-          }
-          tempFilterArray.push(tempEvents);
-          for(index; index < c.filterArray.length; index++){
-            tempFilterArray.push(c.filterArray[index]);
-          }
-          c.filterArray = tempFilterArray;
-          console.log(c.filterArray);
+      let moveLength = Math.max.apply(null, data.map(d=> {
+        if(d.branches.length > 0) { 
+          let total = +d.filterArray.length;
+          total = total + d.branches[0].filterArray.length;
+          return +total;
         }
-
-      })
+        else{ return +d.filterArray.length;}
+      }));
 
       data.forEach(c => {
-        
         let e = c.filterArray.map(function(event, i){
-          let xMove = (+i * 40) + 65;
+          let index = +i;
+          let xMove = (index * (140/moveLength)) + 65;
           if(event.length > 1){ 
-            let coord = [{x: xMove, y: 6 },{x: xMove + 6, y: 6}, {x: xMove + 9, y: 0}, {x: xMove + 12, y: 12}, {x: xMove + 15, y: 6}];
+            let coord = [{x: xMove, y: 6 },{x: xMove + 6, y: 6}, {x: xMove + 9, y: 0}, {x: xMove + 12, y: 12}, {x: xMove + 14, y: 6}];
             return coord;
           }else{
             let coord = {x: xMove, y: 6 };
@@ -236,14 +251,13 @@ export class CohortSideBar {
       });
 
       data.forEach(c => {
-    
         if(c.branches.length != 0){
             c.branches.forEach((b, i) => {
-                b.rowData = [{x: 27, y: -27 }, {x: 60, y: 0 }];
-                b.filterArray.forEach((event, i) => {
-                    let xMove = (i * 40) + 65;
+                b.rowData = [{x: (0 - (140/moveLength)) + 65, y: -27 }, {x: ((0 - (140/moveLength))/ 2) + 65, y: 0 }];
+                b.filterArray.forEach((event, j) => {
+                  let xMove = (+j * (140/moveLength)) + 65;
                     if(event.length > 1){ 
-                      b.rowData.push({x: xMove, y: 6 }, {x: xMove + 6, y: 6}, {x: xMove + 9, y: 0}, {x: xMove + 12, y: 12}, {x: xMove + 15, y: 6});
+                      b.rowData.push({x: xMove, y: 6 }, {x: xMove + 6, y: 6}, {x: xMove + 9, y: 0}, {x: xMove + 12, y: 12}, {x: xMove + 14, y: 6});
                     }else{
                       let coord = {x: xMove, y: 6 };
                       b.rowData.push(coord);
@@ -259,10 +273,8 @@ export class CohortSideBar {
 
         let cohorts = div.selectAll('.cohort-lines').data(data);
         cohorts.exit().remove();
-
         let cohEnter = cohorts.enter().append('g').attr('class', (d, i) => d.label).classed('cohort-lines', true);
         cohorts = cohEnter.merge(cohorts);
-
         cohorts.attr('transform', (d, i)=> 'translate(0,' + ((i * 30) + 10) + ')');
 
         let label = cohorts.append('g').classed('labels', true);
@@ -270,11 +282,9 @@ export class CohortSideBar {
         label.append('text').text((d, i)=> {return d.label} );
         label.attr('transform', 'translate(3, 10)');
         label.on('click', (d, i)=> {
-          
             this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
             thislabel[i].classList.add('selected');
-    
             if(d.parentIndex == null){
                 events.fire('cohort_selected', d);
             }else{
@@ -282,7 +292,9 @@ export class CohortSideBar {
             }
         });
 
-        let linegroups = cohorts.append('g').classed('rows', true).attr('transform', (d) => 'translate('+ (d.eventIndex * 4) +'0)');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
+        function translateEvent(d){ return d.eventIndex * (140/+moveLength); }
+
+        let linegroups = cohorts.append('g').classed('rows', true).attr('transform', (d) => 'translate('+ translateEvent(d) +',0)');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
         let linePath = linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
 
         let cohortevents = linegroups.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
@@ -291,7 +303,7 @@ export class CohortSideBar {
         let eventEnter = cohortevents.enter().append('g').classed('events', true);
 
         cohortevents = eventEnter.merge(cohortevents);
-        cohortevents.attr('transform', (d, i)=> 'translate(' + i * 40 + ', 0)');
+        cohortevents.attr('transform', (d, i)=> 'translate(' + i * (140/moveLength) + ', 0)');
 
         let circle = cohortevents.append('circle').attr('cx', 5).attr('cy', 5).attr('r', 4);
         circle.on("mouseover", (d) => {
@@ -311,23 +323,27 @@ export class CohortSideBar {
             .style("opacity", 0);
           });
 
-          
           let nested = cohortevents.filter(d=> d.length > 1);
        
           nested.classed('agg', true);
-          nested.select('circle').attr('r', 6)
+          nested.select('circle').attr('r', 6);
+
+          nested.on('click', (d, i)=> {
+            this.groupEvents(data, false).then(g=> {
+              this.updateCohorts(g, this.cohortKeeper).then(co=> {
+                  let selected = co.filter(c=> c.flatIndex == i);
+                  selected.classed('selected', true);
+              });
+            });
+          });
 
           let last = selectAll('.event-rows').nodes();
-
           selectAll('.lastChild').classed('lastChild', false);
 
           last.forEach((c, i) => {
-
             let eventNodes = select(c).selectAll('.events').nodes();
-        
             let index = eventNodes.length;
             let lastChild = eventNodes[index - 1];
-
             select(lastChild).classed('lastChild', true)
                 .on("mouseover", (d) => {
                   let t = transition('t').duration(500);
@@ -346,7 +362,7 @@ export class CohortSideBar {
                     .style("opacity", 0);
                 });
 
-            let text = select(lastChild).append('g').append('text').text('+');
+          let text = select(lastChild).append('g').append('text').text('+');
    
           text.attr('transform', 'translate(1, 10)');
 
@@ -366,7 +382,6 @@ export class CohortSideBar {
             select(".tooltip").transition(t)
             .style("opacity", 0);
         });
-
           select(lastChild).on('click', (d, i)=> {
             events.fire('branch_cohort');
           });
@@ -403,9 +418,10 @@ export class CohortSideBar {
       barGroup = barGroupEnter.merge(barGroup);
 
       let barSvg = barGroup.append('svg').classed('filter_stage_svg', true);
-
+     
       let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d['count'])).attr('transform', 'translate(12, 0)');
       rect.attr('class', d=> classRect(d));
+      rect.classed('c-' + cohort.flatIndex, true);
       let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
       text.append('text').text((d, i)=> { return (i + 1) + ': '});
 
@@ -417,7 +433,6 @@ export class CohortSideBar {
       xGroup.attr('transform', (d, i)=> 'translate(205, 0)');
 
       xGroup.on('click', function(d, i){
-       console.log(d);
         events.fire('remove_filter', d);
       });
 
@@ -437,9 +452,6 @@ export class CohortSideBar {
           if(d.type == 'Demographic'){
               if(d.value.length != 0){
                   des = d.filter;
-               //   d.value.forEach(c => {
-               //     des = des + ' ' + c + ',';
-               //   });
               }else{ des = 'All Patients'; }
           }else if(d.type == 'CPT'){ des = d.filter;
           }else if(d.type == 'Start'){ des = 'All Patients'; }
@@ -450,7 +462,6 @@ export class CohortSideBar {
 
       text.append('text').text(d => d['count']).attr('transform', 'translate(170, 0)');
       text.on("mouseover", (d) => {
-        console.log(d);
           let t = transition('t').duration(500);
           select(".tooltip")
           .html(() => {
@@ -482,12 +493,9 @@ private renderFilterTooltip(data) {
   let text = data.filter + '</br>';
 
   if(data.value != null){ 
-    console.log(data);
     if(data.filter == 'BMI' || data.filter == 'AGE' || data.filter == 'CCI'){ text = text + data.value[0] + ' - ' + data.value[1]; 
     }else if(data.filter == 'ALCOHOL'){ 
-      console.log(data.value);
       text = data.value.forEach(v => { 
-        console.log(v)
         text + String(v) + ', '} );}
   }
   return text;
