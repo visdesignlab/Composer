@@ -83,7 +83,6 @@ export class DataManager {
         events.on('create_button_down', () => { // called in sidebar
     
                 this.loadNewCohortData().then(data=> {
-                    console.log(data);
                     events.fire('new_cohort', data)});
           });
 //this is for loading the data in don't delete this
@@ -105,12 +104,10 @@ export class DataManager {
             }else{
              
                 this.searchByEvent(cpt, codes[0]).then((cptFiltered)=> {
-                    console.log(cptFiltered);
                     let eventStartArray = cptFiltered;
                     this.addMinDay(promis, eventStartArray).then(co=> {
                         this.getDays(co, 'days').then(promisShifted=> {
                             this.getBaselines(promisShifted).then(based=> {
-                                console.log(promisShifted);
                                 this.updateCptDiff(codes[0], cpt, promisShifted).then(cptShifted=> {
                                     events.fire('min_day_calculated', [based, cptShifted, codes]);
                                 });
@@ -136,7 +133,7 @@ export class DataManager {
             let cohort = item[0];
             let type = cohort.dataType;
              let promis = cohort.og[type];
-             console.log(promis);
+       
              let cpt = cohort.cpt;
              let filters = item[1];
 
@@ -277,7 +274,7 @@ export class DataManager {
         let test = await filters.map(d=> {
             if(d.type == 'CPT'){
                 that.searchByEvent(cpt, d.value).then((c)=> {
-                    console.log(c);
+               
                     let ids = c.map(id=> id[0].key);
                     demo = demo.filter(dem=> ids.indexOf(dem.ID) > -1);
                     return demo;
@@ -329,9 +326,6 @@ export class DataManager {
             let promis = cohort.chartData;
     
             let cohortFiltered = promis.filter(d=> d.value.length > 1);
-
-            console.log(cohortFiltered)
-    
             let negdiff = 0;
             let posdiff = 0;
     
@@ -345,6 +339,9 @@ export class DataManager {
                 if(patneg < negdiff) {negdiff = patneg;  };
                 if(patpos > posdiff) {posdiff = patpos;  };
             });
+
+            console.log(negdiff);
+            console.log(posdiff);
            
             negdiff = Math.round(negdiff / 10) * 10;
             posdiff = Math.round(posdiff / 10) * 10;
@@ -420,9 +417,6 @@ export class DataManager {
                     if(top != undefined){ pat.bins[i].y = (top.slope * x) + top.b; };
                 }
             });
-
-            let test = cohortFiltered.map(d=> d.bins.map(b=> b.y));
-            console.log(test);
        
             return cohortFiltered;
     }
@@ -560,8 +554,37 @@ export class DataManager {
         return mapped;
     };
     private async getQuant_Separate(cohort, binNum, relativeChange) {
-        console.log(cohort);
+  
         let arrayofArrays = [];
+        let binTest = cohort.map(c=> {
+            let bin = c.bins.map(b=> { return { x: b.x, y: b.y, b:c.b, key: c.key} })
+            return bin });
+
+        let diffArr = binTest.map(bin => {
+            return bin.filter(b=> b.x > -1 && b.x < 365);
+            //if(diffs.every(d=> d.y == null) == false){return diffs}
+            });
+
+        diffArr = diffArr.filter(d=> d.every(f=> f.y == null) == false);
+
+       let avDiff = diffArr.map(arr=> {
+           arr = arr.map(d=> {
+            return { x: d.x, y: +d.y - +d.b, key: d.key}
+           });
+           return arr;
+       });
+
+       let avs = avDiff.map(av=> { 
+           console.log(av);
+           let test = av.map(t=> t.y);
+           let score = test.reduce((a, b) => a + b) / av.length;
+        console.log(score);
+        return {average: score, key: av.key};
+        });
+           
+       console.log(avs);
+       
+
         if(relativeChange == true){
             cohort.forEach(pat => {
                 let afterEvent = pat.value.filter(v=> v.diff > -1);
@@ -646,7 +669,6 @@ export class DataManager {
             
         return arrayofArrays;
     }
-
     public async mapDemoData(table) {
 
             let that = this;
