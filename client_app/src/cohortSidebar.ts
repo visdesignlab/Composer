@@ -64,8 +64,6 @@ export class CohortSideBar {
 
     events.on('test', (evt, item)=> {
       this.groupEvents(item[0], true).then(d=> {
-        console.log(d);
-        
         this.updateCohorts(d, this.cohortKeeper).then(cohorts=> {
               let index = item[1];
               let selected = cohorts.filter(c=> c.cohortIndex == index);
@@ -158,7 +156,6 @@ export class CohortSideBar {
       if(groupBool == true){
         let test = data.map((co, i)=> {
           if(co.filterArray.length > 3){
-            console.log(co);
             let tempFilterArray = [];
             let tempEvents = [];
             let stopIndex = co.filterArray.length - 1;
@@ -177,7 +174,6 @@ export class CohortSideBar {
         });
         return test;
       }else{
-        console.log('ungroup');
         let test = data.map((co, i)=> {
           if(co.filterArray[0].length > 1){
             let temp = [];
@@ -247,7 +243,6 @@ export class CohortSideBar {
           }else{ tempArray.push(element); }
         });
         c.rowData = tempArray;
-       
       });
 
       data.forEach(c => {
@@ -363,7 +358,6 @@ export class CohortSideBar {
                 });
 
           let text = select(lastChild).append('g').append('text').text('+');
-   
           text.attr('transform', 'translate(1, 10)');
 
           text.on("mouseover", (d) => {

@@ -35,6 +35,7 @@ export class PlotKeeper {
     comparisonArray;
     drawPromisChart;
     frequencyCalc;
+    drawAgg;
     clearDiagram;
     scoreScale;
     timeScale;
@@ -48,6 +49,7 @@ export class PlotKeeper {
 
         this.drawPromisChart = promisDiagram.drawPromisChart;
         this.frequencyCalc = promisDiagram.frequencyCalc;
+        this.drawAgg = promisDiagram.drawAgg;
         this.clearDiagram = promisDiagram.clearDiagram;
 
         this.$node = select(parent);
@@ -199,12 +201,12 @@ export class PlotKeeper {
                   if(clumped){
                       //if it is aggregated
                       if(separated){
-                          this.frequencyCalc(item.promisSep[0], 'bottom', this.selectedPlot, item, null);
-                          this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'middle'));
-                          this.frequencyCalc(item.promisSep[2], 'top', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'bottom'));
+                          this.frequencyCalc(item.promisSep[0], this.selectedPlot, item, null).then(co=> this.drawAgg(co, 'bottom', this.selectedPlot, null));
+                          this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item, null).then(co=> this.drawAgg(co, 'middle', this.selectedPlot, null));
+                          this.frequencyCalc(item.promisSep[2], 'top', this.selectedPlot, item, null).then(co=> this.drawAgg(co, 'bottom', this.selectedPlot, null));
                       }else{
                           
-                          this.frequencyCalc(promis, 'all', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'all'));
+                          this.frequencyCalc(promis, 'all', this.selectedPlot, item, null).then(co=> this.drawAgg(co, 'all', this.selectedPlot, item, null));
                       }
       
                   }else{
