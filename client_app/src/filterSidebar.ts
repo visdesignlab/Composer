@@ -232,10 +232,8 @@ export class FilterSideBar {
     private async frequencyMapper(data, key){
         
         if(key == "DM_CODE"){
-            console.log('dm!');
             data = data.map(d=> parseInt(d));
             let categories = Array.from(new Set(data));
-            console.log(categories);
             let mapped = categories.map(cat => {
                 let counter = data.filter(d=> d == cat);
                 let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
@@ -246,9 +244,7 @@ export class FilterSideBar {
         }else{
 
             let categories = Array.from(new Set(data));
-            console.log(categories);
             let mapped = [];
-    
             categories.forEach(cat => {
                 let counter = data.filter(d=> d == cat);
                 let map = {value: cat, length: counter.length, binCount: categories.length, frequency: counter.length/categories.length, type: 'qual'};
@@ -299,7 +295,6 @@ export class FilterSideBar {
     private async distribute(data){
 
         let totalPatients = data.length;
-        console.log(data);
 
         let mappedBMI = data.map((d: number) => +d['BMI']);
         let mappedAGE = data.map((d: number) => +d['AGE']);
@@ -315,7 +310,6 @@ export class FilterSideBar {
         let dmDomain = Array.from(new Set(mappedDM));
         let tobDomain = Array.from(new Set(mappedTOB));
         let genDomain = Array.from(new Set(mappedGENDER));
-        console.log(dmDomain);
 
         let binBMI = await this.histogrammer(mappedBMI, 'quant', 8);
         let binCCI = await this.histogrammer(mappedCCI, 'quant', 22);

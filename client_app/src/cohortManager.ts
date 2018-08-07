@@ -355,7 +355,7 @@ export class CohortManager {
             });
 
             events.on('demo_filter_change', (evt, item)=> {
-                console.log(this.selectedCohort);
+          
                 let filterArray = this.selectedCohort.filterArray;
                 if(filterArray[0].length > 1){
                     let temp = [];
@@ -445,8 +445,7 @@ export class CohortManager {
             
             this.counter++;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-            console.log(this.selectedCohort);
-         
+
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
 
@@ -500,7 +499,7 @@ export class CohortManager {
           });
 
         events.on('remove_cohort', (evt, item)=> {
-            console.log(item.cohortIndex);
+
             if(item.cohortIndex.length > 1){
                 let pIndex = item.cohortIndex[0];
                 let bIndex = item.cohortIndex[1];
@@ -542,7 +541,7 @@ export class CohortManager {
 
         events.on('remove_filter', (evt, item)=>{
             let filterArray = this.selectedCohort.filterArray;
-            console.log(item);
+     
             if(filterArray[0].length > 1){
                 let temp = [];
                 filterArray.forEach(fil => {
@@ -554,7 +553,7 @@ export class CohortManager {
             }
 
             let newFilters = filterArray.filter(f=> f.filter != item.filter);
-            console.log(newFilters);
+
             this.selectedCohort.filterArray = newFilters;
             events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, null]);
 
