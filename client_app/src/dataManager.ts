@@ -579,7 +579,7 @@ export class DataManager {
            let test = av.map(t=> t.y);
            let score = test.reduce((a, b) => a + b) / av.length;
         console.log(score);
-        return {average: score, key: av.key};
+        return {average: score, key: av[0].key};
         });
            
        console.log(avs);
