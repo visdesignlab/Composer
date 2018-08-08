@@ -143,11 +143,19 @@ export class CohortManager {
                     this.selectedCohort.clumped = true;
                 }
 
-                events.fire('update_chart', this.selectedCohort);
+               // events.fire('update_chart', this.selectedCohort);
+               events.fire('calc_bins', this.selectedCohort);
+
             }
         
           
             });
+        events.on('bins_calculated', (evt, item)=> {
+            console.log(item);
+            console.log(this.selectedCohort);
+            this.selectedCohort.chartData = item;
+            events.fire('update_chart', this.selectedCohort);
+        })
 
         events.on('branch_cohort', ()=> {
 
@@ -230,26 +238,26 @@ export class CohortManager {
                     }
                 
                 events.fire('draw_layers', this.layerKeeper);
-        }else{  
-              let scaleRelative;
+            }else{  
+                let scaleRelative;
 
-            if(this.branchSelected == null){
-                scaleRelative = this.cohortTree[this.cohortIndex].scaleR;
-                this.selectedCohort = this.cohortTree[this.cohortIndex];
-            }else{
-                scaleRelative = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].scaleR;
-                this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
-            }
+                if(this.branchSelected == null){
+                    scaleRelative = this.cohortTree[this.cohortIndex].scaleR;
+                    this.selectedCohort = this.cohortTree[this.cohortIndex];
+                }else{
+                    scaleRelative = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].scaleR;
+                    this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
+                }
 
-            if(!scaleRelative){
-                scaleRelative = true;
-                
-            }else{
-                scaleRelative = false;
+                if(!scaleRelative){
+                    scaleRelative = true;
+                    
+                }else{
+                    scaleRelative = false;
+                }
+                this.selectedCohort.scaleR = scaleRelative;
+                events.fire('update_chart', this.selectedCohort);
             }
-            this.selectedCohort.scaleR = scaleRelative;
-            events.fire('update_chart', this.selectedCohort);
-        }
            
         });
 
@@ -533,9 +541,6 @@ export class CohortManager {
                     this.cohortIndex = 0;
                     events.fire('create_button_down');
                 }
-              
-                
-             
             }
         });
 
@@ -556,7 +561,6 @@ export class CohortManager {
 
             this.selectedCohort.filterArray = newFilters;
             events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, null]);
-
         });
 
         events.on('filter_aggregate', (evt, item)=> {

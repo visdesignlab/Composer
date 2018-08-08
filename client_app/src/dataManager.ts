@@ -119,8 +119,9 @@ export class DataManager {
         });
 
 
-        events.on('filter_cohort_agg', (evt, item)=> {
-            console.log('filter cohrot agg happens');
+        events.on('calc_bins', (evt, item)=> {
+            console.log(item);
+            this.frequencyCalc(item).then(d=> events.fire('bins_calculated', d))
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -181,6 +182,7 @@ export class DataManager {
             }
             this.selected = item[0];
            this.frequencyCalc(this.selected).then(co=> { this.getQuant_Separate(co, 3, this.scoreChangeBool).then(sep=> {
+               console.log(sep);
                 events.fire('separated_by_quant', sep);
             })
         });
@@ -333,15 +335,12 @@ export class DataManager {
             cohortFiltered.forEach(pat => {
                 let patZero = pat.value.filter(p=> p.diff == 0);
                 let patDiffArray = pat.value.map(d=> +d.diff);
-                console.log(patDiffArray);
+         
                 let patneg = d3.min(patDiffArray);
                 let patpos = d3.max(patDiffArray);
                 if(patneg < negdiff) {negdiff = patneg;  };
                 if(patpos > posdiff) {posdiff = patpos;  };
             });
-
-            console.log(negdiff);
-            console.log(posdiff);
            
             negdiff = Math.round(negdiff / 10) * 10;
             posdiff = Math.round(posdiff / 10) * 10;
@@ -361,23 +360,31 @@ export class DataManager {
                             let x2 = pat.value[i].diff;
                             let y1;
                             let y2;
+
+                            /*
                             if(scaleRelative){
                                 y1 = pat.value[i-1].relScore;
                                 y2 = pat.value[i].relScore;
                             }else{
                                 y1 = pat.value[i-1].SCORE;
                                 y2 = pat.value[i].SCORE;
-                            }
-                        
+                            }*/
+
+                            y1 = pat.value[i-1].SCORE;
+                            y2 = pat.value[i].SCORE;
+
                             pat.value[i].calc = [[x1, y1],[x2, y2]];
                             let slope = (y2 - y1) / (x2 - x1);
     
                             pat.value[i].slope = slope;
+                            pat.value[i].b = y1 - (slope * x1);
+
+                            /*
                             if(scaleRelative){
                                 pat.value[i].b = 0;
                             }else{
                                 pat.value[i].b = y1 - (slope * x1);
-                            } 
+                            } */
                     }
                 }
     
@@ -399,15 +406,15 @@ export class DataManager {
     
                 if(first != undefined){
                     const startIndex = pat.bins.indexOf(first);
-                    if(scaleRelative){ 
-                        first.y = pat.value[0].relScore;
-                    }else{
-                        first.y = pat.value[0].SCORE;
-                    }
+                    first.y = pat.value[0].SCORE;
+/*
+                    if(scaleRelative){ first.y = pat.value[0].relScore; }else{ first.y = pat.value[0].SCORE; }
+*/
                 }
     
                 if(last != undefined){
-                    if(scaleRelative){  last.y = pat.value[pat.value.length-1].relScore; }else{  last.y = pat.value[pat.value.length-1].SCORE; }
+                    last.y = pat.value[pat.value.length-1].SCORE;
+                  //  if(scaleRelative){  last.y = pat.value[pat.value.length-1].relScore; }else{  last.y = pat.value[pat.value.length-1].SCORE; }
                     }
     
                 for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
@@ -556,6 +563,7 @@ export class DataManager {
     private async getQuant_Separate(cohort, binNum, relativeChange) {
   
         let arrayofArrays = [];
+
         let binTest = cohort.map(c=> {
             let bin = c.bins.map(b=> { return { x: b.x, y: b.y, b:c.b, key: c.key} })
             return bin });
@@ -567,24 +575,31 @@ export class DataManager {
 
         diffArr = diffArr.filter(d=> d.every(f=> f.y == null) == false);
 
-       let avDiff = diffArr.map(arr=> {
-           arr = arr.map(d=> {
-            return { x: d.x, y: +d.y - +d.b, key: d.key}
-           });
-           return arr;
-       });
+        let avDiff;
 
+    if(relativeChange == true){
+        avDiff = diffArr.map(arr=> {
+            arr = arr.map(d=> {
+             return { x: d.x, y: +d.y - +d.b, key: d.key}
+            });
+            return arr;
+        });
+    }else{
+        avDiff = diffArr.map(arr=> {
+            arr = arr.map(d=> {
+             return { x: d.x, y: +d.y, key: d.key}
+            });
+            return arr;
+        });
+    }
+      
        let avs = avDiff.map(av=> { 
-           console.log(av);
            let test = av.map(t=> t.y);
            let score = test.reduce((a, b) => a + b) / av.length;
-        console.log(score);
-        return {average: score, key: av[0].key};
+           return {average: score, key: av[0].key };
         });
-           
-       console.log(avs);
-       
-
+        
+/*
         if(relativeChange == true){
             cohort.forEach(pat => {
                 let afterEvent = pat.value.filter(v=> v.diff > -1);
@@ -602,9 +617,16 @@ export class DataManager {
      
              let avsArray = cohort.map(d=> d.avChange);
              avsArray = avsArray.sort((a,b)=> a-b);
-         
+         *
              let thresholdArray = Array.from(new Set(avsArray));
-     
+     */
+             let avsArray = avs.map(d=> d.average);
+             avsArray = avsArray.sort((a,b)=> a-b);
+             console.log(avsArray.length)
+            
+             let thresholdArray = Array.from(new Set(avsArray));
+             console.log(thresholdArray);
+
              let num = Math.floor(thresholdArray.length / binNum);
      
              let thresholds = [];
@@ -612,62 +634,31 @@ export class DataManager {
              for(let i = 0; i < (binNum - 1); i++){
                thresholds.push(thresholdArray[num]);
                num = num + num;  }
-               
-             for(let i = 0; i < binNum; i++){
-                 if(i == 0){ 
-                     arrayofArrays.push(cohort.filter(c=> c.avChange < thresholds[i]));
-                 }else if(i == (binNum - 1)) {
-                     arrayofArrays.push(cohort.filter(c=> c.avChange > thresholds[i-1]));
-                 }else {
-                     arrayofArrays.push(cohort.filter(c=> c.avChange < thresholds[i] && c.avChange > thresholds[i-1] ));
-                 }
-             }
-        }else {
-     
-            let barray = cohort.map(pat=> {
-                if(pat.b != undefined){return pat.b;
-                }else { return pat.value[0].SCORE; }
-            });
 
-        
-       
-            barray = barray.sort((a,b)=> a-b);
-            let thresholdArray = Array.from(new Set(barray));
-    
-            let num = Math.floor(thresholdArray.length / binNum);
-    
-            let thresholds = [];
+            console.log(thresholds);
 
-            for(let i = 0; i < (binNum - 1); i++){
-                thresholds.push(thresholdArray[num]);
-                num = num + num;  }
-
-  
-            if(cohort[0].b != undefined){
-                for(let i = 0; i < binNum; i++){
-                    if(i == 0){ 
-                        arrayofArrays.push(cohort.filter(c=> c.b < thresholds[i]));
-                    }else if(i == (binNum - 1)) {
-                        arrayofArrays.push(cohort.filter(c=> c.b > thresholds[i-1]));
-                    }else {
-                        arrayofArrays.push(cohort.filter(c=> c.b < thresholds[i] && c.b > thresholds[i-1] ));
-                    }
-                }
-            }else {
-                for(let i = 0; i < binNum; i++){
-                    if(i == 0){ 
-                        arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE < thresholds[i]));
-                    }else if(i == (binNum - 1)) {
-                        arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE > thresholds[i-1]));
-                    }else {
-                        arrayofArrays.push(cohort.filter(c=> c.value[0].SCORE < thresholds[i] && c.value[0].SCORE > thresholds[i-1] ));
-                    }
-
+            for(let i = 0; i < binNum; i++){
+                if(i == 0){ 
+                    arrayofArrays.push(avs.filter(c=> c.average < thresholds[i]));
+                }else if(i == (binNum - 1)) {
+                    arrayofArrays.push(avs.filter(c=> c.average > thresholds[i-1]));
+                }else {
+                    arrayofArrays.push(avs.filter(c=> c.average < thresholds[i] && c.average > thresholds[i-1] ));
                 }
             }
-        }
+
+            console.log(arrayofArrays);
+
+            let test = arrayofArrays.forEach(a=> {
+                a.map(d=> {
+                    let index = cohort.map(c=> c.key).indexOf(d.key);
+                    d.values = cohort[index];
+                    return d.values;
+                });
+                console.log(a);
+            });
             
-        return arrayofArrays;
+        return arrayofArrays.map(a=> a.map(d=> d.values));
     }
     public async mapDemoData(table) {
 
