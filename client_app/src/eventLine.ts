@@ -25,8 +25,6 @@ import {argFilter} from 'phovea_core/src/';
 
 export class EventLine {
     private $node;
-    private eventScale;
-    private circleScale;
     private filter;
     private startCodes;
     private scoreLabel;
@@ -36,21 +34,22 @@ export class EventLine {
     private branchHeight;
     private layerBool;
     private scoreChangeBool;
+    private diffDays;
+    private handle;
+    private sepBool;
 
     constructor(parent: Element, cohort) {
 
     this.$node = select(parent);
-    this.eventScale = scaleLinear().domain([0, 4])
-            .range([0, 750]).clamp(true);
-
-    this.circleScale = scaleLinear().domain([0, 3000])
-            .range([1, 15]).clamp(true);
 
     this.scoreLabel = 'Absolute Scale';
     this.startEventLabel = 'Change Start to Event';
     this.branchHeight = 30;
+    this.diffDays;
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
     let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
+    let eventButtonDiv = this.$node.append('div').attr('id', 'eventButtonDiv');
+    let slider = this.$node.append('div').attr('id', 'sliderDiv');
     branchWrapper.append('svg').attr('height', this.branchHeight);
     this.scoreChangeBool;
    
@@ -107,8 +106,12 @@ export class EventLine {
          
         });
 
-        events.on('update_chart', (evt, item)=> {
+        events.on('separated_by_quant', (evt, item)=> {
+            console.log(this.diffDays);
+            if(!this.sepBool){ this.drawSlider(); }
+        });
 
+        events.on('update_chart', (evt, item)=> {
             if(item){
                 this.filter = item.filterArray;
 
@@ -116,12 +119,10 @@ export class EventLine {
                 if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
                     this.startEventLabel = item.startEvent[1];
                 }
-
                 if(this.filter){
                     this.drawEventButtons(item);
                 }
             }
-   
         });
 
     }
@@ -208,7 +209,124 @@ export class EventLine {
 
     }
 
-    private drawEventButtons(cohort){
+    private async drawSlider(){
+     // let sliderDiv = this.$node.select()
+        let that = this;
+
+        var margin = {left: 30, right: 30},
+        width = 200,
+        height = 60,
+        range = [30, 360],
+        step = 2; // change the step and if null, it'll switch back to a normal slider
+
+        // append svg
+        const sliderDiv = select('#sliderDiv').node();
+        
+        const svg = select(sliderDiv).append('svg').node();
+
+        select(svg).attr('width', width)
+                        .attr('height', height);
+    
+        const slider = select(svg).append('g').node();
+
+        select(slider).classed('slider', true)
+            .attr('transform', 'translate(' + margin.left +', '+ (height/2) + ')');
+
+        // using clamp here to avoid slider exceeding the range limits
+        var xScale = scaleLinear()
+            .domain(range)
+            .range([0, width - margin.left - margin.right])
+            .clamp(true);
+    
+        // array useful for step sliders
+        var rangeValues = d3.range(range[0], range[1], step || 1).concat(range[1]);
+        var xAxis = axisBottom(xScale).ticks(8);
+      //  .tickFormat((d)=> {
+         //   return d;
+       ///});
+
+    xScale.clamp(true);
+    // drag behavior initialization
+    const dragg = drag()
+        .on('start.interrupt', function () {
+            select(slider).interrupt();
+        })
+        .on('drag', function () { dragged(event.x); })
+        .on('end', function () { 
+            var x = xScale.invert(event.x);
+            console.log(x);
+            that.diffDays = x;
+            events.fire('change_sep_day', x);
+         });
+       // .on('mouse up', function(){ dragged(event.x) } );
+
+        // this is the main bar with a stroke (applied through CSS)
+    var track = select(slider).append('line').attr('class', 'track')
+    .attr('x1', xScale.range()[0])
+    .attr('x2', xScale.range()[1]);
+
+    var trackInset = select(slider).append('line').attr('class', 'track-inset')
+    .attr('x1', xScale.range()[0])
+    .attr('x2', xScale.range()[1]);
+
+    var trackOverlay = select(slider).append('g').attr('class', 'track-overlay')
+    .attr('x1', xScale.range()[0])
+    .attr('x2', xScale.range()[1])
+
+    if(!this.diffDays){ this.diffDays = 30 }
+    
+    let text = select(slider).append('text').text('Day Range: ' + this.diffDays).attr('transform', 'translate(0, -15)');
+    // this is a bar (steelblue) that's inside the main "track" to make it look like a rect with a border
+   // var trackInset = d3.select(slider.appendChild(track.node().cloneNode())).attr('class', 'track-inset');
+
+    var ticks = select(slider).append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
+        .call(xAxis);
+  
+    // drag handle
+    var handle = select(slider).append('circle').classed('handle', true)
+        .attr('r', 8).call(dragg);
+
+    select(slider).transition().duration(750)
+    .tween("drag", function () {
+       // var i = d3.interpolate(0, 10);
+        return function (t) {
+           // dragged(xScale(i(t)));
+            dragged(xScale(t));
+        }
+    });
+
+    function dragged(value) {
+        var x = xScale.invert(value), index = null, midPoint, cx, xVal;
+        text.text('Day Range: ' + x);
+        if(step) {
+            // if step has a value, compute the midpoint based on range values and reposition the slider based on the mouse position
+            for (var i = 0; i < rangeValues.length - 1; i++) {
+                if (x >= rangeValues[i] && x <= rangeValues[i + 1]) {
+                    index = i;
+                    break;
+                }
+            }
+            midPoint = (rangeValues[index] + rangeValues[index + 1]) / 2;
+            if (x < midPoint) {
+                cx = xScale(rangeValues[index]);
+                xVal = rangeValues[index];
+            } else {
+                cx = xScale(rangeValues[index + 1]);
+                xVal = rangeValues[index + 1];
+            }
+        } else {
+            // if step is null or 0, return the drag value as is
+            cx = xScale(x);
+            xVal = x.toFixed(3);
+        }
+        // use xVal as drag value
+        handle.attr('cx', cx);
+    }
+    this.sepBool = true;
+
+    }
+
+    private async drawEventButtons(cohort){
             let filters = cohort.filterArray;
             let scaleRelative = cohort.scaleR;
             let separated = cohort.separated;
@@ -254,9 +372,10 @@ export class EventLine {
 
             filters = filters.filter(d=> {return d.type != 'Branch' && d.type != 'Demographic' && d.type != 'Score'});
         
-            this.$node.select('.event-buttons').remove();
-
-            let div = this.$node.append('div').classed('event-buttons', true);
+           // this.$node.select('.event-buttons').remove();
+            let div = this.$node.select('#eventButtonDiv');
+            div.selectAll('*').remove();
+           // let div = this.$node.append('div').classed('event-buttons', true);
             //toggle for event day
             let startPanel = div.append('div').classed('start-event', true);
                     
@@ -381,120 +500,19 @@ export class EventLine {
                         that.scoreChangeBool = this.id;
                         events.fire('change_sep_bool', scoreChange);
                     });*/
+                    //let slidDiv = quartDiv.append('div').attr('id', 'sepSlider');
 
-                    let slidDiv = quartDiv.append('div').attr('id', 'sepSlider');
 
-                    var margin = {left: 30, right: 30},
-                    width = 200,
-                    height = 60,
-                    range = [0, 365],
-                    step = 2; // change the step and if null, it'll switch back to a normal slider
-            
-                    // append svg
-                    const sliderDiv = select('#sepSlider').node();
-                    
-                    const svg = select(sliderDiv).append('svg').node();
-
-                    select(svg).attr('width', width)
-                                    .attr('height', height);
-                
-                    const slider = select(svg).append('g').node();
-
-                    select(slider).classed('slider', true)
-                        .attr('transform', 'translate(' + margin.left +', '+ (height/2) + ')');
-
-                    // using clamp here to avoid slider exceeding the range limits
-                    var xScale = scaleLinear()
-                        .domain(range)
-                        .range([0, width - margin.left - margin.right])
-                        .clamp(true);
-                
-                    // array useful for step sliders
-                    var rangeValues = d3.range(range[0], range[1], step || 1).concat(range[1]);
-                    var xAxis = axisBottom(xScale).ticks(10);
-                  //  .tickFormat((d)=> {
-                     //   return d;
-                   ///});
-            
-                xScale.clamp(true);
-                // drag behavior initialization
-                const dragg = drag()
-                    .on('start.interrupt', function () {
-                        select(slider).interrupt();
-                    }).on('start drag', function () {
-                        dragged(event.x);
-        
-                    });
-
-                
-                    // this is the main bar with a stroke (applied through CSS)
-                var track = select(slider).append('line').attr('class', 'track')
-                .attr('x1', xScale.range()[0])
-                .attr('x2', xScale.range()[1]);
-
-                var trackInset = select(slider).append('line').attr('class', 'track-inset')
-                .attr('x1', xScale.range()[0])
-                .attr('x2', xScale.range()[1]);
-
-                var trackOverlay = select(slider).append('g').attr('class', 'track-overlay')
-                .attr('x1', xScale.range()[0])
-                .attr('x2', xScale.range()[1])
-                
-
-                // this is a bar (steelblue) that's inside the main "track" to make it look like a rect with a border
-               // var trackInset = d3.select(slider.appendChild(track.node().cloneNode())).attr('class', 'track-inset');
-
-                var ticks = select(slider).append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
-                    .call(xAxis);
-
-                // drag handle
-                var handle = select(slider).append('circle').classed('handle', true)
-                    .attr('r', 8).call(dragg);
-
-                select(slider).transition().duration(750)
-                .tween("drag", function () {
-                   // var i = d3.interpolate(0, 10);
-                    return function (t) {
-                       // dragged(xScale(i(t)));
-                        dragged(xScale(t));
-                    }
-                });
-
-                function dragged(value) {
-                    var x = xScale.invert(value), index = null, midPoint, cx, xVal;
-                    console.log(x);
-                    if(step) {
-                        // if step has a value, compute the midpoint based on range values and reposition the slider based on the mouse position
-                        for (var i = 0; i < rangeValues.length - 1; i++) {
-                            if (x >= rangeValues[i] && x <= rangeValues[i + 1]) {
-                                index = i;
-                                break;
-                            }
-                        }
-                        midPoint = (rangeValues[index] + rangeValues[index + 1]) / 2;
-                        if (x < midPoint) {
-                            cx = xScale(rangeValues[index]);
-                            xVal = rangeValues[index];
-                        } else {
-                            cx = xScale(rangeValues[index + 1]);
-                            xVal = rangeValues[index + 1];
-                        }
-                    } else {
-                        // if step is null or 0, return the drag value as is
-                        cx = xScale(x);
-                        xVal = x.toFixed(3);
-                    }
-                    // use xVal as drag value
-                    handle.attr('cx', cx);
-                
-                }
-/*
                     if(!separated){  
-                        checkDiv.classed('hidden', true); 
-                        radio.classed('hidden', true); }
-                    else{ checkDiv.classed('hidden', false); 
-                          radio.classed('hidden', false);}
-*/
+                        checkDiv.classed('hidden', true);
+                        select('#sliderDiv').classed('hidden', true);
+             
+                    }
+
+                    else{ checkDiv.classed('hidden', false);
+                    select('#sliderDiv').classed('hidden', false);
+                    }
+
                     if(this.layerBool){
                         //document.getElementById('quartile-btn').classList.add('disabled');
                         quartDiv.select('#quartile-btn').classed('disabled', true);

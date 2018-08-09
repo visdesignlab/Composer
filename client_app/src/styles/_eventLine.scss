@@ -163,14 +163,14 @@
     opacity: .8;
 }
 
-.event-buttons {
+#eventButtonDiv {
     width: 700px;
     // height: 25px;
     display: inline;
     float: left;
 }
 
-.event-buttons div {
+#eventButtonDiv div {
     display: inline;
     float: left;
     margin-right: 2px;
@@ -178,7 +178,7 @@
     margin-top: 0px;
 }
 
-.event-buttons div div button {
+#eventButtonDiv div div button {
     margin-top: 0px;
 }
 

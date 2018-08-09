@@ -164,11 +164,14 @@ export class DataManager {
 
          //there are two of these you need to get rid of one
 
-         events.on('change_sep_bool', (evt, item)=> {
+         events.on('change_sep_day', (evt, item)=> {
             let bool;
+            console.log(item);
+            let days = item;
+            console.log(this.selected)
         
-            this.getQuant_Separate(this.selected.chartData, 3, item.scaleR).then(sep=> {
-                events.fire('separated_by_quant', sep);
+            this.getQuant_Separate(this.selected, 3, item.scaleR, days).then(sep=> {
+                events.fire('separated_by_quant', [sep, days]);
             });
 
          })
@@ -180,16 +183,17 @@ export class DataManager {
             }else{
                 sepBool = false;
             }
+            //YOU NEED TO CHANGE THIS TO WORK WITH SLIDER
             this.selected = item[0];
-           this.frequencyCalc(this.selected).then(co=> { this.getQuant_Separate(co, 3, this.scoreChangeBool).then(sep=> {
+           this.frequencyCalc(this.selected).then(co=> { this.getQuant_Separate(co, 3, this.scoreChangeBool, 30).then(sep=> {
                console.log(sep);
-                events.fire('separated_by_quant', sep);
+               this.selected = co;
+                events.fire('separated_by_quant', [sep, 30]);
             })
         });
         });
 
         events.on('update_cpt_days', (evt, item)=>{
-
             this.updateCptDiff(this.targetOrder, item[0], null).then(cpt=> {
                 events.fire('cpt_updated', cpt);
            });
@@ -560,7 +564,7 @@ export class DataManager {
         const mapped = entries(filteredPatOrders);
         return mapped;
     };
-    private async getQuant_Separate(cohort, binNum, relativeChange) {
+    private async getQuant_Separate(cohort, binNum, relativeChange, dayRange) {
   
         let arrayofArrays = [];
 
@@ -569,7 +573,7 @@ export class DataManager {
             return bin });
 
         let diffArr = binTest.map(bin => {
-            return bin.filter(b=> b.x > -1 && b.x < 365);
+            return bin.filter(b=> b.x > -1 && b.x < dayRange);
             //if(diffs.every(d=> d.y == null) == false){return diffs}
             });
 
