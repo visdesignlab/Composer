@@ -19,6 +19,7 @@ import * as d3 from 'd3';
 import * as dataCalc from './dataCalculations';
 import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
 import {timeParse, timeFormat} from 'd3-time-format';
+import { promises } from 'fs';
 
 export class DataManager {
 
@@ -120,8 +121,16 @@ export class DataManager {
 
 
         events.on('calc_bins', (evt, item)=> {
-            console.log(item);
-            this.frequencyCalc(item).then(d=> events.fire('bins_calculated', d))
+      
+            if(item.layers){
+                let layers = item.layers.map(l=> l.data);
+                this.changeLayerData(layers).then(d=> {
+                    console.log(d);
+                    events.fire('bins_calculated', d)})
+            }else{
+                this.frequencyCalc(item).then(d=> events.fire('bins_calculated', d))
+            }
+          
         });
 
         events.on('filtering_Promis_count', (evt, item)=> {
@@ -200,6 +209,16 @@ export class DataManager {
         });
 
     }
+    private async changeLayerData(layers) {
+        let binned = await layers.map(d => {
+                return this.frequencyCalc(d);
+
+        });
+        console.log(binned);
+       // return binned;
+        return Promise.all(binned);
+    }
+   
     //loads, maps and calculates the day differences for cpt, promis and oswestry index.
     private async loadNewCohortData(){
         let promis =  await this.loadPromisData(this.promisTable, 1123);
@@ -328,10 +347,8 @@ export class DataManager {
          // creates bin array for each patient scores and calulates slope for each bin
         //TODO : get rid of test in name and global variables?
             let scaleRelative = cohort.scaleR;
-  
-            let promis = cohort.chartData;
     
-            let cohortFiltered = promis.filter(d=> d.value.length > 1);
+            let cohortFiltered = cohort.chartData.filter(d=> d.value.length > 1);
             let negdiff = 0;
             let posdiff = 0;
     
@@ -354,7 +371,7 @@ export class DataManager {
     
             let bincount = Math.floor(daydiff/10);
     
-            cohortFiltered.forEach(pat=> {
+            await cohortFiltered.forEach(pat=> {
     
                 for (let i = 1; i < pat.value.length; i++) {
     
@@ -428,7 +445,7 @@ export class DataManager {
                     if(top != undefined){ pat.bins[i].y = (top.slope * x) + top.b; };
                 }
             });
-       
+          
             return cohortFiltered;
     }
     private async getDays(cohort, date) {

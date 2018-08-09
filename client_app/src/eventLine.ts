@@ -47,10 +47,10 @@ export class EventLine {
     this.branchHeight = 30;
     this.diffDays;
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
-    let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
+  
     let eventButtonDiv = this.$node.append('div').attr('id', 'eventButtonDiv');
     let slider = this.$node.append('div').attr('id', 'sliderDiv');
-    branchWrapper.append('svg').attr('height', this.branchHeight);
+
     this.scoreChangeBool;
    
     this.attachListener();
@@ -94,16 +94,14 @@ export class EventLine {
             //need to update comparison array
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
+            console.log('test firing');
+            console.log(item[0]);
             this.buildLayerFilter(layer, item[0]);
     
           });
 
         events.on('clear_cohorts', (evt, item)=> {
-            let branchSvg =this.$node.select('.branch-wrapper').select('svg');
-            branchSvg.selectAll('*').remove();
-
             this.layerBool = false;
-         
         });
 
         events.on('separated_by_quant', (evt, item)=> {

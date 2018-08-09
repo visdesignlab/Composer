@@ -43,74 +43,74 @@
     stroke-width: 2px;
 }
 
-.avLine_all {
+.avLine.all {
     stroke: #212F3D;
-    stroke-width: 2px;
+    stroke-width: 3px;
     fill: none;
 }
 
-.avLine_top {
+.avLine.top {
     stroke: #2874A6;
     stroke-width: 3px;
     fill: none;
 }
 
-.avLine_middle {
+.avLine.middle {
     stroke: #F7DC6F;
     stroke-width: 3px;
     fill: none;
 }
 
-.avLine_bottom {
+.avLine.bottom {
     stroke: #fc8d59;
     stroke-width: 3px;
     fill: none;
 }
 
-.stLine_all {
+.stLine.all {
     stroke: #212F3D;
     stroke-width: 1px;
     fill: none;
     opacity: .2;
 }
 
-.stLine_top {
+.stLine.top {
     stroke: #2874A6;
     stroke-width: 1px;
     fill: none;
     opacity: .2;
 }
 
-.stLine_middle {
+.stLine.middle {
     stroke: #F7DC6F;
     stroke-width: 1px;
     fill: none;
     opacity: .2;
 }
 
-.stLine_bottom {
+.stLine.bottom {
     stroke: #fc8d59;
     stroke-width: 1px;
     fill: none;
     opacity: .2;
 }
 
-.qLine_all {
+.qLine.all {
     fill: #212F3D;
     opacity: .2;
 }
 
-.qLine_top {
+.qLine.top {
     fill: #2874A6;
     opacity: .06;
 }
 
-.qLine_middle {
+.qLine.middle {
     fill: #F7DC6F;
     opacity: .06;
 }
 
-.qLine_bottom {
+.qLine.bottom {
     fill: #fc8d59;
     opacity: .06;
 }
@@ -141,6 +141,82 @@
 .lines {
     z-index: 1000;
     position: relative;
+}
+
+.layer-0 path.qLine.layer-0 {
+    fill: #ff4e50;
+    opacity: .06;
+}
+
+.layer-0 path.stLine.layer-0 {
+    stroke: #ff4e50;
+    fill: none;
+    opacity: .5;
+    stroke-width: 1px;
+}
+
+.layer-0 path.avLine.layer-0 {
+    stroke: #ff4e50;
+    fill: none;
+    opacity: 1;
+    stroke-width: 3px;
+}
+
+.layer-1 path.qLine.layer-1 {
+    fill: #f9d62e;
+    opacity: .06;
+}
+
+.layer-1 path.stLine.layer-1 {
+    stroke: #f9d62e;
+    fill: none;
+    opacity: .5;
+    stroke-width: 1px;
+}
+
+.layer-1 path.avLine.layer-1 {
+    stroke: #f9d62e;
+    fill: none;
+    opacity: 1;
+    stroke-width: 3px;
+}
+
+.layer-2 path.qLine.layer-2 {
+    fill: #8ec127;
+    opacity: .06;
+}
+
+.layer-2 path.stLine.layer-2 {
+    stroke: #8ec127;
+    fill: none;
+    opacity: .5;
+    stroke-width: 1px;
+}
+
+.layer-2 path.avLine.layer-2 {
+    stroke: #8ec127;
+    fill: none;
+    opacity: 1;
+    stroke-width: 3px;
+}
+
+.layer-3 path.qLine.layer-3 {
+    fill: #83d0c9;
+    opacity: .06;
+}
+
+.layer-3 path.stLine.layer-3 {
+    stroke: #83d0c9;
+    fill: none;
+    opacity: .5;
+    stroke-width: 1px;
+}
+
+.layer-3 path.avLine.layer-3 {
+    stroke: #83d0c9;
+    fill: none;
+    opacity: 1;
+    stroke-width: 3px;
 }
 
 .layer-0 path {
