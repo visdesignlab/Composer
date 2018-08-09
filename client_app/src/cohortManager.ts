@@ -128,7 +128,8 @@ export class CohortManager {
                         this.layerKeeper.clumped = false;
                     }
                 
-                events.fire('draw_layers', this.layerKeeper);
+               // events.fire('draw_layers', this.layerKeeper);
+                events.fire('calc_bins', this.layerKeeper);
             
                 
             }else{
@@ -153,8 +154,18 @@ export class CohortManager {
         events.on('bins_calculated', (evt, item)=> {
             console.log(item);
             console.log(this.selectedCohort);
-            this.selectedCohort.chartData = item;
-            events.fire('update_chart', this.selectedCohort);
+            if(this.layerBool){
+                item.forEach((layer, i) => {
+                    this.layerKeeper.layers[i].data.chartData = layer;
+                });
+                console.log(this.layerBool);
+                events.fire('draw_layers', this.layerKeeper);
+
+            }else{
+                this.selectedCohort.chartData = item;
+                events.fire('update_chart', this.selectedCohort);
+            }
+           
         })
 
         events.on('branch_cohort', ()=> {

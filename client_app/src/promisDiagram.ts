@@ -504,21 +504,23 @@ export function clearDiagram(node, cohortIndex) {
    aggline.select('.avLine_top').remove();
    aggline.select('.avLine_middle').remove();
    aggline.select('.avLine_bottom').remove();
+   aggline.select('.stLine').remove();
    aggline.selectAll('.stLine_all').remove();
    aggline.selectAll('.stLine_top').remove();
    aggline.selectAll('.stLine_middle').remove();
    aggline.selectAll('.stLine_bottom').remove();
+   aggline.selectAll('.qLine').remove();
    aggline.selectAll('.qLine_all').remove();
    aggline.selectAll('.qLine_top').remove();
    aggline.selectAll('.qLine_middle').remove();
    aggline.selectAll('.qLine_bottom').remove();
 }
 
-    export async function drawAgg(cohort, clump, node, scale, i){
+    export async function drawAgg(chartData, clump, node, cohort, i){
         console.log(cohort);
  
-        let patbin = cohort.map((d)=> d.bins.map(b=> {
-            if(scale){
+        let patbin = chartData.map((d)=> d.bins.map(b=> {
+            if(cohort.scaleR){
                 if(b.y == null){ 
                     return {x: b.x, y: null };
                  }else{
@@ -539,7 +541,7 @@ export function clearDiagram(node, cohortIndex) {
         
         if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
        }else{
-           zeroEvent = cohort.startEvent[1][0].key;
+           zeroEvent = cohort.startEvent[1];
        }
             
         for(let i = 0; i < patbin[0].length; i++){
@@ -583,7 +585,7 @@ export function clearDiagram(node, cohortIndex) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                        if(scale){ arr.push(null); }else{ arr.push(null); }
+                        if(cohort.scaleR){ arr.push(null); }else{ arr.push(null); }
                       }else{arr.push(q); }
                 });
                 quart2.push(arr);
@@ -598,7 +600,7 @@ export function clearDiagram(node, cohortIndex) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                        if(scale){ arr.push(null); }else{ arr.push(null); }
+                        if(cohort.scaleR){ arr.push(null); }else{ arr.push(null); }
                        
                       }else{arr.push(q); }
                 });
@@ -614,7 +616,7 @@ export function clearDiagram(node, cohortIndex) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                        if(scale){ arr.push(null); }else{ arr.push(null); }
+                        if(cohort.scaleR){ arr.push(null); }else{ arr.push(null); }
                       }else{ arr.push(q); }
                 });
                 topdev2.push(arr);
@@ -625,12 +627,10 @@ export function clearDiagram(node, cohortIndex) {
             topdev2 = topdev2.filter(m=> m[1] != null);
             quart2 = quart2.filter(m=> m[1] != null);
             let data = means.filter(m=> m[1] != undefined);
-            console.log(data);
-            console.log(devs);
-            
+      
             let scoreScale = node.scoreScale;
 
-            if(scale){
+            if(cohort.scaleR){
                 scoreScale.domain([30, -30]);
             }else{ 
         
@@ -674,7 +674,8 @@ export function clearDiagram(node, cohortIndex) {
     
                 group
                 .append('path')
-                .classed('qLine_' + clump, true)
+                .classed('qLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([quart2])
                 .attr('d', drawPaths)
@@ -684,7 +685,8 @@ export function clearDiagram(node, cohortIndex) {
     
                 group
                 .append('path')
-                .classed('avLine_' + clump, true)
+                .classed('avLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([data])
                 .attr('d', lineFunc)
@@ -694,7 +696,8 @@ export function clearDiagram(node, cohortIndex) {
     
                 group
                 .append('path')
-                .classed('stLine_' + clump, true)
+                .classed('stLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([topdev2])
                 .attr('d', lineFunc)
@@ -704,7 +707,8 @@ export function clearDiagram(node, cohortIndex) {
     
                 group
                 .append('path')
-                .classed('stLine_' + clump, true)
+                .classed('stLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([botdev2])
                 .attr('d', lineFunc)

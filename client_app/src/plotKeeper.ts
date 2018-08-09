@@ -104,10 +104,9 @@ export class PlotKeeper {
                 console.log(cohort);
                 if(cohort.data.clumped){
                     //if it is aggregated
-                  //  this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i).then(co=> this.drawAgg(co, 'all', this.selectedPlot, cohort.data.scaleR, i));
-                  this.drawAgg(cohort.data.chartData, 'all', this.selectedPlot, cohort.data.scaleR, i);
+                  this.drawAgg(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data.scaleR, i);
                 }else{
-                    this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
+                    this.drawPromisChart(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data, i);
                 }
             });}
         });
@@ -146,6 +145,7 @@ export class PlotKeeper {
               let selected = layer.selectAll('.fill').nodes();
                selected.forEach((sel, i) => {
                    let cohort = select(sel).data()[0];
+                   console.log(cohort);
                    let entry = {class: 'layer-' + i, data: cohort }
                    array.push(entry);
               });
@@ -196,19 +196,20 @@ export class PlotKeeper {
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
                   let separated = item.separated;
-
+                  console.log('no layers');
                
                   if(clumped){
                       //if it is aggregated
                       if(separated){
                 
-                         this.drawAgg(item.promisSep[0], 'bottom', this.selectedPlot, item.scaleR, null);
-                         this.drawAgg(item.promisSep[1], 'middle', this.selectedPlot, item.scaleR, null);
-                         this.drawAgg(item.promisSep[2], 'top', this.selectedPlot, item.scaleR, null);
+                         this.drawAgg(item.promisSep[0], 'bottom', this.selectedPlot, item, null);
+                         this.drawAgg(item.promisSep[1], 'middle', this.selectedPlot, item, null);
+                         this.drawAgg(item.promisSep[2], 'top', this.selectedPlot, item, null);
 
                       }else{
-                          
-                          this.drawAgg(promis, 'all', this.selectedPlot, item.scaleR, null);
+                        console.log('not sep clumped!');
+                        console.log(item);
+                          this.drawAgg(promis, 'all', this.selectedPlot, item, null);
                       }
       
                   }else{
