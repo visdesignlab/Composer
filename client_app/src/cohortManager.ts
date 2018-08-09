@@ -408,11 +408,11 @@ export class CohortManager {
         events.on('separated_by_quant', (evt, item)=> {
            // this.seperatedCohortArray = item;
             if(this.branchSelected == null){
-                this.cohortTree[this.cohortIndex].promisSep = item;
+                this.cohortTree[this.cohortIndex].promisSep = item[0];
                 this.cohortTree[this.cohortIndex].separated = true;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
             }else{
-                this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].promisSep = item;
+                this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].promisSep = item[0];
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].separated = true;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
