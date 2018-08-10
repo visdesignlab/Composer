@@ -74,7 +74,6 @@ export class EventLine {
               let entry = {class: sel.classList[0], data: sel.__data__ }
               array.push(entry);
           });
-      
           events.fire('update_layers', array);
         });
 
@@ -94,8 +93,6 @@ export class EventLine {
             //need to update comparison array
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
-            console.log('test firing');
-            console.log(item[0]);
             this.buildLayerFilter(layer, item[0]);
     
           });
@@ -131,7 +128,6 @@ export class EventLine {
         let array = [];
         let rows = [];
      
-            
         data.forEach(d => {
             flatData.push(d);
               if(d.branches.length != 0){ 
@@ -140,7 +136,7 @@ export class EventLine {
                 });
                };
             });
-            let panel = compareDiv.append('div').classed('panel', true).classed('panel-default', true).attr('width', 500);
+           let panel = compareDiv.append('div').classed('panel', true).classed('panel-default', true).attr('width', 500);
            let header =  panel.append('div').classed('panel-heading', true);
            header.append('text').text('Layer Control');
 
@@ -239,88 +235,88 @@ export class EventLine {
         // array useful for step sliders
         var rangeValues = d3.range(range[0], range[1], step || 1).concat(range[1]);
         var xAxis = axisBottom(xScale).ticks(8);
-      //  .tickFormat((d)=> {
+         //  .tickFormat((d)=> {
          //   return d;
-       ///});
+         ///});
 
-    xScale.clamp(true);
-    // drag behavior initialization
-    const dragg = drag()
-        .on('start.interrupt', function () {
-            select(slider).interrupt();
-        })
-        .on('drag', function () { dragged(event.x); })
-        .on('end', function () { 
-            var x = xScale.invert(event.x);
-            console.log(x);
-            that.diffDays = x;
-            events.fire('change_sep_day', x);
-         });
-       // .on('mouse up', function(){ dragged(event.x) } );
+        xScale.clamp(true);
+        // drag behavior initialization
+        const dragg = drag()
+            .on('start.interrupt', function () {
+                select(slider).interrupt();
+            })
+            .on('drag', function () { dragged(event.x); })
+            .on('end', function () { 
+                var x = xScale.invert(event.x);
+                console.log(x);
+                that.diffDays = x;
+                events.fire('change_sep_day', x);
+            });
+        // .on('mouse up', function(){ dragged(event.x) } );
 
-        // this is the main bar with a stroke (applied through CSS)
-    var track = select(slider).append('line').attr('class', 'track')
-    .attr('x1', xScale.range()[0])
-    .attr('x2', xScale.range()[1]);
+            // this is the main bar with a stroke (applied through CSS)
+        var track = select(slider).append('line').attr('class', 'track')
+        .attr('x1', xScale.range()[0])
+        .attr('x2', xScale.range()[1]);
 
-    var trackInset = select(slider).append('line').attr('class', 'track-inset')
-    .attr('x1', xScale.range()[0])
-    .attr('x2', xScale.range()[1]);
+        var trackInset = select(slider).append('line').attr('class', 'track-inset')
+        .attr('x1', xScale.range()[0])
+        .attr('x2', xScale.range()[1]);
 
-    var trackOverlay = select(slider).append('g').attr('class', 'track-overlay')
-    .attr('x1', xScale.range()[0])
-    .attr('x2', xScale.range()[1])
+        var trackOverlay = select(slider).append('g').attr('class', 'track-overlay')
+        .attr('x1', xScale.range()[0])
+        .attr('x2', xScale.range()[1])
 
-    if(!this.diffDays){ this.diffDays = 30 }
+        if(!this.diffDays){ this.diffDays = 30 }
+        
+        let text = select(slider).append('text').text('Day Range: ' + this.diffDays).attr('transform', 'translate(0, -15)');
+        // this is a bar (steelblue) that's inside the main "track" to make it look like a rect with a border
+        // var trackInset = d3.select(slider.appendChild(track.node().cloneNode())).attr('class', 'track-inset');
+
+        var ticks = select(slider).append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
+            .call(xAxis);
     
-    let text = select(slider).append('text').text('Day Range: ' + this.diffDays).attr('transform', 'translate(0, -15)');
-    // this is a bar (steelblue) that's inside the main "track" to make it look like a rect with a border
-   // var trackInset = d3.select(slider.appendChild(track.node().cloneNode())).attr('class', 'track-inset');
+        // drag handle
+        var handle = select(slider).append('circle').classed('handle', true)
+            .attr('r', 8).call(dragg);
 
-    var ticks = select(slider).append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
-        .call(xAxis);
-  
-    // drag handle
-    var handle = select(slider).append('circle').classed('handle', true)
-        .attr('r', 8).call(dragg);
+        select(slider).transition().duration(750)
+        .tween("drag", function () {
+        // var i = d3.interpolate(0, 10);
+            return function (t) {
+            // dragged(xScale(i(t)));
+                dragged(xScale(t));
+            }
+         });
 
-    select(slider).transition().duration(750)
-    .tween("drag", function () {
-       // var i = d3.interpolate(0, 10);
-        return function (t) {
-           // dragged(xScale(i(t)));
-            dragged(xScale(t));
-        }
-    });
-
-    function dragged(value) {
-        var x = xScale.invert(value), index = null, midPoint, cx, xVal;
-        text.text('Day Range: ' + x);
-        if(step) {
-            // if step has a value, compute the midpoint based on range values and reposition the slider based on the mouse position
-            for (var i = 0; i < rangeValues.length - 1; i++) {
-                if (x >= rangeValues[i] && x <= rangeValues[i + 1]) {
-                    index = i;
-                    break;
+        function dragged(value) {
+            var x = xScale.invert(value), index = null, midPoint, cx, xVal;
+            text.text('Day Range: ' + x);
+            if(step) {
+                // if step has a value, compute the midpoint based on range values and reposition the slider based on the mouse position
+                for (var i = 0; i < rangeValues.length - 1; i++) {
+                    if (x >= rangeValues[i] && x <= rangeValues[i + 1]) {
+                        index = i;
+                        break;
+                    }
                 }
-            }
-            midPoint = (rangeValues[index] + rangeValues[index + 1]) / 2;
-            if (x < midPoint) {
-                cx = xScale(rangeValues[index]);
-                xVal = rangeValues[index];
+                midPoint = (rangeValues[index] + rangeValues[index + 1]) / 2;
+                if (x < midPoint) {
+                    cx = xScale(rangeValues[index]);
+                    xVal = rangeValues[index];
+                } else {
+                    cx = xScale(rangeValues[index + 1]);
+                    xVal = rangeValues[index + 1];
+                }
             } else {
-                cx = xScale(rangeValues[index + 1]);
-                xVal = rangeValues[index + 1];
+                // if step is null or 0, return the drag value as is
+                cx = xScale(x);
+                xVal = x.toFixed(3);
             }
-        } else {
-            // if step is null or 0, return the drag value as is
-            cx = xScale(x);
-            xVal = x.toFixed(3);
+            // use xVal as drag value
+            handle.attr('cx', cx);
         }
-        // use xVal as drag value
-        handle.attr('cx', cx);
-    }
-    this.sepBool = true;
+        this.sepBool = true;
 
     }
 
@@ -351,7 +347,6 @@ export class EventLine {
                 }else{ console.log('Branch filter passed')};
             }
             function labelClick(d){
-              
                 let rec = select(d);
                     if(d == 'First Promis Score'){
                         that.startCodes = null;
@@ -360,7 +355,6 @@ export class EventLine {
                         events.fire('event_selected', [that.startCodes, that.startEventLabel]);
                         }else{
                         that.startCodes = d.value;
-                      
                         let label = d.filter;
                         that.startEventLabel = label;
                         that.drawEventButtons(cohort);
@@ -410,9 +404,9 @@ export class EventLine {
     
             scaletogglebutton.append('span').classed('caret', true);
     
-                        let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
-                        let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
-                        let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
+            let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+            let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
+            let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
               
             abs.on('click', () =>{
                             this.drawEventButtons(cohort);
@@ -480,31 +474,9 @@ export class EventLine {
                     });
                     bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
 
-                    /*
-                    let radio = quartDiv.append('form');
-                    radio.append('input').attr('type', 'radio').attr('value', true).attr('name', 'quart').attr('id', 'quartile-radio-1');
-                    radio.append('label').attr('for', 'quartile-radio-1').text('Average Score Change');
-                    radio.append('input').attr('type', 'radio').attr('value', false).attr('name', 'quart').attr('id', 'quartile-radio-2');
-                    radio.append('label').attr('for', 'quartile-radio-2').text('Score at Zero Day');
-                    if(this.scoreChangeBool){
-                        select(document.getElementById(this.scoreChangeBool)).attr('checked', true);
-                    }*/
-           
-                   /*
-                    this.$node.selectAll("input[name='quart']").on('change', function() {
-                        let scoreChange = {id : this.id, scaleR: null};
-                        if(this.id == 'quartile-radio-1'){ scoreChange.scaleR = true;
-                        }else{ scoreChange.scaleR = false; }
-                        that.scoreChangeBool = this.id;
-                        events.fire('change_sep_bool', scoreChange);
-                    });*/
-                    //let slidDiv = quartDiv.append('div').attr('id', 'sepSlider');
-
-
-                    if(!separated){  
+                    if(!separated){
                         checkDiv.classed('hidden', true);
                         select('#sliderDiv').classed('hidden', true);
-             
                     }
 
                     else{ checkDiv.classed('hidden', false);
@@ -541,6 +513,9 @@ export class EventLine {
                                 c2.on('click', ()=> {
                                     this.scoreType = 'Oswestry Index';
                                     events.fire('change_plot_data', 'oswestry')});
+
+                    let addPlot = div.append('input').attr('type', 'button').attr('id', 'addPlot').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Add Plot');
+                        addPlot.on('click', function(d){ events.fire('add_plot'); });
             }
 
     private async flattenCohort(cohort) {

@@ -54,6 +54,7 @@ export class TimelineKeeper {
             .range([0, 640]).clamp(true);
 
         this.$node.append('div').classed('day_line', true);
+
         this.attachListener();
 
     };
@@ -63,11 +64,6 @@ export class TimelineKeeper {
         events.on('timeline_max_set', (evt, item) =>{
             this.maxDay = item;
             });
-
-        events.on('population demo loaded', (evt, item)=> {
-            this.populationDemo = item;
-            this.drawTimeline();
-        });
 
         events.on('timeline_max_set', (evt, item)=> {
             this.maxDay = item;
@@ -80,48 +76,6 @@ export class TimelineKeeper {
         });
     }
 
-    private drawTimeline() {
-
-        let timeline = this.$node.select('.day_line');
-       // let timelineMin = timeline.append('text').text('0 Days');
-        let timelineSVG = timeline.append('svg').classed('day_line_svg', true);
-                          
-
-        timelineSVG.append('g')
-                        .attr('class', '.xAxisMini')
-                        .attr('transform', () => `translate(75, 0)`)
-                        .call(axisBottom(this.timeScale));
-
-      //  let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
-
-         // ----- SLIDER
-
-        let slider = timelineSVG.append('g')
-         .attr('class', 'slider')
-         .attr('transform', `translate(75, 0)`);
-
-        let that = this;
-
-        this.brush = brushX()
-        .extent([[0, 0], [670, 20]])
-        .handleSize(0)
-        .on("end", () => {
-            if (event.selection === null) {
-
-            } else {
-              let start = this.timeScale.invert(event.selection[0]);
-              let end = this.timeScale.invert(event.selection[1]);
-              events.fire('domain updated', [start, end]);
-            }
-
-          });
-
-
-        slider.call(this.brush)
-         .call(this.brush.move, [this.timeScale(-10), this.timeScale(50)]);
-
-    }
-
     private updateDays(start, end) {
 
         let startDay = this.timeScale(start);
@@ -129,8 +83,6 @@ export class TimelineKeeper {
 
         this.maxDay = endDay;
     }
-
-   
 
 }
 

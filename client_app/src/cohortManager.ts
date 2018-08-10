@@ -58,12 +58,14 @@ export class CohortManager {
     layerBool;
     counter;
     layerKeeper;
+    plotCount;
 
     constructor() {
         this.codes = codeDict.create();
         this.branchSelected = null;
         this.counter = 0;
         this.layerKeeper = {layers : [], clumped: false, scaleR: false}
+        this.plotCount = 0;
         
         this.attachListener();
     }
@@ -152,13 +154,12 @@ export class CohortManager {
           
             });
         events.on('bins_calculated', (evt, item)=> {
-            console.log(item);
-            console.log(this.selectedCohort);
+
             if(this.layerBool){
                 item.forEach((layer, i) => {
                     this.layerKeeper.layers[i].data.chartData = layer;
                 });
-                console.log(this.layerBool);
+          
                 events.fire('draw_layers', this.layerKeeper);
 
             }else{
@@ -339,7 +340,6 @@ export class CohortManager {
                 events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, filterLabel]);
             }
          });
-            // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
         
             //this comes directly from cohrot tree in eventline;
         events.on('cohort_selected', (evt, item)=>{
@@ -371,6 +371,11 @@ export class CohortManager {
                     this.comparisonBool = false;
                     events.fire('exit_comparison_view');
                 }
+            });
+
+            events.on('add_plot_button', ()=> {
+                console.log('plot adding');
+                this.plotCount++;
             });
 
             events.on('demo_filter_change', (evt, item)=> {
