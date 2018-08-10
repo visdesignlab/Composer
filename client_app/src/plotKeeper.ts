@@ -104,7 +104,7 @@ export class PlotKeeper {
                 console.log(cohort);
                 if(cohort.data.clumped){
                     //if it is aggregated
-                  this.drawAgg(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data.scaleR, i);
+                  this.drawAgg(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data, i);
                 }else{
                     this.drawPromisChart(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data, i);
                 }
