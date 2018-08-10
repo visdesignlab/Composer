@@ -26,6 +26,7 @@ export class PlotKeeper {
     private cohortData = [];
     private plotDiv;
     private domain;
+    private dimension;
     private initialLoadBool;
     selectedCohort;
     selectedPlot;
@@ -46,6 +47,12 @@ export class PlotKeeper {
             minDay: -10,
         }
 
+        this.dimension = {
+            height : 400,
+            width : 600,
+            margin : {x: 50, y: 10},
+        }
+
         this.drawPromisChart = promisDiagram.drawPromisChart;
         this.drawAgg = promisDiagram.drawAgg;
         this.clearDiagram = promisDiagram.clearDiagram;
@@ -55,8 +62,8 @@ export class PlotKeeper {
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('div').classed('allDiagramDiv', true);
        
-        const timeline = this.$node.append('div').classed('timeline_view', true);
-        timelineKeeper.create(timeline.node());
+       // const timeline = this.$node.append('div').classed('timeline_view', true);
+       // timelineKeeper.create(timeline.node());
         this.attachListener();
     }
 
@@ -81,7 +88,7 @@ export class PlotKeeper {
 
             this.comparisonArray.forEach((cohort, i) => {
                
-                let plot = this.buildPlot(this.plotDiv, i, this.domain);
+                let plot = this.buildPlot(this.plotDiv, i, this.domain, this.dimension);
                 plot.svg.select(parent).on('click', (d, i)=> {console.log(d); console.log(i)});
 
                 this.plotArray.push(plot);
@@ -101,7 +108,7 @@ export class PlotKeeper {
      
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
             this.comparisonArray.layers.forEach((cohort, i) => {
-                console.log(cohort);
+  
                 if(cohort.data.clumped){
                     //if it is aggregated
                   this.drawAgg(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data, i);
@@ -117,7 +124,7 @@ export class PlotKeeper {
 
         events.on('exit_comparison_view', ()=> {
             this.plotDiv.selectAll('*').remove();
-            this.buildPlot(this.plotDiv, 0, this.domain);
+            this.buildPlot(this.plotDiv, 0, this.domain, this.dimension);
             events.fire('cohort_selected', this.cohortData[0]);
             this.compareBool = false;
         });
@@ -130,7 +137,7 @@ export class PlotKeeper {
         events.on('exit_layer_view', ()=> {
             this.layerBool = false;
             this.plotDiv.selectAll('*').remove();
-            this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
+            this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain, this.dimension);
             document.getElementById('layerButton').classList.remove('btn-warning');
             events.fire('cohort_selected', this.cohortData[0]);
         });
@@ -145,7 +152,6 @@ export class PlotKeeper {
               let selected = layer.selectAll('.fill').nodes();
                selected.forEach((sel, i) => {
                    let cohort = select(sel).data()[0];
-                   console.log(cohort);
                    let entry = {class: 'layer-' + i, data: cohort }
                    array.push(entry);
               });
@@ -154,7 +160,7 @@ export class PlotKeeper {
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-                this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
+                this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain, this.dimension);
                 if(this.layerBool){
                 }else{
                     this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
@@ -174,7 +180,7 @@ export class PlotKeeper {
                 this.plotDiv.selectAll('*').remove();
 
             this.comparisonArray.forEach((cohort, i) => {
-                let plot = this.buildPlot(this.plotDiv, i, this.domain);
+                let plot = this.buildPlot(this.plotDiv, i, this.domain, this.dimension);
                 this.plotArray.push(plot);
                 this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort, i);
               });
@@ -232,9 +238,9 @@ export class PlotKeeper {
 
 }
 
-    private buildPlot(container, index, domain) {
+    private buildPlot(container, index, domain, dimension) {
 
-       return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain);
+       return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain, dimension);
 
     }
 

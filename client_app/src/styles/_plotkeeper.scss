@@ -1,13 +1,16 @@
+/*
 .day_line {
     height: 60px;
     width: 700px;
     display: inline-block;
+    z-index: 1000;
 }
 
 .day_line_svg {
     height: 50px;
     width: 700px;
-}
+    z-index: 1000;
+}*/
 
 .day_line text {
     font-size: 9px;
@@ -20,7 +23,7 @@
 .allDiagramDiv {
     // clear: left;
     width: 700px;
-    height: 403px;
+    height: 500px;
     float: left;
 }
 
@@ -29,7 +32,12 @@
     float: left;
     padding-right: 50px;
     width: 700px;
-    height: 403px;
+    height: 400px;
+}
+
+.timeline_view {
+    display: inline-block;
+    float: left;
 }
 
 .scoreLine {

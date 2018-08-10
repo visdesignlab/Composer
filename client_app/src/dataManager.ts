@@ -63,7 +63,7 @@ export class DataManager {
             events.fire('create_button_down');
             events.fire('initial_cohort_load');
            // this.frequentSets(ob);
-            let cpt = this.getCPT(null, ob).then(d=> this.mapCPT(null, d).then(m=> this.frequentSets(m)));
+           // let cpt = this.getCPT(null, ob).then(d=> this.mapCPT(null, d).then(m=> this.frequentSets(m)));
         }));
 
         this.loadData('Total_Scores').then(d=>this.promisTable = d );
@@ -197,7 +197,6 @@ export class DataManager {
             //YOU NEED TO CHANGE THIS TO WORK WITH SLIDER
             this.selected = item[0];
            this.frequencyCalc(this.selected).then(co=> { this.getQuant_Separate(co, 3, this.scoreChangeBool, 30).then(sep=> {
-               console.log(sep);
                this.selected = co;
                 events.fire('separated_by_quant', [sep, 30]);
             })
@@ -219,6 +218,7 @@ export class DataManager {
        // return binned;
         return Promise.all(binned);
     }
+
     private async frequentSets(cpt) {
         console.log(cpt);
         let test = [];

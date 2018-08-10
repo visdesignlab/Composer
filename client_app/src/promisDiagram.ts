@@ -12,7 +12,7 @@ import {drag} from 'd3-drag';
 import * as d3 from 'd3';
 import * as d3Voronoi from 'd3-voronoi';
 import {transition} from 'd3-transition';
-import {brush, brushY} from 'd3-brush';
+import {brush, brushY, brushX} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
 import * as dataManager from './dataManager';
 import {ITable, asTable} from 'phovea_core/src/table';
@@ -23,11 +23,13 @@ import {asVector} from 'phovea_core/src/vector/Vector';
 import {argFilter, uniqueId} from 'phovea_core/src/';
 import { stringify } from 'querystring';
 import {format} from 'd3-format';
+import * as timelineKeeper from './timelinekeeper';
 
 export class promisDiagram {
-
+    private $node;
     private diagram;
     private timeScale;
+    private timelineScale;
     scoreScale;
     svg;
     private brush;
@@ -42,10 +44,9 @@ export class promisDiagram {
     private maxDay;
     private minDay = 0;
 
-    height = 420;
-    width = 600;
-    promisDimension = {height: 460, width: 700};
-    margin = {x: 80, y: 40};
+    height;
+    width;
+    margin;
 
     private sliderWidth = 10;
     private lineScale;
@@ -57,10 +58,30 @@ export class promisDiagram {
     private domains;
     private scoreGroup;
     private plotLabel;
+    private plotHeader;
 
-    constructor(parent: Element, diagram, index, domains) {
+    constructor(parent: Element, diagram, index, domains, dimension) {
 
         const that = this;
+        this.$node = select(parent);
+
+        let plotPanel = this.$node.append('div').classed('panel', true).classed('panel-default', true).style('width', '750px').style('height', '550px');
+        this.plotHeader =  plotPanel.append('div').classed('panel-heading', true);
+        let headText = this.plotHeader.append('text').text('Plot ' + (index + 1));
+        let remove = this.plotHeader.append('svg').attr('width', 300).attr('height', 25).append('g').classed('x', true);
+      
+        remove.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
+        
+        let x = remove.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
+        remove.attr('transform', (d, i)=> 'translate(205, 0)');
+  
+        remove.on('click', function(d, i){
+          //events.fire('remove_filter', d);
+          console.log(index);
+          console.log(this.$node);
+        });
+
+        let panelBody = plotPanel.append('div').classed('panel-body', true);
 
         this.cohortIndex = String(index);
 
@@ -68,44 +89,57 @@ export class promisDiagram {
       //  this.cohortLabel = cohortData.label;
         this.domains = domains;
 
-        let plotDiv = select(parent).append('div')
-        .classed('diagramDiv-' + this.cohortIndex, true);;
+        this.width = dimension.width;
+        this.height = dimension.height;
+        this.margin = dimension.margin;
+
+        let plotDiv = panelBody.append('div')
+        .classed('diagramDiv', true)
+        .classed('p-'+index, true);
+
+          // scales
+          this.timeScale = scaleLinear()
+          .range([0,  this.width - (this.margin.x * 2)]);
+          //.clamp(true);
+      this.timelineScale = scaleLinear()
+          .domain([-300, 1251])
+          .range([0, this.width]).clamp(true);
+
+      this.scoreScale = scaleLinear()
+          .domain([80, 0])
+          .range([0,  this.height - (this.margin.y * 2)]);//.clamp(true);
+
+      this.lineScale = scaleLinear()
+          .domain([1, 6071])
+          .range([1, .2])//.clamp(true);
+
+      this.lineOpacity = scaleLinear()
+          .domain([1, 6071])
+          .range([.8, .2]);//.clamp(true);
+
+        const timeline = panelBody.append('div').classed('timeline_view', true);
+        
+//1252 days is the max number of days for the patients
+      
+       // timelineKeeper.create(timeline.node());
 
         this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
-            .attr('height', this.promisDimension.height)
-            .attr('width', this.promisDimension.width);
+            .attr('height',  this.height + (this.margin.y * 2))
+            .attr('width',  this.width + (this.margin.x * 2));
 
-        this.scoreGroup = this.svg.append('g').classed('scoreGroup-'+ this.cohortIndex, true);
+        this.scoreGroup = this.svg.append('g').classed('scoreGroup-'+ this.cohortIndex, true).attr('transform', `translate(${( this.margin.x / 2)},${ this.margin.y})`);
         let voronoiGroup = this.scoreGroup.append('g').classed('voronoi', true);
 
         let lineGroup = this.scoreGroup.append('g').classed('lines', true);
 
-        // scales
-        this.timeScale = scaleLinear()
-            .range([0, this.promisDimension.width]);
-            //.clamp(true);
-
-        this.scoreScale = scaleLinear()
-            .domain([80, 0])
-            .range([0, this.promisDimension.height - 3 * this.margin.y]);//.clamp(true);
-
-        this.lineScale = scaleLinear()
-            .domain([1, 6071])
-            .range([1, .2])//.clamp(true);
-
-        this.lineOpacity = scaleLinear()
-            .domain([1, 6071])
-            .range([.8, .2]);//.clamp(true);
-
         // axis
         this.scoreGroup.append('g')
             .attr('class', 'xAxis')
-            .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
+            .attr('transform', `translate(${ this.margin.x}, ${ (this.height - this.margin.y)})`);
 
         this.scoreGroup.append('g')
             .attr('class', 'yAxis')
-         //   .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`);
-            .attr('transform', `translate(${(this.margin.x - 5)},${this.margin.y})`);
+            .attr('transform', `translate(${( this.margin.x)},${ this.margin.y})`);
 
         // ----- SLIDER
 /*
@@ -138,21 +172,17 @@ export class promisDiagram {
             });
         // -----
         */
-/*
-        scoreGroup.append('text')
-            .text(`${this.diagram}`)
-            .attr('text-anchor', 'middle')
-            .attr('transform', `translate(${this.margin.x / 4},${this.promisDimension.height * 0.5}) rotate(-90)`);
-*/
+
         this.scoreGroup.append('g')
-            .attr('class', 'grid')
-            .attr('transform', `translate(${this.margin.x},${this.margin.y})`)
+            .attr('class', 'grid').attr('transform', () => `translate(`+ (this.margin.x) +`,`+ (this.margin.y) +`)`)
             .call(axisLeft(this.scoreScale)
-                .tickSize(-(this.promisDimension.width - this.margin.x))
+                .tickSize(-( this.width -  this.margin.x))
             )
             .selectAll('text').remove();
 
         this.plotLabel = this.scoreGroup.append('text');
+
+        this.drawTimeline();
 
     }
 
@@ -165,6 +195,47 @@ export class promisDiagram {
         return await ajax.getAPIJSON(URL);
     }
 
+    private drawTimeline() {
+
+        let timeline = this.$node.select('.timeline_view').attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
+       // let timelineMin = timeline.append('text').text('0 Days');
+        let timelineSVG = timeline.append('svg').classed('day_line_svg', true).attr('width', this.width + this.margin.x).attr('height', 40);
+                          
+
+        timelineSVG.append('g')
+                        .attr('class', '.xAxisMini')
+                        .attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
+                        .call(axisBottom(this.timelineScale));
+
+      //  let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
+
+         // ----- SLIDER
+
+        let slider = timelineSVG.append('g')
+         .attr('class', 'slider').attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
+       //  .attr('transform', `translate(50, 0)`);
+
+        let that = this;
+
+        this.brush = brushX()
+        .extent([[0, -3], [this.width, 30]])
+        .handleSize(2)
+        .on("end", () => {
+            if (event.selection === null) {
+
+            } else {
+              let start = this.timelineScale.invert(event.selection[0]);
+              let end = this.timelineScale.invert(event.selection[1]);
+              events.fire('domain updated', [start, end]);
+            }
+
+          });
+
+
+        slider.call(this.brush)
+         .call(this.brush.move, [this.timelineScale(-10), this.timelineScale(50)]);
+
+    }
 
     private renderOrdersTooltip(tooltip_data) {
 
@@ -202,7 +273,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     node.plotLabel
     .text(`${this.diagram}`)
     .attr('text-anchor', 'middle')
-    .attr('transform', `translate(${node.margin.x / 4},${node.promisDimension.height * 0.5}) rotate(-90)`);
+    .attr('transform', `translate(${node.margin.x/2.5},${node.height/2}) rotate(-90)`);
 
     let test = promis.map(p=> p.value);
     if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
@@ -217,24 +288,24 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
         }else{  scoreScale.domain([80, 0]); }
      }
 
-   svg.select('.cohort-plot-label').remove();
+   //svg.select('.cohort-plot-label').remove();
 
    let maxDay = node.domains.maxDay;
    let minDay = node.domains.minDay;
 
-   let cohortLabel = svg.append('text')
-   .text(`${cohortName}`).classed('cohort-plot-label', true)
-   .attr('transform', `translate(50,20)`);
+   //let cohortLabel = node.header
+   //.text(`${cohortName}`).classed('cohort-plot-label', true)
+  // .attr('transform', `translate(${node.margin.x/2},${node.margin.x/2})`);
    
    svg.select('.voronoi').selectAll('*').remove();
 
-   const promisScoreGroup = svg.select('.scoreGroup-'+ index);
+   const promisScoreGroup = svg.select('.scoreGroup-'+ index);//.attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
 
    if(scaleRelative){
            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
            .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
            zeroLine.append('line')
-                   .attr('x1', 0).attr('x2', 670)
+                   .attr('x1', 0).attr('x2', node.width)
                    .attr('y1', scoreScale(0)).attr('y2', scoreScale(0)).attr('stroke-width', .5)
                    .attr('stroke', '#E67E22');
    }
@@ -296,8 +367,8 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
        promisScoreGroup.append('clipPath').attr('id', 'clip')
        .append('rect')
-       .attr('width', 850)
-       .attr('height', 340);
+       .attr('width', node.width)
+       .attr('height', node.height);
 
        let that = this;
 
@@ -350,7 +421,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                 let voronoi = d3Voronoi.voronoi()
                    .x((d, i) => { return d.x })
                    .y((d, i) => { return d.y })
-                   .extent([[0, 0], [850, 350]]);
+                   .extent([[0, 0], [node.width, 350]]);
 
                 voronoiGroup.selectAll('g')
                    .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
@@ -372,7 +443,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
             zeroLine.append('line')
                .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
-               .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
+               .attr('y1', 0).attr('y2', node.width - node.margin.y).attr('stroke-width', .5).attr('stroke', '#E67E22');
 
             let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
 
@@ -478,7 +549,10 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                 return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
             }).style('opacity', 1);
          }
+
    }
+
+   
 
 /**
 * clear the diagram
@@ -730,12 +804,6 @@ export function clearDiagram(node, cohortIndex) {
                 }
 }
 
-
-
-
-
-    
-
-export function create(parent: Element, diagram, index, domains) {
-    return new promisDiagram(parent, diagram, index, domains);
+export function create(parent: Element, diagram, index, domains, dimension) {
+    return new promisDiagram(parent, diagram, index, domains, dimension);
 }
