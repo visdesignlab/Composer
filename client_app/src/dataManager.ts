@@ -62,6 +62,8 @@ export class DataManager {
             this.totalCptObjects = ob;
             events.fire('create_button_down');
             events.fire('initial_cohort_load');
+           // this.frequentSets(ob);
+            let cpt = this.getCPT(null, ob).then(d=> this.mapCPT(null, d).then(m=> this.frequentSets(m)));
         }));
 
         this.loadData('Total_Scores').then(d=>this.promisTable = d );
@@ -212,11 +214,22 @@ export class DataManager {
     private async changeLayerData(layers) {
         let binned = await layers.map(d => {
                 return this.frequencyCalc(d);
-
         });
-        console.log(binned);
+
        // return binned;
         return Promise.all(binned);
+    }
+    private async frequentSets(cpt) {
+        console.log(cpt);
+        let test = [];
+        cpt.forEach(c=> {
+          //  let array = []
+            c.forEach(v => {
+                test.push(v.value[0]);
+            });
+        });
+
+        console.log(test);
     }
    
     //loads, maps and calculates the day differences for cpt, promis and oswestry index.
@@ -382,15 +395,6 @@ export class DataManager {
                             let y1;
                             let y2;
 
-                            /*
-                            if(scaleRelative){
-                                y1 = pat.value[i-1].relScore;
-                                y2 = pat.value[i].relScore;
-                            }else{
-                                y1 = pat.value[i-1].SCORE;
-                                y2 = pat.value[i].SCORE;
-                            }*/
-
                             y1 = pat.value[i-1].SCORE;
                             y2 = pat.value[i].SCORE;
 
@@ -400,12 +404,6 @@ export class DataManager {
                             pat.value[i].slope = slope;
                             pat.value[i].b = y1 - (slope * x1);
 
-                            /*
-                            if(scaleRelative){
-                                pat.value[i].b = 0;
-                            }else{
-                                pat.value[i].b = y1 - (slope * x1);
-                            } */
                     }
                 }
     
@@ -810,8 +808,7 @@ export class DataManager {
                     filteredPatOrders[item.PAT_ID].push(item);
                  }
             });
-        }
-        if (cohortIdArray == null) {
+        }else{
             cptObject.forEach((d) => {
                 if (filteredPatOrders[d.PAT_ID] === undefined) {
                         filteredPatOrders[d.PAT_ID] = [];
@@ -819,7 +816,7 @@ export class DataManager {
                 filteredPatOrders[d.PAT_ID].push(d);
             });
         }
-
+    
         const mapped = entries(filteredPatOrders);
         return mapped;
     };
@@ -835,19 +832,21 @@ export class DataManager {
         let minDate = new Date();
         let maxDate = this.parseTime(CPTobjects[0].value[0]['PROC_DTM'], null);
 
-        for(let i= 0;  i< CPTobjects.length; i++) {
+        if(patProInfo){
 
-            let keycpt = CPTobjects[i].key;
+            for(let i= 0;  i< CPTobjects.length; i++) {
+                let keycpt = CPTobjects[i].key;
+                for(let j = 0; j < patProInfo.length; j++) {
+                  let keypromis = patProInfo[j].key;
+                  if(keycpt == keypromis) {
+                    CPTobjects[i].minPromis = patProInfo[j].min_date;
+                  }
+                } 
+              };
 
-            for(let j = 0; j < patProInfo.length; j++) {
-
-              let keypromis = patProInfo[j].key;
-
-              if(keycpt == keypromis) {
-                CPTobjects[i].minPromis = patProInfo[j].min_date;
-              }
-            } 
-          };
+        }else{
+            console.log(CPTobjects);
+        }
 
         CPTobjects.forEach((d) => {
                 let minDatePat = this.findMinDateCPT(d.value);
@@ -874,12 +873,15 @@ export class DataManager {
             d.array = []; 
             d.time = d['PROC_DTM'];
 
-            try {
-                d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
-                } catch (TypeError) {
-                        console.log('error');
-                        d.diff = -1;
-                      }
+            if(patProInfo){
+                try {
+                    d.diff = Math.ceil((this.parseTime(d['PROC_DTM'], null).getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+                    } catch (TypeError) {
+                            console.log('error');
+                            d.diff = -1;
+                        }
+            }
+        
                 if(d['CPT_1'] !== 0){ d.array.push(d['CPT_1']);   };
                 if(d['CPT_2'] !== 0){ d.array.push(d['CPT_2']);    };
                 if(d['CPT_3'] !== 0){ d.array.push(d['CPT_3']);    };
