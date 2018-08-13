@@ -59,30 +59,13 @@ export class promisDiagram {
     private scoreGroup;
     private plotLabel;
     private plotHeader;
+    private panelWidth;
 
     constructor(parent: Element, diagram, index, domains, dimension) {
 
         const that = this;
         this.$node = select(parent);
-
-        let plotPanel = this.$node.append('div').classed('panel', true).classed('panel-default', true).style('width', '750px').style('height', '550px');
-        this.plotHeader =  plotPanel.append('div').classed('panel-heading', true);
-        let headText = this.plotHeader.append('text').text('Plot ' + (index + 1));
-        let remove = this.plotHeader.append('svg').attr('width', 300).attr('height', 25).append('g').classed('x', true);
-      
-        remove.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
-        
-        let x = remove.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
-        remove.attr('transform', (d, i)=> 'translate(205, 0)');
-  
-        remove.on('click', function(d, i){
-          //events.fire('remove_filter', d);
-          console.log(index);
-          console.log(this.$node);
-        });
-
-        let panelBody = plotPanel.append('div').classed('panel-body', true);
-
+        this.panelWidth = 700;
         this.cohortIndex = String(index);
 
         this.diagram = diagram;
@@ -93,6 +76,24 @@ export class promisDiagram {
         this.height = dimension.height;
         this.margin = dimension.margin;
 
+        let plotPanel = this.$node.append('div').classed('panel', true).classed('panel-default', true).style('width', '700px').style('height', '550px');
+        this.plotHeader =  plotPanel.append('div').classed('panel-heading', true);
+        let headText = this.plotHeader.append('text').text('Plot ' + (index + 1));
+        let remove = this.plotHeader.append('svg').attr('width', 600).attr('height', 25).append('g').classed('x', true);
+      
+        remove.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
+        
+        let x = remove.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
+        remove.attr('transform', (d, i)=> 'translate(570, 0)');
+  
+        remove.on('click', function(d, i){
+          //events.fire('remove_filter', d);
+          console.log(index);
+          console.log(this.$node);
+        });
+
+        let panelBody = plotPanel.append('div').classed('panel-body', true);
+        
         let plotDiv = panelBody.append('div')
         .classed('diagramDiv', true)
         .classed('p-'+index, true);
@@ -103,7 +104,7 @@ export class promisDiagram {
           //.clamp(true);
       this.timelineScale = scaleLinear()
           .domain([-300, 1251])
-          .range([0, this.width]).clamp(true);
+          .range([0, this.width - this.margin.x]).clamp(true);
 
       this.scoreScale = scaleLinear()
           .domain([80, 0])
@@ -121,8 +122,6 @@ export class promisDiagram {
         
 //1252 days is the max number of days for the patients
       
-       // timelineKeeper.create(timeline.node());
-
         this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height',  this.height + (this.margin.y * 2))
             .attr('width',  this.width + (this.margin.x * 2));
@@ -198,16 +197,12 @@ export class promisDiagram {
     private drawTimeline() {
 
         let timeline = this.$node.select('.timeline_view').attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
-       // let timelineMin = timeline.append('text').text('0 Days');
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true).attr('width', this.width + this.margin.x).attr('height', 40);
-                          
 
         timelineSVG.append('g')
                         .attr('class', '.xAxisMini')
                         .attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
                         .call(axisBottom(this.timelineScale));
-
-      //  let timelineMax = timeline.append('text').classed('maxDay', true).text(this.maxDay);
 
          // ----- SLIDER
 
@@ -292,10 +287,6 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
    let maxDay = node.domains.maxDay;
    let minDay = node.domains.minDay;
-
-   //let cohortLabel = node.header
-   //.text(`${cohortName}`).classed('cohort-plot-label', true)
-  // .attr('transform', `translate(${node.margin.x/2},${node.margin.x/2})`);
    
    svg.select('.voronoi').selectAll('*').remove();
 
@@ -367,7 +358,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
        promisScoreGroup.append('clipPath').attr('id', 'clip')
        .append('rect')
-       .attr('width', node.width)
+       .attr('width', node.width - node.margin.x)
        .attr('height', node.height);
 
        let that = this;
@@ -443,7 +434,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
             zeroLine.append('line')
                .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
-               .attr('y1', 0).attr('y2', node.width - node.margin.y).attr('stroke-width', .5).attr('stroke', '#E67E22');
+               .attr('y1', 0).attr('y2', node.height - node.margin.y).attr('stroke-width', .5).attr('stroke', '#E67E22');
 
             let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
 
@@ -741,8 +732,8 @@ export function clearDiagram(node, cohortIndex) {
     
             promisScoreGroup.append('clipPath').attr('id', 'clip')
             .append('rect')
-            .attr('width', 850)
-            .attr('height', node.height - 50);
+            .attr('width', node.width - node.margin.x)
+            .attr('height', node.height - node.margin.y);
     
             let group = promisScoreGroup.append('g').classed(clump, true);
     
@@ -795,7 +786,7 @@ export function clearDiagram(node, cohortIndex) {
     
                 zeroLine.append('line')//.attr('class', 'myLine')
                         .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
-                        .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
+                        .attr('y1', 0).attr('y2', node.height - node.margin.y).attr('stroke-width', .5).attr('stroke', '#E67E22');
                
                 let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
 
