@@ -372,12 +372,7 @@ export class CohortManager {
                     events.fire('exit_comparison_view');
                 }
             });
-
-            events.on('add_plot_button', ()=> {
-                console.log('plot adding');
-                this.plotCount++;
-            });
-
+    
             events.on('demo_filter_change', (evt, item)=> {
           
                 let filterArray = this.selectedCohort.filterArray;

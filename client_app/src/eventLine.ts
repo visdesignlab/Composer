@@ -515,7 +515,7 @@ export class EventLine {
                                     events.fire('change_plot_data', 'oswestry')});
 
                     let addPlot = div.append('input').attr('type', 'button').attr('id', 'addPlot').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Add Plot');
-                        addPlot.on('click', function(d){ events.fire('add_plot'); });
+                        addPlot.on('click', function(d){ events.fire('add_plot_button'); });
             }
 
     private async flattenCohort(cohort) {

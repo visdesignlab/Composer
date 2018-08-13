@@ -76,7 +76,7 @@ export class promisDiagram {
         this.height = dimension.height;
         this.margin = dimension.margin;
 
-        let plotPanel = this.$node.append('div').classed('panel', true).classed('panel-default', true).style('width', '700px').style('height', '550px');
+        let plotPanel = this.$node.append('div').classed('plot-' + index, true).classed('panel', true).classed('panel-default', true).style('width', '700px').style('height', '550px');
         this.plotHeader =  plotPanel.append('div').classed('panel-heading', true);
         let headText = this.plotHeader.append('text').text('Plot ' + (index + 1));
         let remove = this.plotHeader.append('svg').attr('width', 600).attr('height', 25).append('g').classed('x', true);
@@ -90,10 +90,11 @@ export class promisDiagram {
           //events.fire('remove_filter', d);
           console.log(index);
           console.log(this.$node);
+          select('.plot-'+ index).remove();
         });
 
         let panelBody = plotPanel.append('div').classed('panel-body', true);
-        
+
         let plotDiv = panelBody.append('div')
         .classed('diagramDiv', true)
         .classed('p-'+index, true);
@@ -118,7 +119,7 @@ export class promisDiagram {
           .domain([1, 6071])
           .range([.8, .2]);//.clamp(true);
 
-        const timeline = panelBody.append('div').classed('timeline_view', true);
+       // const timeline = panelBody.append('div').classed('timeline_view', true);
         
 //1252 days is the max number of days for the patients
       
@@ -181,7 +182,7 @@ export class promisDiagram {
 
         this.plotLabel = this.scoreGroup.append('text');
 
-        this.drawTimeline();
+        this.drawTimeline(plotDiv);
 
     }
 
@@ -194,9 +195,11 @@ export class promisDiagram {
         return await ajax.getAPIJSON(URL);
     }
 
-    private drawTimeline() {
+    private drawTimeline(div) {
 
-        let timeline = this.$node.select('.timeline_view').attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
+        console.log(div)
+
+        let timeline = div.append('div').classed('timeline_view', true).attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true).attr('width', this.width + this.margin.x).attr('height', 40);
 
         timelineSVG.append('g')
