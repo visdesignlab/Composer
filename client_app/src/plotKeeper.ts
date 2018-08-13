@@ -106,7 +106,7 @@ export class PlotKeeper {
         events.on('exit_layer_view', ()=> {
             this.layerBool = false;
             this.plotDiv.selectAll('*').remove();
-            this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain, this.dimension);
+            this.selectedPlot = this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData);
             document.getElementById('layerButton').classList.remove('btn-warning');
             events.fire('cohort_selected', this.cohortData[0]);
         });
@@ -126,30 +126,28 @@ export class PlotKeeper {
               });
               events.fire('update_layers', array);
             }
-
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-                this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain, this.dimension).then(d=> {
-                    console.log(d)
+                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=> {
+                    console.log(d);
+                    this.selectedPlot = d;
                     this.plotArray.push(d);
-                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null);
+                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
                 });
  
-                    
-                
+
             }
         });
 
         events.on('add_plot_button', (evt, item)=> {
             console.log('making plots');
             let count = this.plotArray.length;
-            this.selectedPlot = this.buildPlot(this.plotDiv, count, this.domain, this.dimension).then(d=> {
-                console.log(d)
+            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=>{
+                console.log(d);
+                this.selectedPlot = d;
                 this.plotArray.push(d);
-                this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null);
+                this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
             });
-
-
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -162,12 +160,20 @@ export class PlotKeeper {
           
 
         });
+        events.on('remove_plot', (evt, item)=> {
+            console.log(item);
+            let test = this.plotArray.filter(f=> f.cohortIndex == item);
+            console.log(test);
+        });
         //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
-          
+  
            if(this.selectedPlot != undefined){
-            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-        
+            console.log(this.selectedPlot);
+            if(this.selectedPlot.cohortIndex != undefined){
+                this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            }
+
                if(this.layerBool == true){
                 console.log('update chart??');
                }else{
@@ -196,28 +202,27 @@ export class PlotKeeper {
                       //if it is not aggregated
                       if(separated){
                          
-                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item, null);
-                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null);
-                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null);
+                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item, null, this.cohortData);
+                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null, this.cohortData);
+                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null, this.cohortData);
                       }else{
-                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null);
+                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null, this.cohortData);
                       }
                   }
                  }
 
                }
-
         });
     
 
 }
 
-    private async buildPlot(container, index, domain, dimension) {
-
-       return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain, dimension);
-
+    private async addPlot(plotDiv, plotArray, domain, dimension, data){
+        let index = plotArray.length;
+        let plot = await promisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain, dimension, data);
+        console.log(plot);
+        return plot;
     }
-
 
 }
 

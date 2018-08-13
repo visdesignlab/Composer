@@ -270,9 +270,7 @@ export class EventLine {
         if(!this.diffDays){ this.diffDays = 30 }
         
         let text = select(slider).append('text').text('Day Range: ' + this.diffDays).attr('transform', 'translate(0, -15)');
-        // this is a bar (steelblue) that's inside the main "track" to make it look like a rect with a border
-        // var trackInset = d3.select(slider.appendChild(track.node().cloneNode())).attr('class', 'track-inset');
-
+ 
         var ticks = select(slider).append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
             .call(xAxis);
     
