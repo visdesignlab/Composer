@@ -131,22 +131,23 @@ export class PlotKeeper {
                 this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=> {
                     console.log(d);
                     this.selectedPlot = d;
-                    this.plotArray.push(d);
+                    this.plotArray.push({plot: d, data: this.selectedCohort});
                     this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
                 });
- 
-
             }
         });
 
         events.on('add_plot_button', (evt, item)=> {
-            console.log('making plots');
+          
             let count = this.plotArray.length;
             this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=>{
-                console.log(d);
-                this.selectedPlot = d;
-                this.plotArray.push(d);
-                this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
+                
+                this.plotArray.push({plot: d, data: this.selectedCohort});
+                this.plotSelected(this.plotArray, d);
+                this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData).then(d=>{
+                    console.log(this.plotArray);
+                    
+                });
             });
         });
 
@@ -154,12 +155,18 @@ export class PlotKeeper {
           
             this.domain.minDay = item[0];
             this.domain.maxDay = item[1];
-            this.plotArray = [];
-
-            events.fire('yBrush_reset');
-          
-
+           
+            events.fire('xBrush_reset');
         });
+
+        events.on('plot_selected', (evt, item)=>{
+            let index = String(item);
+      
+            this.selectedPlot = this.plotArray.filter(p=> p.plot.cohortIndex == index)[0].plot;
+            console.log(this.selectedPlot);
+            this.plotSelected(this.plotArray, this.selectedPlot);
+        });
+
         events.on('remove_plot', (evt, item)=> {
             console.log(item);
             let test = this.plotArray.filter(f=> f.cohortIndex == item);
@@ -167,9 +174,10 @@ export class PlotKeeper {
         });
         //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
-  
-           if(this.selectedPlot != undefined){
+            console.log('chart?');
             console.log(this.selectedPlot);
+           if(this.selectedPlot != undefined){
+      
             if(this.selectedPlot.cohortIndex != undefined){
                 this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
             }
@@ -208,14 +216,20 @@ export class PlotKeeper {
                       }else{
                           this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null, this.cohortData);
                       }
+
                   }
                  }
-
                }
         });
-    
-
 }
+
+    private async plotSelected(plotArray, selectedPlot){
+        console.log(plotArray);
+        console.log(selectedPlot);
+        selectAll('.selected_Plot').classed('selected_Plot', false);
+        selectedPlot.plotHeader.classed('selected_Plot', true);
+        this.selectedPlot = selectedPlot;
+    }
 
     private async addPlot(plotDiv, plotArray, domain, dimension, data){
         let index = plotArray.length;

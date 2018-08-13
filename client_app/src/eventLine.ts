@@ -102,7 +102,7 @@ export class EventLine {
         });
 
         events.on('separated_by_quant', (evt, item)=> {
-            console.log(this.diffDays);
+         
             if(!this.sepBool){ this.drawSlider(); }
         });
 
@@ -248,7 +248,7 @@ export class EventLine {
             .on('drag', function () { dragged(event.x); })
             .on('end', function () { 
                 var x = xScale.invert(event.x);
-                console.log(x);
+         
                 that.diffDays = x;
                 events.fire('change_sep_day', x);
             });
@@ -326,7 +326,7 @@ export class EventLine {
             let dataType = cohort.chartData[0].value[0]['FORM'];
             let startEvent = cohort.startEvent;
 
-            console.log(startEvent);
+       
 
             if(!scaleRelative){  this.scoreLabel = 'Absolute Scale';
             }else{ this.scoreLabel = 'Relative Scale'; }
@@ -362,11 +362,9 @@ export class EventLine {
 
             filters = filters.filter(d=> {return d.type != 'Branch' && d.type != 'Demographic' && d.type != 'Score'});
         
-           // this.$node.select('.event-buttons').remove();
             let div = this.$node.select('#eventButtonDiv');
             div.selectAll('*').remove();
-           // let div = this.$node.append('div').classed('event-buttons', true);
-            //toggle for event day
+      
             let startPanel = div.append('div').classed('start-event', true);
                     
             let startToggle = startPanel.append('div').classed('btn-group', true);

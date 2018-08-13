@@ -81,7 +81,7 @@ export class CohortManager {
                     this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
                     events.fire('test', [this.cohortTree, [this.branchSelected]]);
                 }
-
+                console.log('add layer to filter array');
                 events.fire('update_chart', this.selectedCohort);
         });
 
@@ -145,8 +145,6 @@ export class CohortManager {
                     clumped = true;
                     this.selectedCohort.clumped = true;
                 }
-
-               // events.fire('update_chart', this.selectedCohort);
                events.fire('calc_bins', this.selectedCohort);
 
             }
@@ -164,6 +162,7 @@ export class CohortManager {
 
             }else{
                 this.selectedCohort.chartData = item;
+                console.log('bins calc');
                 events.fire('update_chart', this.selectedCohort);
             }
            
@@ -227,7 +226,7 @@ export class CohortManager {
             this.cohortIndex = item[0];
             let branchIndex = item[1];
             this.selectedCohort = this.cohortTree[this.cohortIndex].branches[branchIndex];
-        
+            console.log('branch selected');
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, this.branchSelected]);
 
@@ -268,6 +267,7 @@ export class CohortManager {
                     scaleRelative = false;
                 }
                 this.selectedCohort.scaleR = scaleRelative;
+                console.log('draw promis scale');
                 events.fire('update_chart', this.selectedCohort);
             }
            
@@ -351,6 +351,7 @@ export class CohortManager {
             this.selectedCohort = this.cohortTree[this.cohortIndex];
 
             this.branchSelected = null;
+            console.log('cohort selected');
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [index]]);
           });
@@ -360,14 +361,16 @@ export class CohortManager {
             this.selectedCohort.dataType = item;
             events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, null]);
             //maybe add layerbool for os?
+            console.log("is this firing?");
         });
 
         events.on('cohort_selected_test', (evt, item)=>{
             console.log(item);
             let index = item[0].cohortIndex;
+            let cohort = item[0];
    
             this.cohortIndex = index;
-            this.cohortTree[this.cohortIndex].promis = item.promis;
+            this.cohortTree[this.cohortIndex].promis = cohort.promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
 
             this.branchSelected = null;
@@ -447,7 +450,7 @@ export class CohortManager {
                 this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]].separated = true;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
-         
+            console.log('sep by quant');
            events.fire('update_chart', this.selectedCohort);
           
           });
@@ -484,7 +487,7 @@ export class CohortManager {
             
             this.counter++;
             this.selectedCohort = this.cohortTree[this.cohortIndex];
-
+            console.log('new cohort');
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
 
@@ -529,6 +532,7 @@ export class CohortManager {
                 this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].cpt = cpt;
                 this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
             }
+            console.log('data filtered');
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
           });
@@ -546,6 +550,7 @@ export class CohortManager {
      
                 this.cohortTree[pIndex].branches = test;
                 this.counter = this.counter - 1;
+                console.log('remove cohort');
                 events.fire('update_chart', this.selectedCohort);
                 events.fire('test', [this.cohortTree, 0]);
             }else{
@@ -640,6 +645,7 @@ export class CohortManager {
                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].chartData = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
             }
+            console.log('cohort interpolated');
                 events.fire('update_chart', this.selectedCohort);
           });
 
@@ -665,6 +671,7 @@ export class CohortManager {
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
                 index = this.branchSelected;
             }
+            console.log('min day calculated');
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, index]);
 
@@ -699,7 +706,9 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
           });
 
-          events.on('yBrush_reset', (evt, item)=> {
+          events.on('xBrush_reset', ()=> {
+            console.log('yBrush');
+            
             events.fire('update_chart', this.selectedCohort);
           });
 
