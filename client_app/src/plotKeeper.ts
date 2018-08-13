@@ -31,7 +31,6 @@ export class PlotKeeper {
     selectedCohort;
     selectedPlot;
     plotArray;
-    private compareBool;
     private layerBool;
     comparisonArray;
     drawPromisChart;
@@ -39,6 +38,7 @@ export class PlotKeeper {
     clearDiagram;
     scoreScale;
     timeScale;
+    plotCount;
 
     constructor(parent: Element) {
 
@@ -61,9 +61,8 @@ export class PlotKeeper {
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('div').classed('allDiagramDiv', true);
-       
-       // const timeline = this.$node.append('div').classed('timeline_view', true);
-       // timelineKeeper.create(timeline.node());
+        this.plotArray = [];
+
         this.attachListener();
     }
 
@@ -76,28 +75,9 @@ export class PlotKeeper {
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
             document.getElementById('layerButton').classList.remove('btn-warning');
+            this.plotCount = 0;
 
         });
-
-        events.on('comparison_update', (evt, item)=> {
-
-            this.comparisonArray = item;
-            this.plotArray = [];
-    
-            this.plotDiv.selectAll('*').remove();
-
-            this.comparisonArray.forEach((cohort, i) => {
-               
-                let plot = this.buildPlot(this.plotDiv, i, this.domain, this.dimension);
-                plot.svg.select(parent).on('click', (d, i)=> {console.log(d); console.log(i)});
-
-                this.plotArray.push(plot);
-                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort, i);
-            });
-
-            this.selectedPlot = this.plotArray[0];
-        });
-
         
         events.on('draw_layers', (evt, item)=> {
 
@@ -116,17 +96,6 @@ export class PlotKeeper {
                     this.drawPromisChart(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data, i);
                 }
             });}
-        });
-
-        events.on('enter_comparison_view', ()=> {
-            this.compareBool = true;
-        });
-
-        events.on('exit_comparison_view', ()=> {
-            this.plotDiv.selectAll('*').remove();
-            this.buildPlot(this.plotDiv, 0, this.domain, this.dimension);
-            events.fire('cohort_selected', this.cohortData[0]);
-            this.compareBool = false;
         });
 
         events.on('enter_layer_view', ()=> {
@@ -160,12 +129,27 @@ export class PlotKeeper {
 
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
-                this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain, this.dimension);
-                if(this.layerBool){
-                }else{
-                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
-                }
+                this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain, this.dimension).then(d=> {
+                    console.log(d)
+                    this.plotArray.push(d);
+                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null);
+                });
+ 
+                    
+                
             }
+        });
+
+        events.on('add_plot_button', (evt, item)=> {
+            console.log('making plots');
+            let count = this.plotArray.length;
+            this.selectedPlot = this.buildPlot(this.plotDiv, count, this.domain, this.dimension).then(d=> {
+                console.log(d)
+                this.plotArray.push(d);
+                this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null);
+            });
+
+
         });
 
         events.on('domain updated', (evt, item)=> {
@@ -173,19 +157,9 @@ export class PlotKeeper {
             this.domain.minDay = item[0];
             this.domain.maxDay = item[1];
             this.plotArray = [];
-           
-            if(!this.compareBool){
-                events.fire('yBrush_reset');
-            }else{
-                this.plotDiv.selectAll('*').remove();
 
-            this.comparisonArray.forEach((cohort, i) => {
-                let plot = this.buildPlot(this.plotDiv, i, this.domain, this.dimension);
-                this.plotArray.push(plot);
-                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort, i);
-              });
-            }
-            
+            events.fire('yBrush_reset');
+          
 
         });
         //cohort, clump, node, index
@@ -238,7 +212,7 @@ export class PlotKeeper {
 
 }
 
-    private buildPlot(container, index, domain, dimension) {
+    private async buildPlot(container, index, domain, dimension) {
 
        return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain, dimension);
 
