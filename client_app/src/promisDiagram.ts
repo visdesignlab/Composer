@@ -60,13 +60,17 @@ export class promisDiagram {
     private plotLabel;
     private plotHeader;
     private panelWidth;
+    private headerToggle;
+    private switchUl;
 
-    constructor(parent: Element, diagram, index, domains, dimension) {
+    constructor(parent: Element, diagram, index, domains, dimension, data) {
 
         const that = this;
         this.$node = select(parent);
         this.panelWidth = 700;
         this.cohortIndex = String(index);
+        console.log(this.cohortIndex);
+        console.log(data);
 
         this.diagram = diagram;
       //  this.cohortLabel = cohortData.label;
@@ -77,20 +81,33 @@ export class promisDiagram {
         this.margin = dimension.margin;
 
         let plotPanel = this.$node.append('div').classed('plot-' + index, true).classed('panel', true).classed('panel-default', true).style('width', '700px').style('height', '550px');
-        this.plotHeader =  plotPanel.append('div').classed('panel-heading', true);
-        let headText = this.plotHeader.append('text').text('Plot ' + (index + 1));
-        let remove = this.plotHeader.append('svg').attr('width', 600).attr('height', 25).append('g').classed('x', true);
+        this.plotHeader =  plotPanel.append('div').classed('panel-heading', true).style('height', '45px');
+        let headText = this.plotHeader.append('div').classed('plot_head', true).append('text').text('Plot ' + (index + 1));
+
+        let headToggle = this.plotHeader.append('div').classed('plot_toggle', true);
+                    
+        this.headerToggle = headToggle.append('div').classed('btn-group', true);
+        this.headerToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                .append('text').text('COHORT TEST');
+
+        let startTogglebutton =  this.headerToggle.append('button')
+                                    .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                    .classed('dropdown-toggle', true)
+                                    .attr('data-toggle', 'dropdown');
+
+        startTogglebutton.append('span').classed('caret', true);
+        this.switchUl =  this.headerToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+
+        let remove = this.plotHeader.append('div').classed('header_x', true).append('svg').attr('width', 25).attr('height', 25).append('g').classed('x', true);
       
         remove.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
         
         let x = remove.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
-        remove.attr('transform', (d, i)=> 'translate(570, 0)');
+       // remove.attr('transform', (d, i)=> 'translate(0, 0)');
   
         remove.on('click', function(d, i){
-          //events.fire('remove_filter', d);
-          console.log(index);
-          console.log(this.$node);
-          select('.plot-'+ index).remove();
+         // select('.plot-'+ index).remove();
+         events.fire('remove_plot', index);
         });
 
         let panelBody = plotPanel.append('div').classed('panel-body', true);
@@ -100,29 +117,25 @@ export class promisDiagram {
         .classed('p-'+index, true);
 
           // scales
-          this.timeScale = scaleLinear()
+        this.timeScale = scaleLinear()
           .range([0,  this.width - (this.margin.x * 2)]);
           //.clamp(true);
-      this.timelineScale = scaleLinear()
-          .domain([-300, 1251])
-          .range([0, this.width - this.margin.x]).clamp(true);
+        this.timelineScale = scaleLinear()
+            .domain([-300, 1251])
+            .range([0, this.width - this.margin.x]).clamp(true);
 
-      this.scoreScale = scaleLinear()
-          .domain([80, 0])
-          .range([0,  this.height - (this.margin.y * 2)]);//.clamp(true);
+        this.scoreScale = scaleLinear()
+            .domain([80, 0])
+            .range([0,  this.height - (this.margin.y * 2)]);//.clamp(true);
 
-      this.lineScale = scaleLinear()
-          .domain([1, 6071])
-          .range([1, .2])//.clamp(true);
+        this.lineScale = scaleLinear()
+            .domain([1, 6071])
+            .range([1, .2])//.clamp(true);
 
-      this.lineOpacity = scaleLinear()
-          .domain([1, 6071])
-          .range([.8, .2]);//.clamp(true);
+        this.lineOpacity = scaleLinear()
+            .domain([1, 6071])
+            .range([.8, .2]);//.clamp(true);
 
-       // const timeline = panelBody.append('div').classed('timeline_view', true);
-        
-//1252 days is the max number of days for the patients
-      
         this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height',  this.height + (this.margin.y * 2))
             .attr('width',  this.width + (this.margin.x * 2));
@@ -140,38 +153,6 @@ export class promisDiagram {
         this.scoreGroup.append('g')
             .attr('class', 'yAxis')
             .attr('transform', `translate(${( this.margin.x)},${ this.margin.y})`);
-
-        // ----- SLIDER
-/*
-        let slider = this.scoreGroup.append('g')
-            .attr('class', 'slider')
-            .attr('transform', `translate(${(this.margin.x - this.sliderWidth + 2)},${this.margin.y})`);
-
-        this.brush = brushY()
-            .extent([[0, 0], [this.sliderWidth - 2, this.scoreScale.range()[1]]])
-            .on("end", () => {
-                let start = that.scoreScale.invert(event.selection[0]);
-                let end = that.scoreScale.invert(event.selection[1]);
-                events.fire('score_domain_change', [+start, +end]);
-            });
- 
-        slider.call(this.brush)
-              .call(this.brush.move, this.scoreScale.range());
-
-        slider.on('click', () => {
-                if(this.yBrushSelection == true) {
-                    if(this.scaleRelative == true ){
-                        this.scoreScale.domain([30, -30]);
-                    }else{ this.scoreScale.domain([80, 0]);}
-                   
-                    slider.call(this.brush)
-                    .call(this.brush.move, this.scoreScale.range());
-           
-                    this.yBrushSelection = false;
-                }
-            });
-        // -----
-        */
 
         this.scoreGroup.append('g')
             .attr('class', 'grid').attr('transform', () => `translate(`+ (this.margin.x) +`,`+ (this.margin.y) +`)`)
@@ -196,8 +177,6 @@ export class promisDiagram {
     }
 
     private drawTimeline(div) {
-
-        console.log(div)
 
         let timeline = div.append('div').classed('timeline_view', true).attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true).attr('width', this.width + this.margin.x).attr('height', 40);
@@ -226,7 +205,6 @@ export class promisDiagram {
               let end = this.timelineScale.invert(event.selection[1]);
               events.fire('domain updated', [start, end]);
             }
-
           });
 
 
@@ -254,7 +232,24 @@ export class promisDiagram {
     }
 }
 
-export async function drawPromisChart(promis, clump, node, cohort, i) {
+export async function drawPromisChart(promis, clump, node, cohort, i, data) {
+
+    console.log(node.headerToggle.select('text'));
+   
+    let eventLabels = node.switchUl.selectAll('li').data(data);
+    eventLabels.exit().remove();
+    let eventEnter = eventLabels.enter().append('li').append('text').text(d=> d.label);
+    eventLabels = eventEnter.merge(eventLabels);
+
+    node.headerToggle.select('text').text(cohort.label);
+
+    eventLabels.on('click', (d, i)=> {
+        console.log(d);
+        console.log(node.cohortIndex);
+        events.fire('cohort_selected_test', [d, node.cohortIndex]);
+    });
+
+    //eventLabels.on('click', d=> labelClick(d));
 
     let scaleRelative = cohort.scaleR;
     let clumped = cohort.clumped;
@@ -585,8 +580,7 @@ export function clearDiagram(node, cohortIndex) {
 }
 
     export async function drawAgg(chartData, clump, node, cohort, i){
-        console.log(cohort);
- 
+      
         let patbin = chartData.map((d)=> d.bins.map(b=> {
             if(cohort.scaleR){
                 if(b.y == null){ 
@@ -600,7 +594,6 @@ export function clearDiagram(node, cohortIndex) {
             }
           
         }));
-        console.log(patbin);
 
         let means = [];
         let devs = [];
@@ -798,6 +791,6 @@ export function clearDiagram(node, cohortIndex) {
                 }
 }
 
-export function create(parent: Element, diagram, index, domains, dimension) {
-    return new promisDiagram(parent, diagram, index, domains, dimension);
+export function create(parent: Element, diagram, index, domains, dimension, data) {
+    return new promisDiagram(parent, diagram, index, domains, dimension, data);
 }

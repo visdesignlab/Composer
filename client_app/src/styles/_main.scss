@@ -33,6 +33,27 @@
     padding-top: 5px;
 }
 
+.plot_head {
+    display: inline-block;
+    height: 30px;
+    width: 60px;
+    float: left;
+}
+
+.plot_toggle {
+    display: inline-block;
+    height: 30px;
+    width: 120px;
+    float: left;
+}
+
+.header_x {
+    display: inline-block;
+    height: 30px;
+    width: 50px;
+    float: right;
+}
+
 .tooltip {
     position: absolute;
     text-align: center;

@@ -362,6 +362,26 @@ export class CohortManager {
             //maybe add layerbool for os?
         });
 
+        events.on('cohort_selected_test', (evt, item)=>{
+            console.log(item);
+            let index = item[0].cohortIndex;
+   
+            this.cohortIndex = index;
+            this.cohortTree[this.cohortIndex].promis = item.promis;
+            this.selectedCohort = this.cohortTree[this.cohortIndex];
+
+            this.branchSelected = null;
+            events.fire('update_chart', this.selectedCohort);
+            events.fire('test', [this.cohortTree, [index]]);
+          });
+
+          events.on('change_plot_data', (evt, item)=> {
+            this.selectedCohort.chartData = this.selectedCohort[item];
+            this.selectedCohort.dataType = item;
+            events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, null]);
+            //maybe add layerbool for os?
+        });
+
           events.on('compare_button_down', ()=> {
     
                 if(!this.comparisonBool){
