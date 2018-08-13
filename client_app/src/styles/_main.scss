@@ -74,6 +74,10 @@
     display: inline-block;
 }
 
+.panel-default div.selected_Plot {
+    background-color: rgb(152, 187, 223);
+}
+
 .stat_sidebar_view {
     display: inline-block;
     float: left;

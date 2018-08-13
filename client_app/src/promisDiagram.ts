@@ -82,6 +82,11 @@ export class promisDiagram {
 
         let plotPanel = this.$node.append('div').classed('plot-' + index, true).classed('panel', true).classed('panel-default', true).style('width', '700px').style('height', '550px');
         this.plotHeader =  plotPanel.append('div').classed('panel-heading', true).style('height', '45px');
+
+        this.plotHeader.on('click', (d)=> {
+            console.log(this.cohortIndex);
+            events.fire('plot_selected', this.cohortIndex);
+        });
         let headText = this.plotHeader.append('div').classed('plot_head', true).append('text').text('Plot ' + (index + 1));
 
         let headToggle = this.plotHeader.append('div').classed('plot_toggle', true);
@@ -235,8 +240,27 @@ export class promisDiagram {
 export async function drawPromisChart(promis, clump, node, cohort, i, data) {
 
     console.log(node.headerToggle.select('text'));
-   
-    let eventLabels = node.switchUl.selectAll('li').data(data);
+
+    let flatData = await flatten(data);
+
+    async function flatten(d){
+
+        let flat = [];
+
+        d.forEach(group => {
+            flat.push(group);
+            if(group.branches.length > 0){
+                group.branches.forEach(branch => {
+                    flat.push(branch);
+                });
+            }
+        });
+
+        return flat;
+    }
+    console.log(flatData);
+
+    let eventLabels = node.switchUl.selectAll('li').data(flatData);
     eventLabels.exit().remove();
     let eventEnter = eventLabels.enter().append('li').append('text').text(d=> d.label);
     eventLabels = eventEnter.merge(eventLabels);
@@ -244,12 +268,8 @@ export async function drawPromisChart(promis, clump, node, cohort, i, data) {
     node.headerToggle.select('text').text(cohort.label);
 
     eventLabels.on('click', (d, i)=> {
-        console.log(d);
-        console.log(node.cohortIndex);
-        events.fire('cohort_selected_test', [d, node.cohortIndex]);
+        events.fire('cohort_selected', d);
     });
-
-    //eventLabels.on('click', d=> labelClick(d));
 
     let scaleRelative = cohort.scaleR;
     let clumped = cohort.clumped;
@@ -353,7 +373,6 @@ export async function drawPromisChart(promis, clump, node, cohort, i, data) {
 
        // ------- draw
       // const promisScoreGroup = this.svg.select('.scoreGroup');
-
        promisScoreGroup.append('clipPath').attr('id', 'clip')
        .append('rect')
        .attr('width', node.width - node.margin.x)
