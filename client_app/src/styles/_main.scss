@@ -78,6 +78,10 @@
     background-color: rgb(152, 187, 223);
 }
 
+li:hover {
+    cursor: pointer;
+}
+
 .stat_sidebar_view {
     display: inline-block;
     float: left;
