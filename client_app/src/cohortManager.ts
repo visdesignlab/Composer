@@ -73,7 +73,6 @@ export class CohortManager {
     private attachListener(){
 
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
-         
                 if(this.branchSelected == null){
                     this.selectedCohort =  this.cohortTree[this.cohortIndex];
                     events.fire('test', [this.cohortTree, [this.cohortIndex]]);
@@ -81,7 +80,6 @@ export class CohortManager {
                     this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
                     events.fire('test', [this.cohortTree, [this.branchSelected]]);
                 }
-                console.log('add layer to filter array');
                 events.fire('update_chart', this.selectedCohort);
         });
 
@@ -113,60 +111,44 @@ export class CohortManager {
     
 
         events.on('aggregate_button_clicked', ()=> {
-
             if(this.layerBool == true){
-             
                 if(!this.layerKeeper.clumped){
-               
                     this.layerKeeper.layers.forEach(layer => {
                         layer.data.clumped = true;
                     });
                     this.layerKeeper.clumped = true;
                 }else{
-                 
-                        this.layerKeeper.layers.forEach(layer => {
-                            layer.data.clumped = false;
-                        });
-                        this.layerKeeper.clumped = false;
+                    this.layerKeeper.layers.forEach(layer => {
+                        layer.data.clumped = false;
+                    });
+                    this.layerKeeper.clumped = false;
                     }
-                
-               // events.fire('draw_layers', this.layerKeeper);
                 events.fire('calc_bins', this.layerKeeper);
-            
-                
             }else{
-
                 let clumped = this.selectedCohort.clumped;
                 if(clumped){
                     clumped = false;
                     this.selectedCohort.clumped = false;
                 }else{
-                 
                     clumped = true;
                     this.selectedCohort.clumped = true;
                 }
                events.fire('calc_bins', this.selectedCohort);
-
             }
-        
-          
-            });
-        events.on('bins_calculated', (evt, item)=> {
+        });
 
+        events.on('bins_calculated', (evt, item)=> {
             if(this.layerBool){
                 item.forEach((layer, i) => {
                     this.layerKeeper.layers[i].data.chartData = layer;
                 });
-          
                 events.fire('draw_layers', this.layerKeeper);
-
             }else{
                 this.selectedCohort.chartData = item;
                 console.log('bins calc');
                 events.fire('update_chart', this.selectedCohort);
             }
-           
-        })
+        });
 
         events.on('branch_cohort', ()=> {
 
@@ -311,6 +293,36 @@ export class CohortManager {
             }
          });
 
+         events.on('cpt_exclude', (evt, item)=> {
+   
+            let filterLabel = item[1][0].key;
+       
+            let filterArray = this.selectedCohort.filterArray;
+            if(filterArray[0].length > 1){
+                let temp = [];
+                filterArray.forEach(fil => {
+                    if(fil.length > 1){
+                        fil.forEach(f => { temp.push(f); });
+                    }else{ temp.push(fil); }
+                });
+                filterArray = temp;
+            }
+            if(item != null){
+                let test = filterArray.map(d=> d.filter);
+                let testIndex = test.indexOf(item.parent);
+        
+                if(+testIndex > -1){
+                    this.selectedCohort.filterArray = filterArray;
+                    this.selectedCohort.filterArray[testIndex].value = item[0];
+              
+                }else{
+                    let filterReq = { filter: filterLabel, type: 'X-CPT', value: item[0], count: null };
+                    this.selectedCohort.filterArray.push(filterReq);
+                }
+                events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, filterLabel]);
+            }
+         });
+
          events.on('filter_by_count', (evt, item)=> {
    
             let filterLabel = 'Score Count';
@@ -345,7 +357,7 @@ export class CohortManager {
         events.on('cohort_selected', (evt, item)=>{
 
             let index = item.cohortIndex;
-   
+            console.log(item);
             this.cohortIndex = index;
             this.cohortTree[this.cohortIndex].promis = item.promis;
             this.selectedCohort = this.cohortTree[this.cohortIndex];

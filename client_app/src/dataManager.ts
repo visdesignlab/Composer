@@ -317,6 +317,14 @@ export class DataManager {
                     demo = demo.filter(dem=> ids.indexOf(dem.ID) > -1);
                     return demo;
                 });
+            }else if(d.type == 'X-CPT'){
+                that.searchByEvent(cpt, d.value).then((c)=> {
+                    let ids = c.map(id=> id[0].key);
+                    demo = demo.filter(dem=> ids.indexOf(dem.ID) == -1);
+                    console.log(demo);
+                    console.log("ANTI FILTER");
+                    return demo;
+                });
             }else if(d.type == 'Demographic'){
                 if(d.filter === 'BMI' || d.filter === 'CCI' || d.filter === 'AGE'){
                     demo = demo.filter(f => { return +f[d.filter] > +d.value[0] && +f[d.filter] < +d.value[1] });

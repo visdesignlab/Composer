@@ -577,6 +577,39 @@ export class FilterSideBar {
 
         select('.orderDiv').select('.codes').remove();
         });
+
+        box.append('input')
+        .attr('type', 'button').classed('btn', true).classed('btn-default', true)
+        .attr('value', 'Exclude Patients with Code')
+        .on('click', () => {
+
+        let checkNodes = ordercheck.nodes();
+        let checkedarray = [];
+        let cptFilterArray = [];
+
+        checkNodes.forEach((n, i) => {
+            if(n['checked']){
+                checkedarray.push(n['value']);
+            // Maybe make the 2 arrays use this array?
+            cptFilterArray.push(order[i]);
+            }
+        });
+
+        let fixed = [];
+        checkedarray.forEach(ch=> {
+            if (ch.indexOf(',') > -1) { 
+                let fix = ch.split(',');
+                fix.forEach(f => {
+                    fixed.push(f);
+                });
+            }else{fixed.push(ch); };
+        });
+      //  events.fire('cpt_filter_button',  [fixed, cptFilterArray]);
+        events.fire('cpt_exclude',  [fixed, cptFilterArray]);
+        // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
+
+        select('.orderDiv').select('.codes').remove();
+        });
 }
 
     private DrawfilterDescriptionBox(cohort){
