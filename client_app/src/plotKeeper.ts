@@ -19,6 +19,7 @@ import * as dataCalc from './dataCalculations';
 import * as promisDiagram from './promisDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
+import { indexOf } from 'phovea_core/src';
 
 export class PlotKeeper {
 
@@ -128,6 +129,7 @@ export class PlotKeeper {
             }
             if(!this.initialLoadBool){
                 this.initialLoadBool = true;
+                this.plotCount = 0;
                 this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=> {
                     console.log(d);
                     this.selectedPlot = d;
@@ -140,6 +142,7 @@ export class PlotKeeper {
         events.on('add_plot_button', (evt, item)=> {
           
             let count = this.plotArray.length;
+            this.plotCount++;
             this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=>{
                 
                 this.plotArray.push({plot: d, data: this.selectedCohort});
@@ -168,9 +171,15 @@ export class PlotKeeper {
         });
 
         events.on('remove_plot', (evt, item)=> {
-            console.log(item);
-            let test = this.plotArray.filter(f=> f.cohortIndex == item);
-            console.log(test);
+     
+            let plotIndexes = this.plotArray.map(p=> p.plot.cohortIndex).indexOf(String(item));
+            let removeIt = this.plotArray.filter((d, i) => i == plotIndexes);
+            console.log(removeIt);
+            removeIt[0].plot.$node.select('.panel').remove();
+            let newArray = this.plotArray.filter((d, i) => i != plotIndexes);
+           
+            this.plotArray = newArray;
+     
         });
         //cohort, clump, node, index
         events.on('update_chart', (evt, item)=> {
@@ -232,8 +241,8 @@ export class PlotKeeper {
     }
 
     private async addPlot(plotDiv, plotArray, domain, dimension, data){
-        let index = plotArray.length;
-        let plot = await promisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain, dimension, data);
+        
+        let plot = await promisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.plotCount, domain, dimension, data);
         console.log(plot);
         return plot;
     }
