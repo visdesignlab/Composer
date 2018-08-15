@@ -112,6 +112,7 @@ export class promisDiagram {
   
         remove.on('click', function(d, i){
          // select('.plot-'+ index).remove();
+         console.log(this.headerToggle);
          events.fire('remove_plot', index);
         });
 
