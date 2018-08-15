@@ -69,50 +69,34 @@ export class promisDiagram {
         this.$node = select(parent);
         this.panelWidth = 700;
         this.cohortIndex = String(index);
-        console.log(this.cohortIndex);
-        console.log(data);
-
         this.diagram = diagram;
-      //  this.cohortLabel = cohortData.label;
         this.domains = domains;
-
         this.width = dimension.width;
         this.height = dimension.height;
         this.margin = dimension.margin;
-
         let plotPanel = this.$node.append('div').classed('plot-' + index, true).classed('panel', true).classed('panel-default', true).style('width', '700px').style('height', '550px');
         this.plotHeader =  plotPanel.append('div').classed('panel-heading', true).style('height', '45px');
-
-        this.plotHeader.on('click', (d)=> {
-            console.log(this.cohortIndex);
+        let headText = this.plotHeader.append('div').classed('plot_head', true).append('text').text('Plot ' + (index + 1));
+        headText.on('click', (d)=> {
             events.fire('plot_selected', this.cohortIndex);
         });
-        let headText = this.plotHeader.append('div').classed('plot_head', true).append('text').text('Plot ' + (index + 1));
-
         let headToggle = this.plotHeader.append('div').classed('plot_toggle', true);
-                    
         this.headerToggle = headToggle.append('div').classed('btn-group', true);
         this.headerToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                                 .append('text').text('COHORT TEST');
-
         let startTogglebutton =  this.headerToggle.append('button')
                                     .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
                                     .classed('dropdown-toggle', true)
                                     .attr('data-toggle', 'dropdown');
-
         startTogglebutton.append('span').classed('caret', true);
+
         this.switchUl =  this.headerToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
 
         let remove = this.plotHeader.append('div').classed('header_x', true).append('svg').attr('width', 25).attr('height', 25).append('g').classed('x', true);
-      
         remove.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
-        
+
         let x = remove.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
-       // remove.attr('transform', (d, i)=> 'translate(0, 0)');
-  
         remove.on('click', function(d, i){
-         // select('.plot-'+ index).remove();
-         console.log(this.headerToggle);
          events.fire('remove_plot', index);
         });
 
@@ -125,7 +109,6 @@ export class promisDiagram {
           // scales
         this.timeScale = scaleLinear()
           .range([0,  this.width - (this.margin.x * 2)]);
-          //.clamp(true);
         this.timelineScale = scaleLinear()
             .domain([-300, 1251])
             .range([0, this.width - this.margin.x]).clamp(true);
@@ -241,11 +224,12 @@ export class promisDiagram {
 export async function drawPromisChart(promis, clump, node, cohort, i, data) {
 
     console.log(node.headerToggle.select('text'));
+    console.log(data);
 
     let flatData = await flatten(data);
 
     async function flatten(d){
-
+        console.log(d);
         let flat = [];
 
         d.forEach(group => {
@@ -599,7 +583,8 @@ export function clearDiagram(node, cohortIndex) {
    aggline.selectAll('.qLine_bottom').remove();
 }
 
-    export async function drawAgg(chartData, clump, node, cohort, i){
+//cohort.data.chartData, cohort.class, this.selectedPlot, i, cohort.data
+    export async function drawAgg(chartData, clump, node, i, cohort){
       
         let patbin = chartData.map((d)=> d.bins.map(b=> {
             if(cohort.scaleR){

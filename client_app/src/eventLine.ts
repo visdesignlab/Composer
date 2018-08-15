@@ -65,6 +65,7 @@ export class EventLine {
         events.on('enter_layer_view', ()=> {
             this.layerBool = true;
             document.getElementById('quartile-btn').classList.add('disabled');
+            document.getElementById('addPlot').classList.add('disabled');
             select('#layerDiv').classed('hidden', false);
             let array = [];
       
@@ -80,6 +81,7 @@ export class EventLine {
         events.on('exit_layer_view', ()=> {
             this.layerBool = false;
             document.getElementById('quartile-btn').classList.remove('disabled');
+            document.getElementById('addPlot').classList.remove('disabled');
             select('#layerDiv').classed('hidden', true);
         });
       
@@ -326,15 +328,13 @@ export class EventLine {
             let dataType = cohort.chartData[0].value[0]['FORM'];
             let startEvent = cohort.startEvent;
 
-       
-
             if(!scaleRelative){  this.scoreLabel = 'Absolute Scale';
             }else{ this.scoreLabel = 'Relative Scale'; }
 
             let that = this;
 
             function filText(d){
-                if(d.type !=  'Branch'){
+                if(d.type !=  'Branch' && d.type != 'X-CPT'){
                     if(d.type == 'Start'){
                         let label = 'First Promis Score';
                         return label;

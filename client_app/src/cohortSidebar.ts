@@ -448,6 +448,7 @@ export class CohortSideBar {
                   des = d.filter;
               }else{ des = 'All Patients'; }
           }else if(d.type == 'CPT'){ des = d.filter;
+          }else if(d.type == 'X-CPT'){ des = 'Excluding '+ d.filter;
           }else if(d.type == 'Start'){ des = 'All Patients'; }
           else{ des = d.filter + ' > ' + d.value; }
 
