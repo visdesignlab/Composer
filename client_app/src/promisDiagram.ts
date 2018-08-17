@@ -80,6 +80,12 @@ export class promisDiagram {
         headText.on('click', (d)=> {
             events.fire('plot_selected', this.cohortIndex);
         });
+
+        plotPanel.on('mouseenter', (d)=>{
+            console.log(this);
+            console.log(this.cohortIndex);
+            events.fire('plot_selected', this.cohortIndex);
+        });
         let headToggle = this.plotHeader.append('div').classed('plot_toggle', true);
         this.headerToggle = headToggle.append('div').classed('btn-group', true);
         this.headerToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)

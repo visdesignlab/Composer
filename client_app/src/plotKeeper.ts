@@ -203,7 +203,7 @@ export class PlotKeeper {
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
                   let separated = item.separated;
-              
+              console.log(item);
                   if(clumped){
                       if(separated){
                        
