@@ -28,6 +28,11 @@
     overflow-x: auto;
 }
 
+.allDiagramDiv .panel {
+    display: inline-block;
+    margin-right: 5px;
+}
+
 //container div for the line graph?
 .diagramDiv {
     float: left;
