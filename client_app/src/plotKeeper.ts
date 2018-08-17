@@ -51,7 +51,7 @@ export class PlotKeeper {
         this.dimension = {
             height : 400,
             width : 600,
-            margin : {x: 50, y: 10},
+            margin : {x: 40, y: 10},
         }
 
         this.drawPromisChart = promisDiagram.drawPromisChart;

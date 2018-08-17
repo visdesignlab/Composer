@@ -69,7 +69,6 @@ export class CohortSideBar {
               let selected = cohorts.filter(c=> c.cohortIndex == index);
               selected.classed('selected', true);
             });
-            
           });
     });
 
@@ -378,6 +377,8 @@ export class CohortSideBar {
         });
           select(lastChild).on('click', (d, i)=> {
             events.fire('branch_cohort');
+//CHANGE THIS HERE!!!!
+            console.log(d);
           });
           });
 

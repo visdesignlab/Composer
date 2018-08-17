@@ -22,9 +22,10 @@
 
 .allDiagramDiv {
     // clear: left;
-    width: 700px;
-    height: 500px;
+    width: 2000px;
+    height: 800px;
     float: left;
+    overflow-x: auto;
 }
 
 //container div for the line graph?
