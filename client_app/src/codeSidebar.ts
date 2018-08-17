@@ -169,7 +169,6 @@ export class CodeSidebar {
 
     private drawHistogram(histobins) {
 
-
        let data = {'key': 'Score-Count', 'label': 'Score Count', 'value': histobins, 'scale': this.xScale.domain([0, histobins[0].binCount])};
 
         this.yScale.domain([0, max(histobins, function (d) {
@@ -273,37 +272,63 @@ export class CodeSidebar {
   }
 
     private drawOrderFilterBox (div) {
-    let orderpanel = div.classed('panel', true).classed('panel-default', true);
-  
-    const form = div.append('form');
+        let orderpanel = div.classed('panel', true).classed('panel-default', true);
+    
+        const form = div.append('form');
 
-    let ordersearch = form.append('div').classed('input-group', true);
+        let ordersearch = form.append('div').classed('order-search', true).classed('input-group', true);
 
-    ordersearch.append('input').classed('form-control', true)
+        ordersearch.append('input').classed('form-control', true)
+                .attr('type', 'text')
+                .attr('placeholder', 'CPT Name/Code')
+                .attr('id', 'order_search')
+                .attr('value');
+
+        ordersearch.append('div').classed('input-group-btn', true)
+                .append('input')
+                .attr('type', 'button').classed('btn', true).classed('btn-default', true)
+            // .append('i').classed('glyphicon glyphicon-search', true)
+                .attr('value', 'Search')
+                .on('click', () => {
+                const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+
+                function hasNumber(myString) {
+                    return /\d/.test(myString);
+                }
+
+                if(!hasNumber(value)){ this.searchDictionary(value, 'dict');
+                    }else{
+                        this.searchDictionary(value, 'code');
+                    }
+        });
+
+        let antiOrder = form.append('div').classed('anti-order-search', true).classed('input-group', true);
+
+        antiOrder.append('input').classed('form-control', true)
             .attr('type', 'text')
             .attr('placeholder', 'CPT Name/Code')
-            .attr('id', 'order_search')
+            .attr('id', 'anti_order_search')
             .attr('value');
 
-    ordersearch.append('div').classed('input-group-btn', true)
+        antiOrder.append('div').classed('input-group-btn', true)
             .append('input')
             .attr('type', 'button').classed('btn', true).classed('btn-default', true)
-           // .append('i').classed('glyphicon glyphicon-search', true)
+        // .append('i').classed('glyphicon glyphicon-search', true)
             .attr('value', 'Search')
             .on('click', () => {
-              const value = (<HTMLInputElement>document.getElementById('order_search')).value;
+            const value = (<HTMLInputElement>document.getElementById('anti_order_search')).value;
 
-              function hasNumber(myString) {
+            function hasNumber(myString) {
                 return /\d/.test(myString);
-              }
+        }
 
-              if(!hasNumber(value)){ this.searchDictionary(value, 'dict');
-                }else{
-                    this.searchDictionary(value, 'code');
-                }
-    });
+        if(!hasNumber(value)){ this.searchDictionary(value, 'dict');
+            }else{
+                this.searchDictionary(value, 'code');
+            }
+});
 
-    div.append('div').classed('orderDiv', true);
+        div.append('div').classed('orderDiv', true);
 
 }
     private drawOrderSearchBar(order){

@@ -5,10 +5,7 @@
 
 .event_line_view {
     display: inline-block;
-    // margin-top: 15px;
-    // height: 100px;
     width: 100%;
-    padding-left: 80px;
     padding-top: 10px;
 }
 
@@ -39,6 +36,41 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.ticks {
+    font: 10px sans-serif;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+    stroke-linecap: round;
+}
+
+.track {
+    stroke: #000;
+    stroke-opacity: 0.3;
+    stroke-width: 10px;
+}
+
+.track-inset {
+    stroke: #ddd;
+    stroke-width: 8px;
+}
+
+.track-overlay {
+    pointer-events: stroke;
+    stroke-width: 50px;
+    stroke: transparent;
+    cursor: crosshair;
+}
+
+.handle {
+    fill: #fff;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    stroke-width: 1.25px;
 }
 
 
@@ -128,14 +160,14 @@
     opacity: .8;
 }
 
-.event-buttons {
+#eventButtonDiv {
     width: 700px;
     // height: 25px;
-    display: inline;
+    display: inline-block;
     float: left;
 }
 
-.event-buttons div {
+#eventButtonDiv div {
     display: inline;
     float: left;
     margin-right: 2px;
@@ -143,7 +175,7 @@
     margin-top: 0px;
 }
 
-.event-buttons div div button {
+#eventButtonDiv div div button {
     margin-top: 0px;
 }
 

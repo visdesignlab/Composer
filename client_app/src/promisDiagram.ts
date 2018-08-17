@@ -12,7 +12,7 @@ import {drag} from 'd3-drag';
 import * as d3 from 'd3';
 import * as d3Voronoi from 'd3-voronoi';
 import {transition} from 'd3-transition';
-import {brush, brushY} from 'd3-brush';
+import {brush, brushY, brushX} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
 import * as dataManager from './dataManager';
 import {ITable, asTable} from 'phovea_core/src/table';
@@ -20,14 +20,16 @@ import {IAnyVector, INumericalVector} from 'phovea_core/src/vector';
 import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
 import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
 import {asVector} from 'phovea_core/src/vector/Vector';
-import {argFilter} from 'phovea_core/src/';
+import {argFilter, uniqueId} from 'phovea_core/src/';
 import { stringify } from 'querystring';
 import {format} from 'd3-format';
+import * as timelineKeeper from './timelinekeeper';
 
 export class promisDiagram {
-
+    private $node;
     private diagram;
     private timeScale;
+    private timelineScale;
     scoreScale;
     svg;
     private brush;
@@ -42,10 +44,9 @@ export class promisDiagram {
     private maxDay;
     private minDay = 0;
 
-    height = 420;
-    width = 600;
-    promisDimension = {height: 460, width: 700};
-    margin = {x: 80, y: 40};
+    height;
+    width;
+    margin;
 
     private sliderWidth = 10;
     private lineScale;
@@ -57,37 +58,64 @@ export class promisDiagram {
     private domains;
     private scoreGroup;
     private plotLabel;
+    private plotHeader;
+    private panelWidth;
+    private headerToggle;
+    private switchUl;
 
-    constructor(parent: Element, diagram, index, domains) {
+    constructor(parent: Element, diagram, index, domains, dimension, data) {
 
         const that = this;
-
+        this.$node = select(parent);
+        this.panelWidth = 700;
         this.cohortIndex = String(index);
-
         this.diagram = diagram;
-      //  this.cohortLabel = cohortData.label;
         this.domains = domains;
+        this.width = dimension.width;
+        this.height = dimension.height;
+        this.margin = dimension.margin;
+        let plotPanel = this.$node.append('div').classed('plot-' + index, true).classed('panel', true).classed('panel-default', true).style('width', '650px').style('height', '550px');
+        this.plotHeader =  plotPanel.append('div').classed('panel-heading', true).style('height', '45px');
+        let headText = this.plotHeader.append('div').classed('plot_head', true).append('text').text('Plot ' + (index + 1));
+        headText.on('click', (d)=> {
+            events.fire('plot_selected', this.cohortIndex);
+        });
+        let headToggle = this.plotHeader.append('div').classed('plot_toggle', true);
+        this.headerToggle = headToggle.append('div').classed('btn-group', true);
+        this.headerToggle.append('button').classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                .append('text').text('COHORT TEST');
+        let startTogglebutton =  this.headerToggle.append('button')
+                                    .classed('btn', true).classed('btn-primary', true).classed('btn-sm', true)
+                                    .classed('dropdown-toggle', true)
+                                    .attr('data-toggle', 'dropdown');
+        startTogglebutton.append('span').classed('caret', true);
 
-        let plotDiv = select(parent).append('div')
-        .classed('diagramDiv-' + this.cohortIndex, true);;
+        this.switchUl =  this.headerToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
 
-        this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
-            .attr('height', this.promisDimension.height)
-            .attr('width', this.promisDimension.width);
+        let remove = this.plotHeader.append('div').classed('header_x', true).append('svg').attr('width', 25).attr('height', 25).append('g').classed('x', true);
+        remove.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
 
-        this.scoreGroup = this.svg.append('g').classed('scoreGroup-'+ this.cohortIndex, true);
-        let voronoiGroup = this.scoreGroup.append('g').classed('voronoi', true);
+        let x = remove.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
+        remove.on('click', function(d, i){
+         events.fire('remove_plot', index);
+        });
 
-        let lineGroup = this.scoreGroup.append('g').classed('lines', true);
+        let panelBody = plotPanel.append('div').classed('panel-body', true);
 
-        // scales
+        let plotDiv = panelBody.append('div')
+        .classed('diagramDiv', true)
+        .classed('p-'+index, true);
+
+          // scales
         this.timeScale = scaleLinear()
-            .range([0, this.promisDimension.width]);
-            //.clamp(true);
+          .range([0,  this.width - (this.margin.x * 2)]);
+        this.timelineScale = scaleLinear()
+            .domain([-300, 1251])
+            .range([0, this.width - this.margin.x]).clamp(true);
 
         this.scoreScale = scaleLinear()
             .domain([80, 0])
-            .range([0, this.promisDimension.height - 3 * this.margin.y]);//.clamp(true);
+            .range([0,  this.height - (this.margin.y * 2)]);//.clamp(true);
 
         this.lineScale = scaleLinear()
             .domain([1, 6071])
@@ -97,62 +125,34 @@ export class promisDiagram {
             .domain([1, 6071])
             .range([.8, .2]);//.clamp(true);
 
+        this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
+            .attr('height',  this.height + (this.margin.y * 2))
+            .attr('width',  this.width + (this.margin.x * 2));
+
+        this.scoreGroup = this.svg.append('g').classed('scoreGroup-'+ this.cohortIndex, true).attr('transform', `translate(${( this.margin.x / 2)},${ this.margin.y})`);
+        let voronoiGroup = this.scoreGroup.append('g').classed('voronoi', true);
+
+        let lineGroup = this.scoreGroup.append('g').classed('lines', true);
+
         // axis
         this.scoreGroup.append('g')
             .attr('class', 'xAxis')
-            .attr('transform', `translate(${this.margin.x},${this.promisDimension.height - 2 * this.margin.y})`);
+            .attr('transform', `translate(${ this.margin.x}, ${ (this.height - this.margin.y)})`);
 
         this.scoreGroup.append('g')
             .attr('class', 'yAxis')
-         //   .attr('transform', `translate(${(this.margin.x - this.sliderWidth)},${this.margin.y})`);
-            .attr('transform', `translate(${(this.margin.x - 5)},${this.margin.y})`);
+            .attr('transform', `translate(${( this.margin.x)},${ this.margin.y})`);
 
-        // ----- SLIDER
-/*
-        let slider = this.scoreGroup.append('g')
-            .attr('class', 'slider')
-            .attr('transform', `translate(${(this.margin.x - this.sliderWidth + 2)},${this.margin.y})`);
-
-        this.brush = brushY()
-            .extent([[0, 0], [this.sliderWidth - 2, this.scoreScale.range()[1]]])
-            .on("end", () => {
-                let start = that.scoreScale.invert(event.selection[0]);
-                let end = that.scoreScale.invert(event.selection[1]);
-                events.fire('score_domain_change', [+start, +end]);
-            });
- 
-        slider.call(this.brush)
-              .call(this.brush.move, this.scoreScale.range());
-
-        slider.on('click', () => {
-                if(this.yBrushSelection == true) {
-                    if(this.scaleRelative == true ){
-                        this.scoreScale.domain([30, -30]);
-                    }else{ this.scoreScale.domain([80, 0]);}
-                   
-                    slider.call(this.brush)
-                    .call(this.brush.move, this.scoreScale.range());
-           
-                    this.yBrushSelection = false;
-                }
-            });
-        // -----
-        */
-/*
-        scoreGroup.append('text')
-            .text(`${this.diagram}`)
-            .attr('text-anchor', 'middle')
-            .attr('transform', `translate(${this.margin.x / 4},${this.promisDimension.height * 0.5}) rotate(-90)`);
-*/
         this.scoreGroup.append('g')
-            .attr('class', 'grid')
-            .attr('transform', `translate(${this.margin.x},${this.margin.y})`)
+            .attr('class', 'grid').attr('transform', () => `translate(`+ (this.margin.x) +`,`+ (this.margin.y) +`)`)
             .call(axisLeft(this.scoreScale)
-                .tickSize(-(this.promisDimension.width - this.margin.x))
+                .tickSize(-( this.width -  this.margin.x))
             )
             .selectAll('text').remove();
 
         this.plotLabel = this.scoreGroup.append('text');
+
+        this.drawTimeline(plotDiv);
 
     }
 
@@ -165,6 +165,42 @@ export class promisDiagram {
         return await ajax.getAPIJSON(URL);
     }
 
+    private drawTimeline(div) {
+
+        let timeline = div.append('div').classed('timeline_view', true).attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
+        let timelineSVG = timeline.append('svg').classed('day_line_svg', true).attr('width', this.width + this.margin.x).attr('height', 40);
+
+        timelineSVG.append('g')
+                        .attr('class', '.xAxisMini')
+                        .attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
+                        .call(axisBottom(this.timelineScale));
+
+         // ----- SLIDER
+
+        let slider = timelineSVG.append('g')
+         .attr('class', 'slider').attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
+       //  .attr('transform', `translate(50, 0)`);
+
+        let that = this;
+
+        this.brush = brushX()
+        .extent([[0, -3], [this.width, 30]])
+        .handleSize(2)
+        .on("end", () => {
+            if (event.selection === null) {
+
+            } else {
+              let start = this.timelineScale.invert(event.selection[0]);
+              let end = this.timelineScale.invert(event.selection[1]);
+              events.fire('domain updated', [start, end]);
+            }
+          });
+
+
+        slider.call(this.brush)
+         .call(this.brush.move, [this.timelineScale(-10), this.timelineScale(50)]);
+
+    }
 
     private renderOrdersTooltip(tooltip_data) {
 
@@ -185,7 +221,40 @@ export class promisDiagram {
     }
 }
 
-export async function drawPromisChart(promis, clump, node, cohort, i) {
+export async function drawPromisChart(promis, clump, node, cohort, i, data) {
+
+    console.log(node.headerToggle.select('text'));
+    console.log(data);
+
+    let flatData = await flatten(data);
+
+    async function flatten(d){
+        console.log(d);
+        let flat = [];
+
+        d.forEach(group => {
+            flat.push(group);
+            if(group.branches.length > 0){
+                group.branches.forEach(branch => {
+                    flat.push(branch);
+                });
+            }
+        });
+
+        return flat;
+    }
+    console.log(flatData);
+
+    let eventLabels = node.switchUl.selectAll('li').data(flatData);
+    eventLabels.exit().remove();
+    let eventEnter = eventLabels.enter().append('li').append('text').text(d=> d.label);
+    eventLabels = eventEnter.merge(eventLabels);
+
+    node.headerToggle.select('text').text(cohort.label);
+
+    eventLabels.on('click', (d, i)=> {
+        events.fire('cohort_selected', d);
+    });
 
     let scaleRelative = cohort.scaleR;
     let clumped = cohort.clumped;
@@ -202,12 +271,9 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
     node.plotLabel
     .text(`${this.diagram}`)
     .attr('text-anchor', 'middle')
-    .attr('transform', `translate(${node.margin.x / 4},${node.promisDimension.height * 0.5}) rotate(-90)`);
+    .attr('transform', `translate(${node.margin.x/2.5},${node.height/2}) rotate(-90)`);
 
     let test = promis.map(p=> p.value);
-
-    console.log(test);
-
     if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
     }else{
         zeroEvent = cohort.startEvent[1];
@@ -220,24 +286,20 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
         }else{  scoreScale.domain([80, 0]); }
      }
 
-   svg.select('.cohort-plot-label').remove();
+   //svg.select('.cohort-plot-label').remove();
 
    let maxDay = node.domains.maxDay;
    let minDay = node.domains.minDay;
-
-   let cohortLabel = svg.append('text')
-   .text(`${cohortName}`).classed('cohort-plot-label', true)
-   .attr('transform', `translate(50,20)`);
    
    svg.select('.voronoi').selectAll('*').remove();
 
-   const promisScoreGroup = svg.select('.scoreGroup-'+ index);
+   const promisScoreGroup = svg.select('.scoreGroup-'+ index);//.attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
 
    if(scaleRelative){
            let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
            .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
            zeroLine.append('line')
-                   .attr('x1', 0).attr('x2', 670)
+                   .attr('x1', 0).attr('x2', node.width)
                    .attr('y1', scoreScale(0)).attr('y2', scoreScale(0)).attr('stroke-width', .5)
                    .attr('stroke', '#E67E22');
    }
@@ -296,11 +358,10 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
        // ------- draw
       // const promisScoreGroup = this.svg.select('.scoreGroup');
-
        promisScoreGroup.append('clipPath').attr('id', 'clip')
        .append('rect')
-       .attr('width', 850)
-       .attr('height', 340);
+       .attr('width', node.width - node.margin.x)
+       .attr('height', node.height);
 
        let that = this;
 
@@ -353,7 +414,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                 let voronoi = d3Voronoi.voronoi()
                    .x((d, i) => { return d.x })
                    .y((d, i) => { return d.y })
-                   .extent([[0, 0], [850, 350]]);
+                   .extent([[0, 0], [node.width, 350]]);
 
                 voronoiGroup.selectAll('g')
                    .data(voronoi.polygons(d3.merge(similarData.map(function(d) { 
@@ -375,7 +436,7 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
 
             zeroLine.append('line')
                .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
-               .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
+               .attr('y1', 0).attr('y2', node.height - node.margin.y).attr('stroke-width', .5).attr('stroke', '#E67E22');
 
             let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
 
@@ -481,7 +542,10 @@ export async function drawPromisChart(promis, clump, node, cohort, i) {
                 return d[0].SCORE <= highScore && d[0].SCORE >= lowScore;
             }).style('opacity', 1);
          }
+
    }
+
+   
 
 /**
 * clear the diagram
@@ -507,181 +571,77 @@ export function clearDiagram(node, cohortIndex) {
    aggline.select('.avLine_top').remove();
    aggline.select('.avLine_middle').remove();
    aggline.select('.avLine_bottom').remove();
+   aggline.select('.stLine').remove();
    aggline.selectAll('.stLine_all').remove();
    aggline.selectAll('.stLine_top').remove();
    aggline.selectAll('.stLine_middle').remove();
    aggline.selectAll('.stLine_bottom').remove();
+   aggline.selectAll('.qLine').remove();
    aggline.selectAll('.qLine_all').remove();
    aggline.selectAll('.qLine_top').remove();
    aggline.selectAll('.qLine_middle').remove();
    aggline.selectAll('.qLine_bottom').remove();
 }
 
-export function frequencyCalc(promis, clump, node, cohort, i) {
-    //item.promisSep[0], 'top', this.selectedNode, item
-     // creates bin array for each patient scores and calulates slope for each bin
-    //TODO : get rid of test in name and global variables?
+//cohort.data.chartData, cohort.class, this.selectedPlot, i, cohort.data
+    export async function drawAgg(chartData, clump, node, i, cohort){
+      
+        let patbin = chartData.map((d)=> d.bins.map(b=> {
+            if(cohort.scaleR){
+                if(b.y == null){ 
+                    return {x: b.x, y: null };
+                 }else{
+                    return {x: b.x, y: b.y - d.b };
+                 }
+                
+            }else{
+                return {x: b.x, y: b.y };
+            }
+          
+        }));
 
-        let minDay = node.domains.minDay;
-        let maxDay = node.domains.maxDay;
+        let means = [];
+        let devs = [];
 
-        let scaleRelative = cohort.scaleR;
-
-        let scoreScale = node.scoreScale;
-
-        if(scaleRelative){
-     
-            scoreScale.domain([30, -30]);
-         }else{ 
-    
-            scoreScale.domain([80, 0]);
-         }
-
-         let zeroEvent;
+        let zeroEvent;
         
-         if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
-        }else{
-            zeroEvent = cohort.startEvent[1][0].key;
+        if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
+       }else{
+           zeroEvent = cohort.startEvent[1];
+       }
+            
+        for(let i = 0; i < patbin[0].length; i++){
+            let bin = patbin.map(d => d[i].y);
+        
+            let mean = d3.mean(patbin.map(d => d[i].y));
+            let med = d3.median(patbin.map(d => d[i].y));
+      
+            let x = d3.mean(patbin.map(d => d[i].x));
+    
+            let dev =  d3.deviation(patbin.map(d => d[i].y));
+
+            means.push([x, med]);
+            devs.push(dev);
         }
 
-        let cohortFiltered = promis.filter(d=> d.value.length > 1);
-
-        let negdiff = 0;
-        let posdiff = 0;
-
-        //get the extreme diff values for each side of the zero event
-        cohortFiltered.forEach(pat => {
-            let patZero = pat.value.filter(p=> p.diff == 0);
-            let patDiffArray = pat.value.map(d=> +d.diff);
-            let patneg = d3.min(patDiffArray);
-            let patpos = d3.max(patDiffArray);
-            if(patneg < negdiff) {negdiff = patneg;  };
-            if(patpos > posdiff) {posdiff = patpos;  };
+        let botdev = means.map((d, i)=> {
+            let y = d[1] - devs[i];
+            let x = d[0];
+            return [x, y];
         });
-       
-
-        negdiff = Math.round(negdiff / 10) * 10;
-        posdiff = Math.round(posdiff / 10) * 10;
-
-        //get diff of days between maxneg diff and maxpos diff
-        let daydiff = posdiff - negdiff;
-
-        let bincount = Math.floor(daydiff/10);
-
-        cohortFiltered.forEach(pat=> {
-
-            for (let i = 1; i < pat.value.length; i++) {
-
-                if(pat.value[i] != undefined) {
-                        
-                        let x1 = pat.value[i-1].diff;
-                        let x2 = pat.value[i].diff;
-                        let y1;
-                        let y2;
-                        if(scaleRelative){
-                            y1 = pat.value[i-1].relScore;
-                            y2 = pat.value[i].relScore;
-                        }else{
-                            y1 = pat.value[i-1].SCORE;
-                            y2 = pat.value[i].SCORE;
-                        }
-                    
-                        pat.value[i].calc = [[x1, y1],[x2, y2]];
-
-                        let slope = (y2 - y1) / (x2 - x1);
-
-                        pat.value[i].slope = slope;
-                        if(scaleRelative){
-                            pat.value[i].b = 0;
-                        }else{
-                            pat.value[i].b = y1 - (slope * x1);
-                        } 
-                }
-            }
-
-            pat.bins = [];
-
-            pat.bins.push({'x': negdiff, 'y': null});
-            for (let i = 1; i < bincount; i++) {
-               let diffplus = negdiff + (i * 10);
-               pat.bins.push({'x': diffplus, 'y': null});
-            }
-            
-            let patstart = pat.value[0].diff;
-            patstart = Math.ceil(patstart / 10)* 10;
-            let patend = pat.value[pat.value.length-1].diff;
-            patend = Math.ceil(patend/10)* 10;
-          
-            let first = pat.bins.find((v)=> v.x == patstart);
-            let last = pat.bins.find((v)=> v.x == patend);
-
-            if(first != undefined){
     
-                const startIndex = pat.bins.indexOf(first);
-                if(scaleRelative){ 
-                    first.y = pat.value[0].relScore;
-                }else{
-                    first.y = pat.value[0].SCORE;
-                }
-            }
-
-            if(last != undefined){
-                if(scaleRelative){  last.y = pat.value[pat.value.length-1].relScore; }else{  last.y = pat.value[pat.value.length-1].SCORE; }
-                }
-
-            for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
-              
-                let x = pat.bins[i].x;
-              
-                    pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
-                        let top = pat.value.find((v)=> v.diff > x);
-                
-                        if(top != undefined){
-                  
-                         pat.bins[i].y = (top.slope * x) + top.b;
-                         };
-            }
+        let topdev = means.map((d, i)=> {
+            let y = d[1] + devs[i];
+            let x = d[0];
+            return [x, y];
         });
-   
-        let patbin = cohortFiltered.map((d)=> {
-            let bin = d.bins;
-            return bin;
-            });
-
-            let means = [];
-            let devs = [];
-            
-            for(let i = 0; i < patbin[0].length; i++){
-                let mean = d3.mean(patbin.map(d => d[i].y));
-                let med = d3.median(patbin.map(d => d[i].y));
-                let x = d3.mean(patbin.map(d => d[i].x));
-                let dev =  d3.deviation(patbin.map(d => d[i].y));
-                means.push([x, med]);
-              //  means.push([x, mean]);
-                devs.push(dev);
-            }
     
-            let botdev = means.map((d, i)=> {
-                let y = d[1] - devs[i];
-                let x = d[0];
-    
-                return [x, y];
-            });
-    
-            let topdev = means.map((d, i)=> {
-                
-               let y = d[1] + devs[i];
-               let x = d[0];
-    
-               return [x, y];
-            });
-    
-            let quart = means.map((d, i)=> {
-                let x = d[0];
-                let y1 = d[1] + devs[i];
-                let y2 = d[1] - devs[i];
-                return [x, y1, y2];
-             });
+        let quart = means.map((d, i)=> {
+            let x = d[0];
+            let y1 = d[1] + devs[i];
+            let y2 = d[1] - devs[i];
+            return [x, y1, y2];
+        });
     
             quart[0] = [means[0][0], quart[1][1], quart[1][2]];
             let quart2 = [];
@@ -691,7 +651,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                        if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
+                        if(cohort.scaleR){ arr.push(null); }else{ arr.push(null); }
                       }else{arr.push(q); }
                 });
                 quart2.push(arr);
@@ -706,7 +666,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                        if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
+                        if(cohort.scaleR){ arr.push(null); }else{ arr.push(null); }
                        
                       }else{arr.push(q); }
                 });
@@ -722,23 +682,29 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 d.forEach(q=> {
                     //let val = [];
                     if (isNaN(q)) {
-                        if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
+                        if(cohort.scaleR){ arr.push(null); }else{ arr.push(null); }
                       }else{ arr.push(q); }
                 });
                 topdev2.push(arr);
             });
     
-            let lineCount = promis.length;
-    
-            let data = means;
-            data.forEach((d, i)=> {
-                if(d[1] == undefined){ 
-                    if(i > 0){
-                        d[1] = data[i-1][1] }
-                    else{ d[1] = data[i+1][1] }
-                }
-                  
-            });
+            let lineCount = cohort.length;
+            botdev2 = botdev2.filter(m=> m[1] != null);
+            topdev2 = topdev2.filter(m=> m[1] != null);
+            quart2 = quart2.filter(m=> m[1] != null);
+            let data = means.filter(m=> m[1] != undefined);
+      
+            let scoreScale = node.scoreScale;
+
+            if(cohort.scaleR){
+                scoreScale.domain([30, -30]);
+            }else{ 
+        
+                scoreScale.domain([80, 0]);
+            }
+
+            let minDay = node.domains.minDay;
+            let maxDay = node.domains.maxDay;
 
             // -----  set domains and axis
             // time scale
@@ -767,14 +733,15 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
     
             promisScoreGroup.append('clipPath').attr('id', 'clip')
             .append('rect')
-            .attr('width', 850)
-            .attr('height', node.height - 50);
+            .attr('width', node.width - node.margin.x)
+            .attr('height', node.height - node.margin.y);
     
             let group = promisScoreGroup.append('g').classed(clump, true);
     
                 group
                 .append('path')
-                .classed('qLine_' + clump, true)
+                .classed('qLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([quart2])
                 .attr('d', drawPaths)
@@ -784,7 +751,8 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
     
                 group
                 .append('path')
-                .classed('avLine_' + clump, true)
+                .classed('avLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([data])
                 .attr('d', lineFunc)
@@ -794,7 +762,8 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
     
                 group
                 .append('path')
-                .classed('stLine_' + clump, true)
+                .classed('stLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([topdev2])
                 .attr('d', lineFunc)
@@ -804,7 +773,8 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
     
                 group
                 .append('path')
-                .classed('stLine_' + clump, true)
+                .classed('stLine', true)
+                .classed(clump, true)
                 .attr('clip-path','url(#clip)')
                 .data([botdev2])
                 .attr('d', lineFunc)
@@ -817,7 +787,7 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
     
                 zeroLine.append('line')//.attr('class', 'myLine')
                         .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
-                        .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
+                        .attr('y1', 0).attr('y2', node.height - node.margin.y).attr('stroke-width', .5).attr('stroke', '#E67E22');
                
                 let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
 
@@ -826,319 +796,6 @@ export function frequencyCalc(promis, clump, node, cohort, i) {
                 }
 }
 
-export function frequencyCalc_saved(promis, clump, node, cohort, i) {
-    //item.promisSep[0], 'top', this.selectedNode, item
-      // creates bin array for each patient scores and calulates slope for each bin
-        //TODO : get rid of test in name and global variables?
-    
-            let minDay = node.domains.minDay;
-            let maxDay = node.domains.maxDay;
-    
-            let scaleRelative = cohort.scaleR;
-    
-            let scoreScale = node.scoreScale;
-    
-            if(scaleRelative){
-         
-                scoreScale.domain([30, -30]);
-             }else{ 
-        
-                scoreScale.domain([80, 0]);
-             }
-    
-             let zeroEvent;
-            
-             if(cohort.startEvent == null){ zeroEvent = 'First Promis Score';
-            }else{
-                zeroEvent = cohort.startEvent[1][0].key;
-            }
-    
-            let cohortFiltered = promis.filter(d=> d.value.length > 1);
-    
-            let negdiff = 0;
-            let posdiff = 0;
-    
-            //get the extreme diff values for each side of the zero event
-            cohortFiltered.forEach(pat => {
-                let patZero = pat.value.filter(p=> p.diff == 0);
-                let patDiffArray = pat.value.map(d=> +d.diff);
-                let patneg = d3.min(patDiffArray);
-                let patpos = d3.max(patDiffArray);
-                if(patneg < negdiff) {negdiff = patneg;  };
-                if(patpos > posdiff) {posdiff = patpos;  };
-            });
-           
-            negdiff = Math.round(negdiff / 10) * 10;
-            posdiff = Math.round(posdiff / 10) * 10;
-    
-  
-            //get diff of days between maxneg diff and maxpos diff
-            let daydiff = posdiff - negdiff;
-  
-            let bincount = Math.floor(daydiff/10);
-    
-            cohortFiltered.forEach(pat=> {
-    
-                for (let i = 1; i < pat.value.length; i++) {
-    
-                    if(pat.value[i] != undefined) {
-                            
-                            let x1 = pat.value[i-1].diff;
-                            let x2 = pat.value[i].diff;
-                            let y1;
-                            let y2;
-                            if(scaleRelative){
-                                y1 = pat.value[i-1].relScore;
-                                y2 = pat.value[i].relScore;
-                            }else{
-                                y1 = pat.value[i-1].SCORE;
-                                y2 = pat.value[i].SCORE;
-                            }
-                        
-                            pat.value[i].calc = [[x1, y1],[x2, y2]];
-    
-                            let slope = (y2 - y1) / (x2 - x1);
-    
-                            pat.value[i].slope = slope;
-                            if(scaleRelative){
-                                pat.value[i].b = 0;
-                            }else{
-                                pat.value[i].b = y1 - (slope * x1);
-                            } 
-                    }
-                }
-    
-                pat.bins = [];
-    
-                pat.bins.push({'x': negdiff, 'y': null});
-                for (let i = 1; i < bincount; i++) {
-                   let diffplus = negdiff + (i * 10);
-                   pat.bins.push({'x': diffplus, 'y': null});
-                }
-                
-                let patstart = pat.value[0].diff;
-                patstart = Math.ceil(patstart / 10)* 10;
-                let patend = pat.value[pat.value.length-1].diff;
-                patend = Math.ceil(patend/10)* 10;
-              
-                let first = pat.bins.find((v)=> v.x == patstart);
-                let last = pat.bins.find((v)=> v.x == patend);
-    
-                if(first != undefined){
-        
-                    const startIndex = pat.bins.indexOf(first);
-                    if(scaleRelative){ 
-                        first.y = pat.value[0].relScore;
-                    }else{
-                        first.y = pat.value[0].SCORE;
-                    }
-                }
-    
-                if(last != undefined){
-                    if(scaleRelative){  last.y = pat.value[pat.value.length-1].relScore; }else{  last.y = pat.value[pat.value.length-1].SCORE; }
-                    }
-    
-                for(let i = pat.bins.indexOf(first); i < pat.bins.indexOf(last); i ++){
-                    let x = pat.bins[i].x;
-                        pat.bins[i].topvalue = pat.value.find((v)=> v.diff > pat.bins[i].x);
-                            let top = pat.value.find((v)=> v.diff > x);
-                            if(top != undefined){
-                             pat.bins[i].y = (top.slope * x) + top.b;
-                            };
-                }
-            });
-       
-            let patbin = cohortFiltered.map((d)=> {
-                let bin = d.bins;
-                return bin;
-                });
-    
-                let means = [];
-                let devs = [];
-                
-                for(let i = 0; i < patbin[0].length; i++){
-                    let mean = d3.mean(patbin.map(d => d[i].y));
-                    let med = d3.median(patbin.map(d => d[i].y));
-                    let x = d3.mean(patbin.map(d => d[i].x));
-                    let dev =  d3.deviation(patbin.map(d => d[i].y));
-                    means.push([x, med]);
-                  //  means.push([x, mean]);
-                    devs.push(dev);
-                }
-        
-                let botdev = means.map((d, i)=> {
-                    let y = d[1] - devs[i];
-                    let x = d[0];
-                    return [x, y];
-                });
-        
-                let topdev = means.map((d, i)=> {
-                    
-                   let y = d[1] + devs[i];
-                   let x = d[0];
-                   return [x, y];
-                });
-        
-                let quart = means.map((d, i)=> {
-                    
-                    let x = d[0];
-                    let y1 = d[1] + devs[i];
-                    let y2 = d[1] - devs[i];
-         
-                    return [x, y1, y2];
-                 });
-        
-                quart[0] = [means[0][0], quart[1][1], quart[1][2]];
-                let quart2 = [];
-                 
-                quart.forEach(d=> {
-                    let arr = [];
-                    d.forEach(q=> {
-                        //let val = [];
-                        if (isNaN(q)) {
-                            if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
-                          }else{arr.push(q); }
-                    });
-                    quart2.push(arr);
-                });
-        
-                 botdev[0] = [means[0][0], botdev[1][1]];
-                 let botdev2 = [];
-                 
-                botdev.forEach(d=> {
-                    console.log(d);
-                    let arr = [];
-                    d.forEach(q=> {
-                        //let val = [];
-                        if (isNaN(q)) {
-                            if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
-                           
-                          }else{arr.push(q); }
-                    });
-                    botdev2.push(arr);
-                });
-        
-                topdev[0] = [means[0][0], topdev[1][1]];
-        
-                let topdev2 = [];
-                 
-                topdev.forEach(d=> {
-                    let arr = [];
-                    d.forEach(q=> {
-                        //let val = [];
-                        if (isNaN(q)) {
-                            if(scaleRelative){ arr.push(0); }else{ arr.push(45); }
-                          }else{ arr.push(q); }
-                    });
-                    topdev2.push(arr);
-                });
-        
-                let lineCount = promis.length;
-        
-                let data = means;
-                data.forEach((d, i)=> {
-                    if(d[1] == undefined){ 
-                        if(i > 0){
-                            d[1] = data[i-1][1] }
-                        else{ d[1] = data[i+1][1] }
-                    }
-                      
-                });
-                console.log(data);
-                
-                // -----  set domains and axis
-                // time scale
-                node.timeScale.domain([minDay, maxDay]);
-        
-                node.svg.select('.xAxis')
-                    .call(axisBottom(node.timeScale));
-        
-                node.svg.select('.yAxis')
-                    .call(axisLeft(scoreScale));
-    
-                // -------  define line function
-                const lineFunc = line()
-                    .curve(curveLinear)
-                    .x((d, i) => { return node.timeScale(+d[0]); })
-                    .y((d) => { return scoreScale(+d[1]); });
-        
-                // -------- line function for quartiles 
-                const drawPaths = area()
-                      .x(d => { return node.timeScale(+d[0]); })
-                      .y0(d => { return scoreScale(+d[2]); })
-                      .y1(d => { return scoreScale(+d[1]); });
-                
-                // ------- draw
-                const promisScoreGroup = node.svg.select('.scoreGroup-'+ node.cohortIndex);
-        
-                promisScoreGroup.append('clipPath').attr('id', 'clip')
-                .append('rect')
-                .attr('width', 850)
-                .attr('height', node.height - 50);
-        
-                let group = promisScoreGroup.append('g').classed(clump, true);
-        
-                    group
-                    .append('path')
-                    .classed('qLine_' + clump, true)
-                    .attr('clip-path','url(#clip)')
-                    .data([quart2])
-                    .attr('d', drawPaths)
-                    .attr('transform', () => {
-                        return `translate(${node.margin.x},${node.margin.y})`;
-                    });
-        
-                    group
-                    .append('path')
-                    .classed('avLine_' + clump, true)
-                    .attr('clip-path','url(#clip)')
-                    .data([data])
-                    .attr('d', lineFunc)
-                    .attr('transform', () => {
-                        return `translate(${node.margin.x},${node.margin.y})`;
-                    });
-        
-                    group
-                    .append('path')
-                    .classed('stLine_' + clump, true)
-                    .attr('clip-path','url(#clip)')
-                    .data([topdev2])
-                    .attr('d', lineFunc)
-                    .attr('transform', () => {
-                        return `translate(${node.margin.x},${node.margin.y})`;
-                    });
-        
-                    group
-                    .append('path')
-                    .classed('stLine_' + clump, true)
-                    .attr('clip-path','url(#clip)')
-                    .data([botdev2])
-                    .attr('d', lineFunc)
-                    .attr('transform', () => {
-                        return `translate(${node.margin.x},${node.margin.y})`;
-                    });
-        
-                    let zeroLine = promisScoreGroup.append('g').classed('zeroLine', true)
-                    .attr('transform', () => `translate(${node.margin.x},${node.margin.y})`);
-        
-                    zeroLine.append('line')//.attr('class', 'myLine')
-                            .attr('x1', node.timeScale(0)).attr('x2', node.timeScale(0))
-                            .attr('y1', 0).attr('y2', 345).attr('stroke-width', .5).attr('stroke', '#E67E22');
-                   
-                    let zeroText = zeroLine.append('text').text(zeroEvent).attr('x', node.timeScale(0));
-    
-                    if(i != null){
-                    zeroText.attr('transform', 'translate(0,'+ i * 12 +')').classed(clump, true);
-                    }
-    
-                    
-    
-    }
-
-
-
-    
-
-export function create(parent: Element, diagram, index, domains) {
-    return new promisDiagram(parent, diagram, index, domains);
+export function create(parent: Element, diagram, index, domains, dimension, data) {
+    return new promisDiagram(parent, diagram, index, domains, dimension, data);
 }
