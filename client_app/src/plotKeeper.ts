@@ -19,6 +19,7 @@ import * as dataCalc from './dataCalculations';
 import * as promisDiagram from './promisDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
+import { indexOf } from 'phovea_core/src';
 
 export class PlotKeeper {
 
@@ -26,18 +27,19 @@ export class PlotKeeper {
     private cohortData = [];
     private plotDiv;
     private domain;
+    private dimension;
     private initialLoadBool;
     selectedCohort;
     selectedPlot;
     plotArray;
-    private compareBool;
     private layerBool;
-    comparisonArray;
+    layerKeeperArray;
     drawPromisChart;
-    frequencyCalc;
+    drawAgg;
     clearDiagram;
     scoreScale;
     timeScale;
+    plotCount;
 
     constructor(parent: Element) {
 
@@ -46,80 +48,60 @@ export class PlotKeeper {
             minDay: -10,
         }
 
+        this.dimension = {
+            height : 400,
+            width : 600,
+            margin : {x: 40, y: 10},
+        }
+
         this.drawPromisChart = promisDiagram.drawPromisChart;
-        this.frequencyCalc = promisDiagram.frequencyCalc;
+        this.drawAgg = promisDiagram.drawAgg;
         this.clearDiagram = promisDiagram.clearDiagram;
 
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('div').classed('allDiagramDiv', true);
-       
-        const timeline = this.$node.append('div').classed('timeline_view', true);
-        timelineKeeper.create(timeline.node());
+        this.plotArray = [];
+
         this.attachListener();
     }
 
     private attachListener(){
 
         events.on('clear_cohorts', (evt, item)=> {
+            console.log('is this going??');
             this.layerBool = false;
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
             document.getElementById('layerButton').classList.remove('btn-warning');
+            this.plotCount = 0;
 
         });
-
-        events.on('comparison_update', (evt, item)=> {
-
-            this.comparisonArray = item;
-            this.plotArray = [];
-    
-            this.plotDiv.selectAll('*').remove();
-
-            this.comparisonArray.forEach((cohort, i) => {
-               
-                let plot = this.buildPlot(this.plotDiv, i, this.domain);
-                plot.svg.select(parent).on('click', (d, i)=> {console.log(d); console.log(i)});
-
-                this.plotArray.push(plot);
-                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort, i);
-            });
-
-            this.selectedPlot = this.plotArray[0];
-        });
-
         
         events.on('draw_layers', (evt, item)=> {
 
             //this comes from the sidebar
         if(this.selectedPlot != undefined){    
             
-            this.comparisonArray = item;
+            this.layerKeeperArray = item;
+            console.log(item);
      
             this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-            this.comparisonArray.layers.forEach((cohort, i) => {
+            this.layerKeeperArray.layers.forEach((cohort, i) => {
                 console.log(cohort);
                 if(cohort.data.clumped){
                     //if it is aggregated
-                    this.frequencyCalc(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);//.then(co=> this.drawAgg(co, 'all'));
+                  this.drawAgg(cohort.data.chartData, cohort.class, this.selectedPlot, i, cohort.data);
                 }else{
-                    this.drawPromisChart(cohort.data.promis, cohort.class, this.selectedPlot, cohort.data, i);
+                    //promis, clump, node, cohort, i, data
+                    console.log(this.cohortData);
+                    //promis, clump, node, cohort, i, data
+                    this.drawPromisChart(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data, i, this.cohortData);
                 }
             });}
-        });
-
-        events.on('enter_comparison_view', ()=> {
-            this.compareBool = true;
-        });
-
-        events.on('exit_comparison_view', ()=> {
-            this.plotDiv.selectAll('*').remove();
-            this.buildPlot(this.plotDiv, 0, this.domain);
-            events.fire('cohort_selected', this.cohortData[0]);
-            this.compareBool = false;
         });
 
         events.on('enter_layer_view', ()=> {
@@ -129,14 +111,22 @@ export class PlotKeeper {
 
         events.on('exit_layer_view', ()=> {
             this.layerBool = false;
-            this.plotDiv.selectAll('*').remove();
-            this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
+            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            let layer = select('#layerDiv');
+            layer.selectAll('*').remove();
+            layer.classed('hidden', true);
+         //   document.getElementById('layerButton').classList.remove('btn-warning');
+           
+        //    this.plotDiv.selectAll('*').remove();
+            
+          //  this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=> {
+              //  this.selectedPlot = d;
+          //  });
             document.getElementById('layerButton').classList.remove('btn-warning');
             events.fire('cohort_selected', this.cohortData[0]);
         });
 
         events.on('test', (evt, item)=> {
-   
             this.cohortData = item[0];
             this.selectedCohort = this.cohortData[item[1][0]];
             let array = [];
@@ -150,89 +140,115 @@ export class PlotKeeper {
               });
               events.fire('update_layers', array);
             }
-
             if(!this.initialLoadBool){
+                console.log('this isnt firing');
                 this.initialLoadBool = true;
-                this.selectedPlot = this.buildPlot(this.plotDiv, 0, this.domain);
-                if(this.layerBool){
-                }else{
-                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', this.selectedPlot, this.selectedCohort, null);
-                }
+                this.plotCount = 0;
+                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=> {
+                    this.selectedPlot = d;
+                    this.plotArray.push({plot: d, data: this.selectedCohort});
+                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
+                });
             }
         });
 
+        events.on('add_plot_button', (evt, item)=> {
+          
+            let count = this.plotArray.length;
+            this.plotCount++;
+            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=>{
+                
+                this.plotArray.push({plot: d, data: this.selectedCohort});
+                this.plotSelected(this.plotArray, d);
+                this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData).then(d=>{
+                    console.log(this.plotArray);
+                });
+            });
+        });
         events.on('domain updated', (evt, item)=> {
           
             this.domain.minDay = item[0];
             this.domain.maxDay = item[1];
-            this.plotArray = [];
            
-            if(!this.compareBool){
-                events.fire('yBrush_reset');
-            }else{
-                this.plotDiv.selectAll('*').remove();
-
-            this.comparisonArray.forEach((cohort, i) => {
-                let plot = this.buildPlot(this.plotDiv, i, this.domain);
-                this.plotArray.push(plot);
-                this.drawPromisChart(cohort.selectedCohort.promis, 'proLine', plot, cohort.selectedCohort, i);
-              });
-            }
-            
-
+            events.fire('xBrush_reset');
         });
-        //cohort, clump, node, index
+        events.on('plot_selected', (evt, item)=>{
+            let index = String(item);
+      
+            this.selectedPlot = this.plotArray.filter(p=> p.plot.cohortIndex == index)[0].plot;
+            console.log(this.selectedPlot);
+            this.plotSelected(this.plotArray, this.selectedPlot);
+        });
+        events.on('remove_plot', (evt, item)=> {
+     
+            let plotIndexes = this.plotArray.map(p=> p.plot.cohortIndex).indexOf(String(item));
+            let removeIt = this.plotArray.filter((d, i) => i == plotIndexes);
+            removeIt[0].plot.$node.select('.panel').remove();
+            let newArray = this.plotArray.filter((d, i) => i != plotIndexes);
+            this.plotArray = newArray;
+        });
         events.on('update_chart', (evt, item)=> {
-          
+ 
            if(this.selectedPlot != undefined){
-            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
-        
-               if(this.layerBool == true){
-                console.log('update chart??');
-               }else{
+      
+                if(this.selectedPlot.cohortIndex != undefined){
+                    this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+                }
+
+                if(this.layerBool == true){
+                    console.log('update chart??');
+                }else{
                
                   let promis = item.chartData;
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
                   let separated = item.separated;
-               
+              
                   if(clumped){
-                      //if it is aggregated
                       if(separated){
-                          this.frequencyCalc(item.promisSep[0], 'bottom', this.selectedPlot, item, null);
-                          this.frequencyCalc(item.promisSep[1], 'middle', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'middle'));
-                          this.frequencyCalc(item.promisSep[2], 'top', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'bottom'));
+                       
+                         this.drawAgg(item.promisSep[0], 'bottom', this.selectedPlot, null, item);
+                         this.drawAgg(item.promisSep[1], 'middle', this.selectedPlot, null, item);
+                         this.drawAgg(item.promisSep[2], 'top', this.selectedPlot, null, item);
+
                       }else{
-                          
-                          this.frequencyCalc(promis, 'all', this.selectedPlot, item, null);//.then(co=> this.drawAgg(co, 'all'));
+                        console.log('not sep clumped!');
+                        console.log(item);
+                          this.drawAgg(promis, 'all', this.selectedPlot, null, item);
                       }
       
                   }else{
                       //if it is not aggregated
                       if(separated){
                          
-                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item, null);
-                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null);
-                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null);
+                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item, null, this.cohortData);
+                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null, this.cohortData);
+                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null, this.cohortData);
                       }else{
-                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null);
+                          console.log('is this happening?')
+                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null, this.cohortData);
                       }
+
                   }
                  }
-
                }
-
         });
-    
-
 }
 
-    private buildPlot(container, index, domain) {
-
-       return promisDiagram.create(container.node(), 'PROMIS Bank v1.2 - Physical Function', index, domain);
-
+    private async plotSelected(plotArray, selectedPlot){
+        console.log(plotArray);
+        console.log(selectedPlot);
+        selectAll('.selected_Plot').classed('selected_Plot', false);
+        selectedPlot.plotHeader.classed('selected_Plot', true);
+        this.selectedPlot = selectedPlot;
     }
 
+    private async addPlot(plotDiv, plotArray, domain, dimension, data){
+        
+        let plot = await promisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.plotCount, domain, dimension, data);
+        console.log(plot);
+        return plot;
+    }
 
 }
 

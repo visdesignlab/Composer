@@ -25,8 +25,6 @@ import {argFilter} from 'phovea_core/src/';
 
 export class EventLine {
     private $node;
-    private eventScale;
-    private circleScale;
     private filter;
     private startCodes;
     private scoreLabel;
@@ -36,22 +34,23 @@ export class EventLine {
     private branchHeight;
     private layerBool;
     private scoreChangeBool;
+    private diffDays;
+    private handle;
+    private sepBool;
 
     constructor(parent: Element, cohort) {
 
     this.$node = select(parent);
-    this.eventScale = scaleLinear().domain([0, 4])
-            .range([0, 750]).clamp(true);
-
-    this.circleScale = scaleLinear().domain([0, 3000])
-            .range([1, 15]).clamp(true);
 
     this.scoreLabel = 'Absolute Scale';
     this.startEventLabel = 'Change Start to Event';
     this.branchHeight = 30;
+    this.diffDays;
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
-    let branchWrapper = this.$node.append('div').classed('branch-wrapper', true);
-    branchWrapper.append('svg').attr('height', this.branchHeight);
+  
+    let eventButtonDiv = this.$node.append('div').attr('id', 'eventButtonDiv');
+    let slider = this.$node.append('div').attr('id', 'sliderDiv');
+
     this.scoreChangeBool;
    
     this.attachListener();
@@ -66,6 +65,7 @@ export class EventLine {
         events.on('enter_layer_view', ()=> {
             this.layerBool = true;
             document.getElementById('quartile-btn').classList.add('disabled');
+            document.getElementById('addPlot').classList.add('disabled');
             select('#layerDiv').classed('hidden', false);
             let array = [];
       
@@ -75,13 +75,13 @@ export class EventLine {
               let entry = {class: sel.classList[0], data: sel.__data__ }
               array.push(entry);
           });
-      
           events.fire('update_layers', array);
         });
 
         events.on('exit_layer_view', ()=> {
             this.layerBool = false;
             document.getElementById('quartile-btn').classList.remove('disabled');
+            document.getElementById('addPlot').classList.remove('disabled');
             select('#layerDiv').classed('hidden', true);
         });
       
@@ -100,15 +100,15 @@ export class EventLine {
           });
 
         events.on('clear_cohorts', (evt, item)=> {
-            let branchSvg =this.$node.select('.branch-wrapper').select('svg');
-            branchSvg.selectAll('*').remove();
-
             this.layerBool = false;
+        });
+
+        events.on('separated_by_quant', (evt, item)=> {
          
+            if(!this.sepBool){ this.drawSlider(); }
         });
 
         events.on('update_chart', (evt, item)=> {
-
             if(item){
                 this.filter = item.filterArray;
 
@@ -116,12 +116,10 @@ export class EventLine {
                 if(startEvent == null){  this.startEventLabel = 'Change Start to Event'; }else{
                     this.startEventLabel = item.startEvent[1];
                 }
-
                 if(this.filter){
                     this.drawEventButtons(item);
                 }
             }
-   
         });
 
     }
@@ -132,7 +130,6 @@ export class EventLine {
         let array = [];
         let rows = [];
      
-            
         data.forEach(d => {
             flatData.push(d);
               if(d.branches.length != 0){ 
@@ -141,7 +138,7 @@ export class EventLine {
                 });
                };
             });
-            let panel = compareDiv.append('div').classed('panel', true).classed('panel-default', true).attr('width', 500);
+           let panel = compareDiv.append('div').classed('panel', true).classed('panel-default', true).attr('width', 500);
            let header =  panel.append('div').classed('panel-heading', true);
            header.append('text').text('Layer Control');
 
@@ -208,7 +205,122 @@ export class EventLine {
 
     }
 
-    private drawEventButtons(cohort){
+    private async drawSlider(){
+     // let sliderDiv = this.$node.select()
+        let that = this;
+
+        var margin = {left: 30, right: 30},
+        width = 200,
+        height = 60,
+        range = [30, 360],
+        step = 2; // change the step and if null, it'll switch back to a normal slider
+
+        // append svg
+        const sliderDiv = select('#sliderDiv').node();
+        
+        const svg = select(sliderDiv).append('svg').node();
+
+        select(svg).attr('width', width)
+                        .attr('height', height);
+    
+        const slider = select(svg).append('g').node();
+
+        select(slider).classed('slider', true)
+            .attr('transform', 'translate(' + margin.left +', '+ (height/2) + ')');
+
+        // using clamp here to avoid slider exceeding the range limits
+        var xScale = scaleLinear()
+            .domain(range)
+            .range([0, width - margin.left - margin.right])
+            .clamp(true);
+    
+        // array useful for step sliders
+        var rangeValues = d3.range(range[0], range[1], step || 1).concat(range[1]);
+        var xAxis = axisBottom(xScale).ticks(8);
+         //  .tickFormat((d)=> {
+         //   return d;
+         ///});
+
+        xScale.clamp(true);
+        // drag behavior initialization
+        const dragg = drag()
+            .on('start.interrupt', function () {
+                select(slider).interrupt();
+            })
+            .on('drag', function () { dragged(event.x); })
+            .on('end', function () { 
+                var x = xScale.invert(event.x);
+         
+                that.diffDays = x;
+                events.fire('change_sep_day', x);
+            });
+        // .on('mouse up', function(){ dragged(event.x) } );
+
+            // this is the main bar with a stroke (applied through CSS)
+        var track = select(slider).append('line').attr('class', 'track')
+        .attr('x1', xScale.range()[0])
+        .attr('x2', xScale.range()[1]);
+
+        var trackInset = select(slider).append('line').attr('class', 'track-inset')
+        .attr('x1', xScale.range()[0])
+        .attr('x2', xScale.range()[1]);
+
+        var trackOverlay = select(slider).append('g').attr('class', 'track-overlay')
+        .attr('x1', xScale.range()[0])
+        .attr('x2', xScale.range()[1])
+
+        if(!this.diffDays){ this.diffDays = 30 }
+        
+        let text = select(slider).append('text').text('Day Range: ' + this.diffDays).attr('transform', 'translate(0, -15)');
+ 
+        var ticks = select(slider).append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
+            .call(xAxis);
+    
+        // drag handle
+        var handle = select(slider).append('circle').classed('handle', true)
+            .attr('r', 8).call(dragg);
+
+        select(slider).transition().duration(750)
+        .tween("drag", function () {
+        // var i = d3.interpolate(0, 10);
+            return function (t) {
+            // dragged(xScale(i(t)));
+                dragged(xScale(t));
+            }
+         });
+
+        function dragged(value) {
+            var x = xScale.invert(value), index = null, midPoint, cx, xVal;
+            text.text('Day Range: ' + x);
+            if(step) {
+                // if step has a value, compute the midpoint based on range values and reposition the slider based on the mouse position
+                for (var i = 0; i < rangeValues.length - 1; i++) {
+                    if (x >= rangeValues[i] && x <= rangeValues[i + 1]) {
+                        index = i;
+                        break;
+                    }
+                }
+                midPoint = (rangeValues[index] + rangeValues[index + 1]) / 2;
+                if (x < midPoint) {
+                    cx = xScale(rangeValues[index]);
+                    xVal = rangeValues[index];
+                } else {
+                    cx = xScale(rangeValues[index + 1]);
+                    xVal = rangeValues[index + 1];
+                }
+            } else {
+                // if step is null or 0, return the drag value as is
+                cx = xScale(x);
+                xVal = x.toFixed(3);
+            }
+            // use xVal as drag value
+            handle.attr('cx', cx);
+        }
+        this.sepBool = true;
+
+    }
+
+    private async drawEventButtons(cohort){
             let filters = cohort.filterArray;
             let scaleRelative = cohort.scaleR;
             let separated = cohort.separated;
@@ -216,15 +328,13 @@ export class EventLine {
             let dataType = cohort.chartData[0].value[0]['FORM'];
             let startEvent = cohort.startEvent;
 
-            console.log(startEvent);
-
             if(!scaleRelative){  this.scoreLabel = 'Absolute Scale';
             }else{ this.scoreLabel = 'Relative Scale'; }
 
             let that = this;
 
             function filText(d){
-                if(d.type !=  'Branch'){
+                if(d.type !=  'Branch' && d.type != 'X-CPT'){
                     if(d.type == 'Start'){
                         let label = 'First Promis Score';
                         return label;
@@ -235,7 +345,6 @@ export class EventLine {
                 }else{ console.log('Branch filter passed')};
             }
             function labelClick(d){
-              
                 let rec = select(d);
                     if(d == 'First Promis Score'){
                         that.startCodes = null;
@@ -244,7 +353,6 @@ export class EventLine {
                         events.fire('event_selected', [that.startCodes, that.startEventLabel]);
                         }else{
                         that.startCodes = d.value;
-                      
                         let label = d.filter;
                         that.startEventLabel = label;
                         that.drawEventButtons(cohort);
@@ -254,10 +362,9 @@ export class EventLine {
 
             filters = filters.filter(d=> {return d.type != 'Branch' && d.type != 'Demographic' && d.type != 'Score'});
         
-            this.$node.select('.event-buttons').remove();
-
-            let div = this.$node.append('div').classed('event-buttons', true);
-            //toggle for event day
+            let div = this.$node.select('#eventButtonDiv');
+            div.selectAll('*').remove();
+      
             let startPanel = div.append('div').classed('start-event', true);
                     
             let startToggle = startPanel.append('div').classed('btn-group', true);
@@ -293,18 +400,15 @@ export class EventLine {
     
             scaletogglebutton.append('span').classed('caret', true);
     
-                        let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
-                        let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
-                        let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
+            let ul = scaleToggle.append('ul').classed('dropdown-menu', true).attr('role', 'menu');
+            let abs = ul.append('li').attr('class', 'choice').append('text').text('Absolute');
+            let rel = ul.append('li').attr('class', 'choice').append('text').text('Relative');//.attr('value', 'Absolute');
               
             abs.on('click', () =>{
-                          //  this.scoreLabel = 'Absolute Scale';
                             this.drawEventButtons(cohort);
-                           // this.drawScoreFilterBox(this.scoreBox);
                             events.fire('change_promis_scale', this.scoreLabel)});
     
             rel.on('click', () =>{
-                               // this.scoreLabel = 'Relative Scale';
                                 this.drawEventButtons(cohort);
                                 events.fire('change_promis_scale', this.scoreLabel)});
     
@@ -365,28 +469,15 @@ export class EventLine {
                         }
                     });
                     bCheck.append('label').attr('for', 'sampleB').text('bottom').style('color', '#fc8d59');
-                    let radio = quartDiv.append('form');
-                    radio.append('input').attr('type', 'radio').attr('value', true).attr('name', 'quart').attr('id', 'quartile-radio-1');
-                    radio.append('label').attr('for', 'quartile-radio-1').text('Average Score Change');
-                    radio.append('input').attr('type', 'radio').attr('value', false).attr('name', 'quart').attr('id', 'quartile-radio-2');
-                    radio.append('label').attr('for', 'quartile-radio-2').text('Score at Zero Day');
-                    if(this.scoreChangeBool){
-                        select(document.getElementById(this.scoreChangeBool)).attr('checked', true);
+
+                    if(!separated){
+                        checkDiv.classed('hidden', true);
+                        select('#sliderDiv').classed('hidden', true);
                     }
 
-                    this.$node.selectAll("input[name='quart']").on('change', function() {
-                        let scoreChange = {id : this.id, scaleR: null};
-                        if(this.id == 'quartile-radio-1'){ scoreChange.scaleR = true;
-                        }else{ scoreChange.scaleR = false; }
-                        that.scoreChangeBool = this.id;
-                        events.fire('change_sep_bool', scoreChange);
-                    });
-
-                    if(!separated){  
-                        checkDiv.classed('hidden', true); 
-                        radio.classed('hidden', true); }
-                    else{ checkDiv.classed('hidden', false); 
-                          radio.classed('hidden', false);}
+                    else{ checkDiv.classed('hidden', false);
+                    select('#sliderDiv').classed('hidden', false);
+                    }
 
                     if(this.layerBool){
                         //document.getElementById('quartile-btn').classList.add('disabled');
@@ -418,6 +509,9 @@ export class EventLine {
                                 c2.on('click', ()=> {
                                     this.scoreType = 'Oswestry Index';
                                     events.fire('change_plot_data', 'oswestry')});
+
+                    let addPlot = div.append('input').attr('type', 'button').attr('id', 'addPlot').attr('class', 'btn').classed('btn-default', true).classed('btn-sm', true).attr('value', 'Add Plot');
+                        addPlot.on('click', function(d){ events.fire('add_plot_button'); });
             }
 
     private async flattenCohort(cohort) {

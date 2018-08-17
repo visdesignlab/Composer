@@ -70,8 +70,7 @@ export class App {
     // main div with child views
     const main = this.$node.append('div').classed('main', true);
     const plots = main.append('div').classed('plot_view', true);
-    const statBar = this.$node.append('div').classed('stat_sidebar_view', true);
-  
+   
     PlotKeeper.create(plots.node());
   
    // codeside.create(statBar.node());

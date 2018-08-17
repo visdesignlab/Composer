@@ -2,7 +2,7 @@
     /*width: 3200px;*/
     height: 100%;
     width: 100%;
-    position: fixed;
+    // position: fixed;
     margin: 0px;
     padding: 0px;
 }
@@ -33,6 +33,27 @@
     padding-top: 5px;
 }
 
+.plot_head {
+    display: inline-block;
+    height: 30px;
+    width: 60px;
+    float: left;
+}
+
+.plot_toggle {
+    display: inline-block;
+    height: 30px;
+    width: 120px;
+    float: left;
+}
+
+.header_x {
+    display: inline-block;
+    height: 30px;
+    width: 50px;
+    float: right;
+}
+
 .tooltip {
     position: absolute;
     text-align: center;
@@ -51,6 +72,14 @@
     width: 50%;
     margin-top: 50px;
     display: inline-block;
+}
+
+.panel-default div.selected_Plot {
+    background-color: rgb(152, 187, 223);
+}
+
+li:hover {
+    cursor: pointer;
 }
 
 .stat_sidebar_view {
@@ -101,81 +130,6 @@
 .context {
     stroke: lightblue;
     stroke-opacity: .1;
-}
-
-.anesthesia {
-    fill: cadetblue;
-    opacity: .3;
-}
-
-.chiropractor {
-    fill: orange;
-    opacity: .3;
-}
-
-.biopsy {
-    fill: orange;
-    opacity: .3;
-}
-
-.ecg_ekg,
-.emg,
-.evaluation,
-.electrical_stimulation,
-.echocardiography {
-    fill: #1B4F72;
-    opacity: .3;
-}
-
-.gynecologic {
-    fill: pink;
-    opacity: .3;
-}
-
-.injection {
-    fill: green;
-    opacity: .3;
-}
-
-.medicine,
-.mammography {
-    fill: brown;
-    opacity: .3;
-}
-
-.nerve_conduction {
-    fill: blueviolet;
-    opacity: .3;
-}
-
-.oncology {
-    fill: greenyellow;
-    opacity: .3;
-}
-
-.opthalmology,
-.other {
-    fill: green;
-    opacity: .3;
-}
-
-.physical_therapy,
-.pulmonary,
-.postoperative_visit,
-.pathology_lab {
-    fill: yellow;
-    opacity: .3;
-}
-
-.radiology {
-    fill: plum;
-    opacity: .3;
-}
-
-.surgery,
-.SLP {
-    fill: red;
-    opacity: .3;
 }
 
 .vaccine {
