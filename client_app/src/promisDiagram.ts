@@ -74,7 +74,7 @@ export class promisDiagram {
         this.width = dimension.width;
         this.height = dimension.height;
         this.margin = dimension.margin;
-        let plotPanel = this.$node.append('div').classed('plot-' + index, true).classed('panel', true).classed('panel-default', true).style('width', '700px').style('height', '550px');
+        let plotPanel = this.$node.append('div').classed('plot-' + index, true).classed('panel', true).classed('panel-default', true).style('width', '650px').style('height', '550px');
         this.plotHeader =  plotPanel.append('div').classed('panel-heading', true).style('height', '45px');
         let headText = this.plotHeader.append('div').classed('plot_head', true).append('text').text('Plot ' + (index + 1));
         headText.on('click', (d)=> {
