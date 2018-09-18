@@ -71,13 +71,14 @@ export class TimelineKeeper {
         });
 
         events.on('score_scale_changed', ()=> {
+            console.log('when does score scale change happen');
             select('.slider').call(this.brush).transition()
             .delay(850).call(this.brush.move, [this.timeScale(-20), this.timeScale(90)]);
         });
     }
 
     private updateDays(start, end) {
-
+        console.log('update days');
         let startDay = this.timeScale(start);
         let endDay = this.timeScale(end);
 
