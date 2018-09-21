@@ -9,7 +9,8 @@ phovea_core
 /phovea_core
 phovea_ui
 /phovea_ui
-
+/data
+data
 
 # testing
 /coverage
