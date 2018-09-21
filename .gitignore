@@ -6,7 +6,9 @@ node_modules
 /phovea_server
 phovea_server
 phovea_core
+/phovea_core
 phovea_ui
+/phovea_ui
 
 # testing
 /coverage
