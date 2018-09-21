@@ -196,36 +196,29 @@ export class PlotKeeper {
                 }
 
                 if(this.layerBool == true){
-                    console.log('update chart??');
+               
                 }else{
                
                   let promis = item.chartData;
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
                   let separated = item.separated;
-              console.log(item);
+              
                   if(clumped){
                       if(separated){
-                       
                          this.drawAgg(item.promisSep[0], 'bottom', this.selectedPlot, null, item);
                          this.drawAgg(item.promisSep[1], 'middle', this.selectedPlot, null, item);
                          this.drawAgg(item.promisSep[2], 'top', this.selectedPlot, null, item);
-
                       }else{
-                        console.log('not sep clumped!');
-                        console.log(item);
                           this.drawAgg(promis, 'all', this.selectedPlot, null, item);
                       }
-      
                   }else{
                       //if it is not aggregated
                       if(separated){
-                         
                           this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item, null, this.cohortData);
                           this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null, this.cohortData);
                           this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null, this.cohortData);
                       }else{
-                          console.log('is this happening?')
                           this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null, this.cohortData);
                       }
 
@@ -236,17 +229,13 @@ export class PlotKeeper {
 }
 
     private async plotSelected(plotArray, selectedPlot){
-        console.log(plotArray);
-        console.log(selectedPlot);
         selectAll('.selected_Plot').classed('selected_Plot', false);
         selectedPlot.plotHeader.classed('selected_Plot', true);
         this.selectedPlot = selectedPlot;
     }
 
     private async addPlot(plotDiv, plotArray, domain, dimension, data){
-        
         let plot = await promisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.plotCount, domain, dimension, data);
-        console.log(plot);
         return plot;
     }
 
