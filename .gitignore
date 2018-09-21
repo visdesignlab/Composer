@@ -11,6 +11,8 @@ phovea_ui
 /phovea_ui
 /data
 data
+/_data
+_data
 
 # testing
 /coverage
