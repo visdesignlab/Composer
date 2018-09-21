@@ -1,4 +1,4 @@
-# dataExploration
+# Running Composer
 
 ### Prerequisites 
 
@@ -7,7 +7,7 @@
 
 ### Installing 
 
- 1. `cd dataExploration`
+ 1. `cd Composer`
  2. We need the `develop` branch from `phovea_server`. There are two ways:
    * `yo phovea:clone phovea_server` (consent to `SSH clone`, `Resolve`, `Update Workspace`). 
    Then `git fetch` and `git checkout develop`
