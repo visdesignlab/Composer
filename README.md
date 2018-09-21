@@ -1,7 +1,7 @@
 # Composer
 ![Composer Interface](assets/2018_vahc_composer_teaser.png)
 
-### About
+## About
 Composer is an open source visual cohort analysis tool developed in collaboration with the Univeristy of Utah Orthopaedic Center. More information can be found on the Visualization Design Lab's [webpage](http://vdl.sci.utah.edu/publications/2018_vahc_composer/).
 
 ## Running Composer
