@@ -82,8 +82,6 @@ export class promisDiagram {
         });
 
         plotPanel.on('mouseenter', (d)=>{
-            console.log(this);
-            console.log(this.cohortIndex);
             events.fire('plot_selected', this.cohortIndex);
         });
         let headToggle = this.plotHeader.append('div').classed('plot_toggle', true);
