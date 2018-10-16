@@ -2,24 +2,12 @@
  * Created by Jen on 1/12/17.
  */
 
-import * as ajax from 'phovea_core/src/ajax';
-import {brushX} from 'd3-brush';
-import * as d3 from 'd3';
+
 import {BaseType, select, selectAll, event} from 'd3-selection';
-import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
-import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
-import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
-import {axisBottom, axisLeft} from 'd3-axis';
-import {drag} from 'd3-drag';
-import { format } from 'd3-format';
-import {transition} from 'd3-transition';
-import * as distributionDiagram from './distributionDiagram';
-import * as dataCalc from './dataCalculations';
 import * as PromisDiagram from './promisDiagram';
-import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
-import { indexOf } from 'phovea_core/src';
+
 
 export class PlotKeeper {
 
@@ -34,9 +22,6 @@ export class PlotKeeper {
     plotArray;
     private layerBool;
     layerKeeperArray;
-    drawPromisChart;
-    drawAgg;
-    clearDiagram;
     scoreScale;
     timeScale;
     plotCount;
@@ -46,15 +31,10 @@ export class PlotKeeper {
         this.domain = {
             maxDay: 50, minDay: -10,
         }
-
         this.dimension = {
             height : 400, width : 600, margin : {x: 40, y: 10},
         }
-
-       // this.drawPromisChart = PromisDiagram.drawPromisChart;
-        this.drawAgg = PromisDiagram.drawAgg;
-        //this.clearDiagram = PromisDiagram.clearDiagram;
-
+      
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
         eventLine.create(eventLineView.node(), null);
@@ -67,7 +47,6 @@ export class PlotKeeper {
     private attachListener(){
 
         events.on('clear_cohorts', (evt, item)=> {
-            console.log('is this going??');
             this.layerBool = false;
             this.selectedPlot.clearDiagram();
             let layer = select('#layerDiv');
@@ -84,17 +63,12 @@ export class PlotKeeper {
         if(this.selectedPlot != undefined){    
             
             this.layerKeeperArray = item;
-            console.log(item);
-     
             this.selectedPlot.clearDiagram();
             this.layerKeeperArray.layers.forEach((cohort, i) => {
-                console.log(cohort);
                 if(cohort.data.clumped){
                     //if it is aggregated
-                  this.drawAgg(cohort.data.chartData, cohort.class, this.selectedPlot, i, cohort.data);
+                  this.selectedPlot.drawAgg(cohort.data.chartData, cohort.class, i, cohort.data);
                 }else{
-                    //promis, clump, node, cohort, i, data
-                    console.log(this.cohortData);
                     //promis, clump, i, cohort, data
                     this.selectedPlot.drawPromisChart(cohort.data.chartData, cohort.class, i, cohort.data, this.cohortData);
                 }
@@ -112,13 +86,6 @@ export class PlotKeeper {
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
-         //   document.getElementById('layerButton').classList.remove('btn-warning');
-           
-        //    this.plotDiv.selectAll('*').remove();
-            
-          //  this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=> {
-              //  this.selectedPlot = d;
-          //  });
             document.getElementById('layerButton').classList.remove('btn-warning');
             events.fire('cohort_selected', this.cohortData[0]);
         });
@@ -138,13 +105,12 @@ export class PlotKeeper {
               events.fire('update_layers', array);
             }
             if(!this.initialLoadBool){
-                console.log('this isnt firing');
+            
                 this.initialLoadBool = true;
                 this.plotCount = 0;
                 this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.selectedCohort, this.cohortData).then(d=> {
                     this.selectedPlot = d;
                     this.plotArray.push({plot: d, data: this.selectedCohort});
-                   // this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
                 });
             }
         });
@@ -199,11 +165,11 @@ export class PlotKeeper {
               
                   if(clumped){
                       if(separated){
-                         this.drawAgg(item.promisSep[0], 'bottom', this.selectedPlot, null, item);
-                         this.drawAgg(item.promisSep[1], 'middle', this.selectedPlot, null, item);
-                         this.drawAgg(item.promisSep[2], 'top', this.selectedPlot, null, item);
+                         this.selectedPlot.drawAgg(item.promisSep[0], 'bottom', null, item);
+                         this.selectedPlot.drawAgg(item.promisSep[1], 'middle', null, item);
+                         this.selectedPlot.drawAgg(item.promisSep[2], 'top', null, item);
                       }else{
-                          this.drawAgg(promis, 'all', this.selectedPlot, null, item);
+                        this.selectedPlot.drawAgg(promis, 'all', null, item);
                       }
                   }else{
                       //if it is not aggregated

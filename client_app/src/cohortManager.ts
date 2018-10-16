@@ -718,12 +718,6 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
           });
 
-          events.on('xBrush_reset', ()=> {
-            console.log('yBrush');
-            
-            events.fire('update_chart', this.selectedCohort);
-          });
-
     }
 
     //adds a cohort filter to the cohort filter array for the cohorts

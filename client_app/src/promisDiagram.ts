@@ -255,8 +255,6 @@ export class PromisDiagram {
             }else{  scoreScale.domain([80, 0]); }
          }
     
-       //svg.select('.cohort-plot-label').remove();
-    
        let maxDay = this.domains.maxDay;
        let minDay = this.domains.minDay;
        
@@ -513,66 +511,7 @@ export class PromisDiagram {
     
        }
 
-    private drawTimeline(div) {
-
-        let timeline = div.append('div').classed('timeline_view', true).attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
-        let timelineSVG = timeline.append('svg').classed('day_line_svg', true).attr('width', this.width + this.margin.x).attr('height', 40);
-
-        timelineSVG.append('g')
-                        .attr('class', '.xAxisMini')
-                        .attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
-                        .call(axisBottom(this.timelineScale));
-
-         // ----- SLIDER
-
-        let slider = timelineSVG.append('g')
-         .attr('class', 'slider').attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
-
-        let that = this;
-
-        this.brush = brushX()
-        .extent([[0, -3], [this.width, 30]])
-        .handleSize(2)
-        .on("end", () => {
-            if (event.selection === null) {
-
-            } else {
-              let start = this.timelineScale.invert(event.selection[0]);
-              let end = this.timelineScale.invert(event.selection[1]);
-              this.domains.minDay = start;
-              this.domains.maxDay = end;
-              this.clearDiagram();
-              this.drawPromisChart(this.plotData.promis, 'proLine', null, this.plotData, this.allData)
-            }
-          });
-
-
-        slider.call(this.brush)
-         .call(this.brush.move, [this.timelineScale(-10), this.timelineScale(50)]);
-
-    }
-
-    private renderOrdersTooltip(tooltip_data) {
-
-        let text = "<strong style='color:darkslateblue'>" + tooltip_data['ORDER_CATALOG_TYPE'] + "</strong></br>";
-        text += '<span>' + tooltip_data['ORDER_MNEMONIC'] + '</span></br>';
-        text += '<span>' + tooltip_data['ORDER_DTM'] + '</span></br>';
-        return text;
-    }
-
-    /**
-     * Show or hide the application loading indicator
-     * @param isBusy
-     */
-    setBusy(isBusy: boolean) {
-        let status = select('.busy').classed('hidden');
-        if (status == isBusy)
-            select('.busy').classed('hidden', !isBusy);
-    }
-}
-
-//cohort.data.chartData, cohort.class, this.selectedPlot, i, cohort.data
-    export async function drawAgg(chartData, clump, node, i, cohort){
+       private async drawAgg(chartData, clump, i, cohort){
       
         let patbin = chartData.map((d)=> d.bins.map(b=> {
             if(cohort.scaleR){
@@ -782,6 +721,64 @@ export class PromisDiagram {
                 if(i != null){
                 zeroText.attr('transform', 'translate(0,'+ i * 12 +')').classed(clump, true);
                 }
+}
+
+    private drawTimeline(div) {
+
+        let timeline = div.append('div').classed('timeline_view', true).attr('width', this.width + (this.margin.y * 2)).attr('height', 30);
+        let timelineSVG = timeline.append('svg').classed('day_line_svg', true).attr('width', this.width + this.margin.x).attr('height', 40);
+
+        timelineSVG.append('g')
+                        .attr('class', '.xAxisMini')
+                        .attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
+                        .call(axisBottom(this.timelineScale));
+
+         // ----- SLIDER
+
+        let slider = timelineSVG.append('g')
+         .attr('class', 'slider').attr('transform', () => `translate(`+ (this.margin.x * 1.5) +`,`+ (this.margin.y * 2.1) +`)`)
+
+        let that = this;
+
+        this.brush = brushX()
+        .extent([[0, -3], [this.width, 30]])
+        .handleSize(2)
+        .on("end", () => {
+            if (event.selection === null) {
+
+            } else {
+              let start = this.timelineScale.invert(event.selection[0]);
+              let end = this.timelineScale.invert(event.selection[1]);
+              this.domains.minDay = start;
+              this.domains.maxDay = end;
+              this.clearDiagram();
+              this.drawPromisChart(this.plotData.promis, 'proLine', null, this.plotData, this.allData)
+            }
+          });
+
+
+        slider.call(this.brush)
+         .call(this.brush.move, [this.timelineScale(-10), this.timelineScale(50)]);
+
+    }
+
+    private renderOrdersTooltip(tooltip_data) {
+
+        let text = "<strong style='color:darkslateblue'>" + tooltip_data['ORDER_CATALOG_TYPE'] + "</strong></br>";
+        text += '<span>' + tooltip_data['ORDER_MNEMONIC'] + '</span></br>';
+        text += '<span>' + tooltip_data['ORDER_DTM'] + '</span></br>';
+        return text;
+    }
+
+    /**
+     * Show or hide the application loading indicator
+     * @param isBusy
+     */
+    setBusy(isBusy: boolean) {
+        let status = select('.busy').classed('hidden');
+        if (status == isBusy)
+            select('.busy').classed('hidden', !isBusy);
+    }
 }
 
 export function create(parent: Element, diagram, index, domains, dimension, plotData, allData) {
