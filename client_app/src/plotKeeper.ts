@@ -51,9 +51,9 @@ export class PlotKeeper {
             height : 400, width : 600, margin : {x: 40, y: 10},
         }
 
-        this.drawPromisChart = PromisDiagram.drawPromisChart;
+       // this.drawPromisChart = PromisDiagram.drawPromisChart;
         this.drawAgg = PromisDiagram.drawAgg;
-        this.clearDiagram = PromisDiagram.clearDiagram;
+        //this.clearDiagram = PromisDiagram.clearDiagram;
 
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
@@ -69,7 +69,7 @@ export class PlotKeeper {
         events.on('clear_cohorts', (evt, item)=> {
             console.log('is this going??');
             this.layerBool = false;
-            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            this.selectedPlot.clearDiagram();
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
@@ -86,7 +86,7 @@ export class PlotKeeper {
             this.layerKeeperArray = item;
             console.log(item);
      
-            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            this.selectedPlot.clearDiagram();
             this.layerKeeperArray.layers.forEach((cohort, i) => {
                 console.log(cohort);
                 if(cohort.data.clumped){
@@ -95,8 +95,8 @@ export class PlotKeeper {
                 }else{
                     //promis, clump, node, cohort, i, data
                     console.log(this.cohortData);
-                    //promis, clump, node, cohort, i, data
-                    this.drawPromisChart(cohort.data.chartData, cohort.class, this.selectedPlot, cohort.data, i, this.cohortData);
+                    //promis, clump, i, cohort, data
+                    this.selectedPlot.drawPromisChart(cohort.data.chartData, cohort.class, i, cohort.data, this.cohortData);
                 }
             });}
         });
@@ -108,7 +108,7 @@ export class PlotKeeper {
 
         events.on('exit_layer_view', ()=> {
             this.layerBool = false;
-            this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+            this.selectedPlot.clearDiagram();
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
@@ -141,10 +141,10 @@ export class PlotKeeper {
                 console.log('this isnt firing');
                 this.initialLoadBool = true;
                 this.plotCount = 0;
-                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=> {
+                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.selectedCohort, this.cohortData).then(d=> {
                     this.selectedPlot = d;
                     this.plotArray.push({plot: d, data: this.selectedCohort});
-                    this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
+                   // this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData);
                 });
             }
         });
@@ -153,14 +153,10 @@ export class PlotKeeper {
           
             let count = this.plotArray.length;
             this.plotCount++;
-            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortData).then(d=>{
-                
+            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.selectedCohort, this.cohortData).then(d=>{
                 this.plotArray.push({plot: d, data: this.selectedCohort});
                 this.plotSelected(this.plotArray, d);
-                
-                this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData).then(d=>{
-                    console.log(this.plotArray);
-                });
+                this.selectedPlot = d;
             });
         });
         events.on('domain updated', (evt, item)=> {
@@ -174,7 +170,6 @@ export class PlotKeeper {
             let index = String(item);
       
             this.selectedPlot = this.plotArray.filter(p=> p.plot.cohortIndex == index)[0].plot;
-            console.log(this.selectedPlot);
             this.plotSelected(this.plotArray, this.selectedPlot);
         });
         events.on('remove_plot', (evt, item)=> {
@@ -190,7 +185,7 @@ export class PlotKeeper {
            if(this.selectedPlot != undefined){
       
                 if(this.selectedPlot.cohortIndex != undefined){
-                    this.clearDiagram(this.selectedPlot.svg, this.selectedPlot.cohortIndex);
+                    this.selectedPlot.clearDiagram();
                 }
 
                 if(this.layerBool == true){
@@ -213,11 +208,12 @@ export class PlotKeeper {
                   }else{
                       //if it is not aggregated
                       if(separated){
-                          this.drawPromisChart(item.promisSep[0], 'bottom', this.selectedPlot, item, null, this.cohortData);
-                          this.drawPromisChart(item.promisSep[1], 'middle', this.selectedPlot, item, null, this.cohortData);
-                          this.drawPromisChart(item.promisSep[2], 'top', this.selectedPlot, item, null, this.cohortData);
+                          this.selectedPlot.drawPromisChart(item.promisSep[0], 'bottom', null, item, this.cohortData);
+                          this.selectedPlot.drawPromisChart(item.promisSep[1], 'middle', null, item, this.cohortData);
+                          this.selectedPlot.drawPromisChart(item.promisSep[2], 'top', null, item, this.cohortData);
                       }else{
-                          this.drawPromisChart(promis, 'proLine', this.selectedPlot, item, null, this.cohortData);
+                       
+                        this.selectedPlot.drawPromisChart(promis, 'proLine', null, item, this.cohortData);
                       }
 
                   }
@@ -232,8 +228,8 @@ export class PlotKeeper {
         this.selectedPlot = selectedPlot;
     }
 
-    private async addPlot(plotDiv, plotArray, domain, dimension, data){
-        let plot = await PromisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.plotCount, domain, dimension, data);
+    private async addPlot(plotDiv, plotArray, domain, dimension, selectedData, data){
+        let plot = await PromisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.plotCount, domain, dimension, selectedData, data);
         return plot;
     }
 
