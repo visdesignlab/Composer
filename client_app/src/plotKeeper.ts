@@ -16,7 +16,7 @@ import { format } from 'd3-format';
 import {transition} from 'd3-transition';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataCalc from './dataCalculations';
-import * as promisDiagram from './promisDiagram';
+import * as PromisDiagram from './promisDiagram';
 import * as timelineKeeper from './timelinekeeper';
 import * as eventLine from './eventLine';
 import { indexOf } from 'phovea_core/src';
@@ -44,19 +44,16 @@ export class PlotKeeper {
     constructor(parent: Element) {
 
         this.domain = {
-            maxDay: 50,
-            minDay: -10,
+            maxDay: 50, minDay: -10,
         }
 
         this.dimension = {
-            height : 400,
-            width : 600,
-            margin : {x: 40, y: 10},
+            height : 400, width : 600, margin : {x: 40, y: 10},
         }
 
-        this.drawPromisChart = promisDiagram.drawPromisChart;
-        this.drawAgg = promisDiagram.drawAgg;
-        this.clearDiagram = promisDiagram.clearDiagram;
+        this.drawPromisChart = PromisDiagram.drawPromisChart;
+        this.drawAgg = PromisDiagram.drawAgg;
+        this.clearDiagram = PromisDiagram.clearDiagram;
 
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
@@ -160,6 +157,7 @@ export class PlotKeeper {
                 
                 this.plotArray.push({plot: d, data: this.selectedCohort});
                 this.plotSelected(this.plotArray, d);
+                
                 this.drawPromisChart(this.selectedCohort.promis, 'proLine', d, this.selectedCohort, null, this.cohortData).then(d=>{
                     console.log(this.plotArray);
                 });
@@ -235,7 +233,7 @@ export class PlotKeeper {
     }
 
     private async addPlot(plotDiv, plotArray, domain, dimension, data){
-        let plot = await promisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.plotCount, domain, dimension, data);
+        let plot = await PromisDiagram.create(plotDiv.node(), 'PROMIS Bank v1.2 - Physical Function', this.plotCount, domain, dimension, data);
         return plot;
     }
 

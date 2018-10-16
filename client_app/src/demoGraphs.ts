@@ -60,8 +60,6 @@ export class demoGraphs {
 
         this.distibutionDivs = this.$node.selectAll('.distribution');
 
-      
-        
         ///////SETTING SCALES//////////////////////////////
         this.xScale = scaleLinear()
             .rangeRound([0, this.distributionDimension.width]);

@@ -2,26 +2,27 @@
  * Created by Jen on 11/4/17.
  */
 
-import * as ajax from 'phovea_core/src/ajax';
+//import * as ajax from 'phovea_core/src/ajax';
 import {select, selectAll, event} from 'd3-selection';
-import {values,keys,entries} from 'd3-collection';
-import {type} from 'os';
+//import {values,keys,entries} from 'd3-collection';
+//import {type} from 'os';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear,scaleTime,scaleOrdinal, scaleBand, scaleLog} from 'd3-scale';
 import {area, line, curveMonotoneX, curveMonotoneY, curveLinear, curveBasis} from 'd3-shape';
 //importing other modules from app
-import * as demoGraph from './demoGraphs';
-import {axisBottom} from 'd3-axis';
-import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
-import { all } from 'phovea_core/src/range';
-import {brushX} from 'd3-brush';
+//import * as demoGraph from './demoGraphs';
+//import {axisBottom} from 'd3-axis';
+//import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
+//import { all } from 'phovea_core/src/range';
+//import {brushX} from 'd3-brush';
 import {transition} from 'd3-transition';
-import { stringify } from 'querystring';
+//import { stringify } from 'querystring';
 
 export class CohortSideBar {
 
   private $node;
-  private filters;
+  
+  //private filters;
   private popRectScale;
   private populationDemo;
   private xScale;
@@ -37,18 +38,20 @@ export class CohortSideBar {
   private ageBrush;
   private distributionHeader;
   private demoform;
+
   private cohortKeeper;
+  
   private selected;
   private branchSelected;
   private comparisonNum;
-  private layerBool;
+  //private layerBool;
+
   comparisonArray;
 
   constructor(parent: Element) {
     
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
- 
     this.xScale = scaleLinear();
     this.yScale = scaleLinear().range([0, 30]);
     this.svgWidth = 170;
@@ -325,7 +328,7 @@ export class CohortSideBar {
           nested.on('click', (d, i)=> {
             this.groupEvents(data, false).then(g=> {
               this.updateCohorts(g, this.cohortKeeper).then(co=> {
-                  let selected = co.filter(c=> c.flatIndex == i);
+                  let selected = co.filter(c=> c.flatIndex === i);
                   selected.classed('selected', true);
               });
             });
@@ -342,9 +345,7 @@ export class CohortSideBar {
                 .on("mouseover", (d) => {
                   let t = transition('t').duration(500);
                   select(".tooltip")
-                  .html(() => {
-                      return this.renderBranchTooltip(d);
-                  })
+                  .html(() => this.renderBranchTooltip())
                   .transition(t)
                   .style("opacity", 1)
                   .style("left", `${event.pageX + 10}px`)
@@ -362,9 +363,7 @@ export class CohortSideBar {
           text.on("mouseover", (d) => {
             let t = transition('t').duration(500);
             select(".tooltip")
-            .html(() => {
-                return this.renderBranchTooltip(d);
-            })
+            .html(() => this.renderBranchTooltip())
             .transition(t)
             .style("opacity", 1)
             .style("left", `${event.pageX + 10}px`)
@@ -418,18 +417,16 @@ export class CohortSideBar {
       rect.attr('class', d=> classRect(d));
       rect.classed('c-' + cohort.flatIndex, true);
       let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
-      text.append('text').text((d, i)=> { return (i + 1) + ': '});
+      text.append('text').text((d, i)=> (i + 1) + ': ');
 
       let xGroup = barSvg.append('g').classed('x', true);
       
       xGroup.append('rect').style('fill', 'gray').style('width', '20px').attr('height', 20).style('opacity', '.7');
       
       let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
-      xGroup.attr('transform', (d, i)=> 'translate(205, 0)');
+      xGroup.attr('transform', ()=> 'translate(205, 0)');
 
-      xGroup.on('click', function(d, i){
-        events.fire('remove_filter', d);
-      });
+      xGroup.on('click', (d)=> events.fire('remove_filter', d));
 
       let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
 
@@ -444,13 +441,13 @@ export class CohortSideBar {
 
       function fillText(d){
           let des;
-          if(d.type == 'Demographic'){
+          if(d.type === 'Demographic'){
               if(d.value.length != 0){
                   des = d.filter;
               }else{ des = 'All Patients'; }
-          }else if(d.type == 'CPT'){ des = d.filter;
-          }else if(d.type == 'X-CPT'){ des = 'Excluding '+ d.filter;
-          }else if(d.type == 'Start'){ des = 'All Patients'; }
+          }else if(d.type === 'CPT'){ des = d.filter;
+          }else if(d.type === 'X-CPT'){ des = 'Excluding '+ d.filter;
+          }else if(d.type === 'Start'){ des = 'All Patients'; }
           else{ des = d.filter + ' > ' + d.value; }
 
           return des;
@@ -497,14 +494,7 @@ private renderFilterTooltip(data) {
   return text;
 }
 
-private renderBranchTooltip(data) {
- 
-  let text = "<strong style='color:darkslateblue'>Branch Cohort</strong></br>";
- 
-  return text;
-}
-
-
+private renderBranchTooltip() { return "<strong style='color:darkslateblue'>Branch Cohort</strong></br>"; }
  }
 
  

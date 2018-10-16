@@ -1,31 +1,18 @@
 
 import * as ajax from 'phovea_core/src/ajax';
 import {BaseType, select, selectAll, event} from 'd3-selection';
-import {nest, values, keys, map, entries} from 'd3-collection';
 import * as events from 'phovea_core/src/event';
 import {scaleLinear, scaleTime, scaleOrdinal} from 'd3-scale';
 import {area, line, curveMonotoneX, curveLinear, curveMonotoneY} from 'd3-shape';
-import {timeParse} from 'd3-time-format';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
-import {drag} from 'd3-drag';
 import * as d3 from 'd3';
 import * as d3Voronoi from 'd3-voronoi';
-import {transition} from 'd3-transition';
-import {brush, brushY, brushX} from 'd3-brush';
+import {brushX} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
-import * as dataManager from './dataManager';
-import {ITable, asTable} from 'phovea_core/src/table';
-import {IAnyVector, INumericalVector} from 'phovea_core/src/vector';
-import {list as listData, getFirstByName, get as getById} from 'phovea_core/src/data';
-import {range, list, join, Range, Range1D, all} from 'phovea_core/src/range';
-import {asVector} from 'phovea_core/src/vector/Vector';
-import {argFilter, uniqueId} from 'phovea_core/src/';
-import { stringify } from 'querystring';
-import {format} from 'd3-format';
-import * as timelineKeeper from './timelinekeeper';
 
-export class promisDiagram {
+
+export class PromisDiagram {
     private $node;
     private diagram;
     private timeScale;
@@ -801,5 +788,5 @@ export function clearDiagram(node, cohortIndex) {
 }
 
 export function create(parent: Element, diagram, index, domains, dimension, data) {
-    return new promisDiagram(parent, diagram, index, domains, dimension, data);
+    return new PromisDiagram(parent, diagram, index, domains, dimension, data);
 }
