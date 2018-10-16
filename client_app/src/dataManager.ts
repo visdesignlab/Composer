@@ -693,12 +693,12 @@ export class DataManager {
 
             // I THINK THIS IS WHAT IS KILLING THE APP? MOST LIKELY THE OBJECTS LOADING
             let patID = (await table.colData('PAT_ID')).map(d => +d);
-            let GENDER = (await table.colData('PAT_GENDER')).map(d => d);
-            let MARITAL_STATUS = (await table.colData('PAT_MARITAL_STAT')).map(d => d);
-            let TOBACCO = (await table.colData('TOBACCO_USER')).map(d => d);
-            let ALCOHOL = (await table.colData('ALCOHOL_USER')).map(d => d);
-            let DRUG_USER = (await table.colData('ILLICIT_DRUG_USER')).map(d => d);
-            let RACE = (await table.colData('PAT_RACE')).map(d => d);
+            let GENDER = (await table.colData('PAT_GENDER'));//.map(d => d);
+            let MARITAL_STATUS = (await table.colData('PAT_MARITAL_STAT'))//.map(d => d);
+            let TOBACCO = (await table.colData('TOBACCO_USER'))//.map(d => d);
+            let ALCOHOL = (await table.colData('ALCOHOL_USER'))//.map(d => d);
+            let DRUG_USER = (await table.colData('ILLICIT_DRUG_USER'))//.map(d => d);
+            let RACE = (await table.colData('PAT_RACE'))//.map(d => d);
             let BMI = (await table.colData('BMI')).map(d => +d);
             let patDOB = (await table.colData('PAT_BIRTHDATE')).map(d => new Date(String(d)));
             let CCI = (await table.colData('CCI')).map(d => +d);
