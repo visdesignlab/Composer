@@ -36,7 +36,7 @@ export class individualStats {
         this.rectBoxDimension = {'width' : 700, 'height': 200};
 
         this.timeScale = scaleLinear().range([25, 650]);
-        this.timeScale.domain([-30, 40]);//.clamp(true);
+        this.timeScale.domain([-10, 50]);//.clamp(true);
      
         this.rectSvg = this.rectWin.append('svg')
             .attr('width', this.rectBoxDimension.width)

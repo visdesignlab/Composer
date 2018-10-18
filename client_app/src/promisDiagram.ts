@@ -479,11 +479,10 @@ export class PromisDiagram {
                 let dotsEnter = dots.enter().append('circle').attr('class', d.key + '-clickdots')
                 .classed('clickdots', true)
                 .attr('cx', (d, i)=> {
-                    console.log(this.timeScale(i));
-                    return this.timeScale(i)})
+                    return that.timeScale(d['diff'])})
                 .attr('cy', (d)=> {
-                    if(scale){  return this.scoreScale(+d['relScore']);
-                            }else{ return this.scoreScale(+d['SCORE']) }
+                    if(scale){  return that.scoreScale(+d['relScore']);
+                            }else{ return that.scoreScale(+d['SCORE']) }
                 }).attr('r', 5).attr('fill', '#FF5733');
              dots = dotsEnter.merge(dots);
              }
