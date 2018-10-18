@@ -209,7 +209,6 @@ export class PromisDiagram {
                     });
                 }
             });
-    
             return flat;
         }
   
@@ -451,7 +450,8 @@ export class PromisDiagram {
                     let promisRect = svg.select('.scoreGroup').select('.lines');
                     let dots = promisRect
                     .selectAll('circle').data(promisData);
-                    dots.enter().append('circle').attr('class', 'hoverdots')
+                    let dotsEnter = dots.enter().append('circle')
+                    .attr('class', 'hoverdots')
                     .attr('cx', (d, i)=> this.timeScale(d.diff))
                     .attr('cy', (d)=> {
                         let score; 
@@ -460,6 +460,7 @@ export class PromisDiagram {
                         }else{  score = d.SCORE; }
                         return this.scoreScale(score);
                     }).attr('r', 5).attr('fill', '#21618C');
+                    dots = dotsEnter.merge(dots);
              
                     dots.append('circle').attr('cx', ()=> this.timeScale(0))
                     .attr('cy', (d)=> this.scoreScale(d.b[0])).attr('r', 5).attr('fill', 'red');
@@ -470,19 +471,21 @@ export class PromisDiagram {
              
                 let n = select(d.line).node();
                 let parent = n.parentNode;
-             
+                console.log(d.value);
                 let promisData = d.value;
                
                 let dots = select(parent)
-                .selectAll('circle').data(promisData);
-                dots.enter().append('circle').attr('class', d.key + '-clickdots')
+                .selectAll('circle').data(d.value);
+                let dotsEnter = dots.enter().append('circle').attr('class', d.key + '-clickdots')
                 .classed('clickdots', true)
-                .attr('cx', (d, i)=> this.timeScale(d['diff']))
+                .attr('cx', (d, i)=> {
+                    console.log(this.timeScale(i));
+                    return this.timeScale(i)})
                 .attr('cy', (d)=> {
                     if(scale){  return this.scoreScale(+d['relScore']);
                             }else{ return this.scoreScale(+d['SCORE']) }
                 }).attr('r', 5).attr('fill', '#FF5733');
-             
+             dots = dotsEnter.merge(dots);
              }
              
              function removeDots () {

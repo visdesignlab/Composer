@@ -54,7 +54,6 @@ export class PlotKeeper {
             layer.classed('hidden', true);
             document.getElementById('layerButton').classList.remove('btn-warning');
             this.plotCount = 0;
-
         });
         
         events.on('draw_layers', (evt, item)=> {
@@ -125,13 +124,7 @@ export class PlotKeeper {
                 this.selectedPlot = d;
             });
         });
-        events.on('domain updated', (evt, item)=> {
-          
-            this.domain.minDay = item[0];
-            this.domain.maxDay = item[1];
-           
-            events.fire('xBrush_reset');
-        });
+
         events.on('plot_selected', (evt, item)=>{
             let index = String(item);
       
