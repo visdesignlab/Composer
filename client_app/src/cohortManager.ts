@@ -66,6 +66,7 @@ export class CohortManager {
         this.counter = 0;
         this.layerKeeper = {layers : [], clumped: false, scaleR: false}
         this.plotCount = 0;
+        this.selectedCohort;
         
         this.attachListener();
     }

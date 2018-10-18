@@ -8,12 +8,10 @@ import * as cohortSideBar from './cohortSideBar';
 import * as events from 'phovea_core/src/event';
 import * as distributionDiagram from './distributionDiagram';
 import * as dataManager from './dataManager';
-import * as cohortManager from './cohortManager';
 import * as cptBreak from './cptBreakdown';
 import * as populationStat from './populationStat';
-import * as timelineKeeper from './timelinekeeper';
 import * as inStat from './individualStats';
-import { CohortManager } from './cohortManager';
+import * as CohortManager from './cohortManager';
 import * as PlotKeeper from './plotKeeper';
 import * as codeside from './codeSidebar';
 import * as filterSidebar from './filterSidebar';
@@ -50,7 +48,7 @@ export class App {
     this.$node.select('h3').remove();
 
     const data = dataManager.create();//dataobject with all the info
-    const cohort = cohortManager.create();
+    const cohortManager = CohortManager.create();
     
     // create side bar
     const sideBarDiv = this.$node.append('div').attr('id', 'cohortSideBar');
@@ -71,7 +69,7 @@ export class App {
     const main = this.$node.append('div').classed('main', true);
     const plots = main.append('div').classed('plot_view', true);
    
-    PlotKeeper.create(plots.node());
+    PlotKeeper.create(plots.node(), cohortManager);
   
    // codeside.create(statBar.node());
     inStat.create(main.node());

@@ -7,6 +7,7 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import * as events from 'phovea_core/src/event';
 import * as PromisDiagram from './promisDiagram';
 import * as eventLine from './eventLine';
+import { CohortManager } from './cohortManager';
 
 
 export class PlotKeeper {
@@ -17,7 +18,6 @@ export class PlotKeeper {
     private domain;
     private dimension;
     private initialLoadBool;
-    selectedCohort;
     selectedPlot;
     plotArray;
     private layerBool;
@@ -25,8 +25,9 @@ export class PlotKeeper {
     scoreScale;
     timeScale;
     plotCount;
+    cohortManager;
 
-    constructor(parent: Element) {
+    constructor(parent: Element, cohortManager: Object) {
 
         this.domain = {
             maxDay: 50, minDay: -10,
@@ -40,6 +41,7 @@ export class PlotKeeper {
         eventLine.create(eventLineView.node(), null);
         this.plotDiv = this.$node.append('div').classed('allDiagramDiv', true);
         this.plotArray = [];
+        this.cohortManager = cohortManager;
 
         this.attachListener();
     }
@@ -91,7 +93,6 @@ export class PlotKeeper {
 
         events.on('test', (evt, item)=> {
             this.cohortData = item[0];
-            this.selectedCohort = this.cohortData[item[1][0]];
             let array = [];
             if(this.layerBool){
               let layer = select('#layerDiv');
@@ -107,9 +108,9 @@ export class PlotKeeper {
             
                 this.initialLoadBool = true;
                 this.plotCount = 0;
-                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.selectedCohort, this.cohortData).then(d=> {
+                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortManager.selectedCohort, this.cohortData).then(d=> {
                     this.selectedPlot = d;
-                    this.plotArray.push({plot: d, data: this.selectedCohort});
+                    this.plotArray.push({plot: d, data: this.cohortManager.selectedCohort});
                 });
             }
         });
@@ -118,8 +119,8 @@ export class PlotKeeper {
           
             let count = this.plotArray.length;
             this.plotCount++;
-            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.selectedCohort, this.cohortData).then(d=>{
-                this.plotArray.push({plot: d, data: this.selectedCohort});
+            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortManager.selectedCohort, this.cohortData).then(d=>{
+                this.plotArray.push({plot: d, data: this.cohortManager.selectedCohort});
                 this.plotSelected(this.plotArray, d);
                 this.selectedPlot = d;
             });
@@ -195,6 +196,6 @@ export class PlotKeeper {
 }
 
 
-export function create(parent: Element) {
-    return new PlotKeeper(parent);
+export function create(parent: Element, cohortManager : Object) {
+    return new PlotKeeper(parent, cohortManager);
 }
