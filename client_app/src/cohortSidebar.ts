@@ -44,11 +44,12 @@ export class CohortSideBar {
   private selected;
   private branchSelected;
   private comparisonNum;
+  cohortManager;
   //private layerBool;
 
   comparisonArray;
 
-  constructor(parent: Element) {
+  constructor(parent: Element, cohortManager: Object) {
     
     this.$node = select(parent);
     this.popRectScale = scaleLinear().range([0,150]);
@@ -59,6 +60,7 @@ export class CohortSideBar {
     this.branchSelected = null;
     this.comparisonNum = 2;
     this.comparisonArray = [];
+    this.cohortManager = cohortManager;
     
     this.attachListener();
   }
@@ -499,6 +501,6 @@ private renderBranchTooltip() { return "<strong style='color:darkslateblue'>Bran
 
  
 
-export function create(parent:Element) {
-  return new  CohortSideBar(parent);
+export function create(parent:Element, cohortManager: Object) {
+  return new  CohortSideBar(parent, cohortManager);
 }

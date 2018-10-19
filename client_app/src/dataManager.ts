@@ -67,7 +67,6 @@ export class DataManager {
         }));
 
         this.loadData('Total_Scores').then(d=>this.promisTable = d );
-
         this.attachListener();
 
     }

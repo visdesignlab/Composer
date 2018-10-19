@@ -10,6 +10,7 @@ import * as d3 from 'd3';
 import * as d3Voronoi from 'd3-voronoi';
 import {brushX} from 'd3-brush';
 import * as dataCalc from './dataCalculations';
+import * as IndividualStats from './individualStats';
 
 
 export class PromisDiagram {
@@ -28,7 +29,7 @@ export class PromisDiagram {
     private clicked;
     private cohortIndex;
     private plotData;
-
+    individualStats;
     private maxDay;
     private minDay = 0;
 
@@ -43,7 +44,7 @@ export class PromisDiagram {
     private clumped = false;
     private yBrushSelection = false;
     private cohortLabel;
-    private domains;
+    private domain;
     private scoreGroup;
     private plotLabel;
     private plotHeader;
@@ -52,14 +53,14 @@ export class PromisDiagram {
     private switchUl;
     private allData;
 
-    constructor(parent: Element, diagram, index, domains, dimension, plotData, allData) {
+    constructor(parent: Element, diagram, index, domain, dimension, plotData, allData) {
 
         const that = this;
         this.$this = select(parent);
         this.panelWidth = 700;
         this.cohortIndex = String(index);
         this.diagram = diagram;
-        this.domains = domains;
+        this.domain = domain;
         this.width = dimension.width;
         this.height = dimension.height;
         this.margin = dimension.margin;
@@ -149,6 +150,8 @@ export class PromisDiagram {
         this.plotLabel = this.scoreGroup.append('text');
         this.drawPromisChart(plotData.promis, 'proLine', null, plotData, allData);
         this.drawTimeline(plotDiv);
+        this.individualStats = IndividualStats.create(plotDiv.node(), this.domain);
+        plotDiv.append('Div').classed('cptDiv', true);
 
     }
 
@@ -195,7 +198,7 @@ export class PromisDiagram {
       }
 
     private async drawPromisChart(promis, clump, i, cohort, data) {
-
+        console.log(promis);
         let flatData = await flatten(data);
         async function flatten(d){
          
@@ -253,9 +256,10 @@ export class PromisDiagram {
             if(cohort.dataType == 'oswestry'){ scoreScale.domain([100, 0])
             }else{  scoreScale.domain([80, 0]); }
          }
-    
-       let maxDay = this.domains.maxDay;
-       let minDay = this.domains.minDay;
+
+       let minDay = this.domain[0];
+       let maxDay = this.domain[1];
+      
        
        svg.select('.voronoi').selectAll('*').remove();
     
@@ -297,7 +301,7 @@ export class PromisDiagram {
     
         function vorline(d) { return d ? 'M' + d.join('L') + 'Z' : null; };
          
-           // -----  set domains and axis
+           // -----  set domain and axis
            // time scale
             this.timeScale.domain([minDay, maxDay]);
     
@@ -632,12 +636,12 @@ export class PromisDiagram {
                 scoreScale.domain([80, 0]);
             }
 
-            let minDay = this.domains.minDay;
-            let maxDay = this.domains.maxDay;
+            let minDay = this.domain[0];
+            let maxDay = this.domain[1];
 
-            // -----  set domains and axis
+            // -----  set domain and axis
             // time scale
-            this.timeScale.domain([minDay, maxDay]);
+            this.timeScale.domain(this.domain);
     
             this.svg.select('.xAxis')
                 .call(axisBottom(this.timeScale));
@@ -751,10 +755,17 @@ export class PromisDiagram {
             } else {
               let start = this.timelineScale.invert(event.selection[0]);
               let end = this.timelineScale.invert(event.selection[1]);
-              this.domains.minDay = start;
-              this.domains.maxDay = end;
+              this.domain[0] = start;
+              this.domain[1] = end;
               this.clearDiagram();
-              this.drawPromisChart(this.plotData.promis, 'proLine', null, this.plotData, this.allData)
+              this.drawPromisChart(this.plotData.chartData, 'proLine', null, this.plotData, this.allData);
+            
+             
+              if(this.individualStats){
+                this.individualStats.clearPatRects();
+                console.log(this.individualStats.domain);
+              }
+              
             }
           });
 
@@ -783,6 +794,6 @@ export class PromisDiagram {
     }
 }
 
-export function create(parent: Element, diagram, index, domains, dimension, plotData, allData) {
-    return new PromisDiagram(parent, diagram, index, domains, dimension, plotData, allData);
+export function create(parent: Element, diagram, index, domain, dimension, plotData, allData) {
+    return new PromisDiagram(parent, diagram, index, domain, dimension, plotData, allData);
 }

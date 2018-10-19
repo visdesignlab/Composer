@@ -7,7 +7,7 @@ import {BaseType, select, selectAll, event} from 'd3-selection';
 import * as events from 'phovea_core/src/event';
 import * as PromisDiagram from './promisDiagram';
 import * as eventLine from './eventLine';
-import { CohortManager } from './cohortManager';
+
 
 
 export class PlotKeeper {
@@ -29,9 +29,9 @@ export class PlotKeeper {
 
     constructor(parent: Element, cohortManager: Object) {
 
-        this.domain = {
-            maxDay: 50, minDay: -10,
-        }
+        this.domain = [-10, 50];
+           // maxDay: 50, minDay: -10,
+      //  }
         this.dimension = {
             height : 400, width : 600, margin : {x: 40, y: 10},
         }
@@ -71,7 +71,7 @@ export class PlotKeeper {
                   this.selectedPlot.drawAgg(cohort.data.chartData, cohort.class, i, cohort.data);
                 }else{
                     //promis, clump, i, cohort, data
-                    this.selectedPlot.drawPromisChart(cohort.data.chartData, cohort.class, i, cohort.data, this.cohortData);
+                    this.selectedPlot.drawPromisChart(cohort.data.chartData, cohort.class, i, cohort.data, this.cohortManager.cohortTree);
                 }
             });}
         });
@@ -88,11 +88,11 @@ export class PlotKeeper {
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
             document.getElementById('layerButton').classList.remove('btn-warning');
-            events.fire('cohort_selected', this.cohortData[0]);
+            events.fire('cohort_selected', this.cohortManager.cohortTree[0]);
         });
 
         events.on('test', (evt, item)=> {
-            this.cohortData = item[0];
+    
             let array = [];
             if(this.layerBool){
               let layer = select('#layerDiv');
@@ -108,7 +108,7 @@ export class PlotKeeper {
             
                 this.initialLoadBool = true;
                 this.plotCount = 0;
-                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortManager.selectedCohort, this.cohortData).then(d=> {
+                this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortManager.selectedCohort, this.cohortManager.cohortTree).then(d=> {
                     this.selectedPlot = d;
                     this.plotArray.push({plot: d, data: this.cohortManager.selectedCohort});
                 });
@@ -119,7 +119,7 @@ export class PlotKeeper {
           
             let count = this.plotArray.length;
             this.plotCount++;
-            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortManager.selectedCohort, this.cohortData).then(d=>{
+            this.addPlot(this.plotDiv, this.plotArray, this.domain, this.dimension, this.cohortManager.selectedCohort, this.cohortManager.cohortTree).then(d=>{
                 this.plotArray.push({plot: d, data: this.cohortManager.selectedCohort});
                 this.plotSelected(this.plotArray, d);
                 this.selectedPlot = d;
@@ -128,9 +128,14 @@ export class PlotKeeper {
 
         events.on('plot_selected', (evt, item)=>{
             let index = String(item);
-      
-            this.selectedPlot = this.plotArray.filter(p=> p.plot.cohortIndex == index)[0].plot;
-            this.plotSelected(this.plotArray, this.selectedPlot);
+            if(this.plotArray.length > 1){
+                this.selectedPlot = this.plotArray.filter(p=> p.plot.cohortIndex == index)[0].plot;
+                this.plotSelected(this.plotArray, this.selectedPlot);
+            }else{
+                this.selectedPlot = this.plotArray[0].plot;
+                this.plotSelected(this.plotArray, this.selectedPlot);
+            }
+
         });
         events.on('remove_plot', (evt, item)=> {
      
@@ -141,7 +146,7 @@ export class PlotKeeper {
             this.plotArray = newArray;
         });
         events.on('update_chart', (evt, item)=> {
- 
+            console.log(this.cohortManager.selectedCohort);
            if(this.selectedPlot != undefined){
       
                 if(this.selectedPlot.cohortIndex != undefined){
@@ -152,7 +157,7 @@ export class PlotKeeper {
                
                 }else{
                
-                  let promis = item.chartData;
+                  let promis = this.cohortManager.selectedCohort.chartData;
                   let scaleRelative = item.scaleR;
                   let clumped = item.clumped;
                   let separated = item.separated;
@@ -163,17 +168,17 @@ export class PlotKeeper {
                          this.selectedPlot.drawAgg(item.promisSep[1], 'middle', null, item);
                          this.selectedPlot.drawAgg(item.promisSep[2], 'top', null, item);
                       }else{
-                        this.selectedPlot.drawAgg(promis, 'all', null, item);
+                        this.selectedPlot.drawAgg(this.cohortManager.selectedCohort.chartData, 'all', null, item);
                       }
                   }else{
                       //if it is not aggregated
                       if(separated){
-                          this.selectedPlot.drawPromisChart(item.promisSep[0], 'bottom', null, item, this.cohortData);
-                          this.selectedPlot.drawPromisChart(item.promisSep[1], 'middle', null, item, this.cohortData);
-                          this.selectedPlot.drawPromisChart(item.promisSep[2], 'top', null, item, this.cohortData);
+                          this.selectedPlot.drawPromisChart(item.promisSep[0], 'bottom', null, item, this.cohortManager.cohortTree);
+                          this.selectedPlot.drawPromisChart(item.promisSep[1], 'middle', null, item, this.cohortManager.cohortTree);
+                          this.selectedPlot.drawPromisChart(item.promisSep[2], 'top', null, item, this.cohortManager.cohortTree);
                       }else{
                        
-                        this.selectedPlot.drawPromisChart(promis, 'proLine', null, item, this.cohortData);
+                        this.selectedPlot.drawPromisChart(this.cohortManager.selectedCohort.chartData, 'proLine', null, item, this.cohortManager.cohortTree);
                       }
 
                   }

@@ -7,25 +7,27 @@ import {select, selectAll, event} from 'd3-selection';
 import {values,keys,entries} from 'd3-collection';
 import {type} from 'os';
 import * as events from 'phovea_core/src/event';
-import {scaleLinear,scaleTime,scaleOrdinal, scaleBand} from 'd3-scale';
+import {scaleLinear, scaleTime,scaleOrdinal, scaleBand} from 'd3-scale';
 import * as demoGraph from './demoGraphs';
 import * as d3 from 'd3';
 import {extent, min, max, ascending} from 'd3-array';
 import {axisBottom,axisLeft} from 'd3-axis';
 import {transition} from 'd3-transition';
 
-export class individualStats {
+export class IndividualStats {
 
     private $node;
     private statWin;
     private rectWin;
     private timeScale;
     private rectBoxDimension;
-    private rectSvg;
+    rectSvg;
     private cptFilter;
+    domain;
 
-    constructor(parent: Element) {
+    constructor(parent: Element, domain: Int32Array) {
 
+        this.domain = domain;
         this.$node = select(parent)
         .append('div')
         .classed('individualStatWrapper', true);
@@ -33,10 +35,10 @@ export class individualStats {
         this.rectWin = this.$node.append('div').classed('patientCPTOrders', true);
         this.statWin = this.$node.append('div').classed('patientPromisOrders', true);
     
-        this.rectBoxDimension = {'width' : 700, 'height': 200};
+        this.rectBoxDimension = {'width' : 600, 'height': 200};
 
         this.timeScale = scaleLinear().range([25, 650]);
-        this.timeScale.domain([-10, 50]);//.clamp(true);
+        this.timeScale.domain(this.domain);//.clamp(true);
      
         this.rectSvg = this.rectWin.append('svg')
             .attr('width', this.rectBoxDimension.width)
@@ -59,15 +61,9 @@ export class individualStats {
         });
 
         events.on('send_filter_to_codebar', (evt, item)=>{
-           
             this.cptFilter = item.filter(d=> {return d[0] == 'CPT'});
         });
 
-        events.on('domain updated', (evt, item)=> {
-            this.timeScale.domain(item);
-            this.rectSvg.selectAll('.rect_group').remove();
-           // this.drawPatRects(item);
-        });
     }
 
     private drawOrderWin(orders){
@@ -83,7 +79,6 @@ export class individualStats {
     
             div.append('text').text('Date :   '+ d.ASSESSMENT_START_DTM);
             div.append('br');
-            
             div.append('text').text('Score :   '+ d.SCORE);
             div.append('br');
             div.append('br');
@@ -91,9 +86,13 @@ export class individualStats {
        
     }
 
-    private drawPatRects(orders) {
-    
-        
+    clearPatRects(){
+
+        this.rectSvg.selectAll('.rect_group').remove();
+    } 
+
+    drawPatRects(orders) {
+        console.log(this.domain);
         let patGroup = this.rectSvg.selectAll('.rect_group').data(orders);
 
         patGroup.exit().remove();
@@ -194,6 +193,6 @@ export class individualStats {
 
 }
 
-export function create(parent:Element) {
-    return new individualStats(parent);
+export function create(parent:Element, domain: Int32Array) {
+    return new IndividualStats(parent, domain);
   }

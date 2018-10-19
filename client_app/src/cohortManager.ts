@@ -49,7 +49,7 @@ class Cohort {
 export class CohortManager {
 
     cohortIdArray;//array of ids for defined patients
-    cohortIndex = 0;
+    cohortIndex;
     selectedCohort;//this is going to be the selected cohort from the cohort keeper array
     codes;
     branchSelected;
@@ -63,10 +63,12 @@ export class CohortManager {
     constructor() {
         this.codes = codeDict.create();
         this.branchSelected = null;
+        this.cohortIndex = 0;
         this.counter = 0;
         this.layerKeeper = {layers : [], clumped: false, scaleR: false}
         this.plotCount = 0;
         this.selectedCohort;
+        this.cohortTree;
         
         this.attachListener();
     }
