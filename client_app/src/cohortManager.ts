@@ -508,9 +508,9 @@ export class CohortManager {
 
             }else{
               //  this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].promis = promis;
-              this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].chartData = chartData;
-                this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].cpt = cpt;
-                this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
+                this.selectedCohort.chartData = chartData;
+                this.selectedCohort.cpt = cpt;
+                //this.selectedCohort = this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]];
             }
             console.log('data filtered');
             events.fire('update_chart', this.selectedCohort);
