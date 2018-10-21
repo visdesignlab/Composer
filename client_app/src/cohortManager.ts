@@ -201,20 +201,8 @@ export class CohortManager {
             this.cohortTree[this.cohortIndex].branches.push(treeBranch);
             this.counter++;
            
-            events.fire('branch_selected', treeBranch.cohortIndex);
-
-            });
-
-        events.on('branch_selected', (evt, item)=> {
-        
-            this.branchSelected = item;
-            this.cohortIndex = item[0];
-            let branchIndex = item[1];
-            this.selectedCohort = this.cohortTree[this.cohortIndex].branches[branchIndex];
-            console.log('branch selected');
-            events.fire('update_chart', this.selectedCohort);
-            events.fire('test', [this.cohortTree, this.branchSelected]);
-
+           // events.fire('branch_selected', treeBranch.cohortIndex);
+            this.selectCohort(treeBranch);
             });
 
         events.on('change_promis_scale', ()=> {
@@ -252,7 +240,7 @@ export class CohortManager {
                     scaleRelative = false;
                 }
                 this.selectedCohort.scaleR = scaleRelative;
-                console.log('draw promis scale');
+                
                 events.fire('update_chart', this.selectedCohort);
             }
            
@@ -269,18 +257,14 @@ export class CohortManager {
          events.on('cpt_filter_button', (evt, item)=> {
    
             let filterLabel = item[1][0].key;
-       
+            console.log(this.selectedCohort);
+            console.log(item);
+   
             let filterArray = this.selectedCohort.filterArray;
-            if(filterArray[0].length > 1){
-                let temp = [];
-                filterArray.forEach(fil => {
-                    if(fil.length > 1){
-                        fil.forEach(f => { temp.push(f); });
-                    }else{ temp.push(fil); }
-                });
-                filterArray = temp;
-            }
-            if(item != null){
+            console.log(filterArray);
+        /*
+            if(item !== undefined){
+                console.log(item);
                 let test = filterArray.map(d=> d.filter);
                 let testIndex = test.indexOf(item.parent);
         
@@ -291,9 +275,16 @@ export class CohortManager {
                 }else{
                     let filterReq = { filter: filterLabel, type: 'CPT', value: item[0], count: null };
                     this.selectedCohort.filterArray.push(filterReq);
-                }
+                    console.log(this.selectedCohort);
+                    console.log(this.selectedCohort.filterArray);
+                }*/
+                let filterReq = { filter: filterLabel, type: 'CPT', value: item[0], count: null };
+                this.selectedCohort.filterArray.push(filterReq);
+                console.log(this.selectedCohort);
+                console.log(this.selectedCohort.filterArray);
+
                 events.fire('filter_data', [this.selectedCohort,  this.selectedCohort.filterArray, filterLabel]);
-            }
+          //  }
          });
 
          events.on('cpt_exclude', (evt, item)=> {
@@ -356,21 +347,6 @@ export class CohortManager {
             }
          });
         
-            //this comes directly from cohrot tree in eventline;
-        events.on('cohort_selected', (evt, item)=>{
-
-            let index = item.cohortIndex;
-            console.log(item);
-            this.cohortIndex = index;
-            this.cohortTree[this.cohortIndex].promis = item.promis;
-            this.selectedCohort = this.cohortTree[this.cohortIndex];
-
-            this.branchSelected = null;
-            console.log('cohort selected');
-            events.fire('update_chart', this.selectedCohort);
-            events.fire('test', [this.cohortTree, [index]]);
-          });
-
           events.on('change_plot_data', (evt, item)=> {
             this.selectedCohort.chartData = this.selectedCohort[item];
             this.selectedCohort.dataType = item;
@@ -378,20 +354,6 @@ export class CohortManager {
             //maybe add layerbool for os?
             console.log("is this firing?");
         });
-
-        events.on('cohort_selected_test', (evt, item)=>{
-            console.log(item);
-            let index = item[0].cohortIndex;
-            let cohort = item[0];
-   
-            this.cohortIndex = index;
-            this.cohortTree[this.cohortIndex].promis = cohort.promis;
-            this.selectedCohort = this.cohortTree[this.cohortIndex];
-
-            this.branchSelected = null;
-            events.fire('update_chart', this.selectedCohort);
-            events.fire('test', [this.cohortTree, [index]]);
-          });
 
           events.on('change_plot_data', (evt, item)=> {
             this.selectedCohort.chartData = this.selectedCohort[item];
@@ -501,7 +463,7 @@ export class CohortManager {
             this.branchSelected = null;
             
             this.counter++;
-            this.selectedCohort = this.cohortTree[this.cohortIndex];
+            this.selectedCohort = newParent;
             console.log('new cohort');
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [this.cohortTree, [this.cohortIndex]]);
@@ -516,6 +478,9 @@ export class CohortManager {
             let chartData = item[1];
             let cpt = item[2];
             let tag = item[3];
+
+            console.log(item);
+            console.log(this.selectedCohort);
 
             let test = this.selectedCohort.filterArray.map(d=> d.filter);
        
@@ -737,6 +702,33 @@ export class CohortManager {
         this.cohortTree = [];
         this.cohortIndex = 0;
 
+    }
+
+    selectCohort(d) {
+        if(d.parentIndex == null){
+            //events.fire('cohort_selected', d);
+            console.log(d);
+            this.selectedCohort = d;
+            this.branchSelected = null;
+            let index = d.cohortIndex;
+            this.cohortIndex = index;
+            console.log('cohort selected in cohort Manager');
+            events.fire('update_chart', this.selectedCohort);
+            events.fire('test', [this.cohortTree, [index]]);
+            console.log(this.selectedCohort);
+        }else{
+            events.fire('branch_selected', d.cohortIndex);
+            console.log(d);
+            console.log(this.selectedCohort);
+            this.branchSelected = d;
+            this.cohortIndex = d;
+           // this.selectedCohort = this.cohortTree[this.cohortIndex[0]].branches[this.cohortIndex[1]];
+           this.selectedCohort = d;
+            console.log('branch selected');
+            events.fire('update_chart', this.selectedCohort);
+            events.fire('test', [this.cohortTree, this.branchSelected.cohortIndex]);
+        
+        }
     }
 
 

@@ -142,8 +142,9 @@ export class DataManager {
 
          events.on('filter_data', (evt, item)=> {
             let cohort = item[0];
+            console.log(cohort);
             let type = cohort.dataType;
-             let promis = cohort.og[type];
+            let promis = cohort.og[type];
        
              let cpt = cohort.cpt;
              let filters = item[1];
@@ -156,6 +157,7 @@ export class DataManager {
                     }else{ temp.push(fil); }
                 });
                 filters = temp;
+                console.log(filters);
              }
              this.dataFilter(filters, this.totalDemoObjects, cpt, promis).then(ids=> {
       
@@ -306,8 +308,10 @@ export class DataManager {
         let cpt = JSON.parse(JSON.stringify(CPT));
         let cohortIds;
         let that = this;
-        filters = filters.filter(fil=> fil.type != 'Start' && fil.filter != undefined);
+        console.log(filters);
+        filters = filters.filter(fil=> fil.type != 'Start' && fil.type != 'Branch' && fil.filter != undefined);
         //use map to loop through each filter, changing demo value;
+        console.log(filters);
         let test = await filters.map(d=> {
             if(d.type == 'CPT'){
                 that.searchByEvent(cpt, d.value).then((c)=> {
@@ -648,11 +652,9 @@ export class DataManager {
      */
              let avsArray = avs.map(d=> d.average);
              avsArray = avsArray.sort((a,b)=> a-b);
-             console.log(avsArray.length)
             
              let thresholdArray = Array.from(new Set(avsArray));
-             console.log(thresholdArray);
-
+            
              let num = Math.floor(thresholdArray.length / binNum);
      
              let thresholds = [];
@@ -661,7 +663,6 @@ export class DataManager {
                thresholds.push(thresholdArray[num]);
                num = num + num;  }
 
-            console.log(thresholds);
 
             for(let i = 0; i < binNum; i++){
                 if(i == 0){ 

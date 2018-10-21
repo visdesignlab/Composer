@@ -284,11 +284,7 @@ export class CohortSideBar {
             this.$node.selectAll('.selected').classed('selected', false);
             let thislabel = label.nodes();
             thislabel[i].classList.add('selected');
-            if(d.parentIndex == null){
-                events.fire('cohort_selected', d);
-            }else{
-                events.fire('branch_selected', d.cohortIndex);
-            }
+            this.cohortManager.selectCohort(d);
         });
 
         function translateEvent(d){ return d.eventIndex * (140/+moveLength); }

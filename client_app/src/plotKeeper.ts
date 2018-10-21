@@ -146,7 +146,6 @@ export class PlotKeeper {
             this.plotArray = newArray;
         });
         events.on('update_chart', (evt, item)=> {
-            console.log(this.cohortManager.selectedCohort);
            if(this.selectedPlot != undefined){
       
                 if(this.selectedPlot.cohortIndex != undefined){

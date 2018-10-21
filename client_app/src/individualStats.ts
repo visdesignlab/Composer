@@ -48,7 +48,7 @@ export class IndividualStats {
             .append('rect')
             .attr('width', 600)
             .attr('height', 1000)
-          //  .attr('transform', 'translate(80, 0)');
+      
 
         this.attachListener();
 
@@ -92,7 +92,6 @@ export class IndividualStats {
     } 
 
     drawPatRects(orders) {
-        console.log(this.domain);
         let patGroup = this.rectSvg.selectAll('.rect_group').data(orders);
 
         patGroup.exit().remove();

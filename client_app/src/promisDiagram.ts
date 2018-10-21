@@ -198,7 +198,7 @@ export class PromisDiagram {
       }
 
     private async drawPromisChart(promis, clump, i, cohort, data) {
-        console.log(promis);
+        
         let flatData = await flatten(data);
         async function flatten(d){
          
@@ -475,7 +475,7 @@ export class PromisDiagram {
              
                 let n = select(d.line).node();
                 let parent = n.parentNode;
-                console.log(d.value);
+        
                 let promisData = d.value;
                
                 let dots = select(parent)
@@ -763,7 +763,7 @@ export class PromisDiagram {
              
               if(this.individualStats){
                 this.individualStats.clearPatRects();
-                console.log(this.individualStats.domain);
+                
               }
               
             }
