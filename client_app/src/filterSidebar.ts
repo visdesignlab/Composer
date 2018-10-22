@@ -572,6 +572,7 @@ export class FilterSideBar {
                 });
             }else{fixed.push(ch); };
         });
+        console.log('this is firing');
         events.fire('cpt_filter_button',  [fixed, cptFilterArray]);
         // events.fire('filter_by_cpt', [fixed, cptFilterArray]);
 

@@ -76,6 +76,7 @@ export class CohortManager {
     private attachListener(){
 
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
+            console.log(item);
                 if(this.branchSelected == null){
                     this.selectedCohort =  this.cohortTree[this.cohortIndex];
                     events.fire('test', [this.cohortTree, [this.cohortIndex]]);
@@ -259,6 +260,7 @@ export class CohortManager {
             let filterLabel = item[1][0].key;
             console.log(this.selectedCohort);
             console.log(item);
+            console.log('cpt filter button');
    
             let filterArray = this.selectedCohort.filterArray;
             console.log(filterArray);
@@ -705,29 +707,15 @@ export class CohortManager {
     }
 
     selectCohort(d) {
-        if(d.parentIndex == null){
-            //events.fire('cohort_selected', d);
-            console.log(d);
+        this.selectedCohort = d;
+        events.fire('update_chart', this.selectedCohort);
+        events.fire('test', [this.cohortTree, this.selectedCohort.cohortIndex]);
+        if(d.parentIndex === null){
             this.selectedCohort = d;
             this.branchSelected = null;
-            let index = d.cohortIndex;
-            this.cohortIndex = index;
-            console.log('cohort selected in cohort Manager');
-            events.fire('update_chart', this.selectedCohort);
-            events.fire('test', [this.cohortTree, [index]]);
-            console.log(this.selectedCohort);
         }else{
-            events.fire('branch_selected', d.cohortIndex);
-            console.log(d);
-            console.log(this.selectedCohort);
             this.branchSelected = d;
-            this.cohortIndex = d;
-           // this.selectedCohort = this.cohortTree[this.cohortIndex[0]].branches[this.cohortIndex[1]];
-           this.selectedCohort = d;
-            console.log('branch selected');
-            events.fire('update_chart', this.selectedCohort);
-            events.fire('test', [this.cohortTree, this.branchSelected.cohortIndex]);
-        
+            events.fire('branch_selected', d.cohortIndex);
         }
     }
 

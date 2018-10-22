@@ -62,8 +62,6 @@ export class DataManager {
             this.totalCptObjects = ob;
             events.fire('create_button_down');
             events.fire('initial_cohort_load');
-           // this.frequentSets(ob);
-           // let cpt = this.getCPT(null, ob).then(d=> this.mapCPT(null, d).then(m=> this.frequentSets(m)));
         }));
 
         this.loadData('Total_Scores').then(d=>this.promisTable = d );

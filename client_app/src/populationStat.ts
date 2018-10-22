@@ -80,7 +80,6 @@ export class populationStat {
         });
 
         events.on('pro_object_filtered', (evt, item)=> {
-
            this.filteredPromis = item;
         });
 
@@ -92,7 +91,6 @@ export class populationStat {
          });
 
         events.on('timeline_max_set', (evt, item)=> {
-
             this.maxDay = item;
             select('.day_line').select('.maxDay').text(this.maxDay + " Days");
         });
@@ -107,14 +105,10 @@ export class populationStat {
     private showStats () {
 
         let popCount = this.populationDemo.length;
-        
         this.$node.select('.fillTotal').text(this.populationDemo.length);
         //this.$node.select('.select_count').append('text').text(this.filteredPromis.length);
-
         let timeline = this.$node.select('.day_line');
-
         let timelineMin = timeline.append('text').text('0 Days');
-
         let timelineSVG = timeline.append('svg').classed('day_line_svg', true)
                           .attr('height', 70).attr('width', 710);
 
