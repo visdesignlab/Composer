@@ -81,9 +81,13 @@ export class CohortSideBar {
       if(item){
           let selectedFilters = item.filterArray;
           let cohortPromis = item.promis;
+          console.log(item);
+          console.log(this.cohortManager.selectedCohort)
+          /*
         if(selectedFilters.length > 0){
           this.DrawfilterDescriptionBox(item);
-        }
+        }*/
+        this.DrawfilterDescriptionBox(item);
       }
     });
   }
@@ -103,9 +107,7 @@ export class CohortSideBar {
     private async BuildCohortPanel(panelDiv){
       let cohorthead = panelDiv.append('div').classed('panel-head', true).style('height', '70px');
       let headertext = cohorthead.append('div').style('display', 'block').style('padding-left', '0').style('float', 'none').attr('width', 200).append('text').text('Cohort Control');
-  
       let cohortBody = panelDiv.append('div').classed('panel-body', true);
-
       let buttondiv = cohorthead.append('div').attr('width', 200).style('padding-left', '0').style('display', 'block').style('float', 'none');
   
       let create = buttondiv.append('button').classed('btn', true).classed('btn-default', true).classed('btn-sm', true)
@@ -217,7 +219,8 @@ export class CohortSideBar {
       let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
       xGroup.attr('transform', (d, i)=> 'translate(230,'+ ((i * 30) + 4) + ')');
 
-      xGroup.on('click', function(d, i){ events.fire('remove_cohort', d); });
+     // xGroup.on('click', function(d, i){ events.fire('remove_cohort', d); });
+      xGroup.on('click', (d)=> this.cohortManager.removeCohort(d));
 
       let moveLength = Math.max.apply(null, data.map(d=> {
         if(d.branches.length > 0) { 
@@ -424,7 +427,12 @@ export class CohortSideBar {
       let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
       xGroup.attr('transform', ()=> 'translate(205, 0)');
 
-      xGroup.on('click', (d)=> events.fire('remove_filter', d));
+     // xGroup.on('click', (d)=> events.fire('remove_filter', d));
+      xGroup.on('click', (d)=> {
+        this.cohortManager.removeFilter(d, this.cohortManager.selectedCohort).then((c)=> {
+          events.fire('filter_data', [c,  c.filterArray, null]);
+        })});
+
 
       let description = text.append('text').text(d=> fillText(d)).attr('transform', 'translate(15, 0)');
 
