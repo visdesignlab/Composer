@@ -68,7 +68,9 @@ export class CohortSideBar {
   private attachListener () {
 
     events.on('test', (evt, item)=> {
+      console.log(item[0]);
       this.groupEvents(item[0], true).then(d=> {
+        console.log(d);
         this.updateCohorts(d, this.cohortKeeper).then(cohorts=> {
               let index = item[1];
               let selected = cohorts.filter(c=> c.cohortIndex == index);
@@ -82,12 +84,12 @@ export class CohortSideBar {
           let selectedFilters = item.filterArray;
           let cohortPromis = item.promis;
           console.log(item);
-          console.log(this.cohortManager.selectedCohort)
+          console.log(this.cohortManager.selectedCohort);
           /*
         if(selectedFilters.length > 0){
           this.DrawfilterDescriptionBox(item);
         }*/
-        this.DrawfilterDescriptionBox(item);
+        this.DrawfilterDescriptionBox(this.cohortManager.selectedCohort);
       }
     });
   }
@@ -148,8 +150,8 @@ export class CohortSideBar {
 
     private async groupEvents(cohortData, groupBool){
   
-      let data = [];
     
+    /*
       let newData = cohortData.map(d=> {
         data.push(d);
         if(d.branches.length != 0){
@@ -158,9 +160,9 @@ export class CohortSideBar {
             if(b.branches.length != 0){ b.branches.map(p=> data.push(p)); }
           });
         }
-      });
+      });*/
       if(groupBool == true){
-        let test = data.map((co, i)=> {
+        let test = cohortData.map((co, i)=> {
           if(co.filterArray.length > 3){
             let tempFilterArray = [];
             let tempEvents = [];
@@ -180,7 +182,7 @@ export class CohortSideBar {
         });
         return test;
       }else{
-        let test = data.map((co, i)=> {
+        let test = cohortData.map((co, i)=> {
           if(co.filterArray[0].length > 1){
             let temp = [];
             co.filterArray.forEach(fil => {
@@ -197,7 +199,7 @@ export class CohortSideBar {
     }
 
     private async updateCohorts(data, div){
-
+      console.log(data);
       div.selectAll('.cohort').remove();
       div.selectAll('.cohort-lines').remove();
 
@@ -328,6 +330,7 @@ export class CohortSideBar {
 
           nested.on('click', (d, i)=> {
             this.groupEvents(data, false).then(g=> {
+              console.log(g);
               this.updateCohorts(g, this.cohortKeeper).then(co=> {
                   let selected = co.filter(c=> c.flatIndex === i);
                   selected.classed('selected', true);
@@ -417,6 +420,7 @@ export class CohortSideBar {
       let rect = barSvg.append('rect').attr('height', 20).attr('width', d=> rectScale(d['count'])).attr('transform', 'translate(12, 0)');
       rect.attr('class', d=> classRect(d));
       rect.classed('c-' + cohort.flatIndex, true);
+     // rect.attr('class', (d, i)=> 'c-' + i);
       let text = barSvg.append('g').attr('transform', 'translate(0, 12)');
       text.append('text').text((d, i)=> (i + 1) + ': ');
 
