@@ -76,7 +76,7 @@ export class CohortManager {
     private attachListener(){
 
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
-            console.log(item);
+    
                 if(this.branchSelected == null){
                     
                     this.flatten(this.cohortTree).then(flatData=> {
@@ -155,7 +155,7 @@ export class CohortManager {
                 events.fire('draw_layers', this.layerKeeper);
             }else{
                 this.selectedCohort.chartData = item;
-                console.log('bins calc');
+                
                 
                 events.fire('update_chart', this.selectedCohort);
             }
@@ -198,7 +198,6 @@ export class CohortManager {
             treeBranch.parentIndex = this.cohortIndex;
             treeBranch.flatIndex = this.counter;
             treeBranch.filterArray = bfilter;
-           // treeBranch.filterArray.push({  filter: 'Cohort Branched', type: 'Start', value: null, count: promis.length  });
             treeBranch.promis = b;
             treeBranch.og = bog;
             treeBranch.cpt = bcpt;
@@ -777,6 +776,61 @@ Removes a filer from a cohort object.
         });
         
         return flat;
+    }
+
+    async branchCohort(){
+        let branch;
+        if(this.selectedCohort.branches.length == 0){
+            branch = [];
+        }else{ 
+            branch = this.selectedCohort.branches;
+        }
+        let parentIndex = this.selectedCohort.cohortIndex;
+        if(parentIndex.length > 1){
+            console.log('parent is branch');
+            console.log([parentIndex].push(0));
+        }
+        let og = this.selectedCohort.og;
+        let promis = this.selectedCohort.promis;
+        let cpt = this.selectedCohort.cpt;
+        let oswestry = this.selectedCohort.oswestry;
+        let filterArray = this.selectedCohort.filterArray;
+        let chartData = this.selectedCohort.chartData;
+        let dataType = this.selectedCohort.dataType;
+        let bcpt = JSON.parse(JSON.stringify(cpt));
+        let bos = JSON.parse(JSON.stringify(oswestry));
+        let bchart = JSON.parse(JSON.stringify(chartData));
+        let bfilter = Object.assign([], this.cohortTree[this.cohortIndex].filterArray);
+        let b = JSON.parse(JSON.stringify(promis));
+        let bog = JSON.parse(JSON.stringify(og));
+  
+        branch.push(b);
+      
+        let newSpot = branch.length - 1;
+        let indexBranch =  this.cohortTree[this.cohortIndex].filterArray.length;
+        let filterReq = {type: 'Branch', value: [newSpot, indexBranch], count: this.cohortTree[this.cohortIndex].length };
+        this.cohortTree[this.cohortIndex].filterArray.push(filterReq);
+        let branchFirst = [{parentEvents: bfilter, parentLink: [this.cohortIndex, b.length - 2]}];
+
+        let treeBranch = new Cohort();
+
+        treeBranch.label = "C-"+ String(this.cohortIndex + 1) + " Branch-" + String((this.cohortTree[this.cohortIndex].branches + 1));
+        treeBranch.eventIndex = indexBranch;
+        treeBranch.parentIndex = this.cohortIndex;
+        treeBranch.flatIndex = this.counter;
+        treeBranch.filterArray = bfilter;
+        treeBranch.promis = b;
+        treeBranch.og = bog;
+        treeBranch.cpt = bcpt;
+        treeBranch.oswestry = bos;
+        treeBranch.chartData = bchart;
+        treeBranch.cohortIndex = [this.cohortIndex, newSpot];
+        treeBranch.dataType = dataType;
+        this.cohortTree[this.cohortIndex].branches.push(treeBranch);
+        this.counter++;
+       
+       // events.fire('branch_selected', treeBranch.cohortIndex);
+        this.selectCohort(treeBranch);
     }
 
 

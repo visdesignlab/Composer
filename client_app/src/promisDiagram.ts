@@ -116,11 +116,11 @@ export class PromisDiagram {
 
         this.lineScale = scaleLinear()
             .domain([1, 6071])
-            .range([1, .2])//.clamp(true);
+            .range([1, .2]);
 
         this.lineOpacity = scaleLinear()
             .domain([1, 6071])
-            .range([.8, .2]);//.clamp(true);
+            .range([.8, .2]);
 
         this.svg = plotDiv.append('svg').classed('svg-' + this.cohortIndex, true)
             .attr('height',  this.height + (this.margin.y * 2))
@@ -167,7 +167,6 @@ export class PromisDiagram {
     private clearDiagram() {
 
         select('.scoreGroup-'+  this.cohortIndex).select('.lines').selectAll('*').remove();
-        // this.svg.select('.scoreGroup-'+ this.cohortIndex).select('.proLine').selectAll('*').remove();
         select('.scoreGroup-'+  this.cohortIndex).selectAll('.zeroLine').remove();
         select('.scoreGroup-'+  this.cohortIndex).select('.voronoi').selectAll('*').remove();
         select('.scoreGroup-'+  this.cohortIndex).selectAll('#clip').remove();
@@ -198,8 +197,6 @@ export class PromisDiagram {
       }
 
     private async drawPromisChart(promis, clump, i, cohort, flatData) {
-        
-       // let flatData = await flatten(data);
 
         let eventLabels = this.switchUl.selectAll('li').data(flatData);
         eventLabels.exit().remove();
@@ -245,7 +242,6 @@ export class PromisDiagram {
        let minDay = this.domain[0];
        let maxDay = this.domain[1];
       
-       
        svg.select('.voronoi').selectAll('*').remove();
     
        const promisScoreGroup = svg.select('.scoreGroup-'+ index);//.attr('transform', () => `translate(${this.margin.x},${this.margin.y})`);

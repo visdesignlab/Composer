@@ -11,10 +11,7 @@ import {scaleLinear,scaleTime,scaleOrdinal, scaleBand, scaleLog} from 'd3-scale'
 import {area, line, curveMonotoneX, curveMonotoneY, curveLinear, curveBasis} from 'd3-shape';
 //importing other modules from app
 //import * as demoGraph from './demoGraphs';
-//import {axisBottom} from 'd3-axis';
-//import {extent, min, max, ascending, histogram, mean, deviation} from 'd3-array';
-//import { all } from 'phovea_core/src/range';
-//import {brushX} from 'd3-brush';
+
 import {transition} from 'd3-transition';
 //import { stringify } from 'querystring';
 
@@ -199,7 +196,7 @@ export class CohortSideBar {
     }
 
     private async updateCohorts(data, div){
-      console.log(data);
+      
       div.selectAll('.cohort').remove();
       div.selectAll('.cohort-lines').remove();
 
@@ -296,10 +293,8 @@ export class CohortSideBar {
 
         let linegroups = cohorts.append('g').classed('rows', true).attr('transform', (d) => 'translate('+ translateEvent(d) +',0)');//.selectAll('.rows').data(d=> d).enter().append('g').classed('rows', true);
         let linePath = linegroups.append('path').attr('d', (d, i)=> linko(d.rowData)).classed('node-links', true);
-
         let cohortevents = linegroups.append('g').classed('event-rows', true).attr('transform', 'translate(60, 0)').selectAll('.events').data(d=> d.filterArray);
         cohortevents.exit().remove();
-
         let eventEnter = cohortevents.enter().append('g').classed('events', true);
 
         cohortevents = eventEnter.merge(cohortevents);
@@ -330,7 +325,7 @@ export class CohortSideBar {
 
           nested.on('click', (d, i)=> {
             this.groupEvents(data, false).then(g=> {
-              console.log(g);
+              
               this.updateCohorts(g, this.cohortKeeper).then(co=> {
                   let selected = co.filter(c=> c.flatIndex === i);
                   selected.classed('selected', true);
@@ -379,9 +374,10 @@ export class CohortSideBar {
             .style("opacity", 0);
         });
           select(lastChild).on('click', (d, i)=> {
-            events.fire('branch_cohort');
+           // events.fire('branch_cohort');
+           this.cohortManager.branchCohort();
 //CHANGE THIS HERE!!!!
-            console.log(d);
+            
           });
           });
 
