@@ -197,25 +197,10 @@ export class PromisDiagram {
          aggline.selectAll('.qLine_bottom').remove();
       }
 
-    private async drawPromisChart(promis, clump, i, cohort, data) {
+    private async drawPromisChart(promis, clump, i, cohort, flatData) {
         
-        let flatData = await flatten(data);
-        async function flatten(d){
-         
-            let flat = [];
-    
-            d.forEach(group => {
-                flat.push(group);
-                if(group.branches.length > 0){
-                    group.branches.forEach(branch => {
-                        flat.push(branch);
-                    });
-                }
-            });
-            return flat;
-        }
-  
-    
+       // let flatData = await flatten(data);
+
         let eventLabels = this.switchUl.selectAll('li').data(flatData);
         eventLabels.exit().remove();
         let eventEnter = eventLabels.enter().append('li').append('text').text(d=> d.label);
@@ -530,10 +515,9 @@ export class PromisDiagram {
             }else{
                 return {x: b.x, y: b.y };
             }
-          
         }));
 
-        let means = [];
+        let medianArray = [];
         let devs = [];
 
         let zeroEvent;
@@ -546,37 +530,37 @@ export class PromisDiagram {
         for(let i = 0; i < patbin[0].length; i++){
             let bin = patbin.map(d => d[i].y);
         
-            let mean = d3.mean(patbin.map(d => d[i].y));
+           // let mean = d3.mean(patbin.map(d => d[i].y));
             let med = d3.median(patbin.map(d => d[i].y));
       
             let x = d3.mean(patbin.map(d => d[i].x));
     
             let dev =  d3.deviation(patbin.map(d => d[i].y));
 
-            means.push([x, med]);
+            medianArray.push([x, med]);
             devs.push(dev);
         }
 
-        let botdev = means.map((d, i)=> {
+        let botdev = medianArray.map((d, i)=> {
             let y = d[1] - devs[i];
             let x = d[0];
             return [x, y];
         });
     
-        let topdev = means.map((d, i)=> {
+        let topdev = medianArray.map((d, i)=> {
             let y = d[1] + devs[i];
             let x = d[0];
             return [x, y];
         });
     
-        let quart = means.map((d, i)=> {
+        let quart = medianArray.map((d, i)=> {
             let x = d[0];
             let y1 = d[1] + devs[i];
             let y2 = d[1] - devs[i];
             return [x, y1, y2];
         });
     
-            quart[0] = [means[0][0], quart[1][1], quart[1][2]];
+            quart[0] = [medianArray[0][0], quart[1][1], quart[1][2]];
             let quart2 = [];
              
             quart.forEach(d=> {
@@ -590,7 +574,7 @@ export class PromisDiagram {
                 quart2.push(arr);
             });
     
-             botdev[0] = [means[0][0], botdev[1][1]];
+             botdev[0] = [medianArray[0][0], botdev[1][1]];
              let botdev2 = [];
              
             botdev.forEach(d=> {
@@ -606,7 +590,7 @@ export class PromisDiagram {
                 botdev2.push(arr);
             });
     
-            topdev[0] = [means[0][0], topdev[1][1]];
+            topdev[0] = [medianArray[0][0], topdev[1][1]];
     
             let topdev2 = [];
              
@@ -625,7 +609,7 @@ export class PromisDiagram {
             botdev2 = botdev2.filter(m=> m[1] != null);
             topdev2 = topdev2.filter(m=> m[1] != null);
             quart2 = quart2.filter(m=> m[1] != null);
-            let data = means.filter(m=> m[1] != undefined);
+            let data = medianArray.filter(m=> m[1] != undefined);
       
             let scoreScale = this.scoreScale;
 

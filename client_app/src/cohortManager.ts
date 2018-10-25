@@ -514,7 +514,6 @@ export class CohortManager {
             
                 this.selectedCohort.chartData = chartData;
                 this.selectedCohort.cpt = cpt;
-             
             }
             console.log('data filtered');
             console.log('selected index ', this.selectedCohort.cohortIndex);
@@ -598,14 +597,13 @@ export class CohortManager {
 
         events.on('min_day_calculated', (evt, item)=> {
 
-          //  let promis = item[0];
             let chartData = item[0];
             let cpt = item[1];
             let codes = item[2];
             let index;
 
             if(this.branchSelected == null){
-               // this.cohortTree[this.cohortIndex].promis = chartData;
+               
                 this.cohortTree[this.cohortIndex].chartData = chartData;
                 this.cohortTree[this.cohortIndex].cpt = cpt;
                 this.cohortTree[this.cohortIndex].startEvent = codes;
@@ -684,13 +682,12 @@ export class CohortManager {
             this.selectedCohort = this.cohortTree[0];
             this.cohortIndex = 0;
             this.cohortTree[pIndex] = await this.removeFilter('Branch', this.cohortTree[pIndex]);
-            console.log(this.cohortTree[pIndex]);
+            
             this.flatten(this.cohortTree).then(flatData=> {
                 events.fire('update_chart', this.selectedCohort);
                 events.fire('test', [flatData, 0]);
             })
-           // events.fire('update_chart', this.selectedCohort);
-           // events.fire('test', [this.cohortTree, 0]);
+      
         }else{
             let test = this.cohortTree.filter(d=> d.label != cohort.label);
             test.forEach((cohort, i) => {
@@ -712,8 +709,6 @@ export class CohortManager {
                     events.fire('update_chart', this.selectedCohort);
                     events.fire('test', [flatData, 0]);
                 })
-                //events.fire('update_chart', this.selectedCohort);
-                //events.fire('test', [this.cohortTree, 0]);
             }else{
                 this.cohortIndex = 0;
                 events.fire('create_button_down');
@@ -752,9 +747,8 @@ Removes a filer from a cohort object.
         this.flatten(this.cohortTree).then(flatData=>{
             events.fire('update_chart', this.selectedCohort);
             events.fire('test', [flatData, this.selectedCohort.cohortIndex]);
-        })
-      //  events.fire('update_chart', this.selectedCohort);
-       // events.fire('test', [this.cohortTree, this.selectedCohort.cohortIndex]);
+        });
+
         if(d.parentIndex === null){
             this.selectedCohort = d;
             this.branchSelected = null;
