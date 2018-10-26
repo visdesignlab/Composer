@@ -65,12 +65,10 @@ export class CohortSideBar {
   private attachListener () {
 
     events.on('test', (evt, item)=> {
-      console.log(item[0]);
+     
       this.groupEvents(item[0], true).then(d=> {
-        console.log(d);
         this.updateCohorts(d, this.cohortKeeper).then(cohorts=> {
-              let index = item[1];
-              let selected = cohorts.filter(c=> c.cohortIndex == index);
+              let selected = cohorts.filter(c=> c.flatIndex === this.cohortManager.selectedCohort.flatIndex);
               selected.classed('selected', true);
             });
           });
@@ -80,12 +78,7 @@ export class CohortSideBar {
       if(item){
           let selectedFilters = item.filterArray;
           let cohortPromis = item.promis;
-          console.log(item);
-          console.log(this.cohortManager.selectedCohort);
-          /*
-        if(selectedFilters.length > 0){
-          this.DrawfilterDescriptionBox(item);
-        }*/
+
         this.DrawfilterDescriptionBox(this.cohortManager.selectedCohort);
       }
     });
@@ -147,17 +140,6 @@ export class CohortSideBar {
 
     private async groupEvents(cohortData, groupBool){
   
-    
-    /*
-      let newData = cohortData.map(d=> {
-        data.push(d);
-        if(d.branches.length != 0){
-          d.branches.map(b=> {
-            data.push(b);
-            if(b.branches.length != 0){ b.branches.map(p=> data.push(p)); }
-          });
-        }
-      });*/
       if(groupBool == true){
         let test = cohortData.map((co, i)=> {
           if(co.filterArray.length > 3){
@@ -377,7 +359,7 @@ export class CohortSideBar {
            // events.fire('branch_cohort');
            this.cohortManager.branchCohort();
 //CHANGE THIS HERE!!!!
-            
+
           });
           });
 
@@ -427,7 +409,6 @@ export class CohortSideBar {
       let x = xGroup.append('text').text('x').classed('x', true).attr('transform', 'translate(7, 14)');
       xGroup.attr('transform', ()=> 'translate(205, 0)');
 
-     // xGroup.on('click', (d)=> events.fire('remove_filter', d));
       xGroup.on('click', (d)=> {
         this.cohortManager.removeFilter(d, this.cohortManager.selectedCohort).then((c)=> {
           events.fire('filter_data', [c,  c.filterArray, null]);

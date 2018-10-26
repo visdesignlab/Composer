@@ -517,7 +517,6 @@ export class CohortManager {
             console.log('data filtered');
             console.log('selected index ', this.selectedCohort.cohortIndex);
             this.flatten(this.cohortTree).then(flatData=> {//
-                console.log(flatData);
                 events.fire('update_chart', this.selectedCohort);
                 events.fire('test', [flatData, [this.selectedCohort.cohortIndex]]);
             });
@@ -640,7 +639,7 @@ export class CohortManager {
             events.fire('update_chart', this.selectedCohort);
         });
         events.on('cpt_updated', (evt, item)=> {
-   
+            /*
              if(this.branchSelected == null){
                 this.cohortTree[this.cohortIndex].cpt = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];
@@ -648,7 +647,9 @@ export class CohortManager {
                 this.cohortTree[this.cohortIndex].branches[this.branchSelected[1]].cpt = item;
                 this.selectedCohort = this.cohortTree[this.branchSelected[0]].branches[this.branchSelected[1]];
             }
-
+            */
+           console.log('cpt updated');
+            this.selectedCohort.cpt = item;
             this.flatten(this.cohortTree).then(cohort=> {
                 events.fire('update_chart', this.selectedCohort);
             });
@@ -659,16 +660,13 @@ export class CohortManager {
     //adds a cohort filter to the cohort filter array for the cohorts
     //this is going to set the index because it fires first 
     private addCohortFilter (filter) {
-      
         this.cohortTree[this.cohortIndex].filterArray.push(filter);
         events.fire('cohort_added', this.cohortTree);
     }
 
     private removeCohortFilterArray () {
-
         this.cohortTree = [];
         this.cohortIndex = 0;
-
     }
 
     async removeCohort(cohort){
@@ -742,6 +740,7 @@ Removes a filer from a cohort object.
     }
 
     selectCohort(d) {
+        console.log('select cohort firing');
         this.selectedCohort = d;
         this.flatten(this.cohortTree).then(flatData=>{
             events.fire('update_chart', this.selectedCohort);
@@ -814,7 +813,7 @@ Removes a filer from a cohort object.
 
         let treeBranch = new Cohort();
 
-        treeBranch.label = "C-"+ String(this.cohortIndex + 1) + " Branch-" + String((this.cohortTree[this.cohortIndex].branches + 1));
+        treeBranch.label = "C-"+ String(this.cohortIndex + 1) + " Branch-" + String((this.cohortTree[this.cohortIndex].branches.length + 1));
         treeBranch.eventIndex = indexBranch;
         treeBranch.parentIndex = this.cohortIndex;
         treeBranch.flatIndex = this.counter;
@@ -828,8 +827,6 @@ Removes a filer from a cohort object.
         treeBranch.dataType = dataType;
         this.cohortTree[this.cohortIndex].branches.push(treeBranch);
         this.counter++;
-       
-       // events.fire('branch_selected', treeBranch.cohortIndex);
         this.selectCohort(treeBranch);
     }
 
