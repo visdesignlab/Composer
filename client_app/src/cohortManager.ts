@@ -78,10 +78,8 @@ export class CohortManager {
         events.on('add_layer_to_filter_array', (evt, item) => { // called in sidebar
     
                 if(this.branchSelected == null){
-                    
                     this.flatten(this.cohortTree).then(flatData=> {
                         this.selectedCohort =  flatData[this.cohortIndex];
-                        console.log(flatData);
                         events.fire('test', [flatData, [this.cohortIndex]]);
                     });
                 }else{
@@ -566,7 +564,7 @@ export class CohortManager {
             });
 
         events.on('filtered_by_quant', (evt, item)=> {
-            if(this.branchSelected == null){
+            if(this.branchSelected === null){
                 this.cohortTree[this.cohortIndex].quantile = item;
                 this.cohortTree[this.cohortIndex].chartData = item;
                 this.selectedCohort = this.cohortTree[this.cohortIndex];

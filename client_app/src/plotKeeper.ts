@@ -19,8 +19,8 @@ export class PlotKeeper {
     private dimension;
     private initialLoadBool;
     selectedPlot;
+    eventLineOb;
     plotArray;
-    private layerBool;
     layerKeeperArray;
     scoreScale;
     timeScale;
@@ -30,15 +30,13 @@ export class PlotKeeper {
     constructor(parent: Element, cohortManager: Object) {
 
         this.domain = [-10, 50];
-           // maxDay: 50, minDay: -10,
-      //  }
         this.dimension = {
             height : 400, width : 600, margin : {x: 40, y: 10},
         }
       
         this.$node = select(parent);
         const eventLineView = this.$node.append('div').classed('event_line_view', true);
-        eventLine.create(eventLineView.node(), null);
+        this.eventLineOb = eventLine.create(eventLineView.node(), cohortManager);
         this.plotDiv = this.$node.append('div').classed('allDiagramDiv', true);
         this.plotArray = [];
         this.cohortManager = cohortManager;
@@ -49,7 +47,7 @@ export class PlotKeeper {
     private attachListener(){
 
         events.on('clear_cohorts', (evt, item)=> {
-            this.layerBool = false;
+            this.eventLineOb.layerBool = false;
             this.selectedPlot.clearDiagram();
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
@@ -77,24 +75,26 @@ export class PlotKeeper {
         });
 
         events.on('enter_layer_view', ()=> {
-            this.layerBool = true;
+            
+            this.eventLineOb.layerBool = true;
             document.getElementById('layerButton').classList.add('btn-warning');
         });
 
         events.on('exit_layer_view', ()=> {
-            this.layerBool = false;
+            this.eventLineOb.layerBool = false;
             this.selectedPlot.clearDiagram();
             let layer = select('#layerDiv');
             layer.selectAll('*').remove();
             layer.classed('hidden', true);
             document.getElementById('layerButton').classList.remove('btn-warning');
-            events.fire('cohort_selected', this.cohortManager.cohortTree[0]);
+            events.fire('cohort_selected', this.cohortManager.selectedCohort);
+           // events.fire('cohort_selected', this.cohortManager.cohortTree[0]);
         });
 
         events.on('test', (evt, item)=> {
     
             let array = [];
-            if(this.layerBool){
+            if(this.eventLineOb.layerBool){
               let layer = select('#layerDiv');
               let selected = layer.selectAll('.fill').nodes();
                selected.forEach((sel, i) => {
@@ -152,7 +152,7 @@ export class PlotKeeper {
                     this.selectedPlot.clearDiagram();
                 }
 
-                if(this.layerBool == true){
+                if(this.eventLineOb.layerBool === true){
                
                 }else{
                

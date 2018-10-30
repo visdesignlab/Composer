@@ -32,22 +32,24 @@ export class EventLine {
     private startEventLabel;
     private eventToggleLabels;
     private branchHeight;
-    private layerBool;
+    layerBool;
     private scoreChangeBool;
     private diffDays;
     private handle;
     private sepBool;
+    private cohortManager;
 
-    constructor(parent: Element, cohort) {
+    constructor(parent: Element, cohortManager: Object) {
 
     this.$node = select(parent);
-
+    this.cohortManager = cohortManager;
     this.scoreLabel = 'Absolute Scale';
     this.startEventLabel = 'Change Start to Event';
     this.branchHeight = 30;
     this.diffDays;
+    this.layerBool = false;
     let layer = this.$node.append('div').attr('id', 'layerDiv').classed('hidden', true);
-  
+    
     let eventButtonDiv = this.$node.append('div').attr('id', 'eventButtonDiv');
     let slider = this.$node.append('div').attr('id', 'sliderDiv');
 
@@ -86,8 +88,8 @@ export class EventLine {
         });
       
         events.on('test', (evt, item)=> {
-       
-            let cohortTree = item[0];
+            console.log(this.layerBool);
+            let flatTree = item[0];
             let cohortIndex = item[1];
 
             selectAll('.selected').classed('selected', false);
@@ -126,10 +128,10 @@ export class EventLine {
 
     private async buildLayerFilter(compareDiv, data){
 
-        let flatData  = [];
+       // let flatData  = [];
         let array = [];
         let rows = [];
-     
+     /*
         data.forEach(d => {
             flatData.push(d);
               if(d.branches.length != 0){ 
@@ -137,7 +139,7 @@ export class EventLine {
                     flatData.push(b);
                 });
                };
-            });
+            });*/
            let panel = compareDiv.append('div').classed('panel', true).classed('panel-default', true).attr('width', 500);
            let header =  panel.append('div').classed('panel-heading', true);
            header.append('text').text('Layer Control');
@@ -146,7 +148,7 @@ export class EventLine {
 
             let svg = panelBody.append('svg').attr('width', 450).attr('height', this.branchHeight);
     
-            let layerG = svg.selectAll('.layers').data(flatData);
+            let layerG = svg.selectAll('.layers').data(data);
     
             let layerenter = layerG.enter().append('g').attr('class', (d,i)=> 'layer-' + String(i)).classed('layers', true);
     
@@ -179,7 +181,7 @@ export class EventLine {
                 array.push(entry);
               });
     
-              if(this.layerBool == true){
+              if(this.layerBool === true){
                 events.fire('update_layers', array);
               }
     
@@ -192,9 +194,7 @@ export class EventLine {
               array.push(entry);
             });
         
-            return array;
-          //  events.fire('update_layers', array);
-        
+            return array;        
       }
 
     private async classingSelected(cohort){
@@ -206,7 +206,7 @@ export class EventLine {
     }
 
     private async drawSlider(){
-     // let sliderDiv = this.$node.select()
+     
         let that = this;
 
         var margin = {left: 30, right: 30},
@@ -564,6 +564,6 @@ export class EventLine {
 
 }
 
-export function create(parent:Element, cohort) {
-    return new EventLine(parent, cohort);
+export function create(parent:Element, cohortManager: Object) {
+    return new EventLine(parent, cohortManager);
   }
